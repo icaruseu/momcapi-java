@@ -1,5 +1,6 @@
 package eu.icarus.momca.momcapi;
 
+import eu.icarus.momca.momcapi.id.CharterId;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -10,8 +11,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Optional;
 import java.util.Properties;
 
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
 /**
@@ -66,7 +69,16 @@ public class MomCATest {
 
     @Test
     public void testGetPublishedCharter() throws Exception {
+        CharterId id = new CharterId("AT-StiAMB", "MuellnOSA", "328");
+        assertEquals(db.getPublishedCharter(id).get().getCharterId(), id,
+                "The from the read charter has to match the provided.");
+    }
 
+    @Test
+    public void testGetPublishedCharterWithNotExistingCharter() throws Exception {
+        CharterId id = new CharterId("AT-StiAMB", "MuellnOSA", "ABCDEFG");
+        assertEquals(db.getPublishedCharter(id), Optional.empty(),
+                "The charter read from the database has to be empty.");
     }
 
     @Test
@@ -76,7 +88,16 @@ public class MomCATest {
 
     @Test
     public void testGetUser() throws Exception {
+        String userId = "apitest@dev.monasterium.net";
+        assertEquals(db.getUser(userId).get().getUserId(), userId,
+                "The user id read from the user in the database must match the provided.");
+    }
 
+    @Test
+    public void testGetUserWithNotExistingUser() throws Exception {
+        String userId = "randomstuff@crazyness.uk";
+        assertEquals(db.getUser(userId), Optional.empty(),
+                "The user read from the database must be empty.");
     }
 
     @Test

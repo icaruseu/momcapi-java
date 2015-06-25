@@ -14,8 +14,15 @@ public class User extends ExistResource {
 
     private static final AbstractMap.SimpleEntry<String, String> NAMESPACE_XRX = new AbstractMap.SimpleEntry<>("xrx", "http://www.monasterium.net/NS/xrx");
 
+    private final String userId;
+
     public User(@NotNull ExistResource existResource) {
         super(existResource);
+        userId = existResource.getResourceName().replace(".xml", "");
+    }
+
+    public String getUserId() {
+        return userId;
     }
 
     @NotNull
