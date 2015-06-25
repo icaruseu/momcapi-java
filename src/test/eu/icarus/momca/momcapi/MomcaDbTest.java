@@ -1,7 +1,8 @@
 package eu.icarus.momca.momcapi;
 
 import org.jetbrains.annotations.NotNull;
-import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.BufferedInputStream;
@@ -20,11 +21,13 @@ public class MomcaDbTest {
 
     private static final String SERVER_PROPERTIES_PATH = "/server.properties";
     String adminUser;
+    MomcaDb db;
     String password;
     String serverUrl;
 
-    @BeforeMethod
+    @BeforeClass
     public void setUp() throws Exception {
+
         URL serverPropertiesUrl = getClass().getResource(SERVER_PROPERTIES_PATH);
         assertNotNull(getClass().getResource(SERVER_PROPERTIES_PATH), "Test file missing");
 
@@ -47,6 +50,15 @@ public class MomcaDbTest {
         assertNotNull(adminUser, "'adminUser' missing from '" + SERVER_PROPERTIES_PATH + "'");
         assertNotNull(password, "'password' missing from '" + SERVER_PROPERTIES_PATH + "'");
 
+        db = new MomcaDb(serverUrl, adminUser, password);
+
+        assertNotNull(db, "Database connection not initialized.");
+
+    }
+
+    @AfterClass
+    public void tearDown() throws Exception {
+        db.closeConnection();
     }
 
     @Test

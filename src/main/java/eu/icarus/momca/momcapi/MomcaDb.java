@@ -53,6 +53,10 @@ public class MomcaDb {
 
     }
 
+    public void closeConnection() throws XMLDBException {
+        rootCollection.close();
+    }
+
     @NotNull
     public Optional<Charter> getImportedCharter(@NotNull CharterId charterId) throws XMLDBException, IOException, ParsingException {
         String resourceName = charterId.getCharterId() + FILE_ENDING_CHARTER_PUBLIC;
