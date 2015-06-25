@@ -17,11 +17,11 @@ import static org.testng.Assert.assertNotNull;
 /**
  * Created by daniel on 25.06.2015.
  */
-public class MomcaDbTest {
+public class MomCATest {
 
     private static final String SERVER_PROPERTIES_PATH = "/server.properties";
-    String adminUser;
-    MomcaDb db;
+    private static final String adminUser = "admin";
+    MomCA db;
     String password;
     String serverUrl;
 
@@ -43,16 +43,14 @@ public class MomcaDbTest {
         }
 
         serverUrl = serverProperties.getProperty("serverUrl");
-        adminUser = serverProperties.getProperty("adminUser");
         password = serverProperties.getProperty("password");
 
         assertNotNull(serverUrl, "'serverUrl' missing from '" + SERVER_PROPERTIES_PATH + "'");
-        assertNotNull(adminUser, "'adminUser' missing from '" + SERVER_PROPERTIES_PATH + "'");
         assertNotNull(password, "'password' missing from '" + SERVER_PROPERTIES_PATH + "'");
 
-        db = new MomcaDb(serverUrl, adminUser, password);
+        db = new MomCA(serverUrl, adminUser, password);
 
-        assertNotNull(db, "Database connection not initialized.");
+        assertNotNull(db, "MomCA connection not initialized.");
 
     }
 

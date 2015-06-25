@@ -16,7 +16,7 @@ public class AtomId {
     @NotNull
     private final ResourceType type;
 
-    public AtomId(@NotNull String atomId) {
+    AtomId(@NotNull String atomId) {
         this.atomId = atomId;
         String[] valueTokens = atomId.split("/");
         prefix = valueTokens[0];
