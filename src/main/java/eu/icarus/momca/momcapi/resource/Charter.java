@@ -1,6 +1,6 @@
 package eu.icarus.momca.momcapi.resource;
 
-import eu.icarus.momca.momcapi.id.CharterId;
+import eu.icarus.momca.momcapi.atomid.CharterAtomId;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -9,22 +9,22 @@ import org.jetbrains.annotations.NotNull;
 public class Charter extends ExistResource {
 
     @NotNull
-    private final CharterId charterId;
+    private final CharterAtomId charterAtomId;
 
-    public Charter(@NotNull ExistResource existResource, @NotNull CharterId charterId) {
+    public Charter(@NotNull ExistResource existResource, @NotNull CharterAtomId charterAtomId) {
         super(existResource);
-        this.charterId = charterId;
+        this.charterAtomId = charterAtomId;
     }
 
     @NotNull
-    public CharterId getCharterId() {
-        return charterId;
+    public CharterAtomId getCharterAtomId() {
+        return charterAtomId;
     }
 
     @Override
     public String toString() {
         return "Charter{" +
-                "charterId=" + charterId +
+                "charterAtomId=" + charterAtomId +
                 "} " + super.toString();
     }
 

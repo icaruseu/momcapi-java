@@ -1,4 +1,4 @@
-package eu.icarus.momca.momcapi.id;
+package eu.icarus.momca.momcapi.atomid;
 
 import eu.icarus.momca.momcapi.resource.ResourceType;
 import nu.xom.Element;
@@ -39,6 +39,7 @@ public class AtomId {
         return type;
     }
 
+    @NotNull
     public Element getXml() {
 
         String qualifiedName = String.format("%s:id", eu.icarus.momca.momcapi.Namespace.ATOM.getPrefix());

@@ -1,4 +1,4 @@
-package eu.icarus.momca.momcapi.id;
+package eu.icarus.momca.momcapi.atomid;
 
 import eu.icarus.momca.momcapi.Namespace;
 import eu.icarus.momca.momcapi.resource.ResourceType;

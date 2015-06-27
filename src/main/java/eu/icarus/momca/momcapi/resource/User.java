@@ -1,6 +1,6 @@
 package eu.icarus.momca.momcapi.resource;
 
-import eu.icarus.momca.momcapi.id.CharterId;
+import eu.icarus.momca.momcapi.atomid.CharterAtomId;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.AbstractMap;
@@ -26,19 +26,19 @@ public class User extends ExistResource {
     }
 
     @NotNull
-    public List<CharterId> listBookmarkedCharterIds() {
+    public List<CharterAtomId> listBookmarkedCharterIds() {
         return parseToCharterIds(queryContent("//xrx:bookmark/text()", NAMESPACE_XRX));
     }
 
     @NotNull
-    public List<CharterId> listSavedCharterIds() {
+    public List<CharterAtomId> listSavedCharterIds() {
         return parseToCharterIds(queryContent("//xrx:saved/xrx:id/text()", NAMESPACE_XRX));
     }
 
     @NotNull
-    private List<CharterId> parseToCharterIds(@NotNull List<String> idStrings) {
-        List<CharterId> ids = new ArrayList<>();
-        idStrings.forEach(s -> ids.add(new CharterId(s)));
+    private List<CharterAtomId> parseToCharterIds(@NotNull List<String> idStrings) {
+        List<CharterAtomId> ids = new ArrayList<>();
+        idStrings.forEach(s -> ids.add(new CharterAtomId(s)));
         return ids;
     }
 

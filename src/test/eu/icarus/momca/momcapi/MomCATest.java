@@ -1,6 +1,6 @@
 package eu.icarus.momca.momcapi;
 
-import eu.icarus.momca.momcapi.id.CharterId;
+import eu.icarus.momca.momcapi.atomid.CharterAtomId;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -69,14 +69,14 @@ public class MomCATest {
 
     @Test
     public void testGetPublishedCharter() throws Exception {
-        CharterId id = new CharterId("CH-KAE", "Urkunden", "KAE_Urkunde_Nr_1");
-        assertEquals(db.getPublishedCharter(id).get().getCharterId(), id,
+        CharterAtomId id = new CharterAtomId("CH-KAE", "Urkunden", "KAE_Urkunde_Nr_1");
+        assertEquals(db.getPublishedCharter(id).get().getCharterAtomId(), id,
                 "The from the read charter has to match the provided.");
     }
 
     @Test
     public void testGetPublishedCharterWithNotExistingCharter() throws Exception {
-        CharterId id = new CharterId("CH-KAE", "Urkunden", "ABCDEFG");
+        CharterAtomId id = new CharterAtomId("CH-KAE", "Urkunden", "ABCDEFG");
         assertEquals(db.getPublishedCharter(id), Optional.empty(),
                 "The charter read from the database has to be empty.");
     }
