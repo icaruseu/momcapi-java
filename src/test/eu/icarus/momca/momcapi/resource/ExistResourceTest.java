@@ -1,6 +1,5 @@
 package eu.icarus.momca.momcapi.resource;
 
-import eu.icarus.momca.momcapi.Namespace;
 import nu.xom.Builder;
 import org.testng.annotations.Test;
 
@@ -60,14 +59,14 @@ public class ExistResourceTest {
     @Test
     public void testQueryContentXmlWithNamespace() throws Exception {
         ExistResource res = new ExistResource(name, parentUri, xmlContentWithNamespace);
-        assertEquals(res.queryContentXml("//xrx:name", Namespace.XRX).get(0), queryResult);
+        assertEquals(res.queryContentXml(XpathQuery.QUERY_XRX_NAME).get(0), queryResult);
 
     }
 
     @Test
     public void testQueryContentXmlWithoutNamespace() throws Exception {
         ExistResource res = new ExistResource(name, parentUri, xmlContentWithoutNamespace);
-        assertEquals(res.queryContentXml("//name").get(0), queryResult);
+        assertEquals(res.queryContentXml(XpathQuery.QUERY_NAME).get(0), queryResult);
     }
 
 }

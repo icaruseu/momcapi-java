@@ -70,20 +70,20 @@ public class MomCA {
     public Optional<Charter> getImportedCharter(@NotNull CharterAtomId charterAtomId) throws MomCAException {
         String resourceName = charterAtomId.getCharterId() + FILE_ENDING_CHARTER_PUBLIC;
         String parentCollectionUri = String.join("/", PATH_CHARTER_IMPORT, charterAtomId.getBasePath());
-        return getExistResource(resourceName, parentCollectionUri).map(e -> new Charter(e, charterAtomId));
+        return getExistResource(resourceName, parentCollectionUri).map(e -> new Charter(e));
     }
 
     @NotNull
     public Optional<Charter> getPublishedCharter(@NotNull CharterAtomId charterAtomId) throws MomCAException {
         String resourceName = charterAtomId.getCharterId() + FILE_ENDING_CHARTER_PUBLIC;
         String parentCollectionUri = String.join("/", PATH_CHARTER_PUBLIC, charterAtomId.getBasePath());
-        return getExistResource(resourceName, parentCollectionUri).map(e -> new Charter(e, charterAtomId));
+        return getExistResource(resourceName, parentCollectionUri).map(e -> new Charter(e));
     }
 
     @NotNull
     public Optional<Charter> getSavedCharter(@NotNull CharterAtomId charterAtomId) throws MomCAException {
         String resourceName = charterAtomId.getAtomId().replace("/", "#") + FILE_ENDING_CHARTER_SAVED;
-        return getExistResource(resourceName, PATH_CHARTER_SAVED).map(e -> new Charter(e, charterAtomId));
+        return getExistResource(resourceName, PATH_CHARTER_SAVED).map(e -> new Charter(e));
     }
 
     @NotNull

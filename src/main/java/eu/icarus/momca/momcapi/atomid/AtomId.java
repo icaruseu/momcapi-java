@@ -24,6 +24,17 @@ public class AtomId {
         type = ResourceType.createFromValue(valueTokens[1]);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AtomId atomId1 = (AtomId) o;
+
+        return atomId.equals(atomId1.atomId);
+
+    }
+
     @NotNull
     public String getAtomId() {
         return atomId;
@@ -50,4 +61,8 @@ public class AtomId {
 
     }
 
+    @Override
+    public int hashCode() {
+        return atomId.hashCode();
+    }
 }

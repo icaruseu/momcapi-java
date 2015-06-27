@@ -14,39 +14,39 @@ import java.util.List;
 public class ExistResource {
 
     @NotNull
-    private final String parentCollectionUri;
+    private final String name;
     @NotNull
-    private final String resourceName;
+    private final String parentUri;
     @NotNull
     private final Document xmlAsDocument;
 
     ExistResource(@NotNull final ExistResource existResource) {
-        this.resourceName = existResource.getName();
+        this.name = existResource.getName();
         this.xmlAsDocument = existResource.getXmlAsDocument();
-        this.parentCollectionUri = existResource.getParentUri();
+        this.parentUri = existResource.getParentUri();
     }
 
-    public ExistResource(@NotNull final String resourceName, @NotNull final String parentCollectionUri, @NotNull final String xmlContent) throws ParsingException, IOException {
-        this.resourceName = resourceName;
+    public ExistResource(@NotNull final String name, @NotNull final String parentCollectionUri, @NotNull final String xmlContent) throws ParsingException, IOException {
+        this.name = name;
         this.xmlAsDocument = parseXmlString(xmlContent);
-        this.parentCollectionUri = parentCollectionUri;
+        this.parentUri = parentCollectionUri;
     }
 
     @NotNull
-    final List<String> queryContentXml(@NotNull String xpath, @NotNull Namespace... namespaces) {
+    final List<String> queryContentXml(@NotNull XpathQuery query) {
 
         List<String> results = new LinkedList<>();
 
         Element root = getXmlAsDocument().getRootElement();
         XPathContext context = XPathContext.makeNamespaceContext(root);
-        if (namespaces.length != 0) {
-            for (Namespace namespace : namespaces) {
+        if (query.getNamespaces().length != 0) {
+            for (Namespace namespace : query.getNamespaces()) {
                 context.addNamespace(namespace.getPrefix(), namespace.getUri());
             }
 
         }
 
-        Nodes nodes = getXmlAsDocument().getRootElement().query(xpath, context);
+        Nodes nodes = getXmlAsDocument().getRootElement().query(query.getQuery(), context);
         for (int i = 0; i < nodes.size(); i++) {
             results.add(nodes.get(i).getValue());
         }
@@ -57,17 +57,17 @@ public class ExistResource {
 
     @NotNull
     public String getName() {
-        return resourceName;
+        return name;
     }
 
     @NotNull
     public String getParentUri() {
-        return parentCollectionUri;
+        return parentUri;
     }
 
     @NotNull
     public String getUri() {
-        return parentCollectionUri + "/" + resourceName;
+        return parentUri + "/" + name;
     }
 
     @NotNull
@@ -78,9 +78,9 @@ public class ExistResource {
     @Override
     public String toString() {
         return "ExistResource{" +
-                "resourceName='" + resourceName + '\'' +
+                "name='" + name + '\'' +
                 ", xmlAsDocument=" + xmlAsDocument +
-                ", parentCollectionUri='" + parentCollectionUri + '\'' +
+                ", parentUri='" + parentUri + '\'' +
                 '}';
     }
 
@@ -88,7 +88,6 @@ public class ExistResource {
     private Document parseXmlString(@NotNull String xmlAsString) throws ParsingException, IOException {
         Builder parser = new Builder();
         return parser.build(xmlAsString, null);
-
     }
 
 }

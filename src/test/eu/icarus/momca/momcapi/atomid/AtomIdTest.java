@@ -7,6 +7,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Created by daniel on 27.06.2015.
@@ -27,6 +28,13 @@ public class AtomIdTest {
     public void testConstructor() throws Exception {
         AtomId id = new AtomId(atomId);
         assertEquals(id.getAtomId(), atomId);
+    }
+
+    @Test
+    public void testEquals() throws Exception {
+        AtomId id1 = new AtomId(atomId);
+        AtomId id2 = new AtomId(atomId);
+        assertTrue(id1.equals(id2));
     }
 
     @Test

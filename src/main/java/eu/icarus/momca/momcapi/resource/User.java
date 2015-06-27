@@ -1,6 +1,5 @@
 package eu.icarus.momca.momcapi.resource;
 
-import eu.icarus.momca.momcapi.Namespace;
 import eu.icarus.momca.momcapi.atomid.CharterAtomId;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,12 +24,12 @@ public class User extends ExistResource {
 
     @NotNull
     public List<CharterAtomId> listBookmarkedCharterIds() {
-        return parseToCharterIds(queryContentXml("//xrx:bookmark/text()", Namespace.XRX));
+        return parseToCharterIds(queryContentXml(XpathQuery.QUERY_XRX_BOOKMARK));
     }
 
     @NotNull
     public List<CharterAtomId> listSavedCharterIds() {
-        return parseToCharterIds(queryContentXml("//xrx:saved/xrx:id/text()", Namespace.XRX));
+        return parseToCharterIds(queryContentXml(XpathQuery.QUERY_XRX_SAVED));
     }
 
     @NotNull

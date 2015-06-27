@@ -70,7 +70,7 @@ public class MomCATest {
     @Test
     public void testGetPublishedCharter() throws Exception {
         CharterAtomId id = new CharterAtomId("CH-KAE", "Urkunden", "KAE_Urkunde_Nr_1");
-        assertEquals(db.getPublishedCharter(id).get().getCharterAtomId(), id,
+        assertEquals(db.getPublishedCharter(id).get().getAtomId(), id,
                 "The from the read charter has to match the provided.");
     }
 
