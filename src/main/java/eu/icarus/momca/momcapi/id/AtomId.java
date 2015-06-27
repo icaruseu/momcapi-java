@@ -21,7 +21,7 @@ public class AtomId {
         this.atomId = atomId;
         String[] valueTokens = atomId.split("/");
         prefix = valueTokens[0];
-        type = ResourceType.valueOf(valueTokens[1].toUpperCase());
+        type = ResourceType.createFromValue(valueTokens[1]);
     }
 
     @NotNull

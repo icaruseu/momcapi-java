@@ -52,4 +52,5 @@ public class AtomIdTest {
         AtomId id = new AtomId(atomId);
         assertEquals(id.getXml().toString(), xml.toString());
     }
+
 }
