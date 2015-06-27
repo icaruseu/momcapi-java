@@ -69,14 +69,14 @@ public class MomCATest {
 
     @Test
     public void testGetPublishedCharter() throws Exception {
-        CharterId id = new CharterId("AT-StiAMB", "MuellnOSA", "328");
+        CharterId id = new CharterId("CH-KAE", "Urkunden", "KAE_Urkunde_Nr_1");
         assertEquals(db.getPublishedCharter(id).get().getCharterId(), id,
                 "The from the read charter has to match the provided.");
     }
 
     @Test
     public void testGetPublishedCharterWithNotExistingCharter() throws Exception {
-        CharterId id = new CharterId("AT-StiAMB", "MuellnOSA", "ABCDEFG");
+        CharterId id = new CharterId("CH-KAE", "Urkunden", "ABCDEFG");
         assertEquals(db.getPublishedCharter(id), Optional.empty(),
                 "The charter read from the database has to be empty.");
     }
@@ -88,7 +88,7 @@ public class MomCATest {
 
     @Test
     public void testGetUser() throws Exception {
-        String userId = "apitest@dev.monasterium.net";
+        String userId = "admin";
         assertEquals(db.getUser(userId).get().getUserId(), userId,
                 "The user id read from the user in the database must match the provided.");
     }
