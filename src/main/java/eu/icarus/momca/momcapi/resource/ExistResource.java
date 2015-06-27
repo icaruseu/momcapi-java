@@ -1,11 +1,10 @@
 package eu.icarus.momca.momcapi.resource;
 
+import eu.icarus.momca.momcapi.Namespace;
 import nu.xom.*;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.AbstractMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -22,9 +21,9 @@ public class ExistResource {
     private final Document xmlAsDocument;
 
     ExistResource(@NotNull final ExistResource existResource) {
-        this.resourceName = existResource.getResourceName();
+        this.resourceName = existResource.getName();
         this.xmlAsDocument = existResource.getXmlAsDocument();
-        this.parentCollectionUri = existResource.getParentCollectionUri();
+        this.parentCollectionUri = existResource.getParentUri();
     }
 
     public ExistResource(@NotNull final String resourceName, @NotNull final String parentCollectionUri, @NotNull final String xmlContent) throws ParsingException, IOException {
@@ -33,17 +32,16 @@ public class ExistResource {
         this.parentCollectionUri = parentCollectionUri;
     }
 
-    @SafeVarargs
     @NotNull
-    final List<String> queryContent(@NotNull String xpath, @Nullable AbstractMap.SimpleEntry<String, String>... namespaces) {
+    final List<String> queryContentXml(@NotNull String xpath, @NotNull Namespace... namespaces) {
 
         List<String> results = new LinkedList<>();
 
         Element root = getXmlAsDocument().getRootElement();
         XPathContext context = XPathContext.makeNamespaceContext(root);
-        if (namespaces != null) {
-            for (AbstractMap.SimpleEntry<String, String> namespace : namespaces) {
-                context.addNamespace(namespace.getKey(), namespace.getValue());
+        if (namespaces.length != 0) {
+            for (Namespace namespace : namespaces) {
+                context.addNamespace(namespace.getPrefix(), namespace.getUri());
             }
 
         }
@@ -58,17 +56,17 @@ public class ExistResource {
     }
 
     @NotNull
-    public String getParentCollectionUri() {
-        return parentCollectionUri;
-    }
-
-    @NotNull
-    public String getResourceName() {
+    public String getName() {
         return resourceName;
     }
 
     @NotNull
-    public String getResourceUri() {
+    public String getParentUri() {
+        return parentCollectionUri;
+    }
+
+    @NotNull
+    public String getUri() {
         return parentCollectionUri + "/" + resourceName;
     }
 

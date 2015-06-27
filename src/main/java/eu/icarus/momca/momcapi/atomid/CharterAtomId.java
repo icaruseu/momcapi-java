@@ -90,6 +90,7 @@ public class CharterAtomId extends AtomId {
         return (!archiveId.isPresent() && !fondId.isPresent()) && collectionId.isPresent();
     }
 
+    @NotNull
     @Override
     public String toString() {
         return "CharterAtomId{" +

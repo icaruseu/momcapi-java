@@ -50,7 +50,7 @@ public class AtomIdTest {
     @Test
     public void testGetXml() throws Exception {
         AtomId id = new AtomId(atomId);
-        assertEquals(id.getXml().toString(), xml.toString());
+        assertEquals(id.getXml().toXML(), xml.toXML());
     }
 
 }

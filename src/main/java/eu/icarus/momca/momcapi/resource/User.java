@@ -1,9 +1,9 @@
 package eu.icarus.momca.momcapi.resource;
 
+import eu.icarus.momca.momcapi.Namespace;
 import eu.icarus.momca.momcapi.atomid.CharterAtomId;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,13 +12,11 @@ import java.util.List;
  */
 public class User extends ExistResource {
 
-    private static final AbstractMap.SimpleEntry<String, String> NAMESPACE_XRX = new AbstractMap.SimpleEntry<>("xrx", "http://www.monasterium.net/NS/xrx");
-
     private final String userId;
 
     public User(@NotNull ExistResource existResource) {
         super(existResource);
-        userId = existResource.getResourceName().replace(".xml", "");
+        userId = existResource.getName().replace(".xml", "");
     }
 
     public String getUserId() {
@@ -27,12 +25,12 @@ public class User extends ExistResource {
 
     @NotNull
     public List<CharterAtomId> listBookmarkedCharterIds() {
-        return parseToCharterIds(queryContent("//xrx:bookmark/text()", NAMESPACE_XRX));
+        return parseToCharterIds(queryContentXml("//xrx:bookmark/text()", Namespace.XRX));
     }
 
     @NotNull
     public List<CharterAtomId> listSavedCharterIds() {
-        return parseToCharterIds(queryContent("//xrx:saved/xrx:id/text()", NAMESPACE_XRX));
+        return parseToCharterIds(queryContentXml("//xrx:saved/xrx:id/text()", Namespace.XRX));
     }
 
     @NotNull
