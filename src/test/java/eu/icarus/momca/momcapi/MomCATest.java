@@ -14,8 +14,7 @@ import java.net.URL;
 import java.util.Optional;
 import java.util.Properties;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.*;
 
 /**
  * Created by daniel on 25.06.2015.
@@ -69,49 +68,48 @@ public class MomCATest {
     @Test
     public void testGetPublishedCharter() throws Exception {
         CharterAtomId id = new CharterAtomId("CH-KAE", "Urkunden", "KAE_Urkunde_Nr_1");
-        assertEquals(db.getPublishedCharter(id).get().getAtomId(), id,
-                "The from the read charter has to match the provided.");
+        assertEquals(db.getPublishedCharter(id).get().getAtomId(), id);
     }
 
     @Test
-    public void testGetPublishedCharterWithNotExistingCharter() throws Exception {
+    public void testGetPublishedCharterNotExisting() throws Exception {
         CharterAtomId id = new CharterAtomId("CH-KAE", "Urkunden", "ABCDEFG");
-        assertEquals(db.getPublishedCharter(id), Optional.empty(),
-                "The charter read from the database has to be empty.");
+        assertFalse(db.getPublishedCharter(id).isPresent());
     }
 
     @Test
     public void testGetSavedCharter() throws Exception {
+        CharterAtomId id = new CharterAtomId("CH-KAE", "Urkunden", "KAE_Urkunde_Nr_2");
+        assertEquals(db.getSavedCharter(id).get().getAtomId(), id);
+    }
 
+    @Test
+    public void testGetSavedCharterNotExisting() throws Exception {
+        CharterAtomId id = new CharterAtomId("CH-KAE", "Urkunden", "ABCDEFG");
+        assertFalse(db.getSavedCharter(id).isPresent());
     }
 
     @Test
     public void testGetUser() throws Exception {
-        String userId = "admin";
-        assertEquals(db.getUser(userId).get().getUserId(), userId,
-                "The user id read from the user in the database must match the provided.");
+        String userId = "user1.testuser@dev.monasterium.net";
+        assertEquals(db.getUser(userId).get().getUserId(), userId);
     }
 
     @Test
     public void testGetUserWithNotExistingUser() throws Exception {
         String userId = "randomstuff@crazyness.uk";
-        assertEquals(db.getUser(userId), Optional.empty(),
-                "The user read from the database must be empty.");
-    }
-
-    @Test
-    public void testListUserResourceNames() throws Exception {
-
+        assertEquals(db.getUser(userId), Optional.empty());
     }
 
     @Test
     public void testListUsers() throws Exception {
-
+        assertTrue(db.listUsers().size() == 3);
     }
 
     @Test
     public void testQueryDatabase() throws Exception {
-
+        String queryModeratorOfUser1 = "declare namespace xrx='http://www.monasterium.net/NS/xrx'; collection('/db/mom-data/xrx.user')/xrx:user[.//xrx:email='user1.testuser@dev.monasterium.net']/xrx:moderator/text()";
+        assertEquals(db.queryDatabase(queryModeratorOfUser1).get(0), "admin");
     }
 
 }
