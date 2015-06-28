@@ -10,7 +10,9 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -108,8 +110,15 @@ public class MomCATest {
 
     @Test
     public void testQueryDatabase() throws Exception {
+
+        Class<?> cl = db.getClass();
+        Method method = cl.getDeclaredMethod("queryDatabase", String.class);
+        method.setAccessible(true);
+
         String queryModeratorOfUser1 = "declare namespace xrx='http://www.monasterium.net/NS/xrx'; collection('/db/mom-data/xrx.user')/xrx:user[.//xrx:email='user1.testuser@dev.monasterium.net']/xrx:moderator/text()";
-        assertEquals(db.queryDatabase(queryModeratorOfUser1).get(0), "admin");
+
+        List<String> queryResults = (List<String>) method.invoke(db, queryModeratorOfUser1);
+        assertEquals(queryResults.get(0), "admin");
     }
 
 }

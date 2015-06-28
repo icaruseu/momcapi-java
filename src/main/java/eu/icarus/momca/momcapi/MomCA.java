@@ -97,39 +97,6 @@ public class MomCA {
     }
 
     @NotNull
-    public List<String> queryDatabase(String query) throws MomCAException {
-
-        XPathQueryService queryService;
-        try {
-            queryService = (XPathQueryService) rootCollection.getService("XPathQueryService", "1.0");
-        } catch (XMLDBException e) {
-            throw new MomCAException("Failed to get the XPath query service.", e);
-        }
-
-        ResourceSet resultSet;
-        try {
-            resultSet = queryService.query(query);
-        } catch (XMLDBException e) {
-            throw new MomCAException(String.format("Failed to execute query '%s'", query), e);
-        }
-
-        List<String> resultList = new ArrayList<>(0);
-        try {
-            ResourceIterator iterator = resultSet.getIterator();
-            while (iterator.hasMoreResources()) {
-                XMLResource resource = (XMLResource) iterator.nextResource();
-                resultList.add(resource.getContent().toString());
-            }
-        } catch (XMLDBException e) {
-            throw new MomCAException("Failed to extract results from query resultSet.", e);
-        }
-
-        return resultList;
-
-
-    }
-
-    @NotNull
     private Optional<Collection> getCollection(@NotNull String uri) throws MomCAException {
         try {
             return Optional.ofNullable(DatabaseManager.getCollection(dbRootUri + uri, admin, password));
@@ -243,6 +210,39 @@ public class MomCA {
 
         users.sort(Comparator.<String>naturalOrder());
         return users;
+
+    }
+
+    @NotNull
+    private List<String> queryDatabase(String query) throws MomCAException {
+
+        XPathQueryService queryService;
+        try {
+            queryService = (XPathQueryService) rootCollection.getService("XPathQueryService", "1.0");
+        } catch (XMLDBException e) {
+            throw new MomCAException("Failed to get the XPath query service.", e);
+        }
+
+        ResourceSet resultSet;
+        try {
+            resultSet = queryService.query(query);
+        } catch (XMLDBException e) {
+            throw new MomCAException(String.format("Failed to execute query '%s'", query), e);
+        }
+
+        List<String> resultList = new ArrayList<>(0);
+        try {
+            ResourceIterator iterator = resultSet.getIterator();
+            while (iterator.hasMoreResources()) {
+                XMLResource resource = (XMLResource) iterator.nextResource();
+                resultList.add(resource.getContent().toString());
+            }
+        } catch (XMLDBException e) {
+            throw new MomCAException("Failed to extract results from query resultSet.", e);
+        }
+
+        return resultList;
+
 
     }
 
