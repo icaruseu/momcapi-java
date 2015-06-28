@@ -9,12 +9,12 @@ import static org.testng.Assert.assertEquals;
  */
 public class ResourceTypeTest {
 
-    private final ResourceType type = ResourceType.ANNOTATION_IMAGE;
-    private final String value = type.getValue();
+    private static final ResourceType TYPE = ResourceType.ANNOTATION_IMAGE;
+    private static final String VALUE = TYPE.getValue();
 
     @Test
     public void testCreateFromValue() throws Exception {
-        assertEquals(ResourceType.createFromValue(value), type);
+        assertEquals(ResourceType.createFromValue(VALUE), TYPE);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
@@ -25,7 +25,7 @@ public class ResourceTypeTest {
 
     @Test
     public void testGetValue() throws Exception {
-        assertEquals(type.getValue(), value);
+        assertEquals(TYPE.getValue(), VALUE);
     }
 
 }

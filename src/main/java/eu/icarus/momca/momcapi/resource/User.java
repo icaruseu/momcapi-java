@@ -14,8 +14,15 @@ public class User extends ExistResource {
     private final String userId;
 
     public User(@NotNull ExistResource existResource) {
+
         super(existResource);
-        userId = existResource.getName().replace(".xml", "");
+        List<String> nameQueryResults = queryContentXml(XpathQuery.QUERY_XRX_EMAIL);
+        if (nameQueryResults.size() == 1) {
+            userId = nameQueryResults.get(0);
+        } else {
+            throw new IllegalArgumentException("The XML content of the resource doesn't have an xrx:name element. It's probably not a valid user resource.");
+        }
+
     }
 
     public String getUserId() {

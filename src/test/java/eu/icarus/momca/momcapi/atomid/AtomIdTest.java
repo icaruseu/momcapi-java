@@ -14,51 +14,51 @@ import static org.testng.Assert.assertTrue;
  */
 public class AtomIdTest {
 
-    private static final String atomId = "tag:www.monasterium.net,2011:/charter/CH-KAE/Urkunden/KAE_Urkunde_Nr_1";
-    private static final String prefix = "tag:www.monasterium.net,2011:";
-    private static final ResourceType type = ResourceType.CHARTER;
-    private static final Element xml = new Element(String.format("%s:id", Namespace.ATOM.getPrefix()), Namespace.ATOM.getUri());
+    private static final String ATOM_ID = "tag:www.monasterium.net,2011:/charter/CH-KAE/Urkunden/KAE_Urkunde_Nr_1";
+    private static final String PREFIX = "tag:www.monasterium.net,2011:";
+    private static final ResourceType TYPE = ResourceType.CHARTER;
+    private static final Element XML = new Element(String.format("%s:id", Namespace.ATOM.getPrefix()), Namespace.ATOM.getUri());
 
     @BeforeClass
     public void setUp() throws Exception {
-        xml.appendChild(atomId);
+        XML.appendChild(ATOM_ID);
     }
 
     @Test
     public void testConstructor() throws Exception {
-        AtomId id = new AtomId(atomId);
-        assertEquals(id.getAtomId(), atomId);
+        AtomId id = new AtomId(ATOM_ID);
+        assertEquals(id.getAtomId(), ATOM_ID);
     }
 
     @Test
     public void testEquals() throws Exception {
-        AtomId id1 = new AtomId(atomId);
-        AtomId id2 = new AtomId(atomId);
+        AtomId id1 = new AtomId(ATOM_ID);
+        AtomId id2 = new AtomId(ATOM_ID);
         assertTrue(id1.equals(id2));
     }
 
     @Test
     public void testGetAtomId() throws Exception {
-        AtomId id = new AtomId(atomId);
-        assertEquals(id.getAtomId(), atomId);
+        AtomId id = new AtomId(ATOM_ID);
+        assertEquals(id.getAtomId(), ATOM_ID);
     }
 
     @Test
     public void testGetPrefix() throws Exception {
-        AtomId id = new AtomId(atomId);
-        assertEquals(id.getPrefix(), prefix);
+        AtomId id = new AtomId(ATOM_ID);
+        assertEquals(id.getPrefix(), PREFIX);
     }
 
     @Test
     public void testGetType() throws Exception {
-        AtomId id = new AtomId(atomId);
-        assertEquals(id.getType(), type);
+        AtomId id = new AtomId(ATOM_ID);
+        assertEquals(id.getType(), TYPE);
     }
 
     @Test
     public void testGetXml() throws Exception {
-        AtomId id = new AtomId(atomId);
-        assertEquals(id.getXml().toXML(), xml.toXML());
+        AtomId id = new AtomId(ATOM_ID);
+        assertEquals(id.getXml().toXML(), XML.toXML());
     }
 
 }
