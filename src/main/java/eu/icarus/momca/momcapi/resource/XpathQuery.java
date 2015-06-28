@@ -11,8 +11,8 @@ public enum XpathQuery {
     QUERY_NAME("//name"),
     QUERY_XRX_BOOKMARK("//xrx:bookmark/text()", Namespace.XRX),
     QUERY_XRX_EMAIL("//xrx:email/text()", Namespace.XRX),
-    QUERY_XRX_SAVED("//xrx:saved/xrx:id/text()", Namespace.XRX),
-    QUERY_XRX_NAME("//xrx:name", Namespace.XRX);
+    QUERY_XRX_NAME("//xrx:name", Namespace.XRX),
+    QUERY_XRX_SAVED("//xrx:saved/xrx:id/text()", Namespace.XRX);
 
     private final Namespace[] namespaces;
     private final String query;
