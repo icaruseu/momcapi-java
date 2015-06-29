@@ -1,4 +1,4 @@
-package eu.icarus.momca.momcapi;
+package eu.icarus.momca.momcapi.exist;
 
 import org.jetbrains.annotations.NotNull;
 

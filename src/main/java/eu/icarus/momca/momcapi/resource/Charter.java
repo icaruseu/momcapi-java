@@ -1,7 +1,7 @@
 package eu.icarus.momca.momcapi.resource;
 
-import eu.icarus.momca.momcapi.MetadataCollectionName;
 import eu.icarus.momca.momcapi.atomid.CharterAtomId;
+import eu.icarus.momca.momcapi.exist.MetadataCollectionName;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
