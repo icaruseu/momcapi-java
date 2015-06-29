@@ -1,6 +1,5 @@
 package eu.icarus.momca.momcapi.resource;
 
-import eu.icarus.momca.momcapi.Namespace;
 import nu.xom.*;
 import org.jetbrains.annotations.NotNull;
 

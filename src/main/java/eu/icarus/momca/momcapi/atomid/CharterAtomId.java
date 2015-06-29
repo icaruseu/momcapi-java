@@ -12,7 +12,7 @@ import java.util.Optional;
  */
 public class CharterAtomId extends AtomId {
 
-    public static final String DEFAULT_ENCODING = "UTF-8";
+    private static final String DEFAULT_ENCODING = "UTF-8";
     @NotNull
     private final Optional<String> archiveId;
     @NotNull

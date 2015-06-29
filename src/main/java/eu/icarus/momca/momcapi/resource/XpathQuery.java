@@ -1,7 +1,5 @@
 package eu.icarus.momca.momcapi.resource;
 
-import eu.icarus.momca.momcapi.Namespace;
-
 /**
  * Created by daniel on 27.06.2015.
  */

@@ -1,6 +1,6 @@
 package eu.icarus.momca.momcapi.atomid;
 
-import eu.icarus.momca.momcapi.Namespace;
+import eu.icarus.momca.momcapi.resource.Namespace;
 import eu.icarus.momca.momcapi.resource.ResourceType;
 import nu.xom.Element;
 import org.testng.annotations.BeforeClass;

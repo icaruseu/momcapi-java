@@ -157,6 +157,7 @@ public class MomCATest {
         Class<?> cl = db.getClass();
         Method method = cl.getDeclaredMethod("queryDatabase", String.class);
         method.setAccessible(true);
+        @SuppressWarnings("unchecked")
         List<String> queryResults = (List<String>) method.invoke(db, QUERY_FACTORY.queryUserModerator("user1.testuser@dev.monasterium.net"));
         assertEquals(queryResults.get(0), "admin");
 

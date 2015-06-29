@@ -1,5 +1,6 @@
 package eu.icarus.momca.momcapi.atomid;
 
+import eu.icarus.momca.momcapi.resource.Namespace;
 import eu.icarus.momca.momcapi.resource.ResourceType;
 import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
@@ -11,9 +12,9 @@ import java.util.Arrays;
 /**
  * Created by daniel on 25.06.2015.
  */
-public class AtomId {
+class AtomId {
 
-    static final String DEFAULT_PREFIX = "tag:www.monasterium.net,2011:";
+    private static final String DEFAULT_PREFIX = "tag:www.monasterium.net,2011:";
     @NotNull
     private final String atomId;
     @NotNull
@@ -30,7 +31,7 @@ public class AtomId {
 
     AtomId(@NotNull String... idParts) {
 
-        if (idParts.length >= 3 && idParts.length <=4 ) {
+        if (idParts.length >= 3 && idParts.length <= 4) {
 
             prefix = DEFAULT_PREFIX;
             type = ResourceType.createFromValue(idParts[0]);
@@ -81,8 +82,8 @@ public class AtomId {
     @NotNull
     public Element getXml() {
 
-        String qualifiedName = String.format("%s:id", eu.icarus.momca.momcapi.Namespace.ATOM.getPrefix());
-        String namespaceUri = eu.icarus.momca.momcapi.Namespace.ATOM.getUri();
+        String qualifiedName = String.format("%s:id", Namespace.ATOM.getPrefix());
+        String namespaceUri = Namespace.ATOM.getUri();
         Element xml = new Element(qualifiedName, namespaceUri);
         xml.appendChild(atomId);
         return xml;

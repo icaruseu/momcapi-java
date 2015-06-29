@@ -1,4 +1,4 @@
-package eu.icarus.momca.momcapi;
+package eu.icarus.momca.momcapi.resource;
 
 /**
  * Created by daniel on 27.06.2015.
@@ -12,7 +12,7 @@ public enum Namespace {
     EAG("http://www.archivgut-online.de/eag"),
     XRX("http://www.monasterium.net/NS/xrx");
 
-    private String uri;
+    private final String uri;
 
     Namespace(String uri) {
         this.uri = uri;
