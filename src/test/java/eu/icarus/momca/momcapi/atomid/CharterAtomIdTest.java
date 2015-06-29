@@ -11,12 +11,13 @@ import static org.testng.Assert.*;
  */
 public class CharterAtomIdTest {
 
-    private static final String ARCHIVE_ID = "ArchiveId";
-    private static final String CHARTER_ID = "CharterId";
-    private static final String COLLECTION_ID = "CollectionId";
-    private static final String COLLECTION_CHARTER_ATOM_ID = String.format("tag:www.monasterium.net,2011:/charter/%s/%s", COLLECTION_ID, CHARTER_ID);
-    private static final String FOND_ID = "FondId";
-    private static final String FOND_CHARTER_ATOM_ID = String.format("tag:www.monasterium.net,2011:/charter/%s/%s/%s", ARCHIVE_ID, FOND_ID, CHARTER_ID);
+    private static final String ARCHIVE_ID = "RS-IAGNS";
+    private static final String COLLECTION_CHARTER_ATOM_ID = "tag:www.monasterium.net,2011:/charter/MedDocBulgEmp/1192-02-02_sic%21_Ioan_Kaliman";
+    private static final String COLLECTION_CHARTER_ID = "1192-02-02_sic!_Ioan_Kaliman";
+    private static final String COLLECTION_ID = "MedDocBulgEmp";
+    private static final String FOND_CHARTER_ATOM_ID = "tag:www.monasterium.net,2011:/charter/RS-IAGNS/Charters/IAGNS_F-.150_6605%7C193232";
+    private static final String FOND_CHARTER_ID = "IAGNS_F-.150_6605|193232";
+    private static final String FOND_ID = "Charters";
     private static final String BASE_PATH = String.format("%s/%s", ARCHIVE_ID, FOND_ID);
 
     @Test
@@ -27,13 +28,13 @@ public class CharterAtomIdTest {
 
     @Test
     public void testConstructorForCollectionCharter() throws Exception {
-        CharterAtomId id = new CharterAtomId(COLLECTION_ID, CHARTER_ID);
+        CharterAtomId id = new CharterAtomId(COLLECTION_ID, COLLECTION_CHARTER_ID);
         assertEquals(id.getAtomId(), COLLECTION_CHARTER_ATOM_ID);
     }
 
     @Test
     public void testConstructorForFondCharter() throws Exception {
-        CharterAtomId id = new CharterAtomId(ARCHIVE_ID, FOND_ID, CHARTER_ID);
+        CharterAtomId id = new CharterAtomId(ARCHIVE_ID, FOND_ID, FOND_CHARTER_ID);
         assertEquals(id.getAtomId(), FOND_CHARTER_ATOM_ID);
     }
 
@@ -52,7 +53,7 @@ public class CharterAtomIdTest {
     @Test
     public void testGetCharterId() throws Exception {
         CharterAtomId id = new CharterAtomId(COLLECTION_CHARTER_ATOM_ID);
-        assertEquals(id.getCharterId(), CHARTER_ID);
+        assertEquals(id.getCharterId(), COLLECTION_CHARTER_ID);
     }
 
     @Test

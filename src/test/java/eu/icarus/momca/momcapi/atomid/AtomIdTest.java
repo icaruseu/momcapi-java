@@ -25,9 +25,22 @@ public class AtomIdTest {
     }
 
     @Test
-    public void testConstructor() throws Exception {
+    public void testConstructorWithAtomId() throws Exception {
         AtomId id = new AtomId(ATOM_ID);
         assertEquals(id.getAtomId(), ATOM_ID);
+    }
+
+    @Test
+    public void testConstructorWithIdParts() throws Exception {
+
+        String expectedEasyAtomId = "tag:www.monasterium.net,2011:/charter/RS-IAGNS/Charters/F1_fasc.16_sub_N_1513";
+        String expectedDifficultAtomId = "tag:www.monasterium.net,2011:/charter/RS-IAGNS/Charters/IAGNS_F-.150_6605%7C193232";
+        AtomId easyId = new AtomId("charter", "RS-IAGNS", "Charters", "F1_fasc.16_sub_N_1513");
+        AtomId difficultId = new AtomId("charter", "RS-IAGNS", "Charters", "IAGNS_F-.150_6605|193232"); // | should be replaced with %7C etc.
+
+        assertEquals(easyId.getAtomId(), expectedEasyAtomId);
+        assertEquals(difficultId.getAtomId(), expectedDifficultAtomId);
+
     }
 
     @Test

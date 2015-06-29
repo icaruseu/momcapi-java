@@ -2,9 +2,8 @@ package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.atomid.CharterAtomId;
 import eu.icarus.momca.momcapi.exception.MomCAException;
-import eu.icarus.momca.momcapi.existquery.ExistQuery;
-import eu.icarus.momca.momcapi.existquery.ExistQueryFactory;
 import eu.icarus.momca.momcapi.resource.Charter;
+import eu.icarus.momca.momcapi.resource.CharterStatus;
 import eu.icarus.momca.momcapi.resource.ExistResource;
 import eu.icarus.momca.momcapi.resource.User;
 import nu.xom.ParsingException;
@@ -33,14 +32,9 @@ import java.util.stream.Collectors;
 public class MomCA {
 
     private static final String DRIVER = "org.exist.xmldb.DatabaseImpl";
-    private static final String FILE_ENDING_CHARTER_PUBLIC = ".cei.xml";
-    private static final String FILE_ENDING_CHARTER_SAVED = ".xml";
-    private static final String PATH_CHARTER_IMPORT = "/db/mom-data/metadata.charter.import";
-    private static final String PATH_CHARTER_PUBLIC = "/db/mom-data/metadata.charter.public";
-    private static final String PATH_CHARTER_SAVED = "/db/mom-data/metadata.charter.saved";
-    private static final String PATH_FONDS_PUBLIC = "/db/mom-data/metadata.fond.public";
     private static final String PATH_USER = "/db/mom-data/xrx.user";
     private static final ExistQueryFactory QUERY_FACTORY = new ExistQueryFactory();
+    private static final String ROOT_COLLECTION = "/db/mom-data";
     private static final String URL_ENCODING = "UTF-8";
     @NotNull
     private final String admin;
@@ -62,35 +56,33 @@ public class MomCA {
     }
 
     public void closeConnection() throws MomCAException {
+
         try {
             rootCollection.close();
         } catch (XMLDBException e) {
             throw new MomCAException("Failed to close the database connection.", e);
         }
-    }
-
-    @NotNull
-    public List<Charter> getImportedCharter(@NotNull CharterAtomId charterAtomId) throws MomCAException {
-
-        List<Charter> charters = new ArrayList<>(0);
-        for (String charterUri : queryDatabase(QUERY_FACTORY.queryUrisOfImportedCharter(charterAtomId))) {
-            getCharterFromUri(charterUri).ifPresent(charters::add);
-        }
-        return charters;
 
     }
 
     @NotNull
-    public Optional<Charter> getPublishedCharter(@NotNull CharterAtomId charterAtomId) throws MomCAException {
-        String resourceName = charterAtomId.getCharterId() + FILE_ENDING_CHARTER_PUBLIC;
-        String parentCollectionUri = String.join("/", PATH_CHARTER_PUBLIC, charterAtomId.getBasePath());
-        return getExistResource(resourceName, parentCollectionUri).map(e -> new Charter(e));
+    public List<Charter> getImportedCharters(@NotNull CharterAtomId charterAtomId) throws MomCAException {
+        return getMatchingCharters(charterAtomId, CharterStatus.IMPORTED.getParentCollection());
     }
 
     @NotNull
-    public Optional<Charter> getSavedCharter(@NotNull CharterAtomId charterAtomId) throws MomCAException {
-        String resourceName = charterAtomId.getAtomId().replace("/", "#") + FILE_ENDING_CHARTER_SAVED;
-        return getExistResource(resourceName, PATH_CHARTER_SAVED).map(e -> new Charter(e));
+    public List<Charter> getPrivateCharters(@NotNull CharterAtomId charterAtomId, @NotNull String userName) throws MomCAException {
+        return getMatchingCharters(charterAtomId, CharterStatus.PRIVATE.getParentCollection() + "/" + userName + "/metadata.charter");
+    }
+
+    @NotNull
+    public List<Charter> getPublishedCharters(@NotNull CharterAtomId charterAtomId) throws MomCAException {
+        return getMatchingCharters(charterAtomId, CharterStatus.PUBLIC.getParentCollection());
+    }
+
+    @NotNull
+    public List<Charter> getSavedCharters(@NotNull CharterAtomId charterAtomId) throws MomCAException {
+        return getMatchingCharters(charterAtomId, CharterStatus.SAVED.getParentCollection());
     }
 
     @NotNull
@@ -111,11 +103,13 @@ public class MomCA {
 
     @NotNull
     private Optional<Collection> getCollection(@NotNull String uri) throws MomCAException {
+
         try {
             return Optional.ofNullable(DatabaseManager.getCollection(dbRootUri + uri, admin, password));
         } catch (XMLDBException e) {
             throw new MomCAException(String.format("Failed to open collection '%s'.", uri), e);
         }
+
     }
 
     @NotNull
@@ -148,6 +142,35 @@ public class MomCA {
         }
 
         return existResource;
+
+    }
+
+    @NotNull
+    private List<Charter> getMatchingCharters(@NotNull CharterAtomId charterAtomId, String parentCollection) throws MomCAException {
+
+        String path;
+        if (parentCollection.equals(CharterStatus.SAVED.getParentCollection())) {
+
+            String[] parts = {ROOT_COLLECTION, parentCollection};
+            path = String.join("/", parts);
+
+        } else if (charterAtomId.isPartOfArchiveFond()) {
+
+            String[] parts = {ROOT_COLLECTION, parentCollection, charterAtomId.getArchiveId().get(), charterAtomId.getFondId().get()};
+            path = String.join("/", parts);
+
+        } else {
+
+            String[] parts = {ROOT_COLLECTION, parentCollection, charterAtomId.getCollectionId().get()};
+            path = String.join("/", parts);
+
+        }
+
+        List<Charter> charters = new ArrayList<>(0);
+        for (String charterUri : queryDatabase(QUERY_FACTORY.queryUrisOfCharter(path, charterAtomId.getCharterId()))) {
+            getCharterFromUri(charterUri).ifPresent(charters::add);
+        }
+        return charters;
 
     }
 
@@ -226,7 +249,7 @@ public class MomCA {
     }
 
     @NotNull
-    private List<String> queryDatabase(ExistQuery existQuery) throws MomCAException {
+    private List<String> queryDatabase(String existQuery) throws MomCAException {
 
         XPathQueryService queryService;
         try {
@@ -237,7 +260,7 @@ public class MomCA {
 
         ResourceSet resultSet;
         try {
-            resultSet = queryService.query(existQuery.getQuery());
+            resultSet = queryService.query(existQuery);
         } catch (XMLDBException e) {
             throw new MomCAException(String.format("Failed to execute query '%s'", existQuery), e);
         }

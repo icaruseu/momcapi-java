@@ -14,9 +14,7 @@ public class Charter extends ExistResource {
     @NotNull
     private final CharterAtomId atomId;
     @NotNull
-    private final Status status;
-
-    public enum Status {IMPORTED, PRIVATE, PUBLIC, SAVED}
+    private final CharterStatus status;
 
     public Charter(@NotNull ExistResource existResource) {
 
@@ -39,7 +37,7 @@ public class Charter extends ExistResource {
     }
 
     @NotNull
-    public Status getStatus() {
+    public CharterStatus getStatus() {
         return status;
     }
 
@@ -51,18 +49,18 @@ public class Charter extends ExistResource {
                 "} " + super.toString();
     }
 
-    private Status initStatus() {
+    private CharterStatus initStatus() {
 
-        Status status;
+        CharterStatus status;
 
         if (getParentUri().contains(MetadataCollectionName.METADATA_CHARTER_IMPORT.getValue())) {
-            status = Status.IMPORTED;
+            status = CharterStatus.IMPORTED;
         } else if (getParentUri().contains(MetadataCollectionName.XRX_USER.getValue())) {
-            status = Status.PRIVATE;
+            status = CharterStatus.PRIVATE;
         } else if (getParentUri().contains(MetadataCollectionName.METADATA_CHARTER_SAVED.getValue())) {
-            status = Status.SAVED;
+            status = CharterStatus.SAVED;
         } else {
-            status = Status.PUBLIC;
+            status = CharterStatus.PUBLIC;
         }
 
         return status;

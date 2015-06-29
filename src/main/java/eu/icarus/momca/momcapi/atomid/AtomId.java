@@ -6,8 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 /**
  * Created by daniel on 25.06.2015.
@@ -23,27 +22,33 @@ public class AtomId {
     private final ResourceType type;
 
     AtomId(@NotNull String atomId) {
-
         String[] valueTokens = atomId.split("/");
-
+        this.atomId = atomId;
         prefix = valueTokens[0];
         type = ResourceType.createFromValue(valueTokens[1]);
+    }
 
-        List<String> cleanTokens = new ArrayList<>(0);
-        for (int i = 0; i < valueTokens.length; i++) {
+    AtomId(@NotNull String... idParts) {
 
-            if (i <= 1) {
-                cleanTokens.add(valueTokens[i]);
-            } else {
+        if (idParts.length >= 3 && idParts.length <=4 ) {
+
+            prefix = DEFAULT_PREFIX;
+            type = ResourceType.createFromValue(idParts[0]);
+
+            StringBuilder idBuilder = new StringBuilder(DEFAULT_PREFIX);
+            for (String idPart : idParts) {
                 try {
-                    cleanTokens.add(URLEncoder.encode(valueTokens[i], "UTF-8"));
+                    idBuilder.append("/");
+                    idBuilder.append(URLEncoder.encode(idPart, "UTF-8"));
                 } catch (UnsupportedEncodingException e) {
                     throw new RuntimeException(e);
                 }
             }
+            this.atomId = idBuilder.toString();
 
+        } else {
+            throw new IllegalArgumentException("'" + Arrays.asList(idParts) + "' has not the right amount of parts; probably not a valid atom:id");
         }
-        this.atomId = String.join("/", cleanTokens);
 
     }
 

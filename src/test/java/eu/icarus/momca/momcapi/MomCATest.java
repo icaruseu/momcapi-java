@@ -1,8 +1,6 @@
 package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.atomid.CharterAtomId;
-import eu.icarus.momca.momcapi.existquery.ExistQuery;
-import eu.icarus.momca.momcapi.existquery.ExistQueryFactory;
 import eu.icarus.momca.momcapi.resource.Charter;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.AfterClass;
@@ -31,7 +29,6 @@ public class MomCATest {
     private static final String adminUser = "admin";
     private static final String password = "momcapitest";
     private MomCA db;
-    private String serverUrl;
 
     @BeforeClass
     public void setUp() throws Exception {
@@ -50,7 +47,7 @@ public class MomCATest {
             throw new RuntimeException("Failed to load properties file.", e);
         }
 
-        serverUrl = serverProperties.getProperty("serverUrl");
+        String serverUrl = serverProperties.getProperty("serverUrl");
 
         assertNotNull(serverUrl, "'serverUrl' missing from '" + SERVER_PROPERTIES_PATH + "'");
         assertNotNull(password, "'password' missing from '" + SERVER_PROPERTIES_PATH + "'");
@@ -70,45 +67,70 @@ public class MomCATest {
     public void testGetImportedCharter() throws Exception {
 
         CharterAtomId id = new CharterAtomId("RS-IAGNS", "Charters", "F1_fasc.16_sub_N_1513");
-        List<Charter> charters = db.getImportedCharter(id);
+        List<Charter> charters = db.getImportedCharters(id);
         assertEquals(charters.size(), 1);
         assertEquals(charters.get(0).getAtomId(), id);
 
     }
 
     @Test
-    public void testGetImportedCharterWithEncodableId() throws Exception {
+    public void testGetImportedCharterNotExisting() throws Exception {
+        CharterAtomId id = new CharterAtomId("RS-IAGNS", "Charters", "NotExisting");
+        List<Charter> charters = db.getImportedCharters(id);
+        assertTrue(charters.isEmpty());
+    }
 
-        CharterAtomId id = new CharterAtomId("RS-IAGNS", "Charters", "IAGNS_F-.150_6605|193232"); // The | gets encoded on the import process when used for the atom:id
-        List<Charter> charters = db.getImportedCharter(id);
+    @Test
+    public void testGetImportedCharterWithEncodeId() throws Exception {
+
+        CharterAtomId id = new CharterAtomId("RS-IAGNS", "Charters", "IAGNS_F-.150_6605|193232"); // The | will be encoded
+        List<Charter> charters = db.getImportedCharters(id);
         assertEquals(charters.size(), 1);
-        charters.get(0).getAtomId().equals(id);
+        assertEquals(charters.get(0).getAtomId(), id);
+
+    }
+
+    @Test
+    public void testGetPrivateCharter() throws Exception {
+
+        CharterAtomId id = new CharterAtomId("ea13e5f1-03b2-4bfa-9dd5-8fb770f98d7b", "46bc10f3-bc35-4fa8-ab82-25827dc243f6");
+        String userName = "admin";
+        List<Charter> charters = db.getPrivateCharters(id, userName);
+        assertEquals(charters.size(), 1);
         assertEquals(charters.get(0).getAtomId(), id);
 
     }
 
     @Test
     public void testGetPublishedCharter() throws Exception {
+
         CharterAtomId id = new CharterAtomId("CH-KAE", "Urkunden", "KAE_Urkunde_Nr_1");
-        assertEquals(db.getPublishedCharter(id).get().getAtomId(), id);
+        List<Charter> charters = db.getPublishedCharters(id);
+        assertEquals(charters.size(), 1);
+        assertEquals(charters.get(0).getAtomId(), id);
+
     }
 
     @Test
     public void testGetPublishedCharterNotExisting() throws Exception {
-        CharterAtomId id = new CharterAtomId("CH-KAE", "Urkunden", "ABCDEFG");
-        assertFalse(db.getPublishedCharter(id).isPresent());
+        CharterAtomId id = new CharterAtomId("CH-KA", "Urkunden", "NotExisting");
+        List<Charter> charters = db.getPublishedCharters(id);
+        assertTrue(charters.isEmpty());
     }
 
     @Test
     public void testGetSavedCharter() throws Exception {
         CharterAtomId id = new CharterAtomId("CH-KAE", "Urkunden", "KAE_Urkunde_Nr_2");
-        assertEquals(db.getSavedCharter(id).get().getAtomId(), id);
+        List<Charter> charters = db.getSavedCharters(id);
+        assertEquals(charters.size(), 1);
+        assertEquals(charters.get(0).getAtomId(), id);
     }
 
     @Test
     public void testGetSavedCharterNotExisting() throws Exception {
-        CharterAtomId id = new CharterAtomId("CH-KAE", "Urkunden", "ABCDEFG");
-        assertFalse(db.getSavedCharter(id).isPresent());
+        CharterAtomId id = new CharterAtomId("CH-KA", "Urkunden", "NotExisting");
+        List<Charter> charters = db.getSavedCharters(id);
+        assertTrue(charters.isEmpty());
     }
 
     @Test
@@ -132,12 +154,9 @@ public class MomCATest {
     public void testQueryDatabase() throws Exception {
 
         Class<?> cl = db.getClass();
-        Method method = cl.getDeclaredMethod("queryDatabase", ExistQuery.class);
+        Method method = cl.getDeclaredMethod("queryDatabase", String.class);
         method.setAccessible(true);
-
-        ExistQuery query = QUERY_FACTORY.queryUserModerator("user1.testuser@dev.monasterium.net");
-
-        List<String> queryResults = (List<String>) method.invoke(db, query);
+        List<String> queryResults = (List<String>) method.invoke(db, QUERY_FACTORY.queryUserModerator("user1.testuser@dev.monasterium.net"));
         assertEquals(queryResults.get(0), "admin");
 
     }

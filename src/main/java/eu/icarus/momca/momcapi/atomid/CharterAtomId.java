@@ -12,6 +12,7 @@ import java.util.Optional;
  */
 public class CharterAtomId extends AtomId {
 
+    public static final String DEFAULT_ENCODING = "UTF-8";
     @NotNull
     private final Optional<String> archiveId;
     @NotNull
@@ -35,15 +36,15 @@ public class CharterAtomId extends AtomId {
             switch (valueTokens.length) {
 
                 case 4:
-                    this.collectionId = Optional.of(URLDecoder.decode(valueTokens[2]));
-                    this.charterId = URLDecoder.decode(valueTokens[3], "UTF-8");
+                    this.collectionId = Optional.of(URLDecoder.decode(valueTokens[2], DEFAULT_ENCODING));
+                    this.charterId = URLDecoder.decode(valueTokens[3], DEFAULT_ENCODING);
                     this.archiveId = Optional.empty();
                     this.fondId = Optional.empty();
                     break;
                 case 5:
-                    this.archiveId = Optional.of(URLDecoder.decode(valueTokens[2], "UTF-8"));
-                    this.fondId = Optional.of(URLDecoder.decode(valueTokens[3], "UTF-8"));
-                    this.charterId = URLDecoder.decode(valueTokens[4], "UTF-8");
+                    this.archiveId = Optional.of(URLDecoder.decode(valueTokens[2], DEFAULT_ENCODING));
+                    this.fondId = Optional.of(URLDecoder.decode(valueTokens[3], DEFAULT_ENCODING));
+                    this.charterId = URLDecoder.decode(valueTokens[4], DEFAULT_ENCODING);
                     this.collectionId = Optional.empty();
                     break;
                 default:
@@ -58,11 +59,23 @@ public class CharterAtomId extends AtomId {
     }
 
     public CharterAtomId(@NotNull String archiveId, @NotNull String fondId, @NotNull String charterId) {
-        this(String.join("/", DEFAULT_PREFIX, ResourceType.CHARTER.getValue(), archiveId, fondId, charterId));
+
+        super(ResourceType.CHARTER.getValue(), archiveId, fondId, charterId);
+        this.archiveId = Optional.of(archiveId);
+        this.fondId = Optional.of(fondId);
+        this.charterId = charterId;
+        this.collectionId = Optional.empty();
+
     }
 
     public CharterAtomId(@NotNull String collectionId, @NotNull String charterId) {
-        this(String.join("/", DEFAULT_PREFIX, ResourceType.CHARTER.getValue(), collectionId, charterId));
+
+        super(ResourceType.CHARTER.getValue(), collectionId, charterId);
+        this.collectionId = Optional.of(collectionId);
+        this.charterId = charterId;
+        this.archiveId = Optional.empty();
+        this.fondId = Optional.empty();
+
     }
 
     @Override
