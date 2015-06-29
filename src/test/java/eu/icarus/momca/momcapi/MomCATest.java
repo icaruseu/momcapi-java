@@ -1,6 +1,9 @@
 package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.atomid.CharterAtomId;
+import eu.icarus.momca.momcapi.existquery.ExistQuery;
+import eu.icarus.momca.momcapi.existquery.ExistQueryFactory;
+import eu.icarus.momca.momcapi.resource.Charter;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -23,11 +26,12 @@ import static org.testng.Assert.*;
  */
 public class MomCATest {
 
+    private static final ExistQueryFactory QUERY_FACTORY = new ExistQueryFactory();
     private static final String SERVER_PROPERTIES_PATH = "/server.properties";
     private static final String adminUser = "admin";
     private static final String password = "momcapitest";
-    MomCA db;
-    String serverUrl;
+    private MomCA db;
+    private String serverUrl;
 
     @BeforeClass
     public void setUp() throws Exception {
@@ -64,6 +68,22 @@ public class MomCATest {
 
     @Test
     public void testGetImportedCharter() throws Exception {
+
+        CharterAtomId id = new CharterAtomId("RS-IAGNS", "Charters", "F1_fasc.16_sub_N_1513");
+        List<Charter> charters = db.getImportedCharter(id);
+        assertEquals(charters.size(), 1);
+        assertEquals(charters.get(0).getAtomId(), id);
+
+    }
+
+    @Test
+    public void testGetImportedCharterWithEncodableId() throws Exception {
+
+        CharterAtomId id = new CharterAtomId("RS-IAGNS", "Charters", "IAGNS_F-.150_6605|193232"); // The | gets encoded on the import process when used for the atom:id
+        List<Charter> charters = db.getImportedCharter(id);
+        assertEquals(charters.size(), 1);
+        charters.get(0).getAtomId().equals(id);
+        assertEquals(charters.get(0).getAtomId(), id);
 
     }
 
@@ -112,13 +132,14 @@ public class MomCATest {
     public void testQueryDatabase() throws Exception {
 
         Class<?> cl = db.getClass();
-        Method method = cl.getDeclaredMethod("queryDatabase", String.class);
+        Method method = cl.getDeclaredMethod("queryDatabase", ExistQuery.class);
         method.setAccessible(true);
 
-        String queryModeratorOfUser1 = "declare namespace xrx='http://www.monasterium.net/NS/xrx'; collection('/db/mom-data/xrx.user')/xrx:user[.//xrx:email='user1.testuser@dev.monasterium.net']/xrx:moderator/text()";
+        ExistQuery query = QUERY_FACTORY.queryUserModerator("user1.testuser@dev.monasterium.net");
 
-        List<String> queryResults = (List<String>) method.invoke(db, queryModeratorOfUser1);
+        List<String> queryResults = (List<String>) method.invoke(db, query);
         assertEquals(queryResults.get(0), "admin");
+
     }
 
 }

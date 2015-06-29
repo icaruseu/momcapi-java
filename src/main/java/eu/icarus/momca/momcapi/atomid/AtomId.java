@@ -4,6 +4,11 @@ import eu.icarus.momca.momcapi.resource.ResourceType;
 import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by daniel on 25.06.2015.
  */
@@ -18,10 +23,28 @@ public class AtomId {
     private final ResourceType type;
 
     AtomId(@NotNull String atomId) {
-        this.atomId = atomId;
+
         String[] valueTokens = atomId.split("/");
+
         prefix = valueTokens[0];
         type = ResourceType.createFromValue(valueTokens[1]);
+
+        List<String> cleanTokens = new ArrayList<>(0);
+        for (int i = 0; i < valueTokens.length; i++) {
+
+            if (i <= 1) {
+                cleanTokens.add(valueTokens[i]);
+            } else {
+                try {
+                    cleanTokens.add(URLEncoder.encode(valueTokens[i], "UTF-8"));
+                } catch (UnsupportedEncodingException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+        }
+        this.atomId = String.join("/", cleanTokens);
+
     }
 
     @Override

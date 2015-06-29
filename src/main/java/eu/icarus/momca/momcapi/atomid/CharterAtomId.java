@@ -3,6 +3,8 @@ package eu.icarus.momca.momcapi.atomid;
 import eu.icarus.momca.momcapi.resource.ResourceType;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Optional;
 
 /**
@@ -28,23 +30,29 @@ public class CharterAtomId extends AtomId {
             throw new IllegalArgumentException(String.format("'%s' identifies a '%s', not a charter.", value, valueTokens[1]));
         }
 
-        switch (valueTokens.length) {
+        try {
 
-            case 4:
-                this.collectionId = Optional.of(valueTokens[2]);
-                this.charterId = valueTokens[3];
-                this.archiveId = Optional.empty();
-                this.fondId = Optional.empty();
-                break;
-            case 5:
-                this.archiveId = Optional.of(valueTokens[2]);
-                this.fondId = Optional.of(valueTokens[3]);
-                this.charterId = valueTokens[4];
-                this.collectionId = Optional.empty();
-                break;
-            default:
-                throw new IllegalArgumentException(String.format("'%s' is not a valid charterId.", value));
+            switch (valueTokens.length) {
 
+                case 4:
+                    this.collectionId = Optional.of(URLDecoder.decode(valueTokens[2]));
+                    this.charterId = URLDecoder.decode(valueTokens[3], "UTF-8");
+                    this.archiveId = Optional.empty();
+                    this.fondId = Optional.empty();
+                    break;
+                case 5:
+                    this.archiveId = Optional.of(URLDecoder.decode(valueTokens[2], "UTF-8"));
+                    this.fondId = Optional.of(URLDecoder.decode(valueTokens[3], "UTF-8"));
+                    this.charterId = URLDecoder.decode(valueTokens[4], "UTF-8");
+                    this.collectionId = Optional.empty();
+                    break;
+                default:
+                    throw new IllegalArgumentException(String.format("'%s' is not a valid charterId.", value));
+
+            }
+
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
         }
 
     }
@@ -55,6 +63,21 @@ public class CharterAtomId extends AtomId {
 
     public CharterAtomId(@NotNull String collectionId, @NotNull String charterId) {
         this(String.join("/", DEFAULT_PREFIX, ResourceType.CHARTER.getValue(), collectionId, charterId));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        CharterAtomId that = (CharterAtomId) o;
+
+        if (!archiveId.equals(that.archiveId)) return false;
+        if (!charterId.equals(that.charterId)) return false;
+        if (!collectionId.equals(that.collectionId)) return false;
+        return fondId.equals(that.fondId);
+
     }
 
     @NotNull
@@ -82,6 +105,16 @@ public class CharterAtomId extends AtomId {
         return fondId;
     }
 
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + archiveId.hashCode();
+        result = 31 * result + charterId.hashCode();
+        result = 31 * result + collectionId.hashCode();
+        result = 31 * result + fondId.hashCode();
+        return result;
+    }
+
     public boolean isPartOfArchiveFond() {
         return (archiveId.isPresent() && fondId.isPresent()) && !collectionId.isPresent();
     }
@@ -100,5 +133,4 @@ public class CharterAtomId extends AtomId {
                 ", charterId='" + charterId + '\'' +
                 '}';
     }
-
 }

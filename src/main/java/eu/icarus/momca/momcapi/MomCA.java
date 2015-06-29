@@ -2,6 +2,8 @@ package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.atomid.CharterAtomId;
 import eu.icarus.momca.momcapi.exception.MomCAException;
+import eu.icarus.momca.momcapi.existquery.ExistQuery;
+import eu.icarus.momca.momcapi.existquery.ExistQueryFactory;
 import eu.icarus.momca.momcapi.resource.Charter;
 import eu.icarus.momca.momcapi.resource.ExistResource;
 import eu.icarus.momca.momcapi.resource.User;
@@ -38,6 +40,7 @@ public class MomCA {
     private static final String PATH_CHARTER_SAVED = "/db/mom-data/metadata.charter.saved";
     private static final String PATH_FONDS_PUBLIC = "/db/mom-data/metadata.fond.public";
     private static final String PATH_USER = "/db/mom-data/xrx.user";
+    private static final ExistQueryFactory QUERY_FACTORY = new ExistQueryFactory();
     private static final String URL_ENCODING = "UTF-8";
     @NotNull
     private final String admin;
@@ -67,10 +70,14 @@ public class MomCA {
     }
 
     @NotNull
-    public Optional<Charter> getImportedCharter(@NotNull CharterAtomId charterAtomId) throws MomCAException {
-        String resourceName = charterAtomId.getCharterId() + FILE_ENDING_CHARTER_PUBLIC;
-        String parentCollectionUri = String.join("/", PATH_CHARTER_IMPORT, charterAtomId.getBasePath());
-        return getExistResource(resourceName, parentCollectionUri).map(e -> new Charter(e));
+    public List<Charter> getImportedCharter(@NotNull CharterAtomId charterAtomId) throws MomCAException {
+
+        List<Charter> charters = new ArrayList<>(0);
+        for (String charterUri : queryDatabase(QUERY_FACTORY.queryUrisOfImportedCharter(charterAtomId))) {
+            getCharterFromUri(charterUri).ifPresent(charters::add);
+        }
+        return charters;
+
     }
 
     @NotNull
@@ -94,6 +101,12 @@ public class MomCA {
     @NotNull
     public List<String> listUsers() throws MomCAException {
         return listUserResourceNames().stream().map(s -> s.replace(".xml", "")).collect(Collectors.toList());
+    }
+
+    private Optional<Charter> getCharterFromUri(String charterUri) throws MomCAException {
+        String resourceName = charterUri.substring(charterUri.lastIndexOf('/') + 1, charterUri.length());
+        String parentUri = charterUri.substring(0, charterUri.lastIndexOf('/'));
+        return getExistResource(resourceName, parentUri).map(Charter::new);
     }
 
     @NotNull
@@ -123,7 +136,6 @@ public class MomCA {
                     throw new MomCAException(String.format("Failed to get content of resource '%s'.", resourceName), e);
                 }
 
-
                 try {
                     existResource = Optional.of(new ExistResource(resourceName, parentCollectionPath, content));
                 } catch (ParsingException e) {
@@ -144,7 +156,7 @@ public class MomCA {
 
         String encodedName;
         try {
-            encodedName = URLEncoder.encode(resourceName, URL_ENCODING);
+            encodedName = URLEncoder.encode(URLDecoder.decode(resourceName, URL_ENCODING), URL_ENCODING);
         } catch (UnsupportedEncodingException e) {
             throw new MomCAException(String.format("URL-Encoding '%s' not supported.", URL_ENCODING), e);
         }
@@ -214,7 +226,7 @@ public class MomCA {
     }
 
     @NotNull
-    private List<String> queryDatabase(String query) throws MomCAException {
+    private List<String> queryDatabase(ExistQuery existQuery) throws MomCAException {
 
         XPathQueryService queryService;
         try {
@@ -225,9 +237,9 @@ public class MomCA {
 
         ResourceSet resultSet;
         try {
-            resultSet = queryService.query(query);
+            resultSet = queryService.query(existQuery.getQuery());
         } catch (XMLDBException e) {
-            throw new MomCAException(String.format("Failed to execute query '%s'", query), e);
+            throw new MomCAException(String.format("Failed to execute query '%s'", existQuery), e);
         }
 
         List<String> resultList = new ArrayList<>(0);
@@ -242,7 +254,6 @@ public class MomCA {
         }
 
         return resultList;
-
 
     }
 
