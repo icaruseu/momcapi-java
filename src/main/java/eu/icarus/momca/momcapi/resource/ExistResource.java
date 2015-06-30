@@ -13,20 +13,20 @@ import java.util.List;
 public class ExistResource {
 
     @NotNull
-    private final String name;
-    @NotNull
     private final String parentUri;
+    @NotNull
+    private final String resourceName;
     @NotNull
     private final Document xmlAsDocument;
 
     ExistResource(@NotNull final ExistResource existResource) {
-        this.name = existResource.getName();
+        this.resourceName = existResource.getResourceName();
         this.xmlAsDocument = existResource.getXmlAsDocument();
         this.parentUri = existResource.getParentUri();
     }
 
-    public ExistResource(@NotNull final String name, @NotNull final String parentCollectionUri, @NotNull final String xmlContent) throws ParsingException, IOException {
-        this.name = name;
+    public ExistResource(@NotNull final String resourceName, @NotNull final String parentCollectionUri, @NotNull final String xmlContent) throws ParsingException, IOException {
+        this.resourceName = resourceName;
         this.xmlAsDocument = parseXmlString(xmlContent);
         this.parentUri = parentCollectionUri;
     }
@@ -55,18 +55,18 @@ public class ExistResource {
     }
 
     @NotNull
-    public String getName() {
-        return name;
-    }
-
-    @NotNull
     public String getParentUri() {
         return parentUri;
     }
 
     @NotNull
+    public String getResourceName() {
+        return resourceName;
+    }
+
+    @NotNull
     public String getUri() {
-        return parentUri + "/" + name;
+        return parentUri + "/" + resourceName;
     }
 
     @NotNull
@@ -77,7 +77,7 @@ public class ExistResource {
     @Override
     public String toString() {
         return "ExistResource{" +
-                "name='" + name + '\'' +
+                "resourceName='" + resourceName + '\'' +
                 ", xmlAsDocument=" + xmlAsDocument +
                 ", parentUri='" + parentUri + '\'' +
                 '}';

@@ -86,6 +86,21 @@ public class MomCA {
 
     }
 
+    public void changeUserPassword(@NotNull String userName, @NotNull String newPassword) throws MomCAException {
+
+        try {
+
+            RemoteUserManagementService service = (RemoteUserManagementService) rootCollection.getService("UserManagementService", "1.0");
+            Account account = service.getAccount(userName);
+            account.setPassword(newPassword);
+            service.updateAccount(account);
+
+        } catch (XMLDBException e) {
+            throw new MomCAException("Failed to change the password for '" + userName + "'", e);
+        }
+
+    }
+
     public void closeConnection() throws MomCAException {
 
         try {
@@ -103,7 +118,7 @@ public class MomCA {
         if (parent.isPresent()) {
 
             try {
-                Resource res = parent.get().getResource(findMatchingResource(resourceToDelete.getName(), parent.get().listResources()));
+                Resource res = parent.get().getResource(findMatchingResource(resourceToDelete.getResourceName(), parent.get().listResources()));
                 if (res != null) {
                     parent.get().removeResource(res);
                 }
@@ -173,8 +188,7 @@ public class MomCA {
         return listUserResourceNames().stream().map(s -> s.replace(".xml", "")).collect(Collectors.toList());
     }
 
-
-    public void removeExistUserAccount(String userName) throws MomCAException {
+    public void removeExistUserAccount(@NotNull String userName) throws MomCAException {
 
         try {
 
@@ -205,7 +219,7 @@ public class MomCA {
 
             try {
 
-                XMLResource newResource = (XMLResource) col.createResource(resource.getName(), "XMLResource");
+                XMLResource newResource = (XMLResource) col.createResource(resource.getResourceName(), "XMLResource");
                 newResource.setContent(resource.getXmlAsDocument().toXML());
                 col.storeResource(newResource);
                 col.close();

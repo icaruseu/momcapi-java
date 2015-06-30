@@ -98,9 +98,27 @@ public class MomCATest {
         ExistResource res = new ExistResource("deleteTest.xml", "/db", "<empty/>");
         db.storeExistResource(res);
         db.deleteExistResource(res);
-        assertFalse(callGetExistResourceMethod(res.getName(), res.getParentUri()).isPresent());
+        assertFalse(callGetExistResourceMethod(res.getResourceName(), res.getParentUri()).isPresent());
 
     }
+
+//    @Test
+//    public void testChangeUserPassword() throws Exception {
+//
+//        String userName = "changePasswordTestUser";
+//        String oldPassword = "oldPassword";
+//        String newPassword = "newPassword";
+//
+//        Field f = MomCA.class.getDeclaredField("rootCollection");
+//        f.setAccessible(true);//Abracadabra
+//        Collection rootCollection = (Collection) f.get(db);
+//        System.out.println(Arrays.asList(rootCollection.getServices()));
+//        RemoteUserManagementService service = (RemoteUserManagementService) rootCollection.getService("UserManagementService", "1.0");
+//
+//        db.addExistUserAccount(userName, oldPassword);
+//        db.changeUserPassword(userName, newPassword);
+//
+//    }
 
     @Test
     public void testGetImportedCharter() throws Exception {
@@ -233,7 +251,7 @@ public class MomCATest {
     public void testStoreExistResource() throws Exception {
         ExistResource res = new ExistResource("writeTest.xml", "/db", "<empty/>");
         db.storeExistResource(res);
-        assertTrue(callGetExistResourceMethod(res.getName(), res.getParentUri()).isPresent());
+        assertTrue(callGetExistResourceMethod(res.getResourceName(), res.getParentUri()).isPresent());
         db.deleteExistResource(res);
     }
 

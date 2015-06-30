@@ -46,7 +46,7 @@ public class ExistResourceTest {
     @Test
     public void testGetResourceName() throws Exception {
         ExistResource res = new ExistResource(NAME, PARENT_URI, XML_CONTENT_WITH_NAMESPACE);
-        assertEquals(res.getName(), NAME);
+        assertEquals(res.getResourceName(), NAME);
     }
 
     @Test
