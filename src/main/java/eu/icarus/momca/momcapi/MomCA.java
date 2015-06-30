@@ -115,8 +115,10 @@ public class MomCA {
 
             RemoteUserManagementService service = (RemoteUserManagementService) rootCollection.getService("UserManagementService", "1.0");
             Account account = service.getAccount(userName);
-            account.setPassword(newPassword);
-            service.updateAccount(account);
+            if (account != null) {
+                account.setPassword(newPassword);
+                service.updateAccount(account);
+            }
 
         } catch (XMLDBException e) {
             throw new MomCAException("Failed to change the password for '" + userName + "'", e);
