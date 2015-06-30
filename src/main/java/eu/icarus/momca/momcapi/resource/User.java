@@ -11,22 +11,22 @@ import java.util.List;
  */
 public class User extends ExistResource {
 
-    private final String userId;
+    private final String userName;
 
     public User(@NotNull ExistResource existResource) {
 
         super(existResource);
         List<String> nameQueryResults = queryContentXml(XpathQuery.QUERY_XRX_EMAIL);
         if (nameQueryResults.size() == 1) {
-            userId = nameQueryResults.get(0);
+            userName = nameQueryResults.get(0);
         } else {
             throw new IllegalArgumentException("The XML content of the resource doesn't have an xrx:name element. It's probably not a valid user resource.");
         }
 
     }
 
-    public String getUserId() {
-        return userId;
+    public String getUserName() {
+        return userName;
     }
 
     @NotNull

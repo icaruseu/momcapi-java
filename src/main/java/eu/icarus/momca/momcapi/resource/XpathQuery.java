@@ -6,10 +6,12 @@ package eu.icarus.momca.momcapi.resource;
 public enum XpathQuery {
 
     QUERY_ATOM_ID("//atom:id/text()", Namespace.ATOM),
-    QUERY_NAME("//name"),
+    QUERY_CONFIG_GROUP_NAME("//config:group/@name", Namespace.CONFIG),
+    QUERY_CONFIG_NAME("//config:name", Namespace.CONFIG),
+    QUERY_NAME("//name/text()"),
     QUERY_XRX_BOOKMARK("//xrx:bookmark/text()", Namespace.XRX),
     QUERY_XRX_EMAIL("//xrx:email/text()", Namespace.XRX),
-    QUERY_XRX_NAME("//xrx:name", Namespace.XRX),
+    QUERY_XRX_NAME("//xrx:name/text()", Namespace.XRX),
     QUERY_XRX_SAVED("//xrx:saved/xrx:id/text()", Namespace.XRX);
 
     private final Namespace[] namespaces;

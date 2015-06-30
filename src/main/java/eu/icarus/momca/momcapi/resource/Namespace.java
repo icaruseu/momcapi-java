@@ -8,6 +8,7 @@ public enum Namespace {
     APP("http://www.w3.org/2007/app"),
     ATOM("http://www.w3.org/2005/Atom"),
     CEI("http://www.monasterium.net/NS/cei"),
+    CONFIG("http://exist-db.org/Configuration"),
     EAD("urn:isbn:1-931666-22-9"),
     EAG("http://www.archivgut-online.de/eag"),
     XRX("http://www.monasterium.net/NS/xrx");

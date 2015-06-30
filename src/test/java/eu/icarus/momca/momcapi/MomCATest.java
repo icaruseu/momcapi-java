@@ -3,6 +3,8 @@ package eu.icarus.momca.momcapi;
 import eu.icarus.momca.momcapi.atomid.CharterAtomId;
 import eu.icarus.momca.momcapi.exist.ExistQueryFactory;
 import eu.icarus.momca.momcapi.resource.Charter;
+import eu.icarus.momca.momcapi.resource.ExistResource;
+import eu.icarus.momca.momcapi.resource.XpathQuery;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -14,6 +16,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
@@ -66,6 +69,30 @@ public class MomCATest {
     @AfterClass
     public void tearDown() throws Exception {
         db.closeConnection();
+    }
+
+    @Test
+    public void testAddExistUserAccount() throws Exception {
+
+        String parentCollection = "/db/system/security/exist/accounts";
+        String newUserName = "newUser@dev.monasterium.net";
+        String newUserPassword = "testing123";
+        List<String> expectedGroups = new ArrayList<>(2);
+        expectedGroups.add("atom");
+        expectedGroups.add("guest");
+
+        db.addExistUserAccount(newUserName, newUserPassword);
+
+        Class<?> cl = db.getClass();
+        Method method = cl.getDeclaredMethod("getExistResource", String.class, String.class);
+        method.setAccessible(true);
+        @SuppressWarnings("unchecked")
+        Optional<ExistResource> accountResource = (Optional<ExistResource>) method.invoke(db, newUserName + ".xml", parentCollection);
+
+        assertTrue(accountResource.isPresent());
+        assertEquals(accountResource.get().queryContentXml(XpathQuery.QUERY_CONFIG_NAME).get(0), newUserName);
+        assertEquals(accountResource.get().queryContentXml(XpathQuery.QUERY_CONFIG_GROUP_NAME), expectedGroups);
+
     }
 
     @Test
@@ -141,7 +168,7 @@ public class MomCATest {
     @Test
     public void testGetUser() throws Exception {
         String userId = "user1.testuser@dev.monasterium.net";
-        assertEquals(db.getUser(userId).get().getUserId(), userId);
+        assertEquals(db.getUser(userId).get().getUserName(), userId);
     }
 
     @Test
@@ -175,4 +202,5 @@ public class MomCATest {
         assertEquals(erroneouslySavedCharterIds.size(), 1);
         assertEquals(erroneouslySavedCharterIds.get(0), erroneouslySavedCharter);
     }
+
 }

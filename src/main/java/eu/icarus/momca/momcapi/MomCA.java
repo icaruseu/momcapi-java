@@ -8,6 +8,11 @@ import eu.icarus.momca.momcapi.resource.CharterStatus;
 import eu.icarus.momca.momcapi.resource.ExistResource;
 import eu.icarus.momca.momcapi.resource.User;
 import nu.xom.ParsingException;
+import org.exist.security.Account;
+import org.exist.security.Group;
+import org.exist.security.internal.aider.GroupAider;
+import org.exist.security.internal.aider.UserAider;
+import org.exist.xmldb.RemoteUserManagementService;
 import org.jetbrains.annotations.NotNull;
 import org.xmldb.api.DatabaseManager;
 import org.xmldb.api.base.Collection;
@@ -20,11 +25,7 @@ import org.xmldb.api.modules.XPathQueryService;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -58,6 +59,34 @@ public class MomCA {
         this.password = password;
 
         initDatabaseConnection();
+
+    }
+
+    public boolean addExistUserAccount(String userName, String password) throws MomCAException {
+
+        String atom = "atom";
+
+        try {
+
+            RemoteUserManagementService service = (RemoteUserManagementService) rootCollection.getService("UserManagementService", "1.0");
+
+            Group atomGroup = new GroupAider(atom);
+            service.addGroup(atomGroup);
+
+            Account newAccount = new UserAider(userName, atomGroup);
+            newAccount.setPassword(password);
+            service.addAccount(newAccount);
+            service.addAccountToGroup(userName, "guest");
+
+            return true;
+
+        } catch (XMLDBException e) {
+            if (e.getMessage().equals(String.format("Failed to invoke method addAccount in class org.exist.xmlrpc.RpcConnection: Account '%s' exist", userName))) {
+                return false;
+            } else {
+                throw new MomCAException("Failed to create user '" + userName + "'", e);
+            }
+        }
 
     }
 
@@ -115,6 +144,31 @@ public class MomCA {
     @NotNull
     public List<String> listUsers() throws MomCAException {
         return listUserResourceNames().stream().map(s -> s.replace(".xml", "")).collect(Collectors.toList());
+    }
+
+    /**
+     * @param resourceName the name of the resource to find in the list
+     * @param resources    the list of resources
+     * @return The actual name of the resource in the list of resources without regards to eventual URL-Encodings for special characters like @ and |
+     * @throws MomCAException if character encoding needs to be consulted, but named character encoding is not supported
+     */
+    @NotNull
+    private String findMatchingResource(@NotNull String resourceName, @NotNull List<String> resources) throws MomCAException {
+
+        String matchingName = "";
+        for (String resource : resources) {
+
+            try {
+                if (URLDecoder.decode(resource, URL_ENCODING).equals(URLDecoder.decode(resourceName, URL_ENCODING))) {
+                    matchingName = resource;
+                }
+            } catch (UnsupportedEncodingException e) {
+                throw new MomCAException(String.format("URL-Encoding '%s' not supported.", URL_ENCODING), e);
+            }
+
+        }
+        return matchingName;
+
     }
 
     @NotNull
@@ -200,15 +254,12 @@ public class MomCA {
     @NotNull
     private Optional<XMLResource> getXMLResource(@NotNull String resourceName, @NotNull Collection parentCollection) throws MomCAException {
 
-        String encodedName;
-        try {
-            encodedName = URLEncoder.encode(URLDecoder.decode(resourceName, URL_ENCODING), URL_ENCODING);
-        } catch (UnsupportedEncodingException e) {
-            throw new MomCAException(String.format("URL-Encoding '%s' not supported.", URL_ENCODING), e);
-        }
 
         try {
-            return Optional.ofNullable((XMLResource) parentCollection.getResource(encodedName));
+
+            List<String> resources = Arrays.asList(parentCollection.listResources());
+            return Optional.ofNullable((XMLResource) parentCollection.getResource(findMatchingResource(resourceName, resources)));
+
         } catch (XMLDBException e) {
             throw new MomCAException(String.format("Failed to get resource '%s' from parent collection.", resourceName), e);
         }

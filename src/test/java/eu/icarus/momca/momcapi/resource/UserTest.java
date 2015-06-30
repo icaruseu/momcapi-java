@@ -42,7 +42,7 @@ public class UserTest {
     @Test
     public void testConstructor() throws Exception {
         User user = new User(resource);
-        assertEquals(user.getUserId(), USER_ID);
+        assertEquals(user.getUserName(), USER_ID);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
@@ -54,7 +54,7 @@ public class UserTest {
     @Test
     public void testGetUserId() throws Exception {
         User user = new User(resource);
-        assertEquals(user.getUserId(), USER_ID);
+        assertEquals(user.getUserName(), USER_ID);
     }
 
     @Test
