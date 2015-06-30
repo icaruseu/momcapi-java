@@ -217,6 +217,19 @@ public class MomCATest {
     }
 
     @Test
+    public void testRemoveExistUserAccount() throws Exception {
+
+        String newUserName = "removeUserTest@dev.monasterium.net";
+        String newUserPassword = "testing123";
+        db.addExistUserAccount(newUserName, newUserPassword);
+
+        db.removeExistUserAccount(newUserName);
+
+        assertFalse(db.isUserInitialized(newUserName));
+
+    }
+
+    @Test
     public void testStoreExistResource() throws Exception {
         ExistResource res = new ExistResource("writeTest.xml", "/db", "<empty/>");
         db.storeExistResource(res);

@@ -173,6 +173,24 @@ public class MomCA {
         return listUserResourceNames().stream().map(s -> s.replace(".xml", "")).collect(Collectors.toList());
     }
 
+
+    public void removeExistUserAccount(String userName) throws MomCAException {
+
+        try {
+
+            RemoteUserManagementService service = (RemoteUserManagementService) rootCollection.getService("UserManagementService", "1.0");
+            Account account = service.getAccount(userName);
+
+            if (account != null) {
+                service.removeAccount(account);
+            }
+
+        } catch (XMLDBException e) {
+            throw new MomCAException("Failed to remove account '" + userName + "'", e);
+        }
+
+    }
+
     /**
      * @param resource the resource to write in the database. If a resource with the same uri is already existing, it gets overwritten.
      * @throws MomCAException on problems to create the resource
