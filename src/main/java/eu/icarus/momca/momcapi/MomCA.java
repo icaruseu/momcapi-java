@@ -97,6 +97,22 @@ public class MomCA {
     }
 
     @NotNull
+    public List<CharterAtomId> listErroneouslySavedCharters(@NotNull String userName) throws MomCAException {
+
+        List<CharterAtomId> erroneouslySavedCharters = new ArrayList<>(0);
+        getUser(userName).ifPresent(user -> erroneouslySavedCharters.addAll(user.listSavedCharterIds()));
+
+        for (CharterAtomId id : erroneouslySavedCharters) {
+            if (isCharterExisting(id, CharterStatus.SAVED)) {
+                erroneouslySavedCharters.remove(id);
+            }
+        }
+
+        return erroneouslySavedCharters;
+
+    }
+
+    @NotNull
     public List<String> listUsers() throws MomCAException {
         return listUserResourceNames().stream().map(s -> s.replace(".xml", "")).collect(Collectors.toList());
     }
@@ -223,6 +239,10 @@ public class MomCA {
         }
 
 
+    }
+
+    private boolean isCharterExisting(@NotNull CharterAtomId charterAtomId, @NotNull CharterStatus status) throws MomCAException {
+        return !getMatchingCharters(charterAtomId, status.getParentCollection()).isEmpty();
     }
 
     @NotNull

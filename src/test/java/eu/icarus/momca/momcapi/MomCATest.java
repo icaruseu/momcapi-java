@@ -167,4 +167,12 @@ public class MomCATest {
 
     }
 
+    @Test
+    public void testlistErroneouslySavedCharters() throws Exception {
+        String userName = "admin";
+        CharterAtomId erroneouslySavedCharter = new CharterAtomId("tag:www.monasterium.net,2011:/charter/CH-KAE/Urkunden/KAE_Urkunde_Nr_1");
+        final List<CharterAtomId> erroneouslySavedCharterIds = db.listErroneouslySavedCharters(userName);
+        assertEquals(erroneouslySavedCharterIds.size(), 1);
+        assertEquals(erroneouslySavedCharterIds.get(0), erroneouslySavedCharter);
+    }
 }
