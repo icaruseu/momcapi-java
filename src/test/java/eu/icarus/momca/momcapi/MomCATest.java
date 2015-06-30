@@ -185,6 +185,21 @@ public class MomCATest {
     }
 
     @Test
+    public void testIsUserInitialized() throws Exception {
+
+        String userName = "madeo.anna@gmail.com";
+        String newUserXml = "<xrx:user xmlns:xrx='http://www.monasterium.net/NS/xrx'> <xrx:username /> <xrx:password /> <xrx:firstname>Anna</xrx:firstname> <xrx:name>Madeo</xrx:name> <xrx:email>madeo.anna@gmail.com</xrx:email> <xrx:moderator>admin</xrx:moderator> <xrx:street /> <xrx:zip /> <xrx:town /> <xrx:phone /> <xrx:institution /> <xrx:info /> <xrx:storage> <xrx:saved_list /> <xrx:bookmark_list /> </xrx:storage> </xrx:user>";
+        ExistResource userResource = new ExistResource(userName + ".xml", "/db/mom-data/xrx.user", newUserXml);
+        db.storeExistResource(userResource);
+
+        assertFalse(db.isUserInitialized(userName));
+        assertTrue(db.isUserInitialized("admin"));
+
+        db.deleteExistResource(userResource);
+
+    }
+
+    @Test
     public void testListUsers() throws Exception {
         assertTrue(db.listUsers().size() == 3);
     }

@@ -141,6 +141,17 @@ public class MomCA {
         return getExistResource(userName + ".xml", PATH_USER).flatMap(existResource -> Optional.of(new User(existResource)));
     }
 
+    public boolean isUserInitialized(@NotNull String userName) throws MomCAException {
+
+        try {
+            RemoteUserManagementService service = (RemoteUserManagementService) rootCollection.getService("UserManagementService", "1.0");
+            return Optional.ofNullable(service.getAccount(userName)).isPresent();
+        } catch (XMLDBException e) {
+            throw new MomCAException("Failed to get resource for user '" + userName + "'", e);
+        }
+
+    }
+
     @NotNull
     public List<CharterAtomId> listErroneouslySavedCharters(@NotNull String userName) throws MomCAException {
 
