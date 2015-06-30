@@ -12,7 +12,9 @@ import org.exist.security.Account;
 import org.exist.security.Group;
 import org.exist.security.internal.aider.GroupAider;
 import org.exist.security.internal.aider.UserAider;
+import org.exist.xmldb.RemoteCollectionManagementService;
 import org.exist.xmldb.RemoteUserManagementService;
+import org.exist.xmldb.XmldbURI;
 import org.jetbrains.annotations.NotNull;
 import org.xmldb.api.DatabaseManager;
 import org.xmldb.api.base.*;
@@ -35,6 +37,8 @@ public class MomCA {
 
     @NotNull
     private static final String DRIVER = "org.exist.xmldb.DatabaseImpl";
+    @NotNull
+    private static final String NEW_USER_CONTENT = "<xrx:user xmlns:xrx=\"http://www.monasterium.net/NS/xrx\"> <xrx:username /> <xrx:password /> <xrx:firstname>%s</xrx:firstname> <xrx:name>%s</xrx:name> <xrx:email>%s</xrx:email> <xrx:moderator>%s</xrx:moderator> <xrx:street /> <xrx:zip /> <xrx:town /> <xrx:phone /> <xrx:institution /> <xrx:info /> <xrx:storage> <xrx:saved_list /> <xrx:bookmark_list /> </xrx:storage> </xrx:user>";
     @NotNull
     private static final String PATH_USER = "/db/mom-data/xrx.user";
     @NotNull
@@ -86,6 +90,25 @@ public class MomCA {
 
     }
 
+    public void addUser(@NotNull String userName, @NotNull String password, @NotNull String moderatorName) throws MomCAException {
+
+        if (!getUser(userName).isPresent()) {
+
+            String xmlContent = String.format(NEW_USER_CONTENT, "New", "User", userName, moderatorName);
+            ExistResource userResource;
+            try {
+                userResource = new ExistResource(userName + ".xml", PATH_USER, xmlContent);
+            } catch (ParsingException | IOException e) {
+                throw new MomCAException("Failed to create new user resource.", e);
+            }
+            storeExistResource(userResource);
+
+            addExistUserAccount(userName, password);
+
+        }
+
+    }
+
     public void changeUserPassword(@NotNull String userName, @NotNull String newPassword) throws MomCAException {
 
         try {
@@ -128,6 +151,37 @@ public class MomCA {
             }
 
         }
+
+    }
+
+    public void deleteExistUserAccount(@NotNull String userName) throws MomCAException {
+
+        try {
+
+            RemoteUserManagementService service = (RemoteUserManagementService) rootCollection.getService("UserManagementService", "1.0");
+            Account account = service.getAccount(userName);
+
+            if (account != null) {
+                service.removeAccount(account);
+            }
+
+        } catch (XMLDBException e) {
+            throw new MomCAException("Failed to remove account '" + userName + "'", e);
+        }
+
+    }
+
+    public void deleteUser(@NotNull String userName) throws MomCAException {
+
+        Optional<User> userOptional = getUser(userName);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            deleteExistResource(user);
+        }
+
+        deleteExistUserAccount(userName);
+
+        deleteCollection(PATH_USER + "/" + userName);
 
     }
 
@@ -188,23 +242,6 @@ public class MomCA {
         return listUserResourceNames().stream().map(s -> s.replace(".xml", "")).collect(Collectors.toList());
     }
 
-    public void removeExistUserAccount(@NotNull String userName) throws MomCAException {
-
-        try {
-
-            RemoteUserManagementService service = (RemoteUserManagementService) rootCollection.getService("UserManagementService", "1.0");
-            Account account = service.getAccount(userName);
-
-            if (account != null) {
-                service.removeAccount(account);
-            }
-
-        } catch (XMLDBException e) {
-            throw new MomCAException("Failed to remove account '" + userName + "'", e);
-        }
-
-    }
-
     /**
      * @param resource the resource to write in the database. If a resource with the same uri is already existing, it gets overwritten.
      * @throws MomCAException on problems to create the resource
@@ -228,6 +265,22 @@ public class MomCA {
                 throw new MomCAException("Failed to create new resource.", e);
             }
 
+        }
+
+    }
+
+    private void deleteCollection(@NotNull String uri) throws MomCAException {
+
+        Optional<Collection> collectionOptional = getCollection(uri);
+
+        if (collectionOptional.isPresent()) {
+            Collection collection = collectionOptional.get();
+            try {
+                RemoteCollectionManagementService service = (RemoteCollectionManagementService) collection.getParentCollection().getService("CollectionManagementService", "1.0");
+                service.removeCollection(XmldbURI.create(uri));
+            } catch (XMLDBException e) {
+                e.printStackTrace();
+            }
         }
 
     }

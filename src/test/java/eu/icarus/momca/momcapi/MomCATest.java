@@ -5,15 +5,19 @@ import eu.icarus.momca.momcapi.exist.ExistQueryFactory;
 import eu.icarus.momca.momcapi.resource.Charter;
 import eu.icarus.momca.momcapi.resource.ExistResource;
 import eu.icarus.momca.momcapi.resource.XpathQuery;
+import org.exist.xmldb.RemoteCollectionManagementService;
+import org.exist.xmldb.XmldbURI;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import org.xmldb.api.base.Collection;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -90,6 +94,33 @@ public class MomCATest {
         assertEquals(accountResource.get().queryContentXml(XpathQuery.QUERY_CONFIG_NAME).get(0), newUserName);
         assertEquals(accountResource.get().queryContentXml(XpathQuery.QUERY_CONFIG_GROUP_NAME), expectedGroups);
 
+        db.deleteExistUserAccount(newUserName);
+
+    }
+
+    @Test
+    public void testDeleteCollection() throws Exception {
+
+        XmldbURI uri = XmldbURI.create("/db/test");
+
+        Field f = db.getClass().getDeclaredField("rootCollection");
+        f.setAccessible(true);
+        Collection rootCollection = (Collection) f.get(db);
+
+        RemoteCollectionManagementService service = (RemoteCollectionManagementService) rootCollection.getService("CollectionManagementService", "1.0");
+        service.createCollection(uri);
+
+        Class<?> cl = db.getClass();
+        Method deleteCollectionMethod = cl.getDeclaredMethod("deleteCollection", String.class);
+        deleteCollectionMethod.setAccessible(true);
+        deleteCollectionMethod.invoke(db, uri.toASCIIString());
+
+        Method getCollectionMethod = cl.getDeclaredMethod("getCollection", String.class);
+        getCollectionMethod.setAccessible(true);
+
+        //noinspection unchecked
+        assertFalse(((Optional<Collection>) getCollectionMethod.invoke(db, uri.toASCIIString())).isPresent());
+
     }
 
     @Test
@@ -119,6 +150,40 @@ public class MomCATest {
 //        db.changeUserPassword(userName, newPassword);
 //
 //    }
+
+    @Test
+    public void testDeleteExistUserAccount() throws Exception {
+
+        String userName = "removeAccountTest@dev.monasterium.net";
+        String password = "testing123";
+        db.addExistUserAccount(userName, password);
+
+        db.deleteExistUserAccount(userName);
+
+        assertFalse(db.isUserInitialized(userName));
+
+    }
+
+    @Test
+    public void testDeleteUser() throws Exception {
+
+        String userName = "removeUserTest@dev.monasterium.net";
+        String password = "testing123";
+        String moderator = "admin";
+
+        db.addUser(userName, password, moderator);
+        db.deleteUser(userName);
+
+        assertFalse(db.getUser(userName).isPresent());
+        assertFalse(db.isUserInitialized(userName));
+
+        Class<?> cl = db.getClass();
+        Method getCollectionMethod = cl.getDeclaredMethod("getCollection", String.class);
+        getCollectionMethod.setAccessible(true);
+        //noinspection unchecked
+        assertFalse(((Optional<Collection>) getCollectionMethod.invoke(db, "/db/mom-data/xrx.user/" + userName)).isPresent());
+
+    }
 
     @Test
     public void testGetImportedCharter() throws Exception {
@@ -219,7 +284,7 @@ public class MomCATest {
 
     @Test
     public void testListUsers() throws Exception {
-        assertTrue(db.listUsers().size() == 3);
+        assertEquals(db.listUsers().size(), 3);
     }
 
     @Test
@@ -235,24 +300,26 @@ public class MomCATest {
     }
 
     @Test
-    public void testRemoveExistUserAccount() throws Exception {
-
-        String newUserName = "removeUserTest@dev.monasterium.net";
-        String newUserPassword = "testing123";
-        db.addExistUserAccount(newUserName, newUserPassword);
-
-        db.removeExistUserAccount(newUserName);
-
-        assertFalse(db.isUserInitialized(newUserName));
-
-    }
-
-    @Test
     public void testStoreExistResource() throws Exception {
         ExistResource res = new ExistResource("writeTest.xml", "/db", "<empty/>");
         db.storeExistResource(res);
         assertTrue(callGetExistResourceMethod(res.getResourceName(), res.getParentUri()).isPresent());
         db.deleteExistResource(res);
+    }
+
+    @Test
+    public void testaddUser() throws Exception {
+
+        String userName = "newlyAddedUser@dev.monasterium.net";
+        String password = "newPassword";
+        String moderator = "admin";
+        db.addUser(userName, password, moderator);
+
+        assertTrue(db.getUser(userName).isPresent());
+        assertTrue(db.isUserInitialized(userName));
+
+        db.deleteUser(userName);
+
     }
 
     @Test
