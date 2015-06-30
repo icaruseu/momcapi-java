@@ -14,6 +14,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
@@ -83,15 +84,21 @@ public class MomCATest {
 
         db.addExistUserAccount(newUserName, newUserPassword);
 
-        Class<?> cl = db.getClass();
-        Method method = cl.getDeclaredMethod("getExistResource", String.class, String.class);
-        method.setAccessible(true);
-        @SuppressWarnings("unchecked")
-        Optional<ExistResource> accountResource = (Optional<ExistResource>) method.invoke(db, newUserName + ".xml", parentCollection);
+        Optional<ExistResource> accountResource = callGetExistResourceMethod(newUserName + ".xml", parentCollection);
 
         assertTrue(accountResource.isPresent());
         assertEquals(accountResource.get().queryContentXml(XpathQuery.QUERY_CONFIG_NAME).get(0), newUserName);
         assertEquals(accountResource.get().queryContentXml(XpathQuery.QUERY_CONFIG_GROUP_NAME), expectedGroups);
+
+    }
+
+    @Test
+    public void testDeleteExistResource() throws Exception {
+
+        ExistResource res = new ExistResource("deleteTest.xml", "/db", "<empty/>");
+        db.storeExistResource(res);
+        db.deleteExistResource(res);
+        assertFalse(callGetExistResourceMethod(res.getName(), res.getParentUri()).isPresent());
 
     }
 
@@ -195,12 +202,31 @@ public class MomCATest {
     }
 
     @Test
+    public void testStoreExistResource() throws Exception {
+        ExistResource res = new ExistResource("writeTest.xml", "/db", "<empty/>");
+        db.storeExistResource(res);
+        assertTrue(callGetExistResourceMethod(res.getName(), res.getParentUri()).isPresent());
+        db.deleteExistResource(res);
+    }
+
+    @Test
     public void testlistErroneouslySavedCharters() throws Exception {
         String userName = "admin";
         CharterAtomId erroneouslySavedCharter = new CharterAtomId("tag:www.monasterium.net,2011:/charter/CH-KAE/Urkunden/KAE_Urkunde_Nr_1");
         final List<CharterAtomId> erroneouslySavedCharterIds = db.listErroneouslySavedCharters(userName);
         assertEquals(erroneouslySavedCharterIds.size(), 1);
         assertEquals(erroneouslySavedCharterIds.get(0), erroneouslySavedCharter);
+    }
+
+    @NotNull
+    private Optional<ExistResource> callGetExistResourceMethod(@NotNull String resourceName, @NotNull String parentCollection) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+
+        Class<?> cl = db.getClass();
+        Method method = cl.getDeclaredMethod("getExistResource", String.class, String.class);
+        method.setAccessible(true);
+        //noinspection unchecked
+        return (Optional<ExistResource>) method.invoke(db, resourceName, parentCollection);
+
     }
 
 }
