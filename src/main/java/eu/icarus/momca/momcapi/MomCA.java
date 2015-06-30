@@ -32,10 +32,15 @@ import java.util.stream.Collectors;
  */
 public class MomCA {
 
+    @NotNull
     private static final String DRIVER = "org.exist.xmldb.DatabaseImpl";
+    @NotNull
     private static final String PATH_USER = "/db/mom-data/xrx.user";
+    @NotNull
     private static final ExistQueryFactory QUERY_FACTORY = new ExistQueryFactory();
+    @NotNull
     private static final String ROOT_COLLECTION = "/db/mom-data";
+    @NotNull
     private static final String URL_ENCODING = "UTF-8";
     @NotNull
     private final String admin;
@@ -96,7 +101,8 @@ public class MomCA {
         return listUserResourceNames().stream().map(s -> s.replace(".xml", "")).collect(Collectors.toList());
     }
 
-    private Optional<Charter> getCharterFromUri(String charterUri) throws MomCAException {
+    @NotNull
+    private Optional<Charter> getCharterFromUri(@NotNull String charterUri) throws MomCAException {
         String resourceName = charterUri.substring(charterUri.lastIndexOf('/') + 1, charterUri.length());
         String parentUri = charterUri.substring(0, charterUri.lastIndexOf('/'));
         return getExistResource(resourceName, parentUri).map(Charter::new);
@@ -147,7 +153,7 @@ public class MomCA {
     }
 
     @NotNull
-    private List<Charter> getMatchingCharters(@NotNull CharterAtomId charterAtomId, String parentCollection) throws MomCAException {
+    private List<Charter> getMatchingCharters(@NotNull CharterAtomId charterAtomId, @NotNull String parentCollection) throws MomCAException {
 
         String path;
         if (parentCollection.equals(CharterStatus.SAVED.getParentCollection())) {
@@ -206,7 +212,7 @@ public class MomCA {
             Optional<Collection> root = getCollection("/db");
             root.ifPresent(collection -> this.rootCollection = collection);
 
-        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
+        } catch (@NotNull ClassNotFoundException | IllegalAccessException | InstantiationException e) {
             throw new MomCAException("Failed to initialize database connection.", e);
         } catch (XMLDBException e) {
             if (e.getMessage().equals("Wrong password for user [admin] ")) {
@@ -250,7 +256,7 @@ public class MomCA {
     }
 
     @NotNull
-    private List<String> queryDatabase(String existQuery) throws MomCAException {
+    private List<String> queryDatabase(@NotNull String existQuery) throws MomCAException {
 
         XPathQueryService queryService;
         try {

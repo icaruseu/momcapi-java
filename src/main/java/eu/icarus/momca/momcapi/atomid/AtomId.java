@@ -14,6 +14,7 @@ import java.util.Arrays;
  */
 class AtomId {
 
+    @NotNull
     private static final String DEFAULT_PREFIX = "tag:www.monasterium.net,2011:";
     @NotNull
     private final String atomId;

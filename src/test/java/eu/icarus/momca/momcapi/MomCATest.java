@@ -25,9 +25,13 @@ import static org.testng.Assert.*;
  */
 public class MomCATest {
 
+    @NotNull
     private static final ExistQueryFactory QUERY_FACTORY = new ExistQueryFactory();
+    @NotNull
     private static final String SERVER_PROPERTIES_PATH = "/server.properties";
+    @NotNull
     private static final String adminUser = "admin";
+    @NotNull
     private static final String password = "momcapitest";
     private MomCA db;
 

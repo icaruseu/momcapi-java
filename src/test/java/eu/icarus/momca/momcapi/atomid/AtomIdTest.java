@@ -3,6 +3,7 @@ package eu.icarus.momca.momcapi.atomid;
 import eu.icarus.momca.momcapi.resource.Namespace;
 import eu.icarus.momca.momcapi.resource.ResourceType;
 import nu.xom.Element;
+import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -14,9 +15,13 @@ import static org.testng.Assert.assertTrue;
  */
 public class AtomIdTest {
 
+    @NotNull
     private static final String ATOM_ID = "tag:www.monasterium.net,2011:/charter/CH-KAE/Urkunden/KAE_Urkunde_Nr_1";
+    @NotNull
     private static final String PREFIX = "tag:www.monasterium.net,2011:";
+    @NotNull
     private static final ResourceType TYPE = ResourceType.CHARTER;
+    @NotNull
     private static final Element XML = new Element(String.format("%s:id", Namespace.ATOM.getPrefix()), Namespace.ATOM.getUri());
 
     @BeforeClass

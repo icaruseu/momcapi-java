@@ -1,5 +1,6 @@
 package eu.icarus.momca.momcapi.resource;
 
+import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -12,8 +13,11 @@ import static org.testng.Assert.assertEquals;
  */
 public class XpathQueryTest {
 
+    @NotNull
     private static final String NAME = "testfile.xml";
+    @NotNull
     private static final String PARENT_URI = "/db/mom-data/";
+    @NotNull
     private static final String XML_CONTENT = "<testxml> <atom:atom xmlns:atom=\"http://www.w3.org/2005/Atom\"> <atom:id>atomid</atom:id> </atom:atom> <name>name</name> <xrx:xrx xmlns:xrx=\"http://www.monasterium.net/NS/xrx\"> <xrx:bookmark>xrxbookmark</xrx:bookmark> <xrx:email>xrxemail</xrx:email> <xrx:name>xrxname</xrx:name> <xrx:saved><xrx:id>xrxsaved</xrx:id></xrx:saved> </xrx:xrx> </testxml>";
     private ExistResource resource;
 

@@ -1,6 +1,7 @@
 package eu.icarus.momca.momcapi.resource;
 
 import nu.xom.Builder;
+import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -10,11 +11,17 @@ import static org.testng.Assert.assertEquals;
  */
 public class ExistResourceTest {
 
+    @NotNull
     private static final String NAME = "admin.xml";
+    @NotNull
     private static final String PARENT_URI = "/db/mom-data/xrx.user";
+    @NotNull
     private static final String QUERY_RESULT = "Mustermann";
+    @NotNull
     private static final String URI = String.format("%s/%s", PARENT_URI, NAME);
+    @NotNull
     private static final String XML_CONTENT_WITHOUT_NAMESPACE = "<user><name>Mustermann</name></user>";
+    @NotNull
     private static final String XML_CONTENT_WITH_NAMESPACE = "<xrx:user xmlns:xrx=\"http://www.monasterium.net/NS/xrx\"> <xrx:username /> <xrx:password /> <xrx:firstname>Max</xrx:firstname> <xrx:name>Mustermann</xrx:name> <xrx:email>admin</xrx:email> <xrx:moderator>admin</xrx:moderator> <xrx:street /> <xrx:zip /> <xrx:town /> <xrx:phone /> <xrx:institution /> <xrx:info /> <xrx:annotations /> <xrx:storage> <xrx:saved_list /> <xrx:bookmark_list /> </xrx:storage> </xrx:user>";
 
     @Test

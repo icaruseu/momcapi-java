@@ -1,5 +1,6 @@
 package eu.icarus.momca.momcapi.resource;
 
+import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -9,7 +10,9 @@ import static org.testng.Assert.assertEquals;
  */
 public class ResourceTypeTest {
 
+    @NotNull
     private static final ResourceType TYPE = ResourceType.ANNOTATION_IMAGE;
+    @NotNull
     private static final String VALUE = TYPE.getValue();
 
     @Test

@@ -1,5 +1,6 @@
 package eu.icarus.momca.momcapi.atomid;
 
+import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
 
 import java.util.Optional;
@@ -11,13 +12,21 @@ import static org.testng.Assert.*;
  */
 public class CharterAtomIdTest {
 
+    @NotNull
     private static final String ARCHIVE_ID = "RS-IAGNS";
+    @NotNull
     private static final String COLLECTION_CHARTER_ATOM_ID = "tag:www.monasterium.net,2011:/charter/MedDocBulgEmp/1192-02-02_sic%21_Ioan_Kaliman";
+    @NotNull
     private static final String COLLECTION_CHARTER_ID = "1192-02-02_sic!_Ioan_Kaliman";
+    @NotNull
     private static final String COLLECTION_ID = "MedDocBulgEmp";
+    @NotNull
     private static final String FOND_CHARTER_ATOM_ID = "tag:www.monasterium.net,2011:/charter/RS-IAGNS/Charters/IAGNS_F-.150_6605%7C193232";
+    @NotNull
     private static final String FOND_CHARTER_ID = "IAGNS_F-.150_6605|193232";
+    @NotNull
     private static final String FOND_ID = "Charters";
+    @NotNull
     private static final String BASE_PATH = String.format("%s/%s", ARCHIVE_ID, FOND_ID);
 
     @Test
