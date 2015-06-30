@@ -4,6 +4,9 @@ import nu.xom.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -26,9 +29,9 @@ public class ExistResource {
     }
 
     public ExistResource(@NotNull final String resourceName, @NotNull final String parentCollectionUri, @NotNull final String xmlContent) throws ParsingException, IOException {
-        this.resourceName = resourceName;
+        this.resourceName = URLEncoder.encode(resourceName, "UTF-8");
         this.xmlAsDocument = parseXmlString(xmlContent);
-        this.parentUri = parentCollectionUri;
+        this.parentUri = encodePath(parentCollectionUri);
     }
 
     @NotNull
@@ -81,6 +84,16 @@ public class ExistResource {
                 ", xmlAsDocument=" + xmlAsDocument +
                 ", parentUri='" + parentUri + '\'' +
                 '}';
+    }
+
+    private String encodePath(String path) throws UnsupportedEncodingException {
+
+        List<String> encodedTokens = new ArrayList<>(0);
+        for (String token : path.split("/")) {
+            encodedTokens.add(URLEncoder.encode(token, "UTF-8"));
+        }
+        return String.join("/", encodedTokens);
+
     }
 
     @NotNull

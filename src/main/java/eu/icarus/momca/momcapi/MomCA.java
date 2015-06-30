@@ -12,18 +12,21 @@ import org.exist.security.Account;
 import org.exist.security.Group;
 import org.exist.security.internal.aider.GroupAider;
 import org.exist.security.internal.aider.UserAider;
+import org.exist.xmldb.RemoteCollection;
 import org.exist.xmldb.RemoteCollectionManagementService;
 import org.exist.xmldb.RemoteUserManagementService;
-import org.exist.xmldb.XmldbURI;
+import org.exist.xmldb.UserManagementService;
 import org.jetbrains.annotations.NotNull;
 import org.xmldb.api.DatabaseManager;
 import org.xmldb.api.base.*;
+import org.xmldb.api.modules.CollectionManagementService;
 import org.xmldb.api.modules.XMLResource;
 import org.xmldb.api.modules.XPathQueryService;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -66,30 +69,6 @@ public class MomCA {
 
     }
 
-    public void addExistUserAccount(String userName, String password) throws MomCAException {
-
-        String atom = "atom";
-
-        try {
-
-            RemoteUserManagementService service = (RemoteUserManagementService) rootCollection.getService("UserManagementService", "1.0");
-
-            Group atomGroup = new GroupAider(atom);
-            service.addGroup(atomGroup);
-
-            Account newAccount = new UserAider(userName, atomGroup);
-            newAccount.setPassword(password);
-            service.addAccount(newAccount);
-            service.addAccountToGroup(userName, "guest");
-
-        } catch (XMLDBException e) {
-            if (!e.getMessage().equals(String.format("Failed to invoke method addAccount in class org.exist.xmlrpc.RpcConnection: Account '%s' exist", userName))) {
-                throw new MomCAException("Failed to create user '" + userName + "'", e);
-            }
-        }
-
-    }
-
     public void addUser(@NotNull String userName, @NotNull String password, @NotNull String moderatorName) throws MomCAException {
 
         if (!getUser(userName).isPresent()) {
@@ -103,7 +82,7 @@ public class MomCA {
             }
             storeExistResource(userResource);
 
-            addExistUserAccount(userName, password);
+            initializeUser(userName, password);
 
         }
 
@@ -212,6 +191,30 @@ public class MomCA {
         return getExistResource(userName + ".xml", PATH_USER).flatMap(existResource -> Optional.of(new User(existResource)));
     }
 
+    public void initializeUser(String userName, String password) throws MomCAException {
+
+        String atom = "atom";
+
+        try {
+
+            RemoteUserManagementService service = (RemoteUserManagementService) rootCollection.getService("UserManagementService", "1.0");
+
+            Group atomGroup = new GroupAider(atom);
+            service.addGroup(atomGroup);
+
+            Account newAccount = new UserAider(userName, atomGroup);
+            newAccount.setPassword(password);
+            service.addAccount(newAccount);
+            service.addAccountToGroup(userName, "guest");
+
+        } catch (XMLDBException e) {
+            if (!e.getMessage().equals(String.format("Failed to invoke method addAccount in class org.exist.xmlrpc.RpcConnection: Account '%s' exist", userName))) {
+                throw new MomCAException("Failed to create user '" + userName + "'", e);
+            }
+        }
+
+    }
+
     public boolean isUserInitialized(@NotNull String userName) throws MomCAException {
 
         try {
@@ -261,10 +264,48 @@ public class MomCA {
                 XMLResource newResource = (XMLResource) col.createResource(resource.getResourceName(), "XMLResource");
                 newResource.setContent(resource.getXmlAsDocument().toXML());
                 col.storeResource(newResource);
+
+                UserManagementService userService = (RemoteUserManagementService) col.getService("UserManagementService", "1.0");
+                userService.chmod(newResource, "rwxrwxrwx");
+
                 col.close();
 
             } catch (XMLDBException e) {
                 throw new MomCAException("Failed to create new resource.", e);
+            }
+
+        }
+
+    }
+
+    private void addCollection(@NotNull String name, @NotNull String parentUri) throws MomCAException {
+
+        String encodedName;
+        String encodedPath;
+
+        try {
+            encodedPath = encode(parentUri);
+            encodedName = encode(name);
+
+        } catch (UnsupportedEncodingException e) {
+            throw new MomCAException("Failed to encode uri.", e);
+        }
+
+        Optional<Collection> parentOptional = getCollection(encodedPath);
+
+        if (parentOptional.isPresent()) {
+
+            Collection parent = parentOptional.get();
+            try {
+                CollectionManagementService parentService = (RemoteCollectionManagementService) parent.getService("CollectionManagementService", "1.0");
+                parentService.createCollection(encodedName);
+
+                Collection newCollection = parent.getChildCollection(encodedName);
+                UserManagementService userService = (RemoteUserManagementService) newCollection.getService("UserManagementService", "1.0");
+                userService.chmod("rwxrwxrwx");
+
+            } catch (XMLDBException e) {
+                throw new MomCAException("Failed to add collection.", e);
             }
 
         }
@@ -279,11 +320,21 @@ public class MomCA {
             Collection collection = collectionOptional.get();
             try {
                 RemoteCollectionManagementService service = (RemoteCollectionManagementService) collection.getParentCollection().getService("CollectionManagementService", "1.0");
-                service.removeCollection(XmldbURI.create(uri));
+                service.removeCollection(((RemoteCollection) collection).getPathURI());
             } catch (XMLDBException e) {
                 e.printStackTrace();
             }
         }
+
+    }
+
+    private String encode(String path) throws UnsupportedEncodingException {
+
+        List<String> encodedTokens = new ArrayList<>(0);
+        for (String token : path.split("/")) {
+            encodedTokens.add(URLEncoder.encode(URLDecoder.decode(token, "UTF-8"), "UTF-8"));
+        }
+        return String.join("/", encodedTokens);
 
     }
 
@@ -323,8 +374,8 @@ public class MomCA {
     private Optional<Collection> getCollection(@NotNull String uri) throws MomCAException {
 
         try {
-            return Optional.ofNullable(DatabaseManager.getCollection(dbRootUri + uri, admin, password));
-        } catch (XMLDBException e) {
+            return Optional.ofNullable(DatabaseManager.getCollection(dbRootUri + encode(uri), admin, password));
+        } catch (UnsupportedEncodingException | XMLDBException e) {
             throw new MomCAException(String.format("Failed to open collection '%s'.", uri), e);
         }
 
