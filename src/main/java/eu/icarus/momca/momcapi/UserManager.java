@@ -15,7 +15,6 @@ import org.xmldb.api.base.XMLDBException;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -34,7 +33,7 @@ class UserManager {
     @NotNull
     private final MomcaConnection momcaConnection;
 
-    public UserManager(@NotNull MomcaConnection momcaConnection) {
+    UserManager(@NotNull MomcaConnection momcaConnection) {
         this.momcaConnection = momcaConnection;
     }
 
@@ -182,9 +181,9 @@ class UserManager {
 
             for (String escapedUserName : escapedUserNames) {
                 try {
-                    users.add(URLDecoder.decode(escapedUserName, MomcaConnection.URL_ENCODING));
+                    users.add(Util.decode(escapedUserName));
                 } catch (UnsupportedEncodingException e) {
-                    throw new MomCAException(String.format("URL-Encoding '%s' not supported.", MomcaConnection.URL_ENCODING), e);
+                    throw new MomCAException(e);
                 }
             }
 

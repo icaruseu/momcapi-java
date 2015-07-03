@@ -20,7 +20,7 @@ public class CharterManager {
 
     private final MomcaConnection momcaConnection;
 
-    public CharterManager(MomcaConnection momcaConnection) {
+    CharterManager(MomcaConnection momcaConnection) {
         this.momcaConnection = momcaConnection;
     }
 

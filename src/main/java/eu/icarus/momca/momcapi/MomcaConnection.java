@@ -17,7 +17,6 @@ import org.xmldb.api.modules.XPathQueryService;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -27,8 +26,6 @@ import java.util.Optional;
  */
 public class MomcaConnection {
 
-    @NotNull
-    static final String URL_ENCODING = "UTF-8";
     @NotNull
     private static final String DRIVER = "org.exist.xmldb.DatabaseImpl";
     @NotNull
@@ -71,6 +68,40 @@ public class MomcaConnection {
     @NotNull
     public UserManager getUserManager() {
         return new UserManager(this);
+    }
+
+    void addCollection(@NotNull String name, @NotNull String parentUri) throws MomCAException {
+
+        String encodedName;
+        String encodedPath;
+
+        try {
+            encodedPath = Util.encode(parentUri);
+            encodedName = Util.encode(name);
+
+        } catch (UnsupportedEncodingException e) {
+            throw new MomCAException("Failed to encode uri.", e);
+        }
+
+        Optional<Collection> parentOptional = getCollection(encodedPath);
+
+        if (parentOptional.isPresent()) {
+
+            Collection parent = parentOptional.get();
+            try {
+                CollectionManagementService parentService = (RemoteCollectionManagementService) parent.getService("CollectionManagementService", "1.0");
+                parentService.createCollection(encodedName);
+
+                Collection newCollection = parent.getChildCollection(encodedName);
+                UserManagementService userService = (RemoteUserManagementService) newCollection.getService("UserManagementService", "1.0");
+                userService.chmod("rwxrwxrwx");
+
+            } catch (XMLDBException e) {
+                throw new MomCAException("Failed to add collection.", e);
+            }
+
+        }
+
     }
 
     void deleteCollection(@NotNull String uri) throws MomCAException {
@@ -220,40 +251,6 @@ public class MomcaConnection {
 
     }
 
-    private void addCollection(@NotNull String name, @NotNull String parentUri) throws MomCAException {
-
-        String encodedName;
-        String encodedPath;
-
-        try {
-            encodedPath = Util.encode(parentUri);
-            encodedName = Util.encode(name);
-
-        } catch (UnsupportedEncodingException e) {
-            throw new MomCAException("Failed to encode uri.", e);
-        }
-
-        Optional<Collection> parentOptional = getCollection(encodedPath);
-
-        if (parentOptional.isPresent()) {
-
-            Collection parent = parentOptional.get();
-            try {
-                CollectionManagementService parentService = (RemoteCollectionManagementService) parent.getService("CollectionManagementService", "1.0");
-                parentService.createCollection(encodedName);
-
-                Collection newCollection = parent.getChildCollection(encodedName);
-                UserManagementService userService = (RemoteUserManagementService) newCollection.getService("UserManagementService", "1.0");
-                userService.chmod("rwxrwxrwx");
-
-            } catch (XMLDBException e) {
-                throw new MomCAException("Failed to add collection.", e);
-            }
-
-        }
-
-    }
-
     /**
      * @param resourceName the name of the resource to find in the list
      * @param resources    the list of resources
@@ -267,11 +264,11 @@ public class MomcaConnection {
         for (String resource : resources) {
 
             try {
-                if (URLDecoder.decode(resource, URL_ENCODING).equals(URLDecoder.decode(resourceName, URL_ENCODING))) {
+                if (Util.decode(resource).equals(Util.decode(resourceName))) {
                     matchingName = resource;
                 }
             } catch (UnsupportedEncodingException e) {
-                throw new MomCAException(String.format("URL-Encoding '%s' not supported.", URL_ENCODING), e);
+                throw new MomCAException(e);
             }
 
         }

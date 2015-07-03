@@ -14,6 +14,17 @@ import java.util.List;
 public class Util {
 
     @NotNull
+    public static String decode(@NotNull String string) throws UnsupportedEncodingException {
+
+        List<String> decodedTokens = new ArrayList<>(0);
+        for (String token : string.split("/")) {
+            decodedTokens.add(URLDecoder.decode(token, "UTF-8"));
+        }
+        return String.join("/", decodedTokens);
+
+    }
+
+    @NotNull
     public static String encode(@NotNull String string) throws UnsupportedEncodingException {
 
         List<String> encodedTokens = new ArrayList<>(0);

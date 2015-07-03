@@ -19,4 +19,7 @@ public class MomCAException extends Exception {
         super(message, e);
     }
 
+    public MomCAException(@NotNull Exception e) {
+        super(e);
+    }
 }

@@ -1,12 +1,12 @@
 package eu.icarus.momca.momcapi.atomid;
 
+import eu.icarus.momca.momcapi.Util;
 import eu.icarus.momca.momcapi.resource.Namespace;
 import eu.icarus.momca.momcapi.resource.ResourceType;
 import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Arrays;
 
 /**
@@ -41,7 +41,7 @@ class AtomId {
             for (String idPart : idParts) {
                 try {
                     idBuilder.append("/");
-                    idBuilder.append(URLEncoder.encode(idPart, "UTF-8"));
+                    idBuilder.append(Util.encode(idPart));
                 } catch (UnsupportedEncodingException e) {
                     throw new RuntimeException(e);
                 }

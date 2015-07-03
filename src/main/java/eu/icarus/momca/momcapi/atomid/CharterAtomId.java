@@ -1,10 +1,10 @@
 package eu.icarus.momca.momcapi.atomid;
 
+import eu.icarus.momca.momcapi.Util;
 import eu.icarus.momca.momcapi.resource.ResourceType;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.Optional;
 
 /**
@@ -12,8 +12,6 @@ import java.util.Optional;
  */
 public class CharterAtomId extends AtomId {
 
-    @NotNull
-    private static final String DEFAULT_ENCODING = "UTF-8";
     @NotNull
     private final Optional<String> archiveId;
     @NotNull
@@ -37,15 +35,15 @@ public class CharterAtomId extends AtomId {
             switch (valueTokens.length) {
 
                 case 4:
-                    this.collectionId = Optional.of(URLDecoder.decode(valueTokens[2], DEFAULT_ENCODING));
-                    this.charterId = URLDecoder.decode(valueTokens[3], DEFAULT_ENCODING);
+                    this.collectionId = Optional.of(Util.decode(valueTokens[2]));
+                    this.charterId = Util.decode(valueTokens[3]);
                     this.archiveId = Optional.empty();
                     this.fondId = Optional.empty();
                     break;
                 case 5:
-                    this.archiveId = Optional.of(URLDecoder.decode(valueTokens[2], DEFAULT_ENCODING));
-                    this.fondId = Optional.of(URLDecoder.decode(valueTokens[3], DEFAULT_ENCODING));
-                    this.charterId = URLDecoder.decode(valueTokens[4], DEFAULT_ENCODING);
+                    this.archiveId = Optional.of(Util.decode(valueTokens[2]));
+                    this.fondId = Optional.of(Util.decode(valueTokens[3]));
+                    this.charterId = Util.decode(valueTokens[4]);
                     this.collectionId = Optional.empty();
                     break;
                 default:

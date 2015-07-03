@@ -10,6 +10,18 @@ import static org.testng.Assert.assertEquals;
 public class UtilTest {
 
     @Test
+    public void testDecode() throws Exception {
+
+        String encodedString = "/db/mom-data/AZK%7CAmbroz";
+        String decodedString = "/db/mom-data/AZK|Ambroz";
+        assertEquals(Util.decode(encodedString), decodedString);
+
+        String nonEncodedString = "User1@monasterium.net";
+        assertEquals(Util.decode(nonEncodedString), nonEncodedString);
+
+    }
+
+    @Test
     public void testEncode() throws Exception {
 
         String nonEncodedString = "User1@monasterium.net";
