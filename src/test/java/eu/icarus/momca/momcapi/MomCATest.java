@@ -139,6 +139,16 @@ public class MomCATest {
 
     }
 
+    @Test
+    public void testDeleteExistResource() throws Exception {
+
+        ExistResource res = new ExistResource("deleteTest.xml", "/db", "<empty/>");
+        db.storeExistResource(res);
+        db.deleteExistResource(res);
+        assertFalse(callGetExistResourceMethod(res.getResourceName(), res.getParentUri()).isPresent());
+
+    }
+
 //    @Test
 //    public void testChangeUserPassword() throws Exception {
 //
@@ -156,16 +166,6 @@ public class MomCATest {
 //        db.changeUserPassword(userName, newPassword);
 //
 //    }
-
-    @Test
-    public void testDeleteExistResource() throws Exception {
-
-        ExistResource res = new ExistResource("deleteTest.xml", "/db", "<empty/>");
-        db.storeExistResource(res);
-        db.deleteExistResource(res);
-        assertFalse(callGetExistResourceMethod(res.getResourceName(), res.getParentUri()).isPresent());
-
-    }
 
     @Test
     public void testDeleteExistUserAccount() throws Exception {
@@ -202,73 +202,68 @@ public class MomCATest {
     }
 
     @Test
-    public void testGetImportedCharter() throws Exception {
+    public void testGetCharterInstancesForImportedCharter() throws Exception {
 
         CharterAtomId id = new CharterAtomId("RS-IAGNS", "Charters", "F1_fasc.16_sub_N_1513");
-        List<Charter> charters = db.getImportedCharters(id);
+        List<Charter> charters = db.getCharterInstances(id);
         assertEquals(charters.size(), 1);
         assertEquals(charters.get(0).getAtomId(), id);
 
     }
 
     @Test
-    public void testGetImportedCharterNotExisting() throws Exception {
-        CharterAtomId id = new CharterAtomId("RS-IAGNS", "Charters", "NotExisting");
-        List<Charter> charters = db.getImportedCharters(id);
-        assertTrue(charters.isEmpty());
-    }
-
-    @Test
-    public void testGetImportedCharterWithEncodeId() throws Exception {
-
-        CharterAtomId id = new CharterAtomId("RS-IAGNS", "Charters", "IAGNS_F-.150_6605|193232"); // The | will be encoded
-        List<Charter> charters = db.getImportedCharters(id);
-        assertEquals(charters.size(), 1);
-        assertEquals(charters.get(0).getAtomId(), id);
-
-    }
-
-    @Test
-    public void testGetPrivateCharter() throws Exception {
+    public void testGetCharterInstancesForPrivateCharter() throws Exception {
 
         CharterAtomId id = new CharterAtomId("ea13e5f1-03b2-4bfa-9dd5-8fb770f98d7b", "46bc10f3-bc35-4fa8-ab82-25827dc243f6");
-        String userName = "admin";
-        List<Charter> charters = db.getPrivateCharters(id, userName);
+        List<Charter> charters = db.getCharterInstances(id);
         assertEquals(charters.size(), 1);
         assertEquals(charters.get(0).getAtomId(), id);
 
     }
 
     @Test
-    public void testGetPublishedCharter() throws Exception {
+    public void testGetCharterInstancesForPublishedPrivateCharter() throws Exception {
+
+        CharterAtomId id = new CharterAtomId("f84fc6a2-85c6-4618-ab52-d0acfbcf58eb", "b94c19ed-95b2-40c6-9f0e-3f97d6e913ac");
+        List<Charter> charters = db.getCharterInstances(id);
+        assertEquals(charters.size(), 2);
+        assertEquals(charters.get(0).getAtomId(), id);
+
+    }
+
+    @Test
+    public void testGetCharterInstancesForSavedCharter() throws Exception {
+        CharterAtomId id = new CharterAtomId("CH-KAE", "Urkunden", "KAE_Urkunde_Nr_2");
+        List<Charter> charters = db.getCharterInstances(id);
+        assertEquals(charters.size(), 2);
+        assertEquals(charters.get(0).getAtomId(), id);
+    }
+
+    @Test
+    public void testGetCharterInstancesWithEncodeId() throws Exception {
+
+        CharterAtomId id = new CharterAtomId("RS-IAGNS", "Charters", "IAGNS_F-.150_6605|193232"); // The | will be encoded
+        List<Charter> charters = db.getCharterInstances(id);
+        assertEquals(charters.size(), 1);
+        assertEquals(charters.get(0).getAtomId(), id);
+
+    }
+
+    @Test
+    public void testGetGetCharterInstancesCharterNotExisting() throws Exception {
+        CharterAtomId id = new CharterAtomId("RS-IAGNS", "Charters", "NotExisting");
+        List<Charter> charters = db.getCharterInstances(id);
+        assertTrue(charters.isEmpty());
+    }
+
+    @Test
+    public void testGetGetCharterInstancesForPublishedCharter() throws Exception {
 
         CharterAtomId id = new CharterAtomId("CH-KAE", "Urkunden", "KAE_Urkunde_Nr_1");
-        List<Charter> charters = db.getPublishedCharters(id);
+        List<Charter> charters = db.getCharterInstances(id);
         assertEquals(charters.size(), 1);
         assertEquals(charters.get(0).getAtomId(), id);
 
-    }
-
-    @Test
-    public void testGetPublishedCharterNotExisting() throws Exception {
-        CharterAtomId id = new CharterAtomId("CH-KA", "Urkunden", "NotExisting");
-        List<Charter> charters = db.getPublishedCharters(id);
-        assertTrue(charters.isEmpty());
-    }
-
-    @Test
-    public void testGetSavedCharter() throws Exception {
-        CharterAtomId id = new CharterAtomId("CH-KAE", "Urkunden", "KAE_Urkunde_Nr_2");
-        List<Charter> charters = db.getSavedCharters(id);
-        assertEquals(charters.size(), 1);
-        assertEquals(charters.get(0).getAtomId(), id);
-    }
-
-    @Test
-    public void testGetSavedCharterNotExisting() throws Exception {
-        CharterAtomId id = new CharterAtomId("CH-KA", "Urkunden", "NotExisting");
-        List<Charter> charters = db.getSavedCharters(id);
-        assertTrue(charters.isEmpty());
     }
 
     @Test
@@ -321,8 +316,19 @@ public class MomCATest {
     }
 
     @Test
+    public void testListUninitializedUserNames() throws Exception {
+
+        String uninitializedUser = "user3.testuser@dev.monasterium.net";
+        List<String> result = db.listUninitializedUserNames();
+
+        assertEquals(result.size(), 1);
+        assertEquals(result.get(0), uninitializedUser);
+
+    }
+
+    @Test
     public void testListUsers() throws Exception {
-        assertEquals(db.listUsers().size(), 3);
+        assertEquals(db.listUserNames().size(), 4);
     }
 
     @Test

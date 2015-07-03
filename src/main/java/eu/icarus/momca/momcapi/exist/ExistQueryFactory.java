@@ -1,5 +1,6 @@
 package eu.icarus.momca.momcapi.exist;
 
+import eu.icarus.momca.momcapi.atomid.CharterAtomId;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -11,16 +12,24 @@ public class ExistQueryFactory {
     }
 
     @NotNull
-    public String queryUrisOfCharter(@NotNull String path, String charterId) {
+    public String queryCharterExistence(@NotNull CharterAtomId charterId) {
 
         return String.format(
                 "declare namespace atom = 'http://www.w3.org/2005/Atom';" +
-                        " declare namespace cei = 'http://www.monasterium.net/NS/cei';" +
-                        " let $nodes := (collection('%s')//atom:entry[.//cei:idno/@id='%s'])" +
+                        " collection('/db/mom-data')//atom:entry[.//atom:id/text()='%s'][1]",
+                charterId.getAtomId());
+
+    }
+
+    @NotNull
+    public String queryCharterUris(@NotNull CharterAtomId charterId) {
+
+        return String.format(
+                "declare namespace atom = 'http://www.w3.org/2005/Atom';" +
+                        " let $nodes := collection('/db/mom-data')//atom:entry[.//atom:id/text()='%s']" +
                         " for $node in $nodes" +
                         " return concat(util:collection-name($node), '/', util:document-name($node))",
-                path,
-                charterId);
+                charterId.getAtomId());
     }
 
     @NotNull

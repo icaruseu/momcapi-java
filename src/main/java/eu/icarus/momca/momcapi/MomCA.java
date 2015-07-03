@@ -4,7 +4,6 @@ import eu.icarus.momca.momcapi.atomid.CharterAtomId;
 import eu.icarus.momca.momcapi.exception.MomCAException;
 import eu.icarus.momca.momcapi.exist.ExistQueryFactory;
 import eu.icarus.momca.momcapi.resource.Charter;
-import eu.icarus.momca.momcapi.resource.CharterStatus;
 import eu.icarus.momca.momcapi.resource.ExistResource;
 import eu.icarus.momca.momcapi.resource.User;
 import nu.xom.ParsingException;
@@ -167,23 +166,14 @@ public class MomCA {
     }
 
     @NotNull
-    public List<Charter> getImportedCharters(@NotNull CharterAtomId charterAtomId) throws MomCAException {
-        return getMatchingCharters(charterAtomId, CharterStatus.IMPORTED.getParentCollection());
-    }
+    public List<Charter> getCharterInstances(@NotNull CharterAtomId charterAtomId) throws MomCAException {
 
-    @NotNull
-    public List<Charter> getPrivateCharters(@NotNull CharterAtomId charterAtomId, @NotNull String userName) throws MomCAException {
-        return getMatchingCharters(charterAtomId, CharterStatus.PRIVATE.getParentCollection() + "/" + userName + "/metadata.charter");
-    }
+        List<Charter> charters = new ArrayList<>(0);
+        for (String charterUri : queryDatabase(QUERY_FACTORY.queryCharterUris(charterAtomId))) {
+            getCharterFromUri(charterUri).ifPresent(charters::add);
+        }
+        return charters;
 
-    @NotNull
-    public List<Charter> getPublishedCharters(@NotNull CharterAtomId charterAtomId) throws MomCAException {
-        return getMatchingCharters(charterAtomId, CharterStatus.PUBLIC.getParentCollection());
-    }
-
-    @NotNull
-    public List<Charter> getSavedCharters(@NotNull CharterAtomId charterAtomId) throws MomCAException {
-        return getMatchingCharters(charterAtomId, CharterStatus.SAVED.getParentCollection());
     }
 
     @NotNull
@@ -233,7 +223,7 @@ public class MomCA {
         getUser(userName).ifPresent(user -> erroneouslySavedCharters.addAll(user.listSavedCharterIds()));
 
         for (CharterAtomId id : erroneouslySavedCharters) {
-            if (isCharterExisting(id, CharterStatus.SAVED)) {
+            if (isCharterExisting(id)) {
                 erroneouslySavedCharters.remove(id);
             }
         }
@@ -243,7 +233,22 @@ public class MomCA {
     }
 
     @NotNull
-    public List<String> listUsers() throws MomCAException {
+    public List<String> listUninitializedUserNames() throws MomCAException {
+
+        List<String> uninitializedUsers = new ArrayList<>(0);
+
+        for (String user : listUserNames()) {
+            if (!isUserInitialized(user)) {
+                uninitializedUsers.add(user);
+            }
+        }
+
+        return uninitializedUsers;
+
+    }
+
+    @NotNull
+    public List<String> listUserNames() throws MomCAException {
         return listUserResourceNames().stream().map(s -> s.replace(".xml", "")).collect(Collectors.toList());
     }
 
@@ -415,35 +420,6 @@ public class MomCA {
     }
 
     @NotNull
-    private List<Charter> getMatchingCharters(@NotNull CharterAtomId charterAtomId, @NotNull String parentCollection) throws MomCAException {
-
-        String path;
-        if (parentCollection.equals(CharterStatus.SAVED.getParentCollection())) {
-
-            String[] parts = {ROOT_COLLECTION, parentCollection};
-            path = String.join("/", parts);
-
-        } else if (charterAtomId.isPartOfArchiveFond()) {
-
-            String[] parts = {ROOT_COLLECTION, parentCollection, charterAtomId.getArchiveId().get(), charterAtomId.getFondId().get()};
-            path = String.join("/", parts);
-
-        } else {
-
-            String[] parts = {ROOT_COLLECTION, parentCollection, charterAtomId.getCollectionId().get()};
-            path = String.join("/", parts);
-
-        }
-
-        List<Charter> charters = new ArrayList<>(0);
-        for (String charterUri : queryDatabase(QUERY_FACTORY.queryUrisOfCharter(path, charterAtomId.getCharterId()))) {
-            getCharterFromUri(charterUri).ifPresent(charters::add);
-        }
-        return charters;
-
-    }
-
-    @NotNull
     private Optional<XMLResource> getXMLResource(@NotNull String resourceName, @NotNull Collection parentCollection) throws MomCAException {
 
         try {
@@ -480,8 +456,8 @@ public class MomCA {
 
     }
 
-    private boolean isCharterExisting(@NotNull CharterAtomId charterAtomId, @NotNull CharterStatus status) throws MomCAException {
-        return !getMatchingCharters(charterAtomId, status.getParentCollection()).isEmpty();
+    private boolean isCharterExisting(@NotNull CharterAtomId charterAtomId) throws MomCAException {
+        return !queryDatabase(QUERY_FACTORY.queryCharterExistence(charterAtomId)).isEmpty();
     }
 
     @NotNull
