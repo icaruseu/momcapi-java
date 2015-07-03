@@ -4,7 +4,6 @@ import eu.icarus.momca.momcapi.atomid.CharterAtomId;
 import eu.icarus.momca.momcapi.exist.ExistQueryFactory;
 import eu.icarus.momca.momcapi.resource.Charter;
 import eu.icarus.momca.momcapi.resource.ExistResource;
-import eu.icarus.momca.momcapi.resource.XpathQuery;
 import org.exist.xmldb.RemoteCollectionManagementService;
 import org.exist.xmldb.XmldbURI;
 import org.jetbrains.annotations.NotNull;
@@ -21,7 +20,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
@@ -31,7 +29,7 @@ import static org.testng.Assert.*;
 /**
  * Created by daniel on 25.06.2015.
  */
-public class MomCATest {
+public class MomcaConnectionTest {
 
     @NotNull
     private static final ExistQueryFactory QUERY_FACTORY = new ExistQueryFactory();
@@ -41,7 +39,7 @@ public class MomCATest {
     private static final String adminUser = "admin";
     @NotNull
     private static final String password = "momcapitest";
-    private MomCA db;
+    private MomcaConnection db;
 
     @BeforeClass
     public void setUp() throws Exception {
@@ -65,9 +63,9 @@ public class MomCATest {
         assertNotNull(serverUrl, "'serverUrl' missing from '" + SERVER_PROPERTIES_PATH + "'");
         assertNotNull(password, "'password' missing from '" + SERVER_PROPERTIES_PATH + "'");
 
-        db = new MomCA(serverUrl, adminUser, password);
+        db = new MomcaConnection(serverUrl, adminUser, password);
 
-        assertNotNull(db, "MomCA connection not initialized.");
+        assertNotNull(db, "MomcaConnection connection not initialized.");
 
     }
 
@@ -99,20 +97,7 @@ public class MomCATest {
 
     }
 
-    @Test
-    public void testAddUser() throws Exception {
 
-        String userName = "newlyAddedUser@dev.monasterium.net";
-        String password = "newPassword";
-        String moderator = "admin";
-        db.addUser(userName, password, moderator);
-
-        assertTrue(db.getUser(userName).isPresent());
-        assertTrue(db.isUserInitialized(userName));
-
-        db.deleteUser(userName);
-
-    }
 
     @Test
     public void testDeleteCollection() throws Exception {
@@ -156,7 +141,7 @@ public class MomCATest {
 //        String oldPassword = "oldPassword";
 //        String newPassword = "newPassword";
 //
-//        Field f = MomCA.class.getDeclaredField("rootCollection");
+//        Field f = MomcaConnection.class.getDeclaredField("rootCollection");
 //        f.setAccessible(true);//Abracadabra
 //        Collection rootCollection = (Collection) f.get(db);
 //        System.out.println(Arrays.asList(rootCollection.getServices()));
@@ -167,39 +152,9 @@ public class MomCATest {
 //
 //    }
 
-    @Test
-    public void testDeleteExistUserAccount() throws Exception {
 
-        String userName = "removeAccountTest@dev.monasterium.net";
-        String password = "testing123";
-        db.initializeUser(userName, password);
 
-        db.deleteExistUserAccount(userName);
 
-        assertFalse(db.isUserInitialized(userName));
-
-    }
-
-    @Test
-    public void testDeleteUser() throws Exception {
-
-        String userName = "removeUserTest@dev.monasterium.net";
-        String password = "testing123";
-        String moderator = "admin";
-
-        db.addUser(userName, password, moderator);
-        db.deleteUser(userName);
-
-        assertFalse(db.getUser(userName).isPresent());
-        assertFalse(db.isUserInitialized(userName));
-
-        Class<?> cl = db.getClass();
-        Method getCollectionMethod = cl.getDeclaredMethod("getCollection", String.class);
-        getCollectionMethod.setAccessible(true);
-        //noinspection unchecked
-        assertFalse(((Optional<Collection>) getCollectionMethod.invoke(db, "/db/mom-data/xrx.user/" + userName)).isPresent());
-
-    }
 
     @Test
     public void testGetCharterInstancesForImportedCharter() throws Exception {
@@ -266,70 +221,9 @@ public class MomCATest {
 
     }
 
-    @Test
-    public void testGetUser() throws Exception {
-        String userId = "user1.testuser@dev.monasterium.net";
-        assertEquals(db.getUser(userId).get().getUserName(), userId);
-    }
 
-    @Test
-    public void testGetUserWithNotExistingUser() throws Exception {
-        String userId = "randomstuff@crazyness.uk";
-        assertEquals(db.getUser(userId), Optional.empty());
-    }
 
-    @Test
-    public void testInitializeUser() throws Exception {
 
-        String parentCollection = "/db/system/security/exist/accounts";
-        String newUserName = "newUser@dev.monasterium.net";
-        String newUserPassword = "testing123";
-        List<String> expectedGroups = new ArrayList<>(2);
-        expectedGroups.add("atom");
-        expectedGroups.add("guest");
-
-        db.initializeUser(newUserName, newUserPassword);
-
-        Optional<ExistResource> accountResource = callGetExistResourceMethod(newUserName + ".xml", parentCollection);
-
-        assertTrue(accountResource.isPresent());
-        assertEquals(accountResource.get().queryContentXml(XpathQuery.QUERY_CONFIG_NAME).get(0), newUserName);
-        assertEquals(accountResource.get().queryContentXml(XpathQuery.QUERY_CONFIG_GROUP_NAME), expectedGroups);
-
-        db.deleteExistUserAccount(newUserName);
-
-    }
-
-    @Test
-    public void testIsUserInitialized() throws Exception {
-
-        String userName = "madeo.anna@gmail.com";
-        String newUserXml = "<xrx:user xmlns:xrx='http://www.monasterium.net/NS/xrx'> <xrx:username /> <xrx:password /> <xrx:firstname>Anna</xrx:firstname> <xrx:name>Madeo</xrx:name> <xrx:email>madeo.anna@gmail.com</xrx:email> <xrx:moderator>admin</xrx:moderator> <xrx:street /> <xrx:zip /> <xrx:town /> <xrx:phone /> <xrx:institution /> <xrx:info /> <xrx:storage> <xrx:saved_list /> <xrx:bookmark_list /> </xrx:storage> </xrx:user>";
-        ExistResource userResource = new ExistResource(userName + ".xml", "/db/mom-data/xrx.user", newUserXml);
-        db.storeExistResource(userResource);
-
-        assertFalse(db.isUserInitialized(userName));
-        assertTrue(db.isUserInitialized("admin"));
-
-        db.deleteExistResource(userResource);
-
-    }
-
-    @Test
-    public void testListUninitializedUserNames() throws Exception {
-
-        String uninitializedUser = "user3.testuser@dev.monasterium.net";
-        List<String> result = db.listUninitializedUserNames();
-
-        assertEquals(result.size(), 1);
-        assertEquals(result.get(0), uninitializedUser);
-
-    }
-
-    @Test
-    public void testListUsers() throws Exception {
-        assertEquals(db.listUserNames().size(), 4);
-    }
 
     @Test
     public void testQueryDatabase() throws Exception {
