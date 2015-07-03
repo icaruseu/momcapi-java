@@ -2,11 +2,9 @@ package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.resource.ExistResource;
 import eu.icarus.momca.momcapi.resource.XpathQuery;
-import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -97,11 +95,17 @@ public class UserManagerTest {
 
         userManager.initializeUser(newUserName, newUserPassword);
 
-        Optional<ExistResource> accountResource = callGetExistResourceMethod(newUserName + ".xml", parentCollection);
+        Optional<ExistResource> resourceOptional = momcaConnection.getExistResource(newUserName + ".xml", parentCollection);
+        assertTrue(resourceOptional.isPresent());
+        ExistResource res = resourceOptional.get();
 
-        assertTrue(accountResource.isPresent());
-        assertEquals(accountResource.get().queryContentXml(XpathQuery.QUERY_CONFIG_NAME).get(0), newUserName);
-        assertEquals(accountResource.get().queryContentXml(XpathQuery.QUERY_CONFIG_GROUP_NAME), expectedGroups);
+        Method queryContentXml = ExistResource.class.getDeclaredMethod("queryContentXml", XpathQuery.class);
+        queryContentXml.setAccessible(true);
+
+        //noinspection unchecked
+        assertEquals(((List<String>) queryContentXml.invoke(res, XpathQuery.QUERY_CONFIG_NAME)).get(0), newUserName);
+        //noinspection unchecked
+        assertEquals(((List<String>) queryContentXml.invoke(res, XpathQuery.QUERY_CONFIG_GROUP_NAME)), expectedGroups);
 
         userManager.deleteExistUserAccount(newUserName);
 
@@ -136,17 +140,6 @@ public class UserManagerTest {
     @Test
     public void testListUsers() throws Exception {
         assertEquals(userManager.listUserNames().size(), 4);
-    }
-
-    @NotNull
-    private Optional<ExistResource> callGetExistResourceMethod(@NotNull String resourceName, @NotNull String parentCollection) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-
-        Class<?> cl = momcaConnection.getClass();
-        Method method = cl.getDeclaredMethod("getExistResource", String.class, String.class);
-        method.setAccessible(true);
-        //noinspection unchecked
-        return (Optional<ExistResource>) method.invoke(momcaConnection, resourceName, parentCollection);
-
     }
 
 }
