@@ -18,7 +18,7 @@ public class CharterManager {
     @NotNull
     private static final ExistQueryFactory QUERY_FACTORY = new ExistQueryFactory();
 
-    private MomcaConnection momcaConnection;
+    private final MomcaConnection momcaConnection;
 
     public CharterManager(MomcaConnection momcaConnection) {
         this.momcaConnection = momcaConnection;

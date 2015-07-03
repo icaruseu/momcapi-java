@@ -32,7 +32,7 @@ class UserManager {
     @NotNull
     private static final String PATH_USER = "/db/mom-data/xrx.user";
     @NotNull
-    private MomcaConnection momcaConnection;
+    private final MomcaConnection momcaConnection;
 
     public UserManager(@NotNull MomcaConnection momcaConnection) {
         this.momcaConnection = momcaConnection;

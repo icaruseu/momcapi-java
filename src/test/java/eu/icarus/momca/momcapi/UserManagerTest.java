@@ -1,6 +1,5 @@
 package eu.icarus.momca.momcapi;
 
-import eu.icarus.momca.momcapi.exist.ExistQueryFactory;
 import eu.icarus.momca.momcapi.resource.ExistResource;
 import eu.icarus.momca.momcapi.resource.XpathQuery;
 import org.jetbrains.annotations.NotNull;
@@ -8,17 +7,11 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.xmldb.api.base.Collection;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Properties;
 
 import static org.testng.Assert.*;
 
@@ -27,45 +20,14 @@ import static org.testng.Assert.*;
  */
 public class UserManagerTest {
 
-    @NotNull
-    private static final ExistQueryFactory QUERY_FACTORY = new ExistQueryFactory();
-    @NotNull
-    private static final String SERVER_PROPERTIES_PATH = "/server.properties";
-    @NotNull
-    private static final String adminUser = "admin";
-    @NotNull
-    private static final String password = "momcapitest";
     private MomcaConnection momcaConnection;
     private UserManager userManager;
 
-
     @BeforeClass
     public void setUp() throws Exception {
-
-        URL serverPropertiesUrl = getClass().getResource(SERVER_PROPERTIES_PATH);
-        assertNotNull(getClass().getResource(SERVER_PROPERTIES_PATH), "Test file missing");
-
-        Properties serverProperties = new Properties();
-        try (FileInputStream file = new FileInputStream(new File(serverPropertiesUrl.getPath()))) {
-
-            BufferedInputStream stream = new BufferedInputStream(file);
-            serverProperties.load(stream);
-            stream.close();
-
-        } catch (@NotNull NullPointerException | IOException e) {
-            throw new RuntimeException("Failed to load properties file.", e);
-        }
-
-        String serverUrl = serverProperties.getProperty("serverUrl");
-
-        assertNotNull(serverUrl, "'serverUrl' missing from '" + SERVER_PROPERTIES_PATH + "'");
-        assertNotNull(password, "'password' missing from '" + SERVER_PROPERTIES_PATH + "'");
-
-        momcaConnection = new MomcaConnection(serverUrl, adminUser, password);
+        momcaConnection = InitMomcaConnection.init();
         userManager = momcaConnection.getUserManager();
-
         assertNotNull(userManager, "MOM-CA connection not initialized.");
-
     }
 
     @Test

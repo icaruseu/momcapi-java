@@ -1,19 +1,11 @@
 package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.atomid.CharterAtomId;
-import eu.icarus.momca.momcapi.exist.ExistQueryFactory;
 import eu.icarus.momca.momcapi.resource.Charter;
-import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.URL;
 import java.util.List;
-import java.util.Properties;
 
 import static org.testng.Assert.*;
 
@@ -22,43 +14,13 @@ import static org.testng.Assert.*;
  */
 public class CharterManagerTest {
 
-    @NotNull
-    private static final ExistQueryFactory QUERY_FACTORY = new ExistQueryFactory();
-    @NotNull
-    private static final String SERVER_PROPERTIES_PATH = "/server.properties";
-    @NotNull
-    private static final String adminUser = "admin";
-    @NotNull
-    private static final String password = "momcapitest";
     private CharterManager charterManager;
 
     @BeforeClass
     public void setUp() throws Exception {
-
-        URL serverPropertiesUrl = getClass().getResource(SERVER_PROPERTIES_PATH);
-        assertNotNull(getClass().getResource(SERVER_PROPERTIES_PATH), "Test file missing");
-
-        Properties serverProperties = new Properties();
-        try (FileInputStream file = new FileInputStream(new File(serverPropertiesUrl.getPath()))) {
-
-            BufferedInputStream stream = new BufferedInputStream(file);
-            serverProperties.load(stream);
-            stream.close();
-
-        } catch (@NotNull NullPointerException | IOException e) {
-            throw new RuntimeException("Failed to load properties file.", e);
-        }
-
-        String serverUrl = serverProperties.getProperty("serverUrl");
-
-        assertNotNull(serverUrl, "'serverUrl' missing from '" + SERVER_PROPERTIES_PATH + "'");
-        assertNotNull(password, "'password' missing from '" + SERVER_PROPERTIES_PATH + "'");
-
-        MomcaConnection momcaConnection = new MomcaConnection(serverUrl, adminUser, password);
+        MomcaConnection momcaConnection = InitMomcaConnection.init();
         charterManager = momcaConnection.getCharterManager();
-
         assertNotNull(charterManager, "MOM-CA connection not initialized.");
-
     }
 
 
@@ -129,12 +91,13 @@ public class CharterManagerTest {
 
     @Test
     public void testlistErroneouslySavedCharters() throws Exception {
+
         String userName = "admin";
         CharterAtomId erroneouslySavedCharter = new CharterAtomId("tag:www.monasterium.net,2011:/charter/CH-KAE/Urkunden/KAE_Urkunde_Nr_1");
         final List<CharterAtomId> erroneouslySavedCharterIds = charterManager.listErroneouslySavedCharters(userName);
         assertEquals(erroneouslySavedCharterIds.size(), 1);
         assertEquals(erroneouslySavedCharterIds.get(0), erroneouslySavedCharter);
-    }
 
+    }
 
 }

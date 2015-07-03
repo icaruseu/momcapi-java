@@ -10,17 +10,11 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.xmldb.api.base.Collection;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URL;
 import java.util.List;
 import java.util.Optional;
-import java.util.Properties;
 
 import static org.testng.Assert.*;
 
@@ -31,40 +25,12 @@ public class MomcaConnectionTest {
 
     @NotNull
     private static final ExistQueryFactory QUERY_FACTORY = new ExistQueryFactory();
-    @NotNull
-    private static final String SERVER_PROPERTIES_PATH = "/server.properties";
-    @NotNull
-    private static final String adminUser = "admin";
-    @NotNull
-    private static final String password = "momcapitest";
     private MomcaConnection db;
 
     @BeforeClass
     public void setUp() throws Exception {
-
-        URL serverPropertiesUrl = getClass().getResource(SERVER_PROPERTIES_PATH);
-        assertNotNull(getClass().getResource(SERVER_PROPERTIES_PATH), "Test file missing");
-
-        Properties serverProperties = new Properties();
-        try (FileInputStream file = new FileInputStream(new File(serverPropertiesUrl.getPath()))) {
-
-            BufferedInputStream stream = new BufferedInputStream(file);
-            serverProperties.load(stream);
-            stream.close();
-
-        } catch (@NotNull NullPointerException | IOException e) {
-            throw new RuntimeException("Failed to load properties file.", e);
-        }
-
-        String serverUrl = serverProperties.getProperty("serverUrl");
-
-        assertNotNull(serverUrl, "'serverUrl' missing from '" + SERVER_PROPERTIES_PATH + "'");
-        assertNotNull(password, "'password' missing from '" + SERVER_PROPERTIES_PATH + "'");
-
-        db = new MomcaConnection(serverUrl, adminUser, password);
-
+        db = InitMomcaConnection.init();
         assertNotNull(db, "MomcaConnection connection not initialized.");
-
     }
 
     @AfterClass
@@ -94,7 +60,6 @@ public class MomcaConnectionTest {
         assertFalse(((Optional<Collection>) getCollection.invoke(db, path + "/" + name)).isPresent());
 
     }
-
 
     @Test
     public void testDeleteCollection() throws Exception {
@@ -130,25 +95,6 @@ public class MomcaConnectionTest {
         assertFalse(callGetExistResourceMethod(res.getResourceName(), res.getParentUri()).isPresent());
 
     }
-
-//    @Test
-//    public void testChangeUserPassword() throws Exception {
-//
-//        String userName = "changePasswordTestUser";
-//        String oldPassword = "oldPassword";
-//        String newPassword = "newPassword";
-//
-//        Field f = MomcaConnection.class.getDeclaredField("rootCollection");
-//        f.setAccessible(true);//Abracadabra
-//        Collection rootCollection = (Collection) f.get(db);
-//        System.out.println(Arrays.asList(rootCollection.getServices()));
-//        RemoteUserManagementService service = (RemoteUserManagementService) rootCollection.getService("UserManagementService", "1.0");
-//
-//        db.initializeUser(userName, oldPassword);
-//        db.changeUserPassword(userName, newPassword);
-//
-//    }
-
 
     @Test
     public void testQueryDatabase() throws Exception {
