@@ -1,9 +1,7 @@
 package eu.icarus.momca.momcapi;
 
-import eu.icarus.momca.momcapi.atomid.CharterAtomId;
 import eu.icarus.momca.momcapi.exception.MomCAException;
 import eu.icarus.momca.momcapi.exist.ExistQueryFactory;
-import eu.icarus.momca.momcapi.resource.Charter;
 import eu.icarus.momca.momcapi.resource.ExistResource;
 import nu.xom.ParsingException;
 import org.exist.xmldb.RemoteCollection;
@@ -67,37 +65,13 @@ public class MomcaConnection {
     }
 
     @NotNull
-    public List<Charter> getCharterInstances(@NotNull CharterAtomId charterAtomId) throws MomCAException {
-
-        List<Charter> charters = new ArrayList<>(0);
-        for (String charterUri : queryDatabase(QUERY_FACTORY.queryCharterUris(charterAtomId))) {
-            getCharterFromUri(charterUri).ifPresent(charters::add);
-        }
-        return charters;
-
+    public CharterManager getCharterManager() {
+        return new CharterManager(this);
     }
 
     @NotNull
     public UserManager getUserManager() {
         return new UserManager(this);
-    }
-
-    @NotNull
-    public List<CharterAtomId> listErroneouslySavedCharters(@NotNull String userName) throws MomCAException {
-
-        UserManager um = new UserManager(this);
-
-        List<CharterAtomId> erroneouslySavedCharters = new ArrayList<>(0);
-        um.getUser(userName).ifPresent(user -> erroneouslySavedCharters.addAll(user.listSavedCharterIds()));
-
-        for (CharterAtomId id : erroneouslySavedCharters) {
-            if (isCharterExisting(id)) {
-                erroneouslySavedCharters.remove(id);
-            }
-        }
-
-        return erroneouslySavedCharters;
-
     }
 
     void deleteCollection(@NotNull String uri) throws MomCAException {
@@ -182,6 +156,38 @@ public class MomcaConnection {
 
     Collection getRootCollection() {
         return rootCollection;
+    }
+
+    @NotNull
+    List<String> queryDatabase(@NotNull String existQuery) throws MomCAException {
+
+        XPathQueryService queryService;
+        try {
+            queryService = (XPathQueryService) rootCollection.getService("XPathQueryService", "1.0");
+        } catch (XMLDBException e) {
+            throw new MomCAException("Failed to get the XPath query service.", e);
+        }
+
+        ResourceSet resultSet;
+        try {
+            resultSet = queryService.query(existQuery);
+        } catch (XMLDBException e) {
+            throw new MomCAException(String.format("Failed to execute query '%s'", existQuery), e);
+        }
+
+        List<String> resultList = new ArrayList<>(0);
+        try {
+            ResourceIterator iterator = resultSet.getIterator();
+            while (iterator.hasMoreResources()) {
+                XMLResource resource = (XMLResource) iterator.nextResource();
+                resultList.add(resource.getContent().toString());
+            }
+        } catch (XMLDBException e) {
+            throw new MomCAException("Failed to extract results from query resultSet.", e);
+        }
+
+        return resultList;
+
     }
 
     /**
@@ -285,13 +291,6 @@ public class MomcaConnection {
     }
 
     @NotNull
-    private Optional<Charter> getCharterFromUri(@NotNull String charterUri) throws MomCAException {
-        String resourceName = charterUri.substring(charterUri.lastIndexOf('/') + 1, charterUri.length());
-        String parentUri = charterUri.substring(0, charterUri.lastIndexOf('/'));
-        return getExistResource(resourceName, parentUri).map(Charter::new);
-    }
-
-    @NotNull
     private Optional<XMLResource> getXMLResource(@NotNull String resourceName, @NotNull Collection parentCollection) throws MomCAException {
 
         try {
@@ -325,43 +324,6 @@ public class MomcaConnection {
             }
         }
 
-
-    }
-
-    private boolean isCharterExisting(@NotNull CharterAtomId charterAtomId) throws MomCAException {
-        return !queryDatabase(QUERY_FACTORY.queryCharterExistence(charterAtomId)).isEmpty();
-    }
-
-
-    @NotNull
-    private List<String> queryDatabase(@NotNull String existQuery) throws MomCAException {
-
-        XPathQueryService queryService;
-        try {
-            queryService = (XPathQueryService) rootCollection.getService("XPathQueryService", "1.0");
-        } catch (XMLDBException e) {
-            throw new MomCAException("Failed to get the XPath query service.", e);
-        }
-
-        ResourceSet resultSet;
-        try {
-            resultSet = queryService.query(existQuery);
-        } catch (XMLDBException e) {
-            throw new MomCAException(String.format("Failed to execute query '%s'", existQuery), e);
-        }
-
-        List<String> resultList = new ArrayList<>(0);
-        try {
-            ResourceIterator iterator = resultSet.getIterator();
-            while (iterator.hasMoreResources()) {
-                XMLResource resource = (XMLResource) iterator.nextResource();
-                resultList.add(resource.getContent().toString());
-            }
-        } catch (XMLDBException e) {
-            throw new MomCAException("Failed to extract results from query resultSet.", e);
-        }
-
-        return resultList;
 
     }
 
