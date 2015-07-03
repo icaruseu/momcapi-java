@@ -11,10 +11,8 @@ import org.testng.annotations.Test;
 import org.xmldb.api.base.Collection;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.Optional;
 
 import static org.testng.Assert.*;
 
@@ -25,17 +23,17 @@ public class MomcaConnectionTest {
 
     @NotNull
     private static final ExistQueryFactory QUERY_FACTORY = new ExistQueryFactory();
-    private MomcaConnection db;
+    private MomcaConnection momcaConnection;
 
     @BeforeClass
     public void setUp() throws Exception {
-        db = InitMomcaConnection.init();
-        assertNotNull(db, "MomcaConnection connection not initialized.");
+        momcaConnection = TestUtils.initMomcaConnection();
+        assertNotNull(momcaConnection, "MomcaConnection connection not initialized.");
     }
 
     @AfterClass
     public void tearDown() throws Exception {
-        db.closeConnection();
+        momcaConnection.closeConnection();
     }
 
     @Test
@@ -44,20 +42,17 @@ public class MomcaConnectionTest {
         String name = "te@m";
         String path = "/db";
 
-        Class<?> cl = db.getClass();
+        Class<?> cl = momcaConnection.getClass();
 
         Method addCollection = cl.getDeclaredMethod("addCollection", String.class, String.class);
         addCollection.setAccessible(true);
-        addCollection.invoke(db, name, path);
+        addCollection.invoke(momcaConnection, name, path);
 
         Method removeCollection = cl.getDeclaredMethod("deleteCollection", String.class);
         removeCollection.setAccessible(true);
-        removeCollection.invoke(db, path + "/" + name);
+        removeCollection.invoke(momcaConnection, path + "/" + name);
 
-        Method getCollection = cl.getDeclaredMethod("getCollection", String.class);
-        getCollection.setAccessible(true);
-        //noinspection unchecked
-        assertFalse(((Optional<Collection>) getCollection.invoke(db, path + "/" + name)).isPresent());
+        assertFalse(momcaConnection.getCollection(path + "/" + name).isPresent());
 
     }
 
@@ -66,23 +61,23 @@ public class MomcaConnectionTest {
 
         XmldbURI uri = XmldbURI.create("/db/t|est");
 
-        Field f = db.getClass().getDeclaredField("rootCollection");
+        Field f = momcaConnection.getClass().getDeclaredField("rootCollection");
         f.setAccessible(true);
-        Collection rootCollection = (Collection) f.get(db);
+        Collection rootCollection = (Collection) f.get(momcaConnection);
 
         RemoteCollectionManagementService service = (RemoteCollectionManagementService) rootCollection.getService("CollectionManagementService", "1.0");
         service.createCollection(uri);
 
-        Class<?> cl = db.getClass();
+        Class<?> cl = momcaConnection.getClass();
         Method deleteCollectionMethod = cl.getDeclaredMethod("deleteCollection", String.class);
         deleteCollectionMethod.setAccessible(true);
-        deleteCollectionMethod.invoke(db, uri.toASCIIString());
+        deleteCollectionMethod.invoke(momcaConnection, uri.toASCIIString());
 
         Method getCollectionMethod = cl.getDeclaredMethod("getCollection", String.class);
         getCollectionMethod.setAccessible(true);
 
         //noinspection unchecked
-        assertFalse(((Optional<Collection>) getCollectionMethod.invoke(db, uri.toASCIIString())).isPresent());
+        assertFalse(momcaConnection.getCollection(uri.toASCIIString()).isPresent());
 
     }
 
@@ -90,20 +85,20 @@ public class MomcaConnectionTest {
     public void testDeleteExistResource() throws Exception {
 
         ExistResource res = new ExistResource("deleteTest.xml", "/db", "<empty/>");
-        db.storeExistResource(res);
-        db.deleteExistResource(res);
-        assertFalse(callGetExistResourceMethod(res.getResourceName(), res.getParentUri()).isPresent());
+        momcaConnection.storeExistResource(res);
+        momcaConnection.deleteExistResource(res);
+        assertFalse(momcaConnection.getExistResource(res.getResourceName(), res.getParentUri()).isPresent());
 
     }
 
     @Test
     public void testQueryDatabase() throws Exception {
 
-        Class<?> cl = db.getClass();
+        Class<?> cl = momcaConnection.getClass();
         Method method = cl.getDeclaredMethod("queryDatabase", String.class);
         method.setAccessible(true);
         @SuppressWarnings("unchecked")
-        List<String> queryResults = (List<String>) method.invoke(db, QUERY_FACTORY.queryUserModerator("user1.testuser@dev.monasterium.net"));
+        List<String> queryResults = (List<String>) method.invoke(momcaConnection, QUERY_FACTORY.queryUserModerator("user1.testuser@dev.monasterium.net"));
         assertEquals(queryResults.get(0), "admin");
 
     }
@@ -111,20 +106,10 @@ public class MomcaConnectionTest {
     @Test
     public void testStoreExistResource() throws Exception {
         ExistResource res = new ExistResource("write@Test.xml", "/db", "<empty/>");
-        db.storeExistResource(res);
-        assertTrue(callGetExistResourceMethod(res.getResourceName(), res.getParentUri()).isPresent());
-        db.deleteExistResource(res);
+        momcaConnection.storeExistResource(res);
+        assertTrue(momcaConnection.getExistResource(res.getResourceName(), res.getParentUri()).isPresent());
+        momcaConnection.deleteExistResource(res);
     }
 
-    @NotNull
-    private Optional<ExistResource> callGetExistResourceMethod(@NotNull String resourceName, @NotNull String parentCollection) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-
-        Class<?> cl = db.getClass();
-        Method method = cl.getDeclaredMethod("getExistResource", String.class, String.class);
-        method.setAccessible(true);
-        //noinspection unchecked
-        return (Optional<ExistResource>) method.invoke(db, resourceName, parentCollection);
-
-    }
 
 }

@@ -18,7 +18,7 @@ public class CharterManagerTest {
 
     @BeforeClass
     public void setUp() throws Exception {
-        MomcaConnection momcaConnection = InitMomcaConnection.init();
+        MomcaConnection momcaConnection = TestUtils.initMomcaConnection();
         charterManager = momcaConnection.getCharterManager();
         assertNotNull(charterManager, "MOM-CA connection not initialized.");
     }

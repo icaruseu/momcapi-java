@@ -5,7 +5,6 @@ import eu.icarus.momca.momcapi.resource.XpathQuery;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import org.xmldb.api.base.Collection;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -25,7 +24,7 @@ public class UserManagerTest {
 
     @BeforeClass
     public void setUp() throws Exception {
-        momcaConnection = InitMomcaConnection.init();
+        momcaConnection = TestUtils.initMomcaConnection();
         userManager = momcaConnection.getUserManager();
         assertNotNull(userManager, "MOM-CA connection not initialized.");
     }
@@ -70,12 +69,7 @@ public class UserManagerTest {
 
         assertFalse(userManager.getUser(userName).isPresent());
         assertFalse(userManager.isUserInitialized(userName));
-
-        Class<?> cl = momcaConnection.getClass();
-        Method getCollectionMethod = cl.getDeclaredMethod("getCollection", String.class);
-        getCollectionMethod.setAccessible(true);
-        //noinspection unchecked
-        assertFalse(((Optional<Collection>) getCollectionMethod.invoke(momcaConnection, "/db/mom-data/xrx.user/" + userName)).isPresent());
+        assertFalse(momcaConnection.getCollection("/db/mom-data/xrx.user/" + userName).isPresent());
 
     }
 

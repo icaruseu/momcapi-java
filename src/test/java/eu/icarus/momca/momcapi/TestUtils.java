@@ -15,7 +15,7 @@ import static org.testng.Assert.assertNotNull;
 /**
  * Created by daniel on 03.07.2015.
  */
-class InitMomcaConnection {
+class TestUtils {
 
     @NotNull
     private static final String SERVER_PROPERTIES_PATH = "/server.properties";
@@ -25,10 +25,10 @@ class InitMomcaConnection {
     private static final String password = "momcapitest";
 
     @NotNull
-    static MomcaConnection init() throws MomCAException {
+    static MomcaConnection initMomcaConnection() throws MomCAException {
 
-        URL serverPropertiesUrl = InitMomcaConnection.class.getResource(SERVER_PROPERTIES_PATH);
-        assertNotNull(InitMomcaConnection.class.getResource(SERVER_PROPERTIES_PATH), "Test file missing");
+        URL serverPropertiesUrl = TestUtils.class.getResource(SERVER_PROPERTIES_PATH);
+        assertNotNull(TestUtils.class.getResource(SERVER_PROPERTIES_PATH), "Test file missing");
 
         Properties serverProperties = new Properties();
         try (FileInputStream file = new FileInputStream(new File(serverPropertiesUrl.getPath()))) {

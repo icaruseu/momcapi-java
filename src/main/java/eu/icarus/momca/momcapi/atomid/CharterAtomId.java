@@ -121,12 +121,14 @@ public class CharterAtomId extends AtomId {
 
     @Override
     public int hashCode() {
+
         int result = super.hashCode();
         result = 31 * result + archiveId.hashCode();
         result = 31 * result + charterId.hashCode();
         result = 31 * result + collectionId.hashCode();
         result = 31 * result + fondId.hashCode();
         return result;
+
     }
 
     public boolean isPartOfArchiveFond() {
@@ -140,11 +142,14 @@ public class CharterAtomId extends AtomId {
     @NotNull
     @Override
     public String toString() {
+
         return "CharterAtomId{" +
                 "collectionId=" + collectionId +
                 ", archiveId=" + archiveId +
                 ", fondId=" + fondId +
                 ", charterId='" + charterId + '\'' +
                 '}';
+
     }
+
 }
