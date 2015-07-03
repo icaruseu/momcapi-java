@@ -34,7 +34,7 @@ public class ExistResource {
     }
 
     @NotNull
-    public final List<String> queryContentXml(@NotNull XpathQuery query) {
+    final List<String> queryContentXml(@NotNull XpathQuery query) {
 
         List<String> results = new LinkedList<>();
 

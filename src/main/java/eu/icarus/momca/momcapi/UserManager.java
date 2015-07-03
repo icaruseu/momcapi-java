@@ -46,7 +46,7 @@ class UserManager {
             ExistResource userResource;
             try {
                 userResource = new ExistResource(userName + ".xml", PATH_USER, xmlContent);
-            } catch (ParsingException | IOException e) {
+            } catch (@NotNull ParsingException | IOException e) {
                 throw new MomCAException("Failed to create new user resource.", e);
             }
             momcaConnection.storeExistResource(userResource);
@@ -110,7 +110,7 @@ class UserManager {
         return momcaConnection.getExistResource(userName + ".xml", PATH_USER).flatMap(existResource -> Optional.of(new User(existResource)));
     }
 
-    public void initializeUser(String userName, String password) throws MomCAException {
+    public void initializeUser(@NotNull String userName, @NotNull String password) throws MomCAException {
 
         String atom = "atom";
 

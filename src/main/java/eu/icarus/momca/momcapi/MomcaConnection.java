@@ -89,7 +89,7 @@ public class MomcaConnection {
 
     }
 
-    void deleteExistResource(ExistResource resourceToDelete) throws MomCAException {
+    void deleteExistResource(@NotNull ExistResource resourceToDelete) throws MomCAException {
 
         Optional<Collection> parent = getCollection(resourceToDelete.getParentUri());
 
@@ -114,7 +114,7 @@ public class MomcaConnection {
 
         try {
             return Optional.ofNullable(DatabaseManager.getCollection(dbRootUri + Util.encode(uri), admin, password));
-        } catch (UnsupportedEncodingException | XMLDBException e) {
+        } catch (@NotNull UnsupportedEncodingException | XMLDBException e) {
             throw new MomCAException(String.format("Failed to open collection '%s'.", uri), e);
         }
 
