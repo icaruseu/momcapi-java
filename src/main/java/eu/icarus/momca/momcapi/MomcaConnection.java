@@ -18,7 +18,6 @@ import org.xmldb.api.modules.XPathQueryService;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -114,7 +113,7 @@ public class MomcaConnection {
     Optional<Collection> getCollection(@NotNull String uri) throws MomCAException {
 
         try {
-            return Optional.ofNullable(DatabaseManager.getCollection(dbRootUri + encode(uri), admin, password));
+            return Optional.ofNullable(DatabaseManager.getCollection(dbRootUri + Util.encode(uri), admin, password));
         } catch (UnsupportedEncodingException | XMLDBException e) {
             throw new MomCAException(String.format("Failed to open collection '%s'.", uri), e);
         }
@@ -227,8 +226,8 @@ public class MomcaConnection {
         String encodedPath;
 
         try {
-            encodedPath = encode(parentUri);
-            encodedName = encode(name);
+            encodedPath = Util.encode(parentUri);
+            encodedName = Util.encode(name);
 
         } catch (UnsupportedEncodingException e) {
             throw new MomCAException("Failed to encode uri.", e);
@@ -252,16 +251,6 @@ public class MomcaConnection {
             }
 
         }
-
-    }
-
-    private String encode(String path) throws UnsupportedEncodingException {
-
-        List<String> encodedTokens = new ArrayList<>(0);
-        for (String token : path.split("/")) {
-            encodedTokens.add(URLEncoder.encode(URLDecoder.decode(token, "UTF-8"), "UTF-8"));
-        }
-        return String.join("/", encodedTokens);
 
     }
 

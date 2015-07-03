@@ -1,13 +1,11 @@
 package eu.icarus.momca.momcapi.resource;
 
+
+import eu.icarus.momca.momcapi.Util;
 import nu.xom.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -30,9 +28,9 @@ public class ExistResource {
     }
 
     public ExistResource(@NotNull final String resourceName, @NotNull final String parentCollectionUri, @NotNull final String xmlContent) throws ParsingException, IOException {
-        this.resourceName = encode(resourceName);
+        this.resourceName = Util.encode(resourceName);
         this.xmlAsDocument = parseXmlString(xmlContent);
-        this.parentUri = encode(parentCollectionUri);
+        this.parentUri = Util.encode(parentCollectionUri);
     }
 
     @NotNull
@@ -85,16 +83,6 @@ public class ExistResource {
                 ", xmlAsDocument=" + xmlAsDocument +
                 ", parentUri='" + parentUri + '\'' +
                 '}';
-    }
-
-    private String encode(String string) throws UnsupportedEncodingException {
-
-        List<String> encodedTokens = new ArrayList<>(0);
-        for (String token : string.split("/")) {
-            encodedTokens.add(URLEncoder.encode(URLDecoder.decode(token, "UTF-8"), "UTF-8"));
-        }
-        return String.join("/", encodedTokens);
-
     }
 
     @NotNull
