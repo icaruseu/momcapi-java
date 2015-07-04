@@ -129,7 +129,7 @@ public class UserManagerTest {
     @Test
     public void testListUninitializedUserNames() throws Exception {
 
-        String uninitializedUser = "user3.testuser@dev.monasterium.net";
+        String uninitializedUser = "uninitialized.testuser@dev.monasterium.net";
         List<String> result = userManager.listUninitializedUserNames();
 
         assertEquals(result.size(), 1);

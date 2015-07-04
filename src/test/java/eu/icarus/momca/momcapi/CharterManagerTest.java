@@ -47,7 +47,7 @@ public class CharterManagerTest {
     @Test
     public void testGetCharterInstancesForPublishedPrivateCharter() throws Exception {
 
-        CharterAtomId id = new CharterAtomId("f84fc6a2-85c6-4618-ab52-d0acfbcf58eb", "b94c19ed-95b2-40c6-9f0e-3f97d6e913ac");
+        CharterAtomId id = new CharterAtomId("67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3", "425d3dba-714e-40c9-af41-7edeb12d1a25");
         List<Charter> charters = charterManager.getCharterInstances(id);
         assertEquals(charters.size(), 2);
         assertEquals(charters.get(0).getAtomId(), id);
