@@ -71,12 +71,6 @@ class UserManager {
         return getUser(user.getUserName()).get();
     }
 
-    public User changeUserName(@NotNull User user, @NotNull String newUserName) {
-        User changedUser = null;
-        // TODO implement
-        return changedUser;
-    }
-
     public void changeUserPassword(@NotNull User user, @NotNull String newPassword) throws MomCAException {
 
         String userName = user.getUserName();
@@ -139,21 +133,6 @@ class UserManager {
         }
 
         return getUser(userName).get();
-
-    }
-
-    @NotNull
-    public List<String> listUninitializedUserNames() throws MomCAException {
-
-        List<String> uninitializedUsers = new ArrayList<>(0);
-
-        for (String user : listUserNames()) {
-            if (!isUserInitialized(user)) {
-                uninitializedUsers.add(user);
-            }
-        }
-
-        return uninitializedUsers;
 
     }
 

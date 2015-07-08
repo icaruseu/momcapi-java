@@ -61,11 +61,6 @@ public class UserManagerTest {
     }
 
     @Test
-    public void testChangeUserName() throws Exception {
-        //TODO implement
-    }
-
-    @Test
     public void testDeleteExistUserAccount() throws Exception {
 
         String userName = "removeAccountTest@dev.monasterium.net";
@@ -155,13 +150,6 @@ public class UserManagerTest {
     public void testIsUserInitialized() throws Exception {
         assertFalse(userManager.isUserInitialized("uninitialized.testuser@dev.monasterium.net"));
         assertTrue(userManager.isUserInitialized("admin"));
-    }
-
-    @Test
-    public void testListUninitializedUserNames() throws Exception {
-        List<String> result = userManager.listUninitializedUserNames();
-        assertEquals(result.size(), 1);
-        assertEquals(result.get(0), "uninitialized.testuser@dev.monasterium.net");
     }
 
     @Test
