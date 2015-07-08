@@ -1,6 +1,7 @@
 package eu.icarus.momca.momcapi.exist;
 
 import eu.icarus.momca.momcapi.atomid.CharterAtomId;
+import eu.icarus.momca.momcapi.resource.Namespace;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -32,13 +33,17 @@ public class ExistQueryFactory {
                 charterId.getAtomId());
     }
 
-    @NotNull
-    public String queryUserModerator(@NotNull String userName) {
+    public String updateFirstOccurenceOfElementInResource(@NotNull String resourceUri, @NotNull String qualifiedElementName, @NotNull String newValue) {
 
-        return String.format(
-                "declare namespace xrx='http://www.monasterium.net/NS/xrx';" +
-                        " collection('/db/mom-data/xrx.user')/xrx:user[.//xrx:email='%s']/xrx:moderator/text()",
-                userName);
+        String namespaceString = qualifiedElementName.substring(0, qualifiedElementName.indexOf(':')).toUpperCase();
+        Namespace namespace = Namespace.valueOf(namespaceString);
+
+        return String.format("declare  namespace %s='%s'; update replace doc('%s')//%s/text() with '%s'",
+                namespace.getPrefix(),
+                namespace.getUri(),
+                resourceUri,
+                qualifiedElementName,
+                newValue);
 
     }
 

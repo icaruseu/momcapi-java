@@ -44,6 +44,23 @@ public class UserManagerTest {
     }
 
     @Test
+    public void testChangeModerator() throws Exception {
+
+        String userName = "modUpdateUser";
+
+        User oldModerator = userManager.getUser("admin").get();
+        User newModerator = userManager.getUser("user1.testuser@dev.monasterium.net").get();
+
+        User user = userManager.addUser(userName, "", oldModerator.getUserName());
+        User updatedUser = userManager.changeModerator(user, newModerator);
+
+        assertEquals(updatedUser.getModeratorName(), newModerator.getUserName());
+
+        userManager.deleteUser(updatedUser);
+
+    }
+
+    @Test
     public void testChangeUserName() throws Exception {
         //TODO implement
     }
@@ -86,7 +103,7 @@ public class UserManagerTest {
         String moderator = "admin";
         User user = userManager.getUser(userName).get();
         assertEquals(user.getUserName(), userName);
-        assertEquals(user.getModerator(), moderator);
+        assertEquals(user.getModeratorName(), moderator);
         assertTrue(user.isInitialized());
 
     }

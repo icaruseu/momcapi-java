@@ -1,6 +1,7 @@
 package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.exception.MomCAException;
+import eu.icarus.momca.momcapi.exist.ExistQueryFactory;
 import eu.icarus.momca.momcapi.resource.ExistResource;
 import eu.icarus.momca.momcapi.resource.User;
 import nu.xom.ParsingException;
@@ -31,6 +32,8 @@ class UserManager {
     @NotNull
     private static final String PATH_USER = "/db/mom-data/xrx.user";
     @NotNull
+    private static final ExistQueryFactory QUERY_FACTORY = new ExistQueryFactory();
+    @NotNull
     private final MomcaConnection momcaConnection;
 
     UserManager(@NotNull MomcaConnection momcaConnection) {
@@ -60,6 +63,12 @@ class UserManager {
 
     public User addUser(@NotNull String userName, @NotNull String password, @NotNull String moderatorName) throws MomCAException {
         return addUser(userName, password, moderatorName, "New", "User");
+    }
+
+    @NotNull
+    public User changeModerator(@NotNull User user, @NotNull User newModerator) throws MomCAException {
+        momcaConnection.queryDatabase(QUERY_FACTORY.updateFirstOccurenceOfElementInResource(user.getUri(), "xrx:moderator", newModerator.getUserName()));
+        return getUser(user.getUserName()).get();
     }
 
     public User changeUserName(@NotNull User user, @NotNull String newUserName) {

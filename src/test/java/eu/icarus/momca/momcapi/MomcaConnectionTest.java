@@ -7,9 +7,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.lang.reflect.Method;
-import java.util.List;
-
 import static org.testng.Assert.*;
 
 /**
@@ -64,18 +61,6 @@ public class MomcaConnectionTest {
         momcaConnection.storeExistResource(res);
         momcaConnection.deleteExistResource(res);
         assertFalse(momcaConnection.getExistResource(res.getResourceName(), res.getParentUri()).isPresent());
-
-    }
-
-    @Test
-    public void testQueryDatabase() throws Exception {
-
-        Class<?> cl = momcaConnection.getClass();
-        Method method = cl.getDeclaredMethod("queryDatabase", String.class);
-        method.setAccessible(true);
-        @SuppressWarnings("unchecked")
-        List<String> queryResults = (List<String>) method.invoke(momcaConnection, QUERY_FACTORY.queryUserModerator("user1.testuser@dev.monasterium.net"));
-        assertEquals(queryResults.get(0), "admin");
 
     }
 

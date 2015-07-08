@@ -27,7 +27,7 @@ public class User extends ExistResource {
     }
 
     @NotNull
-    public String getModerator() {
+    public String getModeratorName() {
         return moderator;
     }
 

@@ -45,7 +45,7 @@ public class UserTest {
     public void testConstructor() throws Exception {
         User user = new User(resource);
         assertEquals(user.getUserName(), USER_NAME);
-        assertEquals(user.getModerator(), MODERATOR);
+        assertEquals(user.getModeratorName(), MODERATOR);
         assertEquals(user.isInitialized(), false);
     }
 
