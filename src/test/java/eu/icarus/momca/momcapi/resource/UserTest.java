@@ -22,7 +22,7 @@ public class UserTest {
     @NotNull
     private static final String PARENT_URI = "/db/mom-data/xrx.user";
     @NotNull
-    private static final String USER_ID = "admin";
+    private static final String USER_NAME = "admin";
     @NotNull
     private static final String WRONG_XML_CONTENT = "<atom:entry xmlns:atom=\"http://www.w3.org/2005/Atom\" />";
     @NotNull
@@ -44,20 +44,15 @@ public class UserTest {
     @Test
     public void testConstructor() throws Exception {
         User user = new User(resource);
-        assertEquals(user.getUserName(), USER_ID);
+        assertEquals(user.getUserName(), USER_NAME);
         assertEquals(user.getModerator(), MODERATOR);
+        assertEquals(user.isInitialized(), false);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConstructorWithWrongXml() throws Exception {
         ExistResource wrongResource = new ExistResource(NAME, PARENT_URI, WRONG_XML_CONTENT);
         new User(wrongResource);
-    }
-
-    @Test
-    public void testGetUserId() throws Exception {
-        User user = new User(resource);
-        assertEquals(user.getUserName(), USER_ID);
     }
 
     @Test
@@ -71,4 +66,5 @@ public class UserTest {
         User user = new User(resource);
         assertEquals(user.listSavedCharterIds(), savedCharters);
     }
+
 }

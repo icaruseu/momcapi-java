@@ -1,6 +1,7 @@
 package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.resource.ExistResource;
+import eu.icarus.momca.momcapi.resource.User;
 import eu.icarus.momca.momcapi.resource.XpathQuery;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -38,8 +39,13 @@ public class UserManagerTest {
         assertTrue(userManager.getUser(userName).isPresent());
         assertTrue(userManager.isUserInitialized(userName));
 
-        userManager.deleteUser(userName);
+        userManager.deleteUser(userManager.getUser(userName).get());
 
+    }
+
+    @Test
+    public void testChangeUserName() throws Exception {
+        //TODO implement
     }
 
     @Test
@@ -47,11 +53,13 @@ public class UserManagerTest {
 
         String userName = "removeAccountTest@dev.monasterium.net";
         String password = "testing123";
-        userManager.initializeUser(userName, password);
-
+        String moderator = "admin";
+        User user = userManager.addUser(userName, password, moderator);
         userManager.deleteExistUserAccount(userName);
 
         assertFalse(userManager.isUserInitialized(userName));
+
+        userManager.deleteUser(user);
 
     }
 
@@ -63,7 +71,7 @@ public class UserManagerTest {
         String moderator = "admin";
 
         userManager.addUser(userName, password, moderator);
-        userManager.deleteUser(userName);
+        userManager.deleteUser(userManager.getUser(userName).get());
 
         assertFalse(userManager.getUser(userName).isPresent());
         assertFalse(userManager.isUserInitialized(userName));
@@ -73,8 +81,14 @@ public class UserManagerTest {
 
     @Test
     public void testGetUser() throws Exception {
-        String userId = "user1.testuser@dev.monasterium.net";
-        assertEquals(userManager.getUser(userId).get().getUserName(), userId);
+
+        String userName = "user1.testuser@dev.monasterium.net";
+        String moderator = "admin";
+        User user = userManager.getUser(userName).get();
+        assertEquals(user.getUserName(), userName);
+        assertEquals(user.getModerator(), moderator);
+        assertTrue(user.isInitialized());
+
     }
 
     @Test
@@ -86,55 +100,51 @@ public class UserManagerTest {
     @Test
     public void testInitializeUser() throws Exception {
 
+        // create user resource
+        String newUserName = "testuser@gmail.com";
+        String newUserXml = "<xrx:user xmlns:xrx='http://www.monasterium.net/NS/xrx'> <xrx:username /> <xrx:password /> <xrx:firstname>Anna</xrx:firstname> <xrx:name>Madeo</xrx:name> <xrx:email>testuser@gmail.com</xrx:email> <xrx:moderator>admin</xrx:moderator> <xrx:street /> <xrx:zip /> <xrx:town /> <xrx:phone /> <xrx:institution /> <xrx:info /> <xrx:storage> <xrx:saved_list /> <xrx:bookmark_list /> </xrx:storage> </xrx:user>";
+        ExistResource userResource = new ExistResource(newUserName + ".xml", "/db/mom-data/xrx.user", newUserXml);
+        momcaConnection.storeExistResource(userResource);
+
+        // create new user without using momcaConnection.addUser()
         String parentCollection = "/db/system/security/exist/accounts";
-        String newUserName = "newUser@dev.monasterium.net";
         String newUserPassword = "testing123";
         List<String> expectedGroups = new ArrayList<>(2);
         expectedGroups.add("atom");
         expectedGroups.add("guest");
+        User user = new User(userResource);
 
-        userManager.initializeUser(newUserName, newUserPassword);
+        // initialize user
+        User initializedUser = userManager.initializeUser(user, newUserPassword);
+        assertTrue(initializedUser.isInitialized());
 
+        // test initialization success directly in the database
         Optional<ExistResource> resourceOptional = momcaConnection.getExistResource(newUserName + ".xml", parentCollection);
         assertTrue(resourceOptional.isPresent());
         ExistResource res = resourceOptional.get();
-
         Method queryContentXml = ExistResource.class.getDeclaredMethod("queryContentXml", XpathQuery.class);
         queryContentXml.setAccessible(true);
-
         //noinspection unchecked
         assertEquals(((List<String>) queryContentXml.invoke(res, XpathQuery.QUERY_CONFIG_NAME)).get(0), newUserName);
         //noinspection unchecked
         assertEquals(((List<String>) queryContentXml.invoke(res, XpathQuery.QUERY_CONFIG_GROUP_NAME)), expectedGroups);
 
-        userManager.deleteExistUserAccount(newUserName);
+        // clean up
+        userManager.deleteUser(initializedUser);
 
     }
 
     @Test
     public void testIsUserInitialized() throws Exception {
-
-        String userName = "madeo.anna@gmail.com";
-        String newUserXml = "<xrx:user xmlns:xrx='http://www.monasterium.net/NS/xrx'> <xrx:username /> <xrx:password /> <xrx:firstname>Anna</xrx:firstname> <xrx:name>Madeo</xrx:name> <xrx:email>madeo.anna@gmail.com</xrx:email> <xrx:moderator>admin</xrx:moderator> <xrx:street /> <xrx:zip /> <xrx:town /> <xrx:phone /> <xrx:institution /> <xrx:info /> <xrx:storage> <xrx:saved_list /> <xrx:bookmark_list /> </xrx:storage> </xrx:user>";
-        ExistResource userResource = new ExistResource(userName + ".xml", "/db/mom-data/xrx.user", newUserXml);
-        momcaConnection.storeExistResource(userResource);
-
-        assertFalse(userManager.isUserInitialized(userName));
+        assertFalse(userManager.isUserInitialized("uninitialized.testuser@dev.monasterium.net"));
         assertTrue(userManager.isUserInitialized("admin"));
-
-        momcaConnection.deleteExistResource(userResource);
-
     }
 
     @Test
     public void testListUninitializedUserNames() throws Exception {
-
-        String uninitializedUser = "uninitialized.testuser@dev.monasterium.net";
         List<String> result = userManager.listUninitializedUserNames();
-
         assertEquals(result.size(), 1);
-        assertEquals(result.get(0), uninitializedUser);
-
+        assertEquals(result.get(0), "uninitialized.testuser@dev.monasterium.net");
     }
 
     @Test

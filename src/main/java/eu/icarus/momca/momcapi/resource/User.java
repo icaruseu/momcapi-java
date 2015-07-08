@@ -11,21 +11,33 @@ import java.util.List;
  */
 public class User extends ExistResource {
 
+    private final boolean isInitialized;
     private final String moderator;
     private final String userName;
 
     public User(@NotNull ExistResource existResource) {
-        super(existResource);
-        userName = queryFieldValue(XpathQuery.QUERY_XRX_EMAIL);
-        moderator = queryFieldValue(XpathQuery.QUERY_XRX_MODERATOR);
+        this(existResource, false);
     }
 
+    public User(@NotNull ExistResource existResource, boolean isInitialized) {
+        super(existResource);
+        userName = queryUniqueFieldValue(XpathQuery.QUERY_XRX_EMAIL);
+        moderator = queryUniqueFieldValue(XpathQuery.QUERY_XRX_MODERATOR);
+        this.isInitialized = isInitialized;
+    }
+
+    @NotNull
     public String getModerator() {
         return moderator;
     }
 
+    @NotNull
     public String getUserName() {
         return userName;
+    }
+
+    public boolean isInitialized() {
+        return isInitialized;
     }
 
     @NotNull
@@ -45,7 +57,8 @@ public class User extends ExistResource {
         return ids;
     }
 
-    private String queryFieldValue(XpathQuery query) {
+    @NotNull
+    private String queryUniqueFieldValue(XpathQuery query) {
 
         List<String> queryResults = queryContentXml(query);
         if (queryResults.size() == 1) {
