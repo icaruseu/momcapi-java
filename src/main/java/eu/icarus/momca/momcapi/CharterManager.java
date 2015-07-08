@@ -4,6 +4,7 @@ import eu.icarus.momca.momcapi.atomid.CharterAtomId;
 import eu.icarus.momca.momcapi.exception.MomCAException;
 import eu.icarus.momca.momcapi.exist.ExistQueryFactory;
 import eu.icarus.momca.momcapi.resource.Charter;
+import eu.icarus.momca.momcapi.resource.User;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -36,12 +37,9 @@ public class CharterManager {
     }
 
     @NotNull
-    public List<CharterAtomId> listErroneouslySavedCharters(@NotNull String userName) throws MomCAException {
+    public List<CharterAtomId> listErroneouslySavedCharters(@NotNull User user) throws MomCAException {
 
-        UserManager um = new UserManager(momcaConnection);
-
-        List<CharterAtomId> erroneouslySavedCharters = new ArrayList<>(0);
-        um.getUser(userName).ifPresent(user -> erroneouslySavedCharters.addAll(user.listSavedCharterIds()));
+        List<CharterAtomId> erroneouslySavedCharters = new ArrayList<>(user.listSavedCharterIds());
 
         for (CharterAtomId id : erroneouslySavedCharters) {
             if (isCharterExisting(id)) {

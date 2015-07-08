@@ -2,6 +2,7 @@ package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.atomid.CharterAtomId;
 import eu.icarus.momca.momcapi.resource.Charter;
+import eu.icarus.momca.momcapi.resource.User;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -15,10 +16,12 @@ import static org.testng.Assert.*;
 public class CharterManagerTest {
 
     private CharterManager charterManager;
+    private MomcaConnection momcaConnection;
 
     @BeforeClass
     public void setUp() throws Exception {
-        MomcaConnection momcaConnection = TestUtils.initMomcaConnection();
+
+        momcaConnection = TestUtils.initMomcaConnection();
         charterManager = momcaConnection.getCharterManager();
         assertNotNull(charterManager, "MOM-CA connection not initialized.");
     }
@@ -92,9 +95,11 @@ public class CharterManagerTest {
     @Test
     public void testlistErroneouslySavedCharters() throws Exception {
 
-        String userName = "admin";
-        CharterAtomId erroneouslySavedCharter = new CharterAtomId("tag:www.monasterium.net,2011:/charter/CH-KAE/Urkunden/KAE_Urkunde_Nr_1");
-        final List<CharterAtomId> erroneouslySavedCharterIds = charterManager.listErroneouslySavedCharters(userName);
+        UserManager um = momcaConnection.getUserManager();
+        User user = um.getUser("admin").get();
+        CharterAtomId
+                erroneouslySavedCharter = new CharterAtomId("tag:www.monasterium.net,2011:/charter/CH-KAE/Urkunden/KAE_Urkunde_Nr_1");
+        final List<CharterAtomId> erroneouslySavedCharterIds = charterManager.listErroneouslySavedCharters(user);
         assertEquals(erroneouslySavedCharterIds.size(), 1);
         assertEquals(erroneouslySavedCharterIds.get(0), erroneouslySavedCharter);
 
