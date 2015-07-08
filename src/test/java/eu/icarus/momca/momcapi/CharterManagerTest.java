@@ -20,7 +20,6 @@ public class CharterManagerTest {
 
     @BeforeClass
     public void setUp() throws Exception {
-
         momcaConnection = TestUtils.initMomcaConnection();
         charterManager = momcaConnection.getCharterManager();
         assertNotNull(charterManager, "MOM-CA connection not initialized.");
@@ -59,10 +58,12 @@ public class CharterManagerTest {
 
     @Test
     public void testGetCharterInstancesForSavedCharter() throws Exception {
+
         CharterAtomId id = new CharterAtomId("CH-KAE", "Urkunden", "KAE_Urkunde_Nr_2");
         List<Charter> charters = charterManager.getCharterInstances(id);
         assertEquals(charters.size(), 2);
         assertEquals(charters.get(0).getAtomId(), id);
+
     }
 
     @Test
@@ -97,8 +98,7 @@ public class CharterManagerTest {
 
         UserManager um = momcaConnection.getUserManager();
         User user = um.getUser("admin").get();
-        CharterAtomId
-                erroneouslySavedCharter = new CharterAtomId("tag:www.monasterium.net,2011:/charter/CH-KAE/Urkunden/KAE_Urkunde_Nr_1");
+        CharterAtomId erroneouslySavedCharter = new CharterAtomId("tag:www.monasterium.net,2011:/charter/CH-KAE/Urkunden/KAE_Urkunde_Nr_1");
         final List<CharterAtomId> erroneouslySavedCharterIds = charterManager.listErroneouslySavedCharters(user);
         assertEquals(erroneouslySavedCharterIds.size(), 1);
         assertEquals(erroneouslySavedCharterIds.get(0), erroneouslySavedCharter);
