@@ -11,18 +11,17 @@ import java.util.List;
  */
 public class User extends ExistResource {
 
+    private final String moderator;
     private final String userName;
 
     public User(@NotNull ExistResource existResource) {
-
         super(existResource);
-        List<String> nameQueryResults = queryContentXml(XpathQuery.QUERY_XRX_EMAIL);
-        if (nameQueryResults.size() == 1) {
-            userName = nameQueryResults.get(0);
-        } else {
-            throw new IllegalArgumentException("The XML content of the resource doesn't have an xrx:name element. It's probably not a valid user resource.");
-        }
+        userName = queryFieldValue(XpathQuery.QUERY_XRX_EMAIL);
+        moderator = queryFieldValue(XpathQuery.QUERY_XRX_MODERATOR);
+    }
 
+    public String getModerator() {
+        return moderator;
     }
 
     public String getUserName() {
@@ -44,6 +43,17 @@ public class User extends ExistResource {
         List<CharterAtomId> ids = new ArrayList<>();
         idStrings.forEach(s -> ids.add(new CharterAtomId(s)));
         return ids;
+    }
+
+    private String queryFieldValue(XpathQuery query) {
+
+        List<String> queryResults = queryContentXml(query);
+        if (queryResults.size() == 1) {
+            return queryResults.get(0);
+        } else {
+            throw new IllegalArgumentException("The XML content of the resource doesn't have an xrx:name element. It's probably not a valid user resource.");
+        }
+
     }
 
 }
