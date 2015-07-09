@@ -16,6 +16,10 @@ public class Charter extends ExistResource {
     @NotNull
     private final String authorName;
     @NotNull
+    private final String idnoId;
+    @NotNull
+    private final String idnoText;
+    @NotNull
     private final CharterStatus status;
 
     public Charter(@NotNull ExistResource existResource) {
@@ -26,6 +30,8 @@ public class Charter extends ExistResource {
 
         this.atomId = initCharterAtomId();
         this.authorName = queryUniqueElement(XpathQuery.QUERY_ATOM_EMAIL);
+        this.idnoText = queryUniqueElement(XpathQuery.QUERY_CEI_IDNO_TEXT);
+        this.idnoId = queryUniqueElement(XpathQuery.QUERY_CEI_IDNO_ID);
 
     }
 
@@ -37,6 +43,16 @@ public class Charter extends ExistResource {
     @NotNull
     public String getAuthorName() {
         return authorName;
+    }
+
+    @NotNull
+    public String getIdnoId() {
+        return idnoId;
+    }
+
+    @NotNull
+    public String getIdnoText() {
+        return idnoText;
     }
 
     @NotNull
