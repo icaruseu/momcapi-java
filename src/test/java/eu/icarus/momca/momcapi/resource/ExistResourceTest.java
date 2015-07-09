@@ -66,14 +66,14 @@ public class ExistResourceTest {
     @Test
     public void testQueryContentXmlWithNamespace() throws Exception {
         ExistResource res = new ExistResource(NAME, PARENT_URI, XML_CONTENT_WITH_NAMESPACE);
-        assertEquals(res.queryContentXml(XpathQuery.QUERY_XRX_NAME).get(0), QUERY_RESULT);
+        assertEquals(res.listQueryResultStrings(XpathQuery.QUERY_XRX_NAME).get(0), QUERY_RESULT);
 
     }
 
     @Test
     public void testQueryContentXmlWithoutNamespace() throws Exception {
         ExistResource res = new ExistResource(NAME, PARENT_URI, XML_CONTENT_WITHOUT_NAMESPACE);
-        assertEquals(res.queryContentXml(XpathQuery.QUERY_NAME).get(0), QUERY_RESULT);
+        assertEquals(res.listQueryResultStrings(XpathQuery.QUERY_NAME).get(0), QUERY_RESULT);
     }
 
 }

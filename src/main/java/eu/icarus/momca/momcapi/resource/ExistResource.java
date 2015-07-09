@@ -34,9 +34,7 @@ public class ExistResource {
     }
 
     @NotNull
-    final List<String> queryContentXml(@NotNull XpathQuery query) {
-
-        List<String> results = new LinkedList<>();
+    final Nodes listQueryResultNodes(@NotNull XpathQuery query) {
 
         Element root = getXmlAsDocument().getRootElement();
         XPathContext context = XPathContext.makeNamespaceContext(root);
@@ -47,7 +45,17 @@ public class ExistResource {
 
         }
 
-        Nodes nodes = getXmlAsDocument().getRootElement().query(query.getQuery(), context);
+        return getXmlAsDocument().getRootElement().query(query.getQuery(), context);
+
+    }
+
+    @NotNull
+    final List<String> listQueryResultStrings(@NotNull XpathQuery query) {
+
+        Nodes nodes = listQueryResultNodes(query);
+
+        List<String> results = new LinkedList<>();
+
         for (int i = 0; i < nodes.size(); i++) {
             results.add(nodes.get(i).getValue());
         }

@@ -4,9 +4,14 @@ package eu.icarus.momca.momcapi.resource;
 import eu.icarus.momca.momcapi.exist.MetadataCollectionName;
 import eu.icarus.momca.momcapi.resource.atom.AtomAuthor;
 import eu.icarus.momca.momcapi.resource.atom.CharterAtomId;
+import eu.icarus.momca.momcapi.resource.cei.CeiFigure;
 import eu.icarus.momca.momcapi.resource.cei.CeiIdno;
+import nu.xom.Element;
+import nu.xom.Elements;
+import nu.xom.Nodes;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,6 +26,8 @@ public class Charter extends ExistResource {
     @NotNull
     private final CeiIdno ceiIdno;
     @NotNull
+    private final List<CeiFigure> ceiWitnessOrigFigures;
+    @NotNull
     private final CharterStatus status;
 
     public Charter(@NotNull ExistResource existResource) {
@@ -32,6 +39,8 @@ public class Charter extends ExistResource {
         this.atomId = initCharterAtomId();
         this.atomAuthor = new AtomAuthor(queryUniqueElement(XpathQuery.QUERY_ATOM_EMAIL));
         this.ceiIdno = new CeiIdno(queryUniqueElement(XpathQuery.QUERY_CEI_IDNO_ID), queryUniqueElement(XpathQuery.QUERY_CEI_IDNO_TEXT));
+
+        this.ceiWitnessOrigFigures = new ArrayList<>(initCeiWitnessOrigFigures());
 
     }
 
@@ -51,6 +60,11 @@ public class Charter extends ExistResource {
     }
 
     @NotNull
+    public List<CeiFigure> getCeiWitnessOrigFigures() {
+        return ceiWitnessOrigFigures;
+    }
+
+    @NotNull
     public CharterStatus getStatus() {
         return status;
     }
@@ -62,6 +76,42 @@ public class Charter extends ExistResource {
                 "atomId=" + atomId +
                 ", status=" + status +
                 "} " + super.toString();
+    }
+
+    @NotNull
+    private List<CeiFigure> initCeiWitnessOrigFigures() {
+
+        List<CeiFigure> results = new ArrayList<>(0);
+
+        Nodes figures = listQueryResultNodes(XpathQuery.QUERY_CEI_WITNESS_ORIG_FIGURE);
+
+        for (int i = 0; i < figures.size(); i++) {
+
+            Element figure = (Element) figures.get(i);
+            String n = figure.getAttribute("n") == null ? "" : figure.getAttribute("n").getValue();
+            Elements childElements = figure.getChildElements("graphic", Namespace.CEI.getUri());
+
+            switch (childElements.size()) {
+
+                case 0:
+                    break;
+
+                case 1:
+                    Element graphic = childElements.get(0);
+                    String url = graphic.getAttribute("url") == null ? "" : childElements.get(0).getAttribute("url").getValue();
+                    String text = graphic.getValue();
+                    results.add(new CeiFigure(n, url, text));
+                    break;
+
+                default:
+                    throw new IllegalArgumentException("More than one child-elements of 'cei:figure'. Only one allowed, 'cei:graphic'.");
+
+            }
+
+        }
+
+        return results;
+
     }
 
     @NotNull
@@ -97,7 +147,7 @@ public class Charter extends ExistResource {
     @NotNull
     private String queryUniqueElement(@NotNull XpathQuery query) {
 
-        List<String> atomQueryResults = queryContentXml(query);
+        List<String> atomQueryResults = listQueryResultStrings(query);
 
         String result;
 

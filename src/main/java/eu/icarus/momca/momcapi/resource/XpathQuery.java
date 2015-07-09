@@ -7,6 +7,7 @@ public enum XpathQuery {
 
     QUERY_ATOM_EMAIL("//atom:email/text()", Namespace.ATOM),
     QUERY_ATOM_ID("//atom:id/text()", Namespace.ATOM),
+    QUERY_CEI_WITNESS_ORIG_FIGURE("//cei:witnessOrig/cei:figure", Namespace.CEI),
     QUERY_CEI_IDNO_ID("//cei:body/cei:idno/@id", Namespace.CEI),
     QUERY_CEI_IDNO_TEXT("//cei:body/cei:idno/text()", Namespace.CEI),
     QUERY_CONFIG_GROUP_NAME("//config:group/@name", Namespace.CONFIG),

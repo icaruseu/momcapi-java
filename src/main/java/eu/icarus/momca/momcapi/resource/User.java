@@ -44,12 +44,12 @@ public class User extends ExistResource {
 
     @NotNull
     public List<CharterAtomId> listBookmarkedCharterIds() {
-        return parseToCharterIds(queryContentXml(XpathQuery.QUERY_XRX_BOOKMARK));
+        return parseToCharterIds(listQueryResultStrings(XpathQuery.QUERY_XRX_BOOKMARK));
     }
 
     @NotNull
     public List<CharterAtomId> listSavedCharterIds() {
-        return parseToCharterIds(queryContentXml(XpathQuery.QUERY_XRX_SAVED));
+        return parseToCharterIds(listQueryResultStrings(XpathQuery.QUERY_XRX_SAVED));
     }
 
     @NotNull
@@ -62,7 +62,7 @@ public class User extends ExistResource {
     @NotNull
     private String queryUniqueFieldValue(@NotNull XpathQuery query) {
 
-        List<String> queryResults = queryContentXml(query);
+        List<String> queryResults = listQueryResultStrings(query);
         if (queryResults.size() == 1) {
             return queryResults.get(0);
         } else {
