@@ -1,7 +1,8 @@
 package eu.icarus.momca.momcapi.resource;
 
+import eu.icarus.momca.momcapi.resource.atom.AtomAuthor;
 import eu.icarus.momca.momcapi.resource.atom.CharterAtomId;
-import eu.icarus.momca.momcapi.resource.cei.Idno;
+import eu.icarus.momca.momcapi.resource.cei.CeiIdno;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -14,11 +15,11 @@ import static org.testng.Assert.assertEquals;
 public class CharterTest {
 
 
-    private static final String AUTHOR_NAME = "user1.testuser@dev.monasterium.net";
+    private static final AtomAuthor ATOM_AUTHOR = new AtomAuthor("user1.testuser@dev.monasterium.net");
+    @NotNull
+    private static final CeiIdno CEI_IDNO = new CeiIdno("KAE_Urkunde_Nr_1", "KAE, Urkunde Nr. 1");
     @NotNull
     private static final CharterAtomId CHARTER_ATOM_ID = new CharterAtomId("tag:www.monasterium.net,2011:/charter/CH-KAE/Urkunden/KAE_Urkunde_Nr_1");
-    @NotNull
-    private static final Idno IDNO = new Idno("KAE_Urkunde_Nr_1", "KAE, Urkunde Nr. 1");
     @NotNull
     private static final String NAME = "KAE_Urkunde_Nr_1.cei.xml";
     @NotNull
@@ -49,21 +50,21 @@ public class CharterTest {
     }
 
     @Test
+    public void testGetAtomAuthor() throws Exception {
+        Charter charter = new Charter(resource);
+        assertEquals(charter.getAtomAuthor().toXML(), ATOM_AUTHOR.toXML());
+    }
+
+    @Test
     public void testGetAtomId() throws Exception {
         Charter charter = new Charter(resource);
         assertEquals(charter.getAtomId().toXML(), CHARTER_ATOM_ID.toXML());
     }
 
     @Test
-    public void testGetAuthorName() throws Exception {
-        Charter charter = new Charter(resource);
-        assertEquals(charter.getAuthorName(), AUTHOR_NAME);
-    }
-
-    @Test
     public void testGetIdno() throws Exception {
         Charter charter = new Charter(resource);
-        assertEquals(charter.getIdno().toXML(), IDNO.toXML());
+        assertEquals(charter.getCeiIdno().toXML(), CEI_IDNO.toXML());
     }
 
     @Test

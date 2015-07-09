@@ -76,6 +76,7 @@ public class ExistResource {
         return xmlAsDocument;
     }
 
+    @NotNull
     @Override
     public String toString() {
         return "ExistResource{" +

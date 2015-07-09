@@ -7,23 +7,23 @@ import static org.testng.Assert.assertEquals;
 /**
  * Created by daniel on 09.07.2015.
  */
-public class IdnoTest {
+public class CeiIdnoTest {
 
-    private static final Idno IDNO = new Idno("id", "text");
+    private static final CeiIdno CEI_IDNO = new CeiIdno("id", "text");
 
     @Test
     public void testGetId() throws Exception {
-        assertEquals(IDNO.getId(), "id");
+        assertEquals(CEI_IDNO.getId(), "id");
     }
 
     @Test
     public void testGetText() throws Exception {
-        assertEquals(IDNO.getText(), "text");
+        assertEquals(CEI_IDNO.getText(), "text");
     }
 
     @Test
     public void testToXML() throws Exception {
-        assertEquals(IDNO.toXML(), "<cei:idno xmlns:cei=\"http://www.monasterium.net/NS/cei\" id=\"id\">text</cei:idno>");
+        assertEquals(CEI_IDNO.toXML(), "<cei:idno xmlns:cei=\"http://www.monasterium.net/NS/cei\" id=\"id\">text</cei:idno>");
     }
 
 }

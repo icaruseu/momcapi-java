@@ -2,8 +2,9 @@ package eu.icarus.momca.momcapi.resource;
 
 
 import eu.icarus.momca.momcapi.exist.MetadataCollectionName;
+import eu.icarus.momca.momcapi.resource.atom.AtomAuthor;
 import eu.icarus.momca.momcapi.resource.atom.CharterAtomId;
-import eu.icarus.momca.momcapi.resource.cei.Idno;
+import eu.icarus.momca.momcapi.resource.cei.CeiIdno;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -14,11 +15,11 @@ import java.util.List;
 public class Charter extends ExistResource {
 
     @NotNull
+    private final AtomAuthor atomAuthor;
+    @NotNull
     private final CharterAtomId atomId;
     @NotNull
-    private final String authorName;
-    @NotNull
-    private final Idno idno;
+    private final CeiIdno ceiIdno;
     @NotNull
     private final CharterStatus status;
 
@@ -29,9 +30,14 @@ public class Charter extends ExistResource {
         this.status = initStatus();
 
         this.atomId = initCharterAtomId();
-        this.authorName = queryUniqueElement(XpathQuery.QUERY_ATOM_EMAIL);
-        this.idno = new Idno(queryUniqueElement(XpathQuery.QUERY_CEI_IDNO_ID), queryUniqueElement(XpathQuery.QUERY_CEI_IDNO_TEXT));
+        this.atomAuthor = new AtomAuthor(queryUniqueElement(XpathQuery.QUERY_ATOM_EMAIL));
+        this.ceiIdno = new CeiIdno(queryUniqueElement(XpathQuery.QUERY_CEI_IDNO_ID), queryUniqueElement(XpathQuery.QUERY_CEI_IDNO_TEXT));
 
+    }
+
+    @NotNull
+    public AtomAuthor getAtomAuthor() {
+        return atomAuthor;
     }
 
     @NotNull
@@ -40,13 +46,8 @@ public class Charter extends ExistResource {
     }
 
     @NotNull
-    public String getAuthorName() {
-        return authorName;
-    }
-
-    @NotNull
-    public Idno getIdno() {
-        return idno;
+    public CeiIdno getCeiIdno() {
+        return ceiIdno;
     }
 
     @NotNull
@@ -54,6 +55,7 @@ public class Charter extends ExistResource {
         return status;
     }
 
+    @NotNull
     @Override
     public String toString() {
         return "Charter{" +
