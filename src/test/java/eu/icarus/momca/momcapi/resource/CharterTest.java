@@ -1,6 +1,7 @@
 package eu.icarus.momca.momcapi.resource;
 
-import eu.icarus.momca.momcapi.atomid.CharterAtomId;
+import eu.icarus.momca.momcapi.resource.atom.CharterAtomId;
+import eu.icarus.momca.momcapi.resource.cei.Idno;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -17,9 +18,7 @@ public class CharterTest {
     @NotNull
     private static final CharterAtomId CHARTER_ATOM_ID = new CharterAtomId("tag:www.monasterium.net,2011:/charter/CH-KAE/Urkunden/KAE_Urkunde_Nr_1");
     @NotNull
-    private static final String IDNO_ID = "KAE_Urkunde_Nr_1";
-    @NotNull
-    private static final String IDNO_TEXT = "KAE, Urkunde Nr. 1";
+    private static final Idno IDNO = new Idno("KAE_Urkunde_Nr_1", "KAE, Urkunde Nr. 1");
     @NotNull
     private static final String NAME = "KAE_Urkunde_Nr_1.cei.xml";
     @NotNull
@@ -40,20 +39,19 @@ public class CharterTest {
     @Test
     public void testConstructor() throws Exception {
         Charter charter = new Charter(resource);
-        assertEquals(charter.getAtomId(), CHARTER_ATOM_ID);
+        assertEquals(charter.getAtomId().toXML(), CHARTER_ATOM_ID.toXML());
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConstructorWithWrongResource() throws Exception {
         ExistResource wrongResource = new ExistResource(NAME, PARENT_URI, WRONG_XML_CONTENT);
-        Charter charter = new Charter(wrongResource);
-        assertEquals(charter.getAtomId(), CHARTER_ATOM_ID);
+        new Charter(wrongResource);
     }
 
     @Test
     public void testGetAtomId() throws Exception {
         Charter charter = new Charter(resource);
-        assertEquals(charter.getAtomId(), CHARTER_ATOM_ID);
+        assertEquals(charter.getAtomId().toXML(), CHARTER_ATOM_ID.toXML());
     }
 
     @Test
@@ -63,15 +61,9 @@ public class CharterTest {
     }
 
     @Test
-    public void testGetIdnoId() throws Exception {
+    public void testGetIdno() throws Exception {
         Charter charter = new Charter(resource);
-        assertEquals(charter.getIdnoId(), IDNO_ID);
-    }
-
-    @Test
-    public void testGetIdnoText() throws Exception {
-        Charter charter = new Charter(resource);
-        assertEquals(charter.getIdnoText(), IDNO_TEXT);
+        assertEquals(charter.getIdno().toXML(), IDNO.toXML());
     }
 
     @Test

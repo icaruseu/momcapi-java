@@ -1,7 +1,7 @@
 package eu.icarus.momca.momcapi.exist;
 
-import eu.icarus.momca.momcapi.atomid.CharterAtomId;
 import eu.icarus.momca.momcapi.resource.Namespace;
+import eu.icarus.momca.momcapi.resource.atom.CharterAtomId;
 import org.jetbrains.annotations.NotNull;
 
 /**

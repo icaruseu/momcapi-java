@@ -1,4 +1,4 @@
-package eu.icarus.momca.momcapi.atomid;
+package eu.icarus.momca.momcapi.resource.atom;
 
 import eu.icarus.momca.momcapi.resource.Namespace;
 import eu.icarus.momca.momcapi.resource.ResourceType;
@@ -8,7 +8,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 
 /**
  * Created by daniel on 27.06.2015.
@@ -33,6 +32,7 @@ public class AtomIdTest {
     public void testConstructorWithAtomId() throws Exception {
         AtomId id = new AtomId(ATOM_ID);
         assertEquals(id.getAtomId(), ATOM_ID);
+        assertEquals(id.toXML(), "<atom:id xmlns:atom=\"http://www.w3.org/2005/Atom\">tag:www.monasterium.net,2011:/charter/CH-KAE/Urkunden/KAE_Urkunde_Nr_1</atom:id>");
     }
 
     @Test
@@ -46,13 +46,6 @@ public class AtomIdTest {
         assertEquals(easyId.getAtomId(), expectedEasyAtomId);
         assertEquals(difficultId.getAtomId(), expectedDifficultAtomId);
 
-    }
-
-    @Test
-    public void testEquals() throws Exception {
-        AtomId id1 = new AtomId(ATOM_ID);
-        AtomId id2 = new AtomId(ATOM_ID);
-        assertTrue(id1.equals(id2));
     }
 
     @Test

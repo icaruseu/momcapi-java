@@ -1,4 +1,4 @@
-package eu.icarus.momca.momcapi.atomid;
+package eu.icarus.momca.momcapi.resource.atom;
 
 import eu.icarus.momca.momcapi.Util;
 import eu.icarus.momca.momcapi.resource.ResourceType;
@@ -77,21 +77,6 @@ public class CharterAtomId extends AtomId {
 
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-
-        CharterAtomId that = (CharterAtomId) o;
-
-        if (!archiveId.equals(that.archiveId)) return false;
-        if (!charterId.equals(that.charterId)) return false;
-        if (!collectionId.equals(that.collectionId)) return false;
-        return fondId.equals(that.fondId);
-
-    }
-
     @NotNull
     public Optional<String> getArchiveId() {
         return archiveId;
@@ -115,18 +100,6 @@ public class CharterAtomId extends AtomId {
     @NotNull
     public Optional<String> getFondId() {
         return fondId;
-    }
-
-    @Override
-    public int hashCode() {
-
-        int result = super.hashCode();
-        result = 31 * result + archiveId.hashCode();
-        result = 31 * result + charterId.hashCode();
-        result = 31 * result + collectionId.hashCode();
-        result = 31 * result + fondId.hashCode();
-        return result;
-
     }
 
     public boolean isPartOfArchiveFond() {

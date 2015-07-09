@@ -16,4 +16,5 @@ public enum CharterStatus {
     public String getParentCollection() {
         return parentCollection;
     }
+
 }

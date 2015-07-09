@@ -1,4 +1,4 @@
-package eu.icarus.momca.momcapi.atomid;
+package eu.icarus.momca.momcapi.resource.atom;
 
 import eu.icarus.momca.momcapi.Util;
 import eu.icarus.momca.momcapi.resource.Namespace;
@@ -12,7 +12,7 @@ import java.util.Arrays;
 /**
  * Created by daniel on 25.06.2015.
  */
-class AtomId {
+class AtomId extends Element {
 
     @NotNull
     private static final String DEFAULT_PREFIX = "tag:www.monasterium.net,2011:";
@@ -24,13 +24,20 @@ class AtomId {
     private final ResourceType type;
 
     AtomId(@NotNull String atomId) {
+
+        super("atom:id", Namespace.ATOM.getUri());
+        appendChild(atomId);
+
         String[] valueTokens = atomId.split("/");
         this.atomId = atomId;
         prefix = valueTokens[0];
         type = ResourceType.createFromValue(valueTokens[1]);
+
     }
 
     AtomId(@NotNull String... idParts) {
+
+        super("atom:id", Namespace.ATOM.getUri());
 
         if (idParts.length >= 3 && idParts.length <= 4) {
 
@@ -47,6 +54,7 @@ class AtomId {
                 }
             }
             this.atomId = idBuilder.toString();
+            appendChild(this.atomId);
 
         } else {
             throw new IllegalArgumentException("'" + Arrays.asList(idParts) + "' has not the right amount of parts; probably not a valid atom:id");
@@ -54,16 +62,6 @@ class AtomId {
 
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        AtomId atomId1 = (AtomId) o;
-
-        return atomId.equals(atomId1.atomId);
-
-    }
 
     @NotNull
     public String getAtomId() {
@@ -91,8 +89,4 @@ class AtomId {
 
     }
 
-    @Override
-    public int hashCode() {
-        return atomId.hashCode();
-    }
 }

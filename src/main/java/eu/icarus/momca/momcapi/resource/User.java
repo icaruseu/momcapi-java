@@ -1,6 +1,6 @@
 package eu.icarus.momca.momcapi.resource;
 
-import eu.icarus.momca.momcapi.atomid.CharterAtomId;
+import eu.icarus.momca.momcapi.resource.atom.CharterAtomId;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;

@@ -1,6 +1,6 @@
 package eu.icarus.momca.momcapi.resource;
 
-import eu.icarus.momca.momcapi.atomid.CharterAtomId;
+import eu.icarus.momca.momcapi.resource.atom.CharterAtomId;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -58,13 +58,13 @@ public class UserTest {
     @Test
     public void testListBookmarkedCharterIds() throws Exception {
         User user = new User(resource);
-        assertEquals(user.listBookmarkedCharterIds(), bookmarkedCharters);
+        assertEquals(user.listBookmarkedCharterIds().toString(), bookmarkedCharters.toString());
     }
 
     @Test
     public void testListSavedCharterIds() throws Exception {
         User user = new User(resource);
-        assertEquals(user.listSavedCharterIds(), savedCharters);
+        assertEquals(user.listSavedCharterIds().toString(), savedCharters.toString());
     }
 
 }

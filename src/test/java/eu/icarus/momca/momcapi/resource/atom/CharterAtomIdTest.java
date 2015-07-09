@@ -1,4 +1,4 @@
-package eu.icarus.momca.momcapi.atomid;
+package eu.icarus.momca.momcapi.resource.atom;
 
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;

@@ -1,10 +1,10 @@
 package eu.icarus.momca.momcapi;
 
-import eu.icarus.momca.momcapi.atomid.CharterAtomId;
 import eu.icarus.momca.momcapi.exception.MomCAException;
 import eu.icarus.momca.momcapi.exist.ExistQueryFactory;
 import eu.icarus.momca.momcapi.resource.Charter;
 import eu.icarus.momca.momcapi.resource.User;
+import eu.icarus.momca.momcapi.resource.atom.CharterAtomId;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;

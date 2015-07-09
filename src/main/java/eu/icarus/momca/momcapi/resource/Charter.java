@@ -1,7 +1,9 @@
 package eu.icarus.momca.momcapi.resource;
 
-import eu.icarus.momca.momcapi.atomid.CharterAtomId;
+
 import eu.icarus.momca.momcapi.exist.MetadataCollectionName;
+import eu.icarus.momca.momcapi.resource.atom.CharterAtomId;
+import eu.icarus.momca.momcapi.resource.cei.Idno;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -16,9 +18,7 @@ public class Charter extends ExistResource {
     @NotNull
     private final String authorName;
     @NotNull
-    private final String idnoId;
-    @NotNull
-    private final String idnoText;
+    private final Idno idno;
     @NotNull
     private final CharterStatus status;
 
@@ -30,8 +30,7 @@ public class Charter extends ExistResource {
 
         this.atomId = initCharterAtomId();
         this.authorName = queryUniqueElement(XpathQuery.QUERY_ATOM_EMAIL);
-        this.idnoText = queryUniqueElement(XpathQuery.QUERY_CEI_IDNO_TEXT);
-        this.idnoId = queryUniqueElement(XpathQuery.QUERY_CEI_IDNO_ID);
+        this.idno = new Idno(queryUniqueElement(XpathQuery.QUERY_CEI_IDNO_ID), queryUniqueElement(XpathQuery.QUERY_CEI_IDNO_TEXT));
 
     }
 
@@ -46,13 +45,8 @@ public class Charter extends ExistResource {
     }
 
     @NotNull
-    public String getIdnoId() {
-        return idnoId;
-    }
-
-    @NotNull
-    public String getIdnoText() {
-        return idnoText;
+    public Idno getIdno() {
+        return idno;
     }
 
     @NotNull
