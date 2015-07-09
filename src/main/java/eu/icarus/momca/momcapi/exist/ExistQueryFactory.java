@@ -31,19 +31,33 @@ public class ExistQueryFactory {
                         " for $node in $nodes" +
                         " return concat(util:collection-name($node), '/', util:document-name($node))",
                 charterId.getAtomId());
+
     }
 
-    public String updateFirstOccurenceOfElementInResource(@NotNull String resourceUri, @NotNull String qualifiedElementName, @NotNull String newValue) {
+    @NotNull
+    public String replaceFirstOccurrenceInResource(@NotNull String resourceUri, @NotNull String qualifiedElementName, @NotNull String newElement) {
 
-        String namespaceString = qualifiedElementName.substring(0, qualifiedElementName.indexOf(':')).toUpperCase();
-        Namespace namespace = Namespace.valueOf(namespaceString);
-
-        return String.format("declare  namespace %s='%s'; update replace doc('%s')//%s/text() with '%s'",
-                namespace.getPrefix(),
-                namespace.getUri(),
+        return String.format("%s update replace doc('%s')//%s[1] with %s",
+                getNamespaceDeclaration(qualifiedElementName),
                 resourceUri,
                 qualifiedElementName,
-                newValue);
+                newElement);
+
+    }
+
+    @NotNull
+    private String getNamespaceDeclaration(@NotNull String... qualifiedElementNames) {
+
+        StringBuilder declarationBuilder = new StringBuilder();
+
+        for (String element : qualifiedElementNames) {
+
+            String namespaceString = element.substring(0, element.indexOf(':')).toUpperCase();
+            Namespace namespace = Namespace.valueOf(namespaceString);
+            declarationBuilder.append(String.format("declare namespace %s='%s';", namespace.getPrefix(),
+                    namespace.getUri()));
+        }
+        return declarationBuilder.toString();
 
     }
 

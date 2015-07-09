@@ -12,7 +12,9 @@ import java.util.List;
 public class User extends ExistResource {
 
     private final boolean isInitialized;
+    @NotNull
     private final String moderator;
+    @NotNull
     private final String userName;
 
     public User(@NotNull ExistResource existResource) {
@@ -58,7 +60,7 @@ public class User extends ExistResource {
     }
 
     @NotNull
-    private String queryUniqueFieldValue(XpathQuery query) {
+    private String queryUniqueFieldValue(@NotNull XpathQuery query) {
 
         List<String> queryResults = queryContentXml(query);
         if (queryResults.size() == 1) {

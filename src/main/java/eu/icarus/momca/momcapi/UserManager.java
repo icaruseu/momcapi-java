@@ -67,7 +67,7 @@ class UserManager {
 
     @NotNull
     public User changeModerator(@NotNull User user, @NotNull User newModerator) throws MomCAException {
-        momcaConnection.queryDatabase(QUERY_FACTORY.updateFirstOccurenceOfElementInResource(user.getUri(), "xrx:moderator", newModerator.getUserName()));
+        momcaConnection.queryDatabase(QUERY_FACTORY.replaceFirstOccurrenceInResource(user.getUri(), "xrx:moderator", String.format("<xrx:moderator>%s</xrx:moderator>", newModerator.getUserName())));
         return getUser(user.getUserName()).get();
     }
 
