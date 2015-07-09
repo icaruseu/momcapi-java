@@ -14,26 +14,29 @@ public class Charter extends ExistResource {
     @NotNull
     private final CharterAtomId atomId;
     @NotNull
+    private final String authorName;
+    @NotNull
     private final CharterStatus status;
 
     public Charter(@NotNull ExistResource existResource) {
 
         super(existResource);
-        List<String> atomQueryResults = queryContentXml(XpathQuery.QUERY_ATOM_ID);
-
-        if (atomQueryResults.size() == 1) {
-            this.atomId = new CharterAtomId(atomQueryResults.get(0));
-        } else {
-            throw new IllegalArgumentException("XML Content is not a valid for a charter");
-        }
 
         this.status = initStatus();
+
+        this.atomId = initCharterAtomId();
+        this.authorName = queryUniqueElement(XpathQuery.QUERY_ATOM_EMAIL);
 
     }
 
     @NotNull
     public CharterAtomId getAtomId() {
         return atomId;
+    }
+
+    @NotNull
+    public String getAuthorName() {
+        return authorName;
     }
 
     @NotNull
@@ -47,6 +50,18 @@ public class Charter extends ExistResource {
                 "atomId=" + atomId +
                 ", status=" + status +
                 "} " + super.toString();
+    }
+
+    @NotNull
+    private CharterAtomId initCharterAtomId() {
+
+        String idString = queryUniqueElement(XpathQuery.QUERY_ATOM_ID);
+        if (idString.isEmpty()) {
+            throw new IllegalArgumentException("No atom:id in charter.");
+        } else {
+            return new CharterAtomId(idString);
+        }
+
     }
 
     private CharterStatus initStatus() {
@@ -64,6 +79,29 @@ public class Charter extends ExistResource {
         }
 
         return status;
+
+    }
+
+    @NotNull
+    private String queryUniqueElement(@NotNull XpathQuery query) {
+
+        List<String> atomQueryResults = queryContentXml(query);
+
+        String result;
+
+        switch (atomQueryResults.size()) {
+            case 0:
+                result = "";
+                break;
+            case 1:
+                result = atomQueryResults.get(0);
+                break;
+            default:
+                throw new IllegalArgumentException(String.format("More than one results for Query '%s'", query.getQuery()));
+
+        }
+
+        return result;
 
     }
 

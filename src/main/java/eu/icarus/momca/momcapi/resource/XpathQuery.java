@@ -5,6 +5,7 @@ package eu.icarus.momca.momcapi.resource;
  */
 public enum XpathQuery {
 
+    QUERY_ATOM_EMAIL("//atom:email/text()", Namespace.ATOM),
     QUERY_ATOM_ID("//atom:id/text()", Namespace.ATOM),
     QUERY_CONFIG_GROUP_NAME("//config:group/@name", Namespace.CONFIG),
     QUERY_CONFIG_NAME("//config:name", Namespace.CONFIG),
