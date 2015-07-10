@@ -4,6 +4,9 @@ import eu.icarus.momca.momcapi.resource.Namespace;
 import eu.icarus.momca.momcapi.resource.atom.CharterAtomId;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Daniel on 07.03.2015.
  */
@@ -16,8 +19,8 @@ public class ExistQueryFactory {
     public String queryCharterExistence(@NotNull CharterAtomId charterId) {
 
         return String.format(
-                "declare namespace atom = 'http://www.w3.org/2005/Atom';" +
-                        " collection('/db/mom-data')//atom:entry[.//atom:id/text()='%s'][1]",
+                "%s collection('/db/mom-data')//atom:entry[.//atom:id/text()='%s'][1]",
+                getNamespaceDeclaration(Namespace.ATOM),
                 charterId.getAtomId());
 
     }
@@ -26,10 +29,10 @@ public class ExistQueryFactory {
     public String queryCharterUris(@NotNull CharterAtomId charterId) {
 
         return String.format(
-                "declare namespace atom = 'http://www.w3.org/2005/Atom';" +
-                        " let $nodes := collection('/db/mom-data')//atom:entry[.//atom:id/text()='%s']" +
+                "%s let $nodes := collection('/db/mom-data')//atom:entry[.//atom:id/text()='%s']" +
                         " for $node in $nodes" +
                         " return concat(util:collection-name($node), '/', util:document-name($node))",
+                getNamespaceDeclaration(Namespace.ATOM),
                 charterId.getAtomId());
 
     }
@@ -46,18 +49,30 @@ public class ExistQueryFactory {
     }
 
     @NotNull
-    private String getNamespaceDeclaration(@NotNull String... qualifiedElementNames) {
+    private String getNamespaceDeclaration(@NotNull Namespace... namespaces) {
 
         StringBuilder declarationBuilder = new StringBuilder();
 
-        for (String element : qualifiedElementNames) {
-
-            String namespaceString = element.substring(0, element.indexOf(':')).toUpperCase();
-            Namespace namespace = Namespace.valueOf(namespaceString);
+        for (Namespace namespace : namespaces) {
             declarationBuilder.append(String.format("declare namespace %s='%s';", namespace.getPrefix(),
                     namespace.getUri()));
         }
+
         return declarationBuilder.toString();
+
+    }
+
+    @NotNull
+    private String getNamespaceDeclaration(@NotNull String... qualifiedElementNames) {
+
+        List<Namespace> namespaceList = new ArrayList<>(0);
+
+        for (String element : qualifiedElementNames) {
+            String namespaceString = element.substring(0, element.indexOf(':')).toUpperCase();
+            namespaceList.add(Namespace.valueOf(namespaceString));
+        }
+
+        return getNamespaceDeclaration(namespaceList.toArray(new Namespace[namespaceList.size()]));
 
     }
 

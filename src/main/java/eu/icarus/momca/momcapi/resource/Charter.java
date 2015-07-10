@@ -69,8 +69,10 @@ public class Charter extends ExistResource {
         return status;
     }
 
+    @NotNull
     @Override
     public String toString() {
+
         return "Charter{" +
                 "atomAuthor=" + atomAuthor +
                 ", atomId=" + atomId +
@@ -78,6 +80,7 @@ public class Charter extends ExistResource {
                 ", ceiWitnessOrigFigures=" + ceiWitnessOrigFigures +
                 ", status=" + status +
                 "} " + super.toString();
+
     }
 
     @NotNull
