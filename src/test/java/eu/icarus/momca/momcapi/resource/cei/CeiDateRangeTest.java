@@ -37,4 +37,12 @@ public class CeiDateRangeTest {
         assertFalse(new CeiDateRange("970801", "14970810", "01. - 10. August 1497").isValid());
         assertFalse(new CeiDateRange("14970801", "70810", "01. - 10. August 1497").isValid());
     }
+
+    @Test
+    public void testIsWrongDateType() throws Exception {
+        assertFalse(CEI_DATE_RANGE.isWrongDateType());
+        CeiDateRange wrongDateRange = new CeiDateRange("14970801", "14970801", "01. August 1497");
+        assertTrue(wrongDateRange.isWrongDateType());
+    }
+
 }

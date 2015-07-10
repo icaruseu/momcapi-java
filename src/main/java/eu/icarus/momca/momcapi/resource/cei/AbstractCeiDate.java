@@ -22,6 +22,8 @@ public abstract class AbstractCeiDate extends Element {
 
     public abstract boolean isValid();
 
+    public abstract boolean isWrongDateType();
+
     @Override
     public String toString() {
         return "AbstractCeiDate{" +

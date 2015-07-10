@@ -22,6 +22,7 @@ public class DateValueTest {
     @Test
     public void testIsValid() throws Exception {
         assertFalse(new DateValue("09471027").isValid());
+        assertTrue(new DateValue("9471027").isValid());
         assertTrue(new DateValue("12471027").isValid());
     }
 
