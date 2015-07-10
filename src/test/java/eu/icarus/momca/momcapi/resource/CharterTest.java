@@ -96,6 +96,13 @@ public class CharterTest {
     }
 
     @Test
+    public void testGetValidationProblems() throws Exception {
+        Charter invalidCharter = new Charter(new ExistResource(NAME, PARENT_URI, INVALID_XML_CONTENT));
+        assertEquals(invalidCharter.getValidationProblems().size(), 2);
+        assertEquals(invalidCharter.getValidationProblems().get(0).getMessage(), "cvc-pattern-valid: Value '09471027' is not facet-valid with respect to pattern '-?[129]?[0-9][0-9][0-9][019][0-9][01239][0-9]' for type 'normalizedDateValue'.");
+    }
+
+    @Test
     public void testIsValidCei() throws Exception {
 
         Charter charter = new Charter(resource);

@@ -108,6 +108,11 @@ public class Charter extends ExistResource {
         return status;
     }
 
+    @NotNull
+    public List<XmlValidationProblem> getValidationProblems() {
+        return validationProblems;
+    }
+
     public boolean isValidCei() {
         return validationProblems.isEmpty();
     }
