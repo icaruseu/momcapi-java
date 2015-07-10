@@ -31,7 +31,7 @@ public class Charter extends ExistResource {
     @NotNull
     private static final String CEI_SCHEMA_URL = "https://raw.githubusercontent.com/icaruseu/mom-ca/master/my/XRX/src/mom/app/cei/xsd/cei10.xsd";
     @NotNull
-    private final AtomAuthor atomAuthor;
+    private final Optional<AtomAuthor> atomAuthor;
     @NotNull
     private final CharterAtomId atomId;
     @NotNull
@@ -78,7 +78,7 @@ public class Charter extends ExistResource {
         this.status = initStatus();
 
         this.atomId = initCharterAtomId();
-        this.atomAuthor = new AtomAuthor(queryUniqueElement(XpathQuery.QUERY_ATOM_EMAIL));
+        this.atomAuthor = initAtomAuthor();
         this.ceiIdno = new CeiIdno(queryUniqueElement(XpathQuery.QUERY_CEI_BODY_IDNO_ID), queryUniqueElement(XpathQuery.QUERY_CEI_BODY_IDNO_TEXT));
 
         this.ceiWitnessOrigFigures = new ArrayList<>(initCeiWitnessOrigFigures());
@@ -88,7 +88,7 @@ public class Charter extends ExistResource {
     }
 
     @NotNull
-    public AtomAuthor getAtomAuthor() {
+    public Optional<AtomAuthor> getAtomAuthor() {
         return atomAuthor;
     }
 
@@ -137,6 +137,17 @@ public class Charter extends ExistResource {
                 ", ceiWitnessOrigFigures=" + ceiWitnessOrigFigures +
                 ", status=" + status +
                 "} " + super.toString();
+
+    }
+
+    private Optional<AtomAuthor> initAtomAuthor() {
+
+        Optional<AtomAuthor> atomAuthor = Optional.empty();
+        String authorEmail = queryUniqueElement(XpathQuery.QUERY_ATOM_EMAIL);
+        if (!authorEmail.isEmpty()) {
+            atomAuthor = Optional.of(new AtomAuthor(authorEmail));
+        }
+        return atomAuthor;
 
     }
 
