@@ -10,6 +10,7 @@ public enum XpathQuery {
     QUERY_CEI_WITNESS_ORIG_FIGURE("//cei:witnessOrig/cei:figure", Namespace.CEI),
     QUERY_CEI_BODY_IDNO_ID("//cei:body/cei:idno/@id", Namespace.CEI),
     QUERY_CEI_BODY_IDNO_TEXT("//cei:body/cei:idno/text()", Namespace.CEI),
+    QUERY_CEI_ISSUED("//cei:issued", Namespace.CEI),
     QUERY_CEI_TEXT("//cei:text", Namespace.CEI),
     QUERY_CONFIG_GROUP_NAME("//config:group/@name", Namespace.CONFIG),
     QUERY_CONFIG_NAME("//config:name", Namespace.CONFIG),

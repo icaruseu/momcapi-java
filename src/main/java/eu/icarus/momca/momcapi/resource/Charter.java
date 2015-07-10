@@ -4,8 +4,7 @@ package eu.icarus.momca.momcapi.resource;
 import eu.icarus.momca.momcapi.exist.MetadataCollectionName;
 import eu.icarus.momca.momcapi.resource.atom.AtomAuthor;
 import eu.icarus.momca.momcapi.resource.atom.CharterAtomId;
-import eu.icarus.momca.momcapi.resource.cei.CeiFigure;
-import eu.icarus.momca.momcapi.resource.cei.CeiIdno;
+import eu.icarus.momca.momcapi.resource.cei.*;
 import nu.xom.*;
 import org.jetbrains.annotations.NotNull;
 import org.xml.sax.ErrorHandler;
@@ -22,6 +21,7 @@ import javax.xml.validation.SchemaFactory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by daniel on 25.06.2015.
@@ -34,6 +34,8 @@ public class Charter extends ExistResource {
     private final AtomAuthor atomAuthor;
     @NotNull
     private final CharterAtomId atomId;
+    @NotNull
+    private final Optional<AbstractCeiDate> ceiDate;
     @NotNull
     private final CeiIdno ceiIdno;
     @NotNull
@@ -81,6 +83,8 @@ public class Charter extends ExistResource {
 
         this.ceiWitnessOrigFigures = new ArrayList<>(initCeiWitnessOrigFigures());
 
+        this.ceiDate = initCeiDate();
+
     }
 
     @NotNull
@@ -91,6 +95,11 @@ public class Charter extends ExistResource {
     @NotNull
     public CharterAtomId getAtomId() {
         return atomId;
+    }
+
+    @NotNull
+    public Optional<AbstractCeiDate> getCeiDate() {
+        return ceiDate;
     }
 
     @NotNull
@@ -129,6 +138,42 @@ public class Charter extends ExistResource {
                 ", status=" + status +
                 "} " + super.toString();
 
+    }
+
+    @NotNull
+    private Optional<AbstractCeiDate> initCeiDate() {
+
+        Optional<AbstractCeiDate> ceiDateOptional = Optional.empty();
+
+        Nodes ceiIssuedNodes = listQueryResultNodes(XpathQuery.QUERY_CEI_ISSUED);
+        if (ceiIssuedNodes.size() != 0) {
+
+            Element ceiIssued = (Element) ceiIssuedNodes.get(0);
+
+            Elements dateElements = ceiIssued.getChildElements("date", Namespace.CEI.getUri());
+            Elements dateRangeElements = ceiIssued.getChildElements("dateRange", Namespace.CEI.getUri());
+
+
+            if (dateElements.size() == 1 && dateRangeElements.size() == 0) {
+
+                Element dateElement = dateElements.get(0);
+                String value = dateElement.getAttributeValue("value");
+                String literalDate = dateElement.getValue();
+                ceiDateOptional = Optional.of(new CeiDate(value, literalDate));
+
+            } else if (dateElements.size() == 0 && dateRangeElements.size() == 1) {
+
+                Element dateRangeElement = dateRangeElements.get(0);
+                String from = dateRangeElement.getAttributeValue("from");
+                String to = dateRangeElement.getAttributeValue("to");
+                String literalDate = dateRangeElement.getValue();
+                ceiDateOptional = Optional.of(new CeiDateRange(from, to, literalDate));
+
+            }
+
+        }
+
+        return ceiDateOptional;
     }
 
     @NotNull
