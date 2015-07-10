@@ -6,11 +6,20 @@ import eu.icarus.momca.momcapi.resource.atom.AtomAuthor;
 import eu.icarus.momca.momcapi.resource.atom.CharterAtomId;
 import eu.icarus.momca.momcapi.resource.cei.CeiFigure;
 import eu.icarus.momca.momcapi.resource.cei.CeiIdno;
-import nu.xom.Element;
-import nu.xom.Elements;
-import nu.xom.Nodes;
+import nu.xom.*;
 import org.jetbrains.annotations.NotNull;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.XMLReader;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.SchemaFactory;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +28,8 @@ import java.util.List;
  */
 public class Charter extends ExistResource {
 
+    @NotNull
+    private static final String CEI_SCHEMA_URL = "https://raw.githubusercontent.com/icaruseu/mom-ca/master/my/XRX/src/mom/app/cei/xsd/cei10.xsd";
     @NotNull
     private final AtomAuthor atomAuthor;
     @NotNull
@@ -29,16 +40,44 @@ public class Charter extends ExistResource {
     private final List<CeiFigure> ceiWitnessOrigFigures;
     @NotNull
     private final CharterStatus status;
+    @NotNull
+    private final List<XmlValidationProblem> validationProblems = new ArrayList<>(0);
+
+    private class SimpleErrorHandler implements ErrorHandler {
+
+        public void error(SAXParseException e) throws SAXException {
+            addToXmlValidationProblem(XmlValidationProblem.Level.ERROR, e);
+        }
+
+        public void fatalError(SAXParseException e) throws SAXException {
+            addToXmlValidationProblem(XmlValidationProblem.Level.FATAL_ERROR, e);
+        }
+
+        public void warning(SAXParseException e) throws SAXException {
+            addToXmlValidationProblem(XmlValidationProblem.Level.WARNING, e);
+        }
+
+        private void addToXmlValidationProblem(@NotNull XmlValidationProblem.Level level, @NotNull SAXParseException e) {
+            validationProblems.add(new XmlValidationProblem(level, e.getLineNumber(), e.getColumnNumber(), e.getMessage()));
+        }
+
+    }
 
     public Charter(@NotNull ExistResource existResource) {
 
         super(existResource);
 
+        try {
+            validateCei(existResource);
+        } catch (SAXException | IOException | ParsingException | ParserConfigurationException e) {
+            throw new RuntimeException(e);
+        }
+
         this.status = initStatus();
 
         this.atomId = initCharterAtomId();
         this.atomAuthor = new AtomAuthor(queryUniqueElement(XpathQuery.QUERY_ATOM_EMAIL));
-        this.ceiIdno = new CeiIdno(queryUniqueElement(XpathQuery.QUERY_CEI_IDNO_ID), queryUniqueElement(XpathQuery.QUERY_CEI_IDNO_TEXT));
+        this.ceiIdno = new CeiIdno(queryUniqueElement(XpathQuery.QUERY_CEI_BODY_IDNO_ID), queryUniqueElement(XpathQuery.QUERY_CEI_BODY_IDNO_TEXT));
 
         this.ceiWitnessOrigFigures = new ArrayList<>(initCeiWitnessOrigFigures());
 
@@ -67,6 +106,10 @@ public class Charter extends ExistResource {
     @NotNull
     public CharterStatus getStatus() {
         return status;
+    }
+
+    public boolean isValidCei() {
+        return validationProblems.isEmpty();
     }
 
     @NotNull
@@ -105,7 +148,7 @@ public class Charter extends ExistResource {
                     Element graphic = childElements.get(0);
                     String url = graphic.getAttribute("url") == null ? "" : childElements.get(0).getAttribute("url").getValue();
                     String text = graphic.getValue();
-                    results.add(new CeiFigure(n, url, text));
+                    results.add(new CeiFigure(url, n, text));
                     break;
 
                 default:
@@ -169,6 +212,34 @@ public class Charter extends ExistResource {
         }
 
         return result;
+
+    }
+
+    private void validateCei(@NotNull ExistResource resource) throws SAXException, ParserConfigurationException, ParsingException, IOException {
+
+        SAXParserFactory factory = SAXParserFactory.newInstance();
+        factory.setValidating(false);
+        factory.setNamespaceAware(true);
+
+        SchemaFactory schemaFactory =
+                SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
+        factory.setSchema(schemaFactory.newSchema(
+                new Source[]{new StreamSource(CEI_SCHEMA_URL)}));
+
+        SAXParser parser = factory.newSAXParser();
+        XMLReader reader = parser.getXMLReader();
+        reader.setErrorHandler(new SimpleErrorHandler());
+
+        Nodes ceiTextNodes = resource.listQueryResultNodes(XpathQuery.QUERY_CEI_TEXT);
+
+        if (ceiTextNodes.size() != 1) {
+            throw new IllegalArgumentException("XML content has no 'cei:text' element therefor it is probably not a mom-ca charter.");
+        }
+
+        Element ceiText = (Element) ceiTextNodes.get(0);
+
+        Builder builder = new Builder(reader);
+        builder.build(ceiText.toXML(), null);
 
     }
 

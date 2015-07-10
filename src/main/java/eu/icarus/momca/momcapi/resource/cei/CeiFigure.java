@@ -4,6 +4,7 @@ import eu.icarus.momca.momcapi.resource.Namespace;
 import nu.xom.Attribute;
 import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Created by daniel on 09.07.2015.
@@ -18,7 +19,7 @@ public class CeiFigure extends Element {
     @NotNull
     private final String url;
 
-    public CeiFigure(@NotNull String n, @NotNull String url, @NotNull String text) {
+    public CeiFigure(@NotNull String url, @Nullable String n, @Nullable String text) {
 
         super("cei:figure", Namespace.CEI.getUri());
 
@@ -26,9 +27,9 @@ public class CeiFigure extends Element {
             throw new IllegalArgumentException("An value for 'cei:figure/cei:graphic/@url' is mandatory!");
         }
 
-        this.n = n;
         this.url = url;
-        this.text = text;
+        this.n = (n == null) ? "" : n;
+        this.text = (text == null) ? "" : text;
 
         initXml();
 
@@ -37,7 +38,7 @@ public class CeiFigure extends Element {
     }
 
     public CeiFigure(@NotNull String url) {
-        this("", url, "");
+        this(url, "", "");
     }
 
     @NotNull
@@ -57,6 +58,18 @@ public class CeiFigure extends Element {
 
     public boolean hasAbsoluteUrl() {
         return hasAbsoluteUrl;
+    }
+
+    @Override
+    public String toString() {
+
+        return "CeiFigure{" +
+                "hasAbsoluteUrl=" + hasAbsoluteUrl +
+                ", n='" + n + '\'' +
+                ", text='" + text + '\'' +
+                ", url='" + url + '\'' +
+                "} " + super.toString();
+
     }
 
     private void initXml() {

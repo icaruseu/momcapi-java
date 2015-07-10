@@ -33,6 +33,7 @@ public class CharterAtomIdTest {
     public void testConstructorForAtomId() throws Exception {
         CharterAtomId id = new CharterAtomId(FOND_CHARTER_ATOM_ID);
         assertEquals(id.getAtomId(), FOND_CHARTER_ATOM_ID);
+        assertEquals(id.getCharterId(), FOND_CHARTER_ID);
     }
 
     @Test

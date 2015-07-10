@@ -28,4 +28,11 @@ public class AtomAuthor extends Element {
         return email;
     }
 
+    @Override
+    public String toString() {
+        return "AtomAuthor{" +
+                "email='" + email + '\'' +
+                "} " + super.toString();
+    }
+
 }

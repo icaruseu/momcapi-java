@@ -36,4 +36,14 @@ public class CeiIdno extends Element {
         return text;
     }
 
+    @Override
+    public String toString() {
+
+        return "CeiIdno{" +
+                "id='" + id + '\'' +
+                ", text='" + text + '\'' +
+                "} " + super.toString();
+
+    }
+
 }

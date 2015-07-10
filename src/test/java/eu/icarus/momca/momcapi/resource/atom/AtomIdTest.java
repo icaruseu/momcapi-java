@@ -15,7 +15,7 @@ import static org.testng.Assert.assertEquals;
 public class AtomIdTest {
 
     @NotNull
-    private static final String ATOM_ID = "tag:www.monasterium.net,2011:/charter/CH-KAE/Urkunden/KAE_Urkunde_Nr_1";
+    private static final String ATOM_ID = "tag:www.monasterium.net,2011:/charter/RS-IAGNS/Charters/AGNS_F.1_the_fascia_9_Sub_3499%7C1817";
     @NotNull
     private static final String PREFIX = "tag:www.monasterium.net,2011:";
     @NotNull
@@ -32,7 +32,7 @@ public class AtomIdTest {
     public void testConstructorWithAtomId() throws Exception {
         AtomId id = new AtomId(ATOM_ID);
         assertEquals(id.getAtomId(), ATOM_ID);
-        assertEquals(id.toXML(), "<atom:id xmlns:atom=\"http://www.w3.org/2005/Atom\">tag:www.monasterium.net,2011:/charter/CH-KAE/Urkunden/KAE_Urkunde_Nr_1</atom:id>");
+        assertEquals(id.toXML(), "<atom:id xmlns:atom=\"http://www.w3.org/2005/Atom\">tag:www.monasterium.net,2011:/charter/RS-IAGNS/Charters/AGNS_F.1_the_fascia_9_Sub_3499%7C1817</atom:id>");
     }
 
     @Test

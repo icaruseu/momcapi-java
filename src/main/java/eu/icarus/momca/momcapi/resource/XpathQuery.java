@@ -8,8 +8,9 @@ public enum XpathQuery {
     QUERY_ATOM_EMAIL("//atom:email/text()", Namespace.ATOM),
     QUERY_ATOM_ID("//atom:id/text()", Namespace.ATOM),
     QUERY_CEI_WITNESS_ORIG_FIGURE("//cei:witnessOrig/cei:figure", Namespace.CEI),
-    QUERY_CEI_IDNO_ID("//cei:body/cei:idno/@id", Namespace.CEI),
-    QUERY_CEI_IDNO_TEXT("//cei:body/cei:idno/text()", Namespace.CEI),
+    QUERY_CEI_BODY_IDNO_ID("//cei:body/cei:idno/@id", Namespace.CEI),
+    QUERY_CEI_BODY_IDNO_TEXT("//cei:body/cei:idno/text()", Namespace.CEI),
+    QUERY_CEI_TEXT("//cei:text", Namespace.CEI),
     QUERY_CONFIG_GROUP_NAME("//config:group/@name", Namespace.CONFIG),
     QUERY_CONFIG_NAME("//config:name", Namespace.CONFIG),
     QUERY_NAME("//name/text()"),
@@ -17,7 +18,7 @@ public enum XpathQuery {
     QUERY_XRX_EMAIL("//xrx:email/text()", Namespace.XRX),
     QUERY_XRX_MODERATOR("//xrx:moderator/text()", Namespace.XRX),
     QUERY_XRX_NAME("//xrx:name/text()", Namespace.XRX),
-    QUERY_XRX_SAVED("//xrx:saved/xrx:id/text()", Namespace.XRX);
+    QUERY_XRX_SAVED_ID("//xrx:saved/xrx:id/text()", Namespace.XRX);
 
     private final Namespace[] namespaces;
     private final String query;

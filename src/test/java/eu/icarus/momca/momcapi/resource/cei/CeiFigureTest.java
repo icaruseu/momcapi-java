@@ -9,7 +9,7 @@ import static org.testng.Assert.*;
  */
 public class CeiFigureTest {
 
-    private static final CeiFigure CEI_FIGURE = new CeiFigure("nvalue", "urlvalue", "textvalue");
+    private static final CeiFigure CEI_FIGURE = new CeiFigure("urlvalue", "nvalue", "textvalue");
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConstructorEmptyUrl() throws Exception {

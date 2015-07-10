@@ -24,15 +24,7 @@ class AtomId extends Element {
     private final ResourceType type;
 
     AtomId(@NotNull String atomId) {
-
-        super("atom:id", Namespace.ATOM.getUri());
-        appendChild(atomId);
-
-        String[] valueTokens = atomId.split("/");
-        this.atomId = atomId;
-        prefix = valueTokens[0];
-        type = ResourceType.createFromValue(valueTokens[1]);
-
+        this(atomId.replace(DEFAULT_PREFIX + "/", "").split("/"));
     }
 
     AtomId(@NotNull String... idParts) {

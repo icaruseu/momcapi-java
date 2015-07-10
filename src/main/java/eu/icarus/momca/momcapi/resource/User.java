@@ -49,7 +49,7 @@ public class User extends ExistResource {
 
     @NotNull
     public List<CharterAtomId> listSavedCharterIds() {
-        return parseToCharterIds(listQueryResultStrings(XpathQuery.QUERY_XRX_SAVED));
+        return parseToCharterIds(listQueryResultStrings(XpathQuery.QUERY_XRX_SAVED_ID));
     }
 
     @NotNull
