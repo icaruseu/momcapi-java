@@ -28,6 +28,7 @@ public class AtomAuthor extends Element {
         return email;
     }
 
+    @NotNull
     @Override
     public String toString() {
         return "AtomAuthor{" +

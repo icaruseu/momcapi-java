@@ -45,15 +45,15 @@ public class Charter extends ExistResource {
 
     private class SimpleErrorHandler implements ErrorHandler {
 
-        public void error(SAXParseException e) throws SAXException {
+        public void error(@NotNull SAXParseException e) throws SAXException {
             addToXmlValidationProblem(XmlValidationProblem.Level.ERROR, e);
         }
 
-        public void fatalError(SAXParseException e) throws SAXException {
+        public void fatalError(@NotNull SAXParseException e) throws SAXException {
             addToXmlValidationProblem(XmlValidationProblem.Level.FATAL_ERROR, e);
         }
 
-        public void warning(SAXParseException e) throws SAXException {
+        public void warning(@NotNull SAXParseException e) throws SAXException {
             addToXmlValidationProblem(XmlValidationProblem.Level.WARNING, e);
         }
 
@@ -69,7 +69,7 @@ public class Charter extends ExistResource {
 
         try {
             validateCei(existResource);
-        } catch (SAXException | IOException | ParsingException | ParserConfigurationException e) {
+        } catch (@NotNull SAXException | IOException | ParsingException | ParserConfigurationException e) {
             throw new RuntimeException(e);
         }
 

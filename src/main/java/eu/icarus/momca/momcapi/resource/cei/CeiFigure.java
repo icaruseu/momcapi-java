@@ -60,6 +60,7 @@ public class CeiFigure extends Element {
         return hasAbsoluteUrl;
     }
 
+    @NotNull
     @Override
     public String toString() {
 

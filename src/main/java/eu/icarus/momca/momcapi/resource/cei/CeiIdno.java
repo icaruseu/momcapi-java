@@ -36,6 +36,7 @@ public class CeiIdno extends Element {
         return text;
     }
 
+    @NotNull
     @Override
     public String toString() {
 
