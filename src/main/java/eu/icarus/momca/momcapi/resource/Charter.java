@@ -72,18 +72,16 @@ public class Charter extends ExistResource {
         try {
             validateCei(existResource);
         } catch (@NotNull SAXException | IOException | ParsingException | ParserConfigurationException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to validate the resource.", e);
         }
 
         this.status = initStatus();
 
         this.atomId = initCharterAtomId();
         this.atomAuthor = initAtomAuthor();
-        this.ceiIdno = new CeiIdno(queryUniqueElement(XpathQuery.QUERY_CEI_BODY_IDNO_ID), queryUniqueElement(XpathQuery.QUERY_CEI_BODY_IDNO_TEXT));
-
-        this.ceiWitnessOrigFigures = new ArrayList<>(initCeiWitnessOrigFigures());
-
+        this.ceiIdno = initCeiIdno();
         this.ceiDate = initCeiDate();
+        this.ceiWitnessOrigFigures = new ArrayList<>(initCeiWitnessOrigFigures());
 
     }
 
@@ -185,6 +183,11 @@ public class Charter extends ExistResource {
         }
 
         return ceiDateOptional;
+    }
+
+    @NotNull
+    private CeiIdno initCeiIdno() {
+        return new CeiIdno(queryUniqueElement(XpathQuery.QUERY_CEI_BODY_IDNO_ID), queryUniqueElement(XpathQuery.QUERY_CEI_BODY_IDNO_TEXT));
     }
 
     @NotNull
