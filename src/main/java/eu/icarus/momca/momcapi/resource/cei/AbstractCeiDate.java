@@ -10,7 +10,7 @@ public abstract class AbstractCeiDate extends Element {
 
     private final String literalDate;
 
-    public AbstractCeiDate(@NotNull Element element, @NotNull String literalDate) {
+    AbstractCeiDate(@NotNull Element element, @NotNull String literalDate) {
         super(element);
         this.literalDate = literalDate;
         this.appendChild(literalDate);

@@ -4,13 +4,12 @@ import eu.icarus.momca.momcapi.Util;
 import eu.icarus.momca.momcapi.resource.ResourceType;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Optional;
 
 /**
  * Created by daniel on 25.06.2015.
  */
-public class CharterAtomId extends AtomId {
+public class AtomIdCharter extends AtomId {
 
     @NotNull
     private final Optional<String> archiveId;
@@ -21,7 +20,7 @@ public class CharterAtomId extends AtomId {
     @NotNull
     private final Optional<String> fondId;
 
-    public CharterAtomId(@NotNull String value) {
+    public AtomIdCharter(@NotNull String value) {
 
         super(value);
         String[] valueTokens = value.split("/");
@@ -30,34 +29,28 @@ public class CharterAtomId extends AtomId {
             throw new IllegalArgumentException(String.format("'%s' identifies a '%s', not a charter.", value, valueTokens[1]));
         }
 
-        try {
+        switch (valueTokens.length) {
 
-            switch (valueTokens.length) {
+            case 4:
+                this.collectionId = Optional.of(Util.decode(valueTokens[2]));
+                this.charterId = Util.decode(valueTokens[3]);
+                this.archiveId = Optional.empty();
+                this.fondId = Optional.empty();
+                break;
+            case 5:
+                this.archiveId = Optional.of(Util.decode(valueTokens[2]));
+                this.fondId = Optional.of(Util.decode(valueTokens[3]));
+                this.charterId = Util.decode(valueTokens[4]);
+                this.collectionId = Optional.empty();
+                break;
+            default:
+                throw new IllegalArgumentException(String.format("'%s' is not a valid charterId.", value));
 
-                case 4:
-                    this.collectionId = Optional.of(Util.decode(valueTokens[2]));
-                    this.charterId = Util.decode(valueTokens[3]);
-                    this.archiveId = Optional.empty();
-                    this.fondId = Optional.empty();
-                    break;
-                case 5:
-                    this.archiveId = Optional.of(Util.decode(valueTokens[2]));
-                    this.fondId = Optional.of(Util.decode(valueTokens[3]));
-                    this.charterId = Util.decode(valueTokens[4]);
-                    this.collectionId = Optional.empty();
-                    break;
-                default:
-                    throw new IllegalArgumentException(String.format("'%s' is not a valid charterId.", value));
-
-            }
-
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
         }
 
     }
 
-    public CharterAtomId(@NotNull String archiveId, @NotNull String fondId, @NotNull String charterId) {
+    public AtomIdCharter(@NotNull String archiveId, @NotNull String fondId, @NotNull String charterId) {
 
         super(ResourceType.CHARTER.getValue(), archiveId, fondId, charterId);
         this.archiveId = Optional.of(archiveId);
@@ -67,7 +60,7 @@ public class CharterAtomId extends AtomId {
 
     }
 
-    public CharterAtomId(@NotNull String collectionId, @NotNull String charterId) {
+    public AtomIdCharter(@NotNull String collectionId, @NotNull String charterId) {
 
         super(ResourceType.CHARTER.getValue(), collectionId, charterId);
         this.collectionId = Optional.of(collectionId);
@@ -114,7 +107,7 @@ public class CharterAtomId extends AtomId {
     @Override
     public String toString() {
 
-        return "CharterAtomId{" +
+        return "AtomIdCharter{" +
                 "collectionId=" + collectionId +
                 ", archiveId=" + archiveId +
                 ", fondId=" + fondId +

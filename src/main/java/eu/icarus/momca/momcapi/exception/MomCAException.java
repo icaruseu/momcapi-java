@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by daniel on 25.06.2015.
  */
-public class MomCAException extends Exception {
+public class MomCAException extends RuntimeException {
 
     public MomCAException() {
         super();

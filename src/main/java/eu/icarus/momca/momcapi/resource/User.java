@@ -1,6 +1,6 @@
 package eu.icarus.momca.momcapi.resource;
 
-import eu.icarus.momca.momcapi.resource.atom.CharterAtomId;
+import eu.icarus.momca.momcapi.resource.atom.AtomIdCharter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -43,19 +43,19 @@ public class User extends ExistResource {
     }
 
     @NotNull
-    public List<CharterAtomId> listBookmarkedCharterIds() {
+    public List<AtomIdCharter> listBookmarkedCharterIds() {
         return parseToCharterIds(listQueryResultStrings(XpathQuery.QUERY_XRX_BOOKMARK));
     }
 
     @NotNull
-    public List<CharterAtomId> listSavedCharterIds() {
+    public List<AtomIdCharter> listSavedCharterIds() {
         return parseToCharterIds(listQueryResultStrings(XpathQuery.QUERY_XRX_SAVED_ID));
     }
 
     @NotNull
-    private List<CharterAtomId> parseToCharterIds(@NotNull List<String> idStrings) {
-        List<CharterAtomId> ids = new ArrayList<>();
-        idStrings.forEach(s -> ids.add(new CharterAtomId(s)));
+    private List<AtomIdCharter> parseToCharterIds(@NotNull List<String> idStrings) {
+        List<AtomIdCharter> ids = new ArrayList<>();
+        idStrings.forEach(s -> ids.add(new AtomIdCharter(s)));
         return ids;
     }
 

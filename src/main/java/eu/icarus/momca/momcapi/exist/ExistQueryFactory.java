@@ -1,8 +1,9 @@
 package eu.icarus.momca.momcapi.exist;
 
 import eu.icarus.momca.momcapi.resource.Namespace;
-import eu.icarus.momca.momcapi.resource.atom.CharterAtomId;
+import eu.icarus.momca.momcapi.resource.atom.AtomIdCharter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,17 +17,18 @@ public class ExistQueryFactory {
     }
 
     @NotNull
-    public String queryCharterExistence(@NotNull CharterAtomId charterId) {
+    public String queryCharterExistence(@NotNull AtomIdCharter charterId, @Nullable MetadataCollectionName metadataCollectionName) {
 
         return String.format(
-                "%s collection('/db/mom-data')//atom:entry[.//atom:id/text()='%s'][1]",
+                "%s collection('/db/mom-data%s')//atom:entry[.//atom:id/text()='%s'][1]",
                 getNamespaceDeclaration(Namespace.ATOM),
+                (metadataCollectionName == null) ? "" : ("/" + metadataCollectionName.getValue()),
                 charterId.getAtomId());
 
     }
 
     @NotNull
-    public String queryCharterUris(@NotNull CharterAtomId charterId) {
+    public String queryCharterUris(@NotNull AtomIdCharter charterId) {
 
         return String.format(
                 "%s let $nodes := collection('/db/mom-data')//atom:entry[.//atom:id/text()='%s']" +

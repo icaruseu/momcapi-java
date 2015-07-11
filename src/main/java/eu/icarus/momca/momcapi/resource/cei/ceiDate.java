@@ -35,6 +35,13 @@ public class CeiDate extends AbstractCeiDate {
     }
 
     @Override
+    public boolean isWrongDateType() {
+        String dayPart = getDateValueAsString().substring(getDateValueAsString().length() - 2, getDateValueAsString().length());
+        String monthPart = getDateValueAsString().substring(getDateValueAsString().length() - 4, getDateValueAsString().length() - 2);
+        return monthPart.equals("99") || dayPart.equals("99");
+    }
+
+    @Override
     public String toString() {
         return "CeiDate{" +
                 "dateValue=" + dateValue +

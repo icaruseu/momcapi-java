@@ -10,7 +10,7 @@ import static org.testng.Assert.*;
 /**
  * Created by daniel on 27.06.2015.
  */
-public class CharterAtomIdTest {
+public class AtomIdCharterTest {
 
     @NotNull
     private static final String ARCHIVE_ID = "RS-IAGNS";
@@ -31,74 +31,74 @@ public class CharterAtomIdTest {
 
     @Test
     public void testConstructorForAtomId() throws Exception {
-        CharterAtomId id = new CharterAtomId(FOND_CHARTER_ATOM_ID);
+        AtomIdCharter id = new AtomIdCharter(FOND_CHARTER_ATOM_ID);
         assertEquals(id.getAtomId(), FOND_CHARTER_ATOM_ID);
         assertEquals(id.getCharterId(), FOND_CHARTER_ID);
     }
 
     @Test
     public void testConstructorForCollectionCharter() throws Exception {
-        CharterAtomId id = new CharterAtomId(COLLECTION_ID, COLLECTION_CHARTER_ID);
+        AtomIdCharter id = new AtomIdCharter(COLLECTION_ID, COLLECTION_CHARTER_ID);
         assertEquals(id.getAtomId(), COLLECTION_CHARTER_ATOM_ID);
     }
 
     @Test
     public void testConstructorForFondCharter() throws Exception {
-        CharterAtomId id = new CharterAtomId(ARCHIVE_ID, FOND_ID, FOND_CHARTER_ID);
+        AtomIdCharter id = new AtomIdCharter(ARCHIVE_ID, FOND_ID, FOND_CHARTER_ID);
         assertEquals(id.getAtomId(), FOND_CHARTER_ATOM_ID);
     }
 
     @Test
     public void testGetArchiveId() throws Exception {
-        CharterAtomId id = new CharterAtomId(FOND_CHARTER_ATOM_ID);
+        AtomIdCharter id = new AtomIdCharter(FOND_CHARTER_ATOM_ID);
         assertEquals(id.getArchiveId(), Optional.of(ARCHIVE_ID));
     }
 
     @Test
     public void testGetBasePath() throws Exception {
-        CharterAtomId id = new CharterAtomId(FOND_CHARTER_ATOM_ID);
+        AtomIdCharter id = new AtomIdCharter(FOND_CHARTER_ATOM_ID);
         assertEquals(id.getBasePath(), BASE_PATH);
     }
 
     @Test
     public void testGetCharterId() throws Exception {
-        CharterAtomId id = new CharterAtomId(COLLECTION_CHARTER_ATOM_ID);
+        AtomIdCharter id = new AtomIdCharter(COLLECTION_CHARTER_ATOM_ID);
         assertEquals(id.getCharterId(), COLLECTION_CHARTER_ID);
     }
 
     @Test
     public void testGetCollectionId() throws Exception {
-        CharterAtomId id = new CharterAtomId(COLLECTION_CHARTER_ATOM_ID);
+        AtomIdCharter id = new AtomIdCharter(COLLECTION_CHARTER_ATOM_ID);
         assertEquals(id.getCollectionId(), Optional.of(COLLECTION_ID));
     }
 
     @Test
     public void testGetFondId() throws Exception {
-        CharterAtomId id = new CharterAtomId(FOND_CHARTER_ATOM_ID);
+        AtomIdCharter id = new AtomIdCharter(FOND_CHARTER_ATOM_ID);
         assertEquals(id.getFondId(), Optional.of(FOND_ID));
     }
 
     @Test
     public void testIsPartOfArchiveFond() throws Exception {
-        CharterAtomId id = new CharterAtomId(FOND_CHARTER_ATOM_ID);
+        AtomIdCharter id = new AtomIdCharter(FOND_CHARTER_ATOM_ID);
         assertTrue(id.isPartOfArchiveFond());
     }
 
     @Test
     public void testIsPartOfArchiveFondWithCollectionCharter() throws Exception {
-        CharterAtomId id = new CharterAtomId(COLLECTION_CHARTER_ATOM_ID);
+        AtomIdCharter id = new AtomIdCharter(COLLECTION_CHARTER_ATOM_ID);
         assertFalse(id.isPartOfArchiveFond());
     }
 
     @Test
     public void testIsPartOfCollection() throws Exception {
-        CharterAtomId id = new CharterAtomId(COLLECTION_CHARTER_ATOM_ID);
+        AtomIdCharter id = new AtomIdCharter(COLLECTION_CHARTER_ATOM_ID);
         assertTrue(id.isPartOfCollection());
     }
 
     @Test
     public void testIsPartOfCollectionWithFond() throws Exception {
-        CharterAtomId id = new CharterAtomId(FOND_CHARTER_ATOM_ID);
+        AtomIdCharter id = new AtomIdCharter(FOND_CHARTER_ATOM_ID);
         assertFalse(id.isPartOfCollection());
     }
 

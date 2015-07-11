@@ -4,18 +4,14 @@ import eu.icarus.momca.momcapi.exception.MomCAException;
 import eu.icarus.momca.momcapi.exist.ExistQueryFactory;
 import eu.icarus.momca.momcapi.resource.ExistResource;
 import eu.icarus.momca.momcapi.resource.User;
-import nu.xom.ParsingException;
 import org.exist.security.Account;
 import org.exist.security.Group;
 import org.exist.security.internal.aider.GroupAider;
 import org.exist.security.internal.aider.UserAider;
 import org.exist.xmldb.RemoteUserManagementService;
 import org.jetbrains.annotations.NotNull;
-import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.XMLDBException;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -40,17 +36,13 @@ class UserManager {
         this.momcaConnection = momcaConnection;
     }
 
-    public User addUser(@NotNull String userName, @NotNull String password, @NotNull String moderatorName, @NotNull String firstName, @NotNull String lastName) throws MomCAException {
+    public User addUser(@NotNull String userName, @NotNull String password, @NotNull String moderatorName, @NotNull String firstName, @NotNull String lastName) {
 
         if (!getUser(userName).isPresent()) {
 
             String xmlContent = String.format(NEW_USER_CONTENT, firstName, lastName, userName, moderatorName);
-            ExistResource userResource;
-            try {
-                userResource = new ExistResource(userName + ".xml", PATH_USER, xmlContent);
-            } catch (@NotNull ParsingException | IOException e) {
-                throw new MomCAException("Failed to create new user resource.", e);
-            }
+            ExistResource userResource = new ExistResource(userName + ".xml", PATH_USER, xmlContent);
+
             momcaConnection.storeExistResource(userResource);
 
             initializeUser(new User(userResource), password);
@@ -61,17 +53,17 @@ class UserManager {
 
     }
 
-    public User addUser(@NotNull String userName, @NotNull String password, @NotNull String moderatorName) throws MomCAException {
+    public User addUser(@NotNull String userName, @NotNull String password, @NotNull String moderatorName) {
         return addUser(userName, password, moderatorName, "New", "User");
     }
 
     @NotNull
-    public User changeModerator(@NotNull User user, @NotNull User newModerator) throws MomCAException {
+    public User changeModerator(@NotNull User user, @NotNull User newModerator) {
         momcaConnection.queryDatabase(QUERY_FACTORY.replaceFirstOccurrenceInResource(user.getUri(), "xrx:moderator", String.format("<xrx:moderator>%s</xrx:moderator>", newModerator.getUserName())));
         return getUser(user.getUserName()).get();
     }
 
-    public void changeUserPassword(@NotNull User user, @NotNull String newPassword) throws MomCAException {
+    public void changeUserPassword(@NotNull User user, @NotNull String newPassword) {
 
         String userName = user.getUserName();
 
@@ -90,7 +82,7 @@ class UserManager {
 
     }
 
-    public void deleteUser(@NotNull User user) throws MomCAException {
+    public void deleteUser(@NotNull User user) {
 
         momcaConnection.deleteExistResource(user);
 
@@ -101,12 +93,12 @@ class UserManager {
     }
 
     @NotNull
-    public Optional<User> getUser(@NotNull String userName) throws MomCAException {
+    public Optional<User> getUser(@NotNull String userName) {
         boolean isInitialized = isUserInitialized(userName);
         return momcaConnection.getExistResource(userName + ".xml", PATH_USER).flatMap(existResource -> Optional.of(new User(existResource, isInitialized)));
     }
 
-    public User initializeUser(@NotNull User uninitializedUser, @NotNull String password) throws MomCAException {
+    public User initializeUser(@NotNull User uninitializedUser, @NotNull String password) {
 
         String userName = uninitializedUser.getUserName();
 
@@ -137,11 +129,11 @@ class UserManager {
     }
 
     @NotNull
-    public List<String> listUserNames() throws MomCAException {
+    public List<String> listUserNames() {
         return listUserResourceNames().stream().map(s -> s.replace(".xml", "")).collect(Collectors.toList());
     }
 
-    void deleteExistUserAccount(@NotNull String accountName) throws MomCAException {
+    void deleteExistUserAccount(@NotNull String accountName) {
 
         try {
 
@@ -158,7 +150,7 @@ class UserManager {
 
     }
 
-    boolean isUserInitialized(@NotNull String userName) throws MomCAException {
+    boolean isUserInitialized(@NotNull String userName) {
 
         try {
             RemoteUserManagementService service = (RemoteUserManagementService) momcaConnection.getRootCollection().getService("UserManagementService", "1.0");
@@ -170,29 +162,23 @@ class UserManager {
     }
 
     @NotNull
-    private List<String> listUserResourceNames() throws MomCAException {
-
-        Optional<Collection> userCollection = momcaConnection.getCollection(PATH_USER);
+    private List<String> listUserResourceNames() {
 
         List<String> users = new ArrayList<>();
-        if (userCollection.isPresent()) {
+        momcaConnection.getCollection(PATH_USER).ifPresent(collection -> {
 
             String[] escapedUserNames;
             try {
-                escapedUserNames = userCollection.get().listResources();
+                escapedUserNames = collection.listResources();
             } catch (XMLDBException e) {
                 throw new MomCAException(String.format("Failed to list resources in collection '%s'.", PATH_USER), e);
             }
 
             for (String escapedUserName : escapedUserNames) {
-                try {
-                    users.add(Util.decode(escapedUserName));
-                } catch (UnsupportedEncodingException e) {
-                    throw new MomCAException(e);
-                }
+                users.add(Util.decode(escapedUserName));
             }
 
-        }
+        });
 
         users.sort(Comparator.<String>naturalOrder());
         return users;

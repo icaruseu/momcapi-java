@@ -1,5 +1,8 @@
 package eu.icarus.momca.momcapi.resource;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Created by daniel on 27.06.2015.
  */
@@ -21,15 +24,15 @@ public enum XpathQuery {
     QUERY_XRX_NAME("//xrx:name/text()", Namespace.XRX),
     QUERY_XRX_SAVED_ID("//xrx:saved/xrx:id/text()", Namespace.XRX);
 
-    private final Namespace[] namespaces;
+    private final List<Namespace> namespaces;
     private final String query;
 
     XpathQuery(String query, Namespace... namespaces) {
         this.query = query;
-        this.namespaces = namespaces;
+        this.namespaces = Arrays.asList(namespaces);
     }
 
-    public Namespace[] getNamespaces() {
+    public List<Namespace> getNamespaces() {
         return namespaces;
     }
 

@@ -14,22 +14,30 @@ import java.util.List;
 public class Util {
 
     @NotNull
-    public static String decode(@NotNull String string) throws UnsupportedEncodingException {
+    public static String decode(@NotNull String string) {
 
         List<String> decodedTokens = new ArrayList<>(0);
         for (String token : string.split("/")) {
-            decodedTokens.add(URLDecoder.decode(token, "UTF-8"));
+            try {
+                decodedTokens.add(URLDecoder.decode(token, "UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
         }
         return String.join("/", decodedTokens);
 
     }
 
     @NotNull
-    public static String encode(@NotNull String string) throws UnsupportedEncodingException {
+    public static String encode(@NotNull String string) {
 
         List<String> encodedTokens = new ArrayList<>(0);
         for (String token : string.split("/")) {
-            encodedTokens.add(URLEncoder.encode(URLDecoder.decode(token, "UTF-8"), "UTF-8"));
+            try {
+                encodedTokens.add(URLEncoder.encode(URLDecoder.decode(token, "UTF-8"), "UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
         }
         return String.join("/", encodedTokens);
 

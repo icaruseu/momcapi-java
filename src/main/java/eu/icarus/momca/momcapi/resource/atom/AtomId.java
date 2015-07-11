@@ -6,7 +6,6 @@ import eu.icarus.momca.momcapi.resource.ResourceType;
 import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
 /**
@@ -38,12 +37,8 @@ class AtomId extends Element {
 
             StringBuilder idBuilder = new StringBuilder(DEFAULT_PREFIX);
             for (String idPart : idParts) {
-                try {
-                    idBuilder.append("/");
-                    idBuilder.append(Util.encode(idPart));
-                } catch (UnsupportedEncodingException e) {
-                    throw new RuntimeException(e);
-                }
+                idBuilder.append("/");
+                idBuilder.append(Util.encode(idPart));
             }
             this.atomId = idBuilder.toString();
             appendChild(this.atomId);

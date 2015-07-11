@@ -27,10 +27,20 @@ public class ExistResource {
         this.parentUri = existResource.getParentUri();
     }
 
-    public ExistResource(@NotNull final String resourceName, @NotNull final String parentCollectionUri, @NotNull final String xmlContent) throws ParsingException, IOException {
-        this.resourceName = Util.encode(resourceName);
-        this.xmlAsDocument = parseXmlString(xmlContent);
-        this.parentUri = Util.encode(parentCollectionUri);
+    public ExistResource(@NotNull final String resourceName, @NotNull final String parentCollectionUri, @NotNull final String xmlContent) {
+
+        try {
+
+            this.resourceName = Util.encode(resourceName);
+            this.xmlAsDocument = parseXmlString(xmlContent);
+            this.parentUri = Util.encode(parentCollectionUri);
+
+        } catch (IOException e) {
+            throw new RuntimeException(String.format("Failed to create ExistResource for '%s'", resourceName), e);
+        } catch (ParsingException e) {
+            throw new IllegalArgumentException(String.format("Failed to parse the xml content of resource '%s'", resourceName), e);
+        }
+
     }
 
     @NotNull
@@ -38,13 +48,7 @@ public class ExistResource {
 
         Element root = getXmlAsDocument().getRootElement();
         XPathContext context = XPathContext.makeNamespaceContext(root);
-        if (query.getNamespaces().length != 0) {
-            for (Namespace namespace : query.getNamespaces()) {
-                context.addNamespace(namespace.getPrefix(), namespace.getUri());
-            }
-
-        }
-
+        query.getNamespaces().forEach(n -> context.addNamespace(n.getPrefix(), n.getUri()));
         return getXmlAsDocument().getRootElement().query(query.getQuery(), context);
 
     }
@@ -53,13 +57,10 @@ public class ExistResource {
     final List<String> listQueryResultStrings(@NotNull XpathQuery query) {
 
         Nodes nodes = listQueryResultNodes(query);
-
         List<String> results = new LinkedList<>();
-
         for (int i = 0; i < nodes.size(); i++) {
             results.add(nodes.get(i).getValue());
         }
-
         return results;
 
     }

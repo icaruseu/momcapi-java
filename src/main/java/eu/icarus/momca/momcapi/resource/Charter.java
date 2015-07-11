@@ -3,7 +3,7 @@ package eu.icarus.momca.momcapi.resource;
 
 import eu.icarus.momca.momcapi.exist.MetadataCollectionName;
 import eu.icarus.momca.momcapi.resource.atom.AtomAuthor;
-import eu.icarus.momca.momcapi.resource.atom.CharterAtomId;
+import eu.icarus.momca.momcapi.resource.atom.AtomIdCharter;
 import eu.icarus.momca.momcapi.resource.cei.*;
 import nu.xom.*;
 import org.jetbrains.annotations.NotNull;
@@ -33,7 +33,7 @@ public class Charter extends ExistResource {
     @NotNull
     private final Optional<AtomAuthor> atomAuthor;
     @NotNull
-    private final CharterAtomId atomId;
+    private final AtomIdCharter atomId;
     @NotNull
     private final Optional<AbstractCeiDate> ceiDate;
     @NotNull
@@ -91,7 +91,7 @@ public class Charter extends ExistResource {
     }
 
     @NotNull
-    public CharterAtomId getAtomId() {
+    public AtomIdCharter getAtomId() {
         return atomId;
     }
 
@@ -227,13 +227,13 @@ public class Charter extends ExistResource {
     }
 
     @NotNull
-    private CharterAtomId initCharterAtomId() {
+    private AtomIdCharter initCharterAtomId() {
 
         String idString = queryUniqueElement(XpathQuery.QUERY_ATOM_ID);
         if (idString.isEmpty()) {
-            throw new IllegalArgumentException("No atom:id in charter.");
+            throw new IllegalArgumentException(String.format("No atom:id in xml content: '%s'", getXmlAsDocument().toXML()));
         } else {
-            return new CharterAtomId(idString);
+            return new AtomIdCharter(idString);
         }
 
     }
@@ -272,7 +272,6 @@ public class Charter extends ExistResource {
                 break;
             default:
                 throw new IllegalArgumentException(String.format("More than one results for Query '%s'", query.getQuery()));
-
         }
 
         return result;

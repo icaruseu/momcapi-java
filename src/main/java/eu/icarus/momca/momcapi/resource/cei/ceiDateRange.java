@@ -52,6 +52,11 @@ public class CeiDateRange extends AbstractCeiDate {
     }
 
     @Override
+    public boolean isWrongDateType() {
+        return fromValue.equals(toValue);
+    }
+
+    @Override
     public String toString() {
 
         return "CeiDateRange{" +
