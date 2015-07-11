@@ -1,8 +1,6 @@
 package eu.icarus.momca.momcapi;
 
-import eu.icarus.momca.momcapi.exist.ExistQueryFactory;
 import eu.icarus.momca.momcapi.resource.ExistResource;
-import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -14,8 +12,6 @@ import static org.testng.Assert.*;
  */
 public class MomcaConnectionTest {
 
-    @NotNull
-    private static final ExistQueryFactory QUERY_FACTORY = new ExistQueryFactory();
     private MomcaConnection momcaConnection;
 
     @BeforeClass

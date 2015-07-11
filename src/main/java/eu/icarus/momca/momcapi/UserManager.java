@@ -28,8 +28,6 @@ class UserManager {
     @NotNull
     private static final String PATH_USER = "/db/mom-data/xrx.user";
     @NotNull
-    private static final ExistQueryFactory QUERY_FACTORY = new ExistQueryFactory();
-    @NotNull
     private final MomcaConnection momcaConnection;
 
     UserManager(@NotNull MomcaConnection momcaConnection) {
@@ -59,7 +57,7 @@ class UserManager {
 
     @NotNull
     public User changeModerator(@NotNull User user, @NotNull User newModerator) {
-        momcaConnection.queryDatabase(QUERY_FACTORY.replaceFirstOccurrenceInResource(user.getUri(), "xrx:moderator", String.format("<xrx:moderator>%s</xrx:moderator>", newModerator.getUserName())));
+        momcaConnection.queryDatabase(ExistQueryFactory.replaceFirstOccurrenceInResource(user.getUri(), "xrx:moderator", String.format("<xrx:moderator>%s</xrx:moderator>", newModerator.getUserName())));
         return getUser(user.getUserName()).get();
     }
 

@@ -17,9 +17,6 @@ import java.util.stream.Collectors;
  */
 public class CharterManager {
 
-    @NotNull
-    private static final ExistQueryFactory QUERY_FACTORY = new ExistQueryFactory();
-
     private final MomcaConnection momcaConnection;
 
     CharterManager(MomcaConnection momcaConnection) {
@@ -29,7 +26,7 @@ public class CharterManager {
     @NotNull
     public List<Charter> getCharterInstances(@NotNull AtomIdCharter atomIdCharter) {
 
-        return momcaConnection.queryDatabase(QUERY_FACTORY.queryCharterUris(atomIdCharter)).stream()
+        return momcaConnection.queryDatabase(ExistQueryFactory.queryCharterUris(atomIdCharter)).stream()
                 .map(this::getCharterFromUri)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
@@ -52,7 +49,7 @@ public class CharterManager {
     }
 
     private boolean isCharterExisting(@NotNull AtomIdCharter atomIdCharter, @Nullable MetadataCollectionName metadataCollectionName) {
-        return !momcaConnection.queryDatabase(QUERY_FACTORY.queryCharterExistence(atomIdCharter, metadataCollectionName)).isEmpty();
+        return !momcaConnection.queryDatabase(ExistQueryFactory.queryCharterExistence(atomIdCharter, metadataCollectionName)).isEmpty();
     }
 
 }

@@ -1,7 +1,7 @@
 package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.exception.MomCAException;
-import eu.icarus.momca.momcapi.exist.ExistQueryFactory;
+import eu.icarus.momca.momcapi.exist.ExistQuery;
 import eu.icarus.momca.momcapi.resource.ExistResource;
 import org.exist.xmldb.RemoteCollection;
 import org.exist.xmldb.RemoteCollectionManagementService;
@@ -25,8 +25,6 @@ public class MomcaConnection {
 
     @NotNull
     private static final String DRIVER = "org.exist.xmldb.DatabaseImpl";
-    @NotNull
-    private static final ExistQueryFactory QUERY_FACTORY = new ExistQueryFactory();
     @NotNull
     private static final String ROOT_COLLECTION = "/db/mom-data";
     @NotNull
@@ -104,7 +102,7 @@ public class MomcaConnection {
     }
 
     @NotNull
-    List<String> queryDatabase(@NotNull String existQuery) {
+    List<String> queryDatabase(@NotNull ExistQuery existQuery) {
 
         XPathQueryService queryService;
         try {
@@ -115,7 +113,7 @@ public class MomcaConnection {
 
         ResourceSet resultSet;
         try {
-            resultSet = queryService.query(existQuery);
+            resultSet = queryService.query(existQuery.getQuery());
         } catch (XMLDBException e) {
             throw new MomCAException(String.format("Failed to execute query '%s'", existQuery), e);
         }

@@ -13,45 +13,45 @@ import java.util.List;
  */
 public class ExistQueryFactory {
 
-    public ExistQueryFactory() {
+    private ExistQueryFactory() {
     }
 
     @NotNull
-    public String queryCharterExistence(@NotNull AtomIdCharter charterId, @Nullable MetadataCollectionName metadataCollectionName) {
+    public static ExistQuery queryCharterExistence(@NotNull AtomIdCharter charterId, @Nullable MetadataCollectionName metadataCollectionName) {
 
-        return String.format(
+        return new ExistQuery(String.format(
                 "%s collection('/db/mom-data%s')//atom:entry[.//atom:id/text()='%s'][1]",
                 getNamespaceDeclaration(Namespace.ATOM),
                 (metadataCollectionName == null) ? "" : ("/" + metadataCollectionName.getValue()),
-                charterId.getAtomId());
+                charterId.getAtomId()));
 
     }
 
     @NotNull
-    public String queryCharterUris(@NotNull AtomIdCharter charterId) {
+    public static ExistQuery queryCharterUris(@NotNull AtomIdCharter charterId) {
 
-        return String.format(
+        return new ExistQuery(String.format(
                 "%s let $nodes := collection('/db/mom-data')//atom:entry[.//atom:id/text()='%s']" +
                         " for $node in $nodes" +
                         " return concat(util:collection-name($node), '/', util:document-name($node))",
                 getNamespaceDeclaration(Namespace.ATOM),
-                charterId.getAtomId());
+                charterId.getAtomId()));
 
     }
 
     @NotNull
-    public String replaceFirstOccurrenceInResource(@NotNull String resourceUri, @NotNull String qualifiedElementName, @NotNull String newElement) {
+    public static ExistQuery replaceFirstOccurrenceInResource(@NotNull String resourceUri, @NotNull String qualifiedElementName, @NotNull String newElement) {
 
-        return String.format("%s update replace doc('%s')//%s[1] with %s",
+        return new ExistQuery(String.format("%s update replace doc('%s')//%s[1] with %s",
                 getNamespaceDeclaration(qualifiedElementName),
                 resourceUri,
                 qualifiedElementName,
-                newElement);
+                newElement));
 
     }
 
     @NotNull
-    private String getNamespaceDeclaration(@NotNull Namespace... namespaces) {
+    private static String getNamespaceDeclaration(@NotNull Namespace... namespaces) {
 
         StringBuilder declarationBuilder = new StringBuilder();
 
@@ -65,7 +65,7 @@ public class ExistQueryFactory {
     }
 
     @NotNull
-    private String getNamespaceDeclaration(@NotNull String... qualifiedElementNames) {
+    private static String getNamespaceDeclaration(@NotNull String... qualifiedElementNames) {
 
         List<Namespace> namespaceList = new ArrayList<>(0);
 
