@@ -1,6 +1,6 @@
 package eu.icarus.momca.momcapi;
 
-import eu.icarus.momca.momcapi.exception.MomCAException;
+import eu.icarus.momca.momcapi.exception.MomcaException;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedInputStream;
@@ -25,7 +25,7 @@ class TestUtils {
     private static final String password = "momcapitest";
 
     @NotNull
-    static MomcaConnection initMomcaConnection() throws MomCAException {
+    static MomcaConnection initMomcaConnection() throws MomcaException {
 
         URL serverPropertiesUrl = TestUtils.class.getResource(SERVER_PROPERTIES_PATH);
         assertNotNull(TestUtils.class.getResource(SERVER_PROPERTIES_PATH), "Test file missing");

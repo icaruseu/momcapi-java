@@ -1,7 +1,7 @@
 package eu.icarus.momca.momcapi;
 
-import eu.icarus.momca.momcapi.exception.MomCAException;
-import eu.icarus.momca.momcapi.exist.ExistQueryFactory;
+import eu.icarus.momca.momcapi.exception.MomcaException;
+import eu.icarus.momca.momcapi.query.ExistQueryFactory;
 import eu.icarus.momca.momcapi.resource.ExistResource;
 import eu.icarus.momca.momcapi.resource.User;
 import org.exist.security.Account;
@@ -75,7 +75,7 @@ class UserManager {
             }
 
         } catch (XMLDBException e) {
-            throw new MomCAException("Failed to change the password for '" + userName + "'", e);
+            throw new MomcaException("Failed to change the password for '" + userName + "'", e);
         }
 
     }
@@ -116,7 +116,7 @@ class UserManager {
 
             } catch (XMLDBException e) {
                 if (!e.getMessage().equals(String.format("Failed to invoke method addAccount in class org.exist.xmlrpc.RpcConnection: Account '%s' exist", userName))) {
-                    throw new MomCAException("Failed to create user '" + userName + "'", e);
+                    throw new MomcaException("Failed to create user '" + userName + "'", e);
                 }
             }
 
@@ -143,7 +143,7 @@ class UserManager {
             }
 
         } catch (XMLDBException e) {
-            throw new MomCAException("Failed to remove account '" + accountName + "'", e);
+            throw new MomcaException("Failed to remove account '" + accountName + "'", e);
         }
 
     }
@@ -154,7 +154,7 @@ class UserManager {
             RemoteUserManagementService service = (RemoteUserManagementService) momcaConnection.getRootCollection().getService("UserManagementService", "1.0");
             return Optional.ofNullable(service.getAccount(userName)).isPresent();
         } catch (XMLDBException e) {
-            throw new MomCAException("Failed to get resource for user '" + userName + "'", e);
+            throw new MomcaException("Failed to get resource for user '" + userName + "'", e);
         }
 
     }
@@ -169,7 +169,7 @@ class UserManager {
             try {
                 escapedUserNames = collection.listResources();
             } catch (XMLDBException e) {
-                throw new MomCAException(String.format("Failed to list resources in collection '%s'.", PATH_USER), e);
+                throw new MomcaException(String.format("Failed to list resources in collection '%s'.", PATH_USER), e);
             }
 
             for (String escapedUserName : escapedUserNames) {

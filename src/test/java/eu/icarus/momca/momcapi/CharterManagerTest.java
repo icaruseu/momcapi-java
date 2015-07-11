@@ -2,7 +2,7 @@ package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.resource.Charter;
 import eu.icarus.momca.momcapi.resource.User;
-import eu.icarus.momca.momcapi.resource.atom.AtomIdCharter;
+import eu.icarus.momca.momcapi.xml.atom.AtomIdCharter;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 

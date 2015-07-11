@@ -1,9 +1,9 @@
 package eu.icarus.momca.momcapi.resource;
 
-import eu.icarus.momca.momcapi.resource.atom.AtomAuthor;
-import eu.icarus.momca.momcapi.resource.atom.AtomIdCharter;
-import eu.icarus.momca.momcapi.resource.cei.CeiFigure;
-import eu.icarus.momca.momcapi.resource.cei.CeiIdno;
+import eu.icarus.momca.momcapi.xml.atom.AtomAuthor;
+import eu.icarus.momca.momcapi.xml.atom.AtomIdCharter;
+import eu.icarus.momca.momcapi.xml.cei.CeiFigure;
+import eu.icarus.momca.momcapi.xml.cei.CeiIdno;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;

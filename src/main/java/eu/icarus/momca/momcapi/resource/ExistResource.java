@@ -2,6 +2,7 @@ package eu.icarus.momca.momcapi.resource;
 
 
 import eu.icarus.momca.momcapi.Util;
+import eu.icarus.momca.momcapi.query.XpathQuery;
 import nu.xom.*;
 import org.jetbrains.annotations.NotNull;
 

@@ -1,4 +1,4 @@
-package eu.icarus.momca.momcapi.resource.atom;
+package eu.icarus.momca.momcapi.xml.atom;
 
 import eu.icarus.momca.momcapi.Util;
 import eu.icarus.momca.momcapi.resource.ResourceType;

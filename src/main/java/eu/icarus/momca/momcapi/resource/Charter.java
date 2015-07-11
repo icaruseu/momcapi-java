@@ -1,10 +1,11 @@
 package eu.icarus.momca.momcapi.resource;
 
 
-import eu.icarus.momca.momcapi.exist.MetadataCollectionName;
-import eu.icarus.momca.momcapi.resource.atom.AtomAuthor;
-import eu.icarus.momca.momcapi.resource.atom.AtomIdCharter;
-import eu.icarus.momca.momcapi.resource.cei.*;
+import eu.icarus.momca.momcapi.query.XpathQuery;
+import eu.icarus.momca.momcapi.xml.XmlValidationProblem;
+import eu.icarus.momca.momcapi.xml.atom.AtomAuthor;
+import eu.icarus.momca.momcapi.xml.atom.AtomIdCharter;
+import eu.icarus.momca.momcapi.xml.cei.*;
 import nu.xom.*;
 import org.jetbrains.annotations.NotNull;
 import org.xml.sax.ErrorHandler;
@@ -159,8 +160,8 @@ public class Charter extends ExistResource {
 
             Element ceiIssued = (Element) ceiIssuedNodes.get(0);
 
-            Elements dateElements = ceiIssued.getChildElements("date", Namespace.CEI.getUri());
-            Elements dateRangeElements = ceiIssued.getChildElements("dateRange", Namespace.CEI.getUri());
+            Elements dateElements = ceiIssued.getChildElements("date", eu.icarus.momca.momcapi.xml.Namespace.CEI.getUri());
+            Elements dateRangeElements = ceiIssued.getChildElements("dateRange", eu.icarus.momca.momcapi.xml.Namespace.CEI.getUri());
 
 
             if (dateElements.size() == 1 && dateRangeElements.size() == 0) {
@@ -201,7 +202,7 @@ public class Charter extends ExistResource {
 
             Element figure = (Element) figures.get(i);
             String n = figure.getAttribute("n") == null ? "" : figure.getAttribute("n").getValue();
-            Elements childElements = figure.getChildElements("graphic", Namespace.CEI.getUri());
+            Elements childElements = figure.getChildElements("graphic", eu.icarus.momca.momcapi.xml.Namespace.CEI.getUri());
 
             switch (childElements.size()) {
 
@@ -242,11 +243,11 @@ public class Charter extends ExistResource {
 
         CharterStatus status;
 
-        if (getParentUri().contains(MetadataCollectionName.METADATA_CHARTER_IMPORT.getValue())) {
+        if (getParentUri().contains(ResourceRoot.METADATA_CHARTER_IMPORT.getValue())) {
             status = CharterStatus.IMPORTED;
-        } else if (getParentUri().contains(MetadataCollectionName.XRX_USER.getValue())) {
+        } else if (getParentUri().contains(ResourceRoot.XRX_USER.getValue())) {
             status = CharterStatus.PRIVATE;
-        } else if (getParentUri().contains(MetadataCollectionName.METADATA_CHARTER_SAVED.getValue())) {
+        } else if (getParentUri().contains(ResourceRoot.METADATA_CHARTER_SAVED.getValue())) {
             status = CharterStatus.SAVED;
         } else {
             status = CharterStatus.PUBLIC;

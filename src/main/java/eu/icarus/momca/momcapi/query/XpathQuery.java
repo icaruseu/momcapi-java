@@ -1,4 +1,6 @@
-package eu.icarus.momca.momcapi.resource;
+package eu.icarus.momca.momcapi.query;
+
+import eu.icarus.momca.momcapi.xml.Namespace;
 
 import java.util.Arrays;
 import java.util.List;

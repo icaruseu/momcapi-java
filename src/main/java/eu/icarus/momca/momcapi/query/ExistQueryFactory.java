@@ -1,7 +1,8 @@
-package eu.icarus.momca.momcapi.exist;
+package eu.icarus.momca.momcapi.query;
 
-import eu.icarus.momca.momcapi.resource.Namespace;
-import eu.icarus.momca.momcapi.resource.atom.AtomIdCharter;
+import eu.icarus.momca.momcapi.resource.ResourceRoot;
+import eu.icarus.momca.momcapi.xml.Namespace;
+import eu.icarus.momca.momcapi.xml.atom.AtomIdCharter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -9,24 +10,41 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Daniel on 07.03.2015.
+ * Creates {@code ExistQuery} instances.
+ *
+ * @author Daniel Jeller
+ *         Created on 07.03.2015.
+ * @see ExistQuery
  */
 public class ExistQueryFactory {
 
     private ExistQueryFactory() {
     }
 
+    /**
+     * Query charter existence.
+     *
+     * @param charterId    the charter's {@code atom:id}
+     * @param resourceRoot the
+     * @return the exist query
+     */
     @NotNull
-    public static ExistQuery queryCharterExistence(@NotNull AtomIdCharter charterId, @Nullable MetadataCollectionName metadataCollectionName) {
+    public static ExistQuery queryCharterExistence(@NotNull AtomIdCharter charterId, @Nullable ResourceRoot resourceRoot) {
 
         return new ExistQuery(String.format(
                 "%s collection('/db/mom-data%s')//atom:entry[.//atom:id/text()='%s'][1]",
                 getNamespaceDeclaration(Namespace.ATOM),
-                (metadataCollectionName == null) ? "" : ("/" + metadataCollectionName.getValue()),
+                (resourceRoot == null) ? "" : ("/" + resourceRoot.getValue()),
                 charterId.getAtomId()));
 
     }
 
+    /**
+     * Query charter uris.
+     *
+     * @param charterId the charter id
+     * @return the exist query
+     */
     @NotNull
     public static ExistQuery queryCharterUris(@NotNull AtomIdCharter charterId) {
 
@@ -39,6 +57,14 @@ public class ExistQueryFactory {
 
     }
 
+    /**
+     * Replace first occurrence in resource.
+     *
+     * @param resourceUri          the resource uri
+     * @param qualifiedElementName the qualified element name
+     * @param newElement           the new element
+     * @return the exist query
+     */
     @NotNull
     public static ExistQuery replaceFirstOccurrenceInResource(@NotNull String resourceUri, @NotNull String qualifiedElementName, @NotNull String newElement) {
 

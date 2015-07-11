@@ -1,10 +1,10 @@
 package eu.icarus.momca.momcapi;
 
-import eu.icarus.momca.momcapi.exist.ExistQueryFactory;
-import eu.icarus.momca.momcapi.exist.MetadataCollectionName;
+import eu.icarus.momca.momcapi.query.ExistQueryFactory;
 import eu.icarus.momca.momcapi.resource.Charter;
+import eu.icarus.momca.momcapi.resource.ResourceRoot;
 import eu.icarus.momca.momcapi.resource.User;
-import eu.icarus.momca.momcapi.resource.atom.AtomIdCharter;
+import eu.icarus.momca.momcapi.xml.atom.AtomIdCharter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,7 +37,7 @@ public class CharterManager {
     @NotNull
     public List<AtomIdCharter> listErroneouslySavedCharters(@NotNull User user) {
         return user.listSavedCharterIds().stream()
-                .filter(charterAtomId -> !isCharterExisting(charterAtomId, MetadataCollectionName.METADATA_CHARTER_SAVED))
+                .filter(charterAtomId -> !isCharterExisting(charterAtomId, ResourceRoot.METADATA_CHARTER_SAVED))
                 .collect(Collectors.toList());
     }
 
@@ -48,8 +48,8 @@ public class CharterManager {
         return momcaConnection.getExistResource(resourceName, parentUri).map(Charter::new);
     }
 
-    private boolean isCharterExisting(@NotNull AtomIdCharter atomIdCharter, @Nullable MetadataCollectionName metadataCollectionName) {
-        return !momcaConnection.queryDatabase(ExistQueryFactory.queryCharterExistence(atomIdCharter, metadataCollectionName)).isEmpty();
+    private boolean isCharterExisting(@NotNull AtomIdCharter atomIdCharter, @Nullable ResourceRoot resourceRoot) {
+        return !momcaConnection.queryDatabase(ExistQueryFactory.queryCharterExistence(atomIdCharter, resourceRoot)).isEmpty();
     }
 
 }

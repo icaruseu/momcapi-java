@@ -1,4 +1,4 @@
-package eu.icarus.momca.momcapi.resource;
+package eu.icarus.momca.momcapi.xml;
 
 /**
  * Created by daniel on 27.06.2015.

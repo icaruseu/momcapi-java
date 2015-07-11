@@ -1,8 +1,8 @@
 package eu.icarus.momca.momcapi;
 
+import eu.icarus.momca.momcapi.query.XpathQuery;
 import eu.icarus.momca.momcapi.resource.ExistResource;
 import eu.icarus.momca.momcapi.resource.User;
-import eu.icarus.momca.momcapi.resource.XpathQuery;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 

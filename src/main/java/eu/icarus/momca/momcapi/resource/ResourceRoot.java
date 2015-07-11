@@ -1,9 +1,9 @@
-package eu.icarus.momca.momcapi.exist;
+package eu.icarus.momca.momcapi.resource;
 
 /**
  * Created by daniel on 27.06.2015.
  */
-public enum MetadataCollectionName {
+public enum ResourceRoot {
 
     METADATA_ANNOTATION("metadata.annotation"),
     METADATA_ARCHIVE_PUBLIC("metadata.archive.public"),
@@ -22,7 +22,7 @@ public enum MetadataCollectionName {
 
     private final String value;
 
-    MetadataCollectionName(String value) {
+    ResourceRoot(String value) {
         this.value = value;
     }
 

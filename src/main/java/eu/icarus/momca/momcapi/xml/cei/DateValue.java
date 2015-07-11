@@ -1,4 +1,4 @@
-package eu.icarus.momca.momcapi.resource.cei;
+package eu.icarus.momca.momcapi.xml.cei;
 
 import org.jetbrains.annotations.NotNull;
 

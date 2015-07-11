@@ -1,5 +1,6 @@
 package eu.icarus.momca.momcapi.resource;
 
+import eu.icarus.momca.momcapi.query.XpathQuery;
 import nu.xom.Builder;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;

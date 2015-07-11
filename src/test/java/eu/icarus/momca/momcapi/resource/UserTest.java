@@ -1,6 +1,6 @@
 package eu.icarus.momca.momcapi.resource;
 
-import eu.icarus.momca.momcapi.resource.atom.AtomIdCharter;
+import eu.icarus.momca.momcapi.xml.atom.AtomIdCharter;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;

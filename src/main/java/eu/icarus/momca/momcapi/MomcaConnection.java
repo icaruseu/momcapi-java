@@ -1,7 +1,7 @@
 package eu.icarus.momca.momcapi;
 
-import eu.icarus.momca.momcapi.exception.MomCAException;
-import eu.icarus.momca.momcapi.exist.ExistQuery;
+import eu.icarus.momca.momcapi.exception.MomcaException;
+import eu.icarus.momca.momcapi.query.ExistQuery;
 import eu.icarus.momca.momcapi.resource.ExistResource;
 import org.exist.xmldb.RemoteCollection;
 import org.exist.xmldb.RemoteCollectionManagementService;
@@ -50,7 +50,7 @@ public class MomcaConnection {
         try {
             rootCollection.close();
         } catch (XMLDBException e) {
-            throw new MomCAException("Failed to close the database connection.", e);
+            throw new MomcaException("Failed to close the database connection.", e);
         }
 
     }
@@ -85,7 +85,7 @@ public class MomcaConnection {
         try {
             return Optional.ofNullable(DatabaseManager.getCollection(dbRootUri + Util.encode(uri), admin, password));
         } catch (@NotNull XMLDBException e) {
-            throw new MomCAException(String.format("Failed to get collection '%s'.", uri), e);
+            throw new MomcaException(String.format("Failed to get collection '%s'.", uri), e);
         }
 
     }
@@ -108,14 +108,14 @@ public class MomcaConnection {
         try {
             queryService = (XPathQueryService) rootCollection.getService("XPathQueryService", "1.0");
         } catch (XMLDBException e) {
-            throw new MomCAException("Failed to get the XPath query service.", e);
+            throw new MomcaException("Failed to get the XPath query service.", e);
         }
 
         ResourceSet resultSet;
         try {
             resultSet = queryService.query(existQuery.getQuery());
         } catch (XMLDBException e) {
-            throw new MomCAException(String.format("Failed to execute query '%s'", existQuery), e);
+            throw new MomcaException(String.format("Failed to execute query '%s'", existQuery), e);
         }
 
         List<String> resultList = new ArrayList<>(0);
@@ -126,7 +126,7 @@ public class MomcaConnection {
                 resultList.add(resource.getContent().toString());
             }
         } catch (XMLDBException e) {
-            throw new MomCAException("Failed to extract results from query resultSet.", e);
+            throw new MomcaException("Failed to extract results from query resultSet.", e);
         }
 
         return resultList;
@@ -152,7 +152,7 @@ public class MomcaConnection {
             userService.chmod("rwxrwxrwx");
 
         } catch (XMLDBException e) {
-            throw new MomCAException(String.format("Failed to add collection '%s/%s'.", parentUri, name), e);
+            throw new MomcaException(String.format("Failed to add collection '%s/%s'.", parentUri, name), e);
         }
 
     }
@@ -164,7 +164,7 @@ public class MomcaConnection {
         try {
             content = (String) resource.getContent();
         } catch (XMLDBException e) {
-            throw new MomCAException(String.format("Failed to get content of resource '%s'.", resourceName), e);
+            throw new MomcaException(String.format("Failed to get content of resource '%s'.", resourceName), e);
         }
         return Optional.of(new ExistResource(resourceName, parentCollectionPath, content));
 
@@ -196,7 +196,7 @@ public class MomcaConnection {
         try {
             return Optional.ofNullable((XMLResource) collection.getResource(findMatchingResource(resourceName, collection.listResources())));
         } catch (XMLDBException e) {
-            throw new MomCAException(String.format("Failed to get resource '%s' from parent collection.", resourceName), e);
+            throw new MomcaException(String.format("Failed to get resource '%s' from parent collection.", resourceName), e);
         }
 
     }
@@ -215,12 +215,12 @@ public class MomcaConnection {
             root.ifPresent(collection -> this.rootCollection = collection);
 
         } catch (@NotNull ClassNotFoundException | IllegalAccessException | InstantiationException e) {
-            throw new MomCAException("Failed to initialize database connection.", e);
+            throw new MomcaException("Failed to initialize database connection.", e);
         } catch (XMLDBException e) {
             if (e.getMessage().equals("Wrong password for user [admin] ")) {
-                throw new MomCAException("Wrong admin password!", e);
+                throw new MomcaException("Wrong admin password!", e);
             } else {
-                throw new MomCAException(String.format("Failed to connect to remote database '%s'", dbRootUri), e);
+                throw new MomcaException(String.format("Failed to connect to remote database '%s'", dbRootUri), e);
             }
         }
 
@@ -232,7 +232,7 @@ public class MomcaConnection {
             RemoteCollectionManagementService service = (RemoteCollectionManagementService) collection.getParentCollection().getService("CollectionManagementService", "1.0");
             service.removeCollection(((RemoteCollection) collection).getPathURI());
         } catch (XMLDBException e) {
-            throw new MomCAException(String.format("Failed to delete collection '%s'", uri), e);
+            throw new MomcaException(String.format("Failed to delete collection '%s'", uri), e);
         }
 
     }
@@ -245,7 +245,7 @@ public class MomcaConnection {
                 collection.removeResource(res);
             }
         } catch (@NotNull XMLDBException e) {
-            throw new MomCAException("Failed to remove the resource '" + resourceToDelete.getUri() + "'", e);
+            throw new MomcaException("Failed to remove the resource '" + resourceToDelete.getUri() + "'", e);
         }
 
     }
@@ -264,7 +264,7 @@ public class MomcaConnection {
             collection.close();
 
         } catch (XMLDBException e) {
-            throw new MomCAException("Failed to create new resource.", e);
+            throw new MomcaException("Failed to create new resource.", e);
         }
 
     }

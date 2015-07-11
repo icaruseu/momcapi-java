@@ -1,6 +1,6 @@
-package eu.icarus.momca.momcapi.resource.cei;
+package eu.icarus.momca.momcapi.xml.cei;
 
-import eu.icarus.momca.momcapi.resource.Namespace;
+import eu.icarus.momca.momcapi.xml.Namespace;
 import nu.xom.Attribute;
 import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;

@@ -2,24 +2,23 @@ package eu.icarus.momca.momcapi.exception;
 
 import org.jetbrains.annotations.NotNull;
 
+
 /**
- * Created by daniel on 25.06.2015.
+ * A MomCA-exception.
+ *
+ * @author Daniel Jeller
+ *         Created on 25.06.2015.
  */
-public class MomCAException extends RuntimeException {
+public class MomcaException extends RuntimeException {
 
-    public MomCAException() {
-        super();
-    }
-
-    public MomCAException(@NotNull String message) {
-        super(message);
-    }
-
-    public MomCAException(@NotNull String message, @NotNull Exception e) {
+    /**
+     * Instantiates a new MomCA-exception from another exception.
+     *
+     * @param message the message
+     * @param e       the original exception
+     */
+    public MomcaException(@NotNull String message, @NotNull Exception e) {
         super(message, e);
     }
 
-    public MomCAException(@NotNull Exception e) {
-        super(e);
-    }
 }
