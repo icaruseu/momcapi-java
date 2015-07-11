@@ -18,12 +18,12 @@ public class CeiDateTest {
 
     @Test
     public void testGetDateValue() throws Exception {
-        assertEquals(CEI_DATE.getDateValue(), new DateValue("12310801"));
+        assertEquals(CEI_DATE.getNumericDate(), new NumericDate("12310801"));
     }
 
     @Test
     public void testGetDateValueAsString() throws Exception {
-        assertEquals(CEI_DATE.getDateValueAsString(), "12310801");
+        assertEquals(CEI_DATE.getNumericDateAsString(), "12310801");
     }
 
     @Test

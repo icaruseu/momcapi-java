@@ -11,9 +11,9 @@ import org.jetbrains.annotations.NotNull;
 public class CeiDateRange extends AbstractCeiDate {
 
     @NotNull
-    private final DateValue fromValue;
+    private final NumericDate fromValue;
     @NotNull
-    private final DateValue toValue;
+    private final NumericDate toValue;
 
     public CeiDateRange(@NotNull String fromValue, @NotNull String toValue, @NotNull String literalDate) {
 
@@ -21,13 +21,13 @@ public class CeiDateRange extends AbstractCeiDate {
         addAttribute(new Attribute("from", fromValue));
         addAttribute(new Attribute("to", toValue));
 
-        this.fromValue = new DateValue(fromValue);
-        this.toValue = new DateValue(toValue);
+        this.fromValue = new NumericDate(fromValue);
+        this.toValue = new NumericDate(toValue);
 
     }
 
     @NotNull
-    public DateValue getFromValue() {
+    public NumericDate getFromValue() {
         return fromValue;
     }
 
@@ -37,7 +37,7 @@ public class CeiDateRange extends AbstractCeiDate {
     }
 
     @NotNull
-    public DateValue getToValue() {
+    public NumericDate getToValue() {
         return toValue;
     }
 
