@@ -23,7 +23,7 @@ public class CeiDateTest {
 
     @Test
     public void testGetDateValueAsString() throws Exception {
-        assertEquals(CEI_DATE.getNumericDateAsString(), "12310801");
+        assertEquals(CEI_DATE.getNumericDate().getValue(), "12310801");
     }
 
     @Test

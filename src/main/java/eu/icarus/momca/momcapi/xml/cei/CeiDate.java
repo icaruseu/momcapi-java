@@ -6,7 +6,7 @@ import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Represents a single-value date as specified in the <a href="http://www.cei.lmu.de/element.php?ID=123">CEI specification</a>. It consists of a literal date as well as a numeric date value.<br/><br/>
+ * Represents a single-value {@code cei:date} element as defined in the <a href="http://www.cei.lmu.de/element.php?ID=123">CEI specification</a>. It consists of a literal date as well as a numeric date value.<br/><br/>
  * Example in XML-form:<br/>
  * {@code <cei:date value="12970311">11th March 1297</cei:date>}
  *
@@ -18,12 +18,11 @@ public class CeiDate extends AbstractCeiDate {
     @NotNull
     private final NumericDate numericDate;
 
-
     /**
      * Instantiates a new date.
      *
      * @param numericDate The numeric date value, e.g. {@code 12970311}.
-     * @param literalDate the literal date value, e.g. {@code 11th March 1297}.
+     * @param literalDate The literal date value, e.g. {@code 11th March 1297}.
      */
     public CeiDate(@NotNull String numericDate, @NotNull String literalDate) {
         super(new Element("cei:date", Namespace.CEI.getUri()), literalDate);
@@ -32,19 +31,11 @@ public class CeiDate extends AbstractCeiDate {
     }
 
     /**
-     * @return The numeric date value (== {@code cei:date/@value}).
+     * @return The numeric date value, e.g. {@code 12970311} (== {@code cei:date/@value}).
      */
     @NotNull
     public NumericDate getNumericDate() {
         return numericDate;
-    }
-
-    /**
-     * @return The numeric date value as a {@code String}.
-     */
-    @NotNull
-    public String getNumericDateAsString() {
-        return numericDate.getValue();
     }
 
     @Override
@@ -54,8 +45,8 @@ public class CeiDate extends AbstractCeiDate {
 
     @Override
     public boolean isWrongDateType() {
-        String dayPart = getNumericDateAsString().substring(getNumericDateAsString().length() - 2, getNumericDateAsString().length());
-        String monthPart = getNumericDateAsString().substring(getNumericDateAsString().length() - 4, getNumericDateAsString().length() - 2);
+        String dayPart = numericDate.getValue().substring(numericDate.getValue().length() - 2, numericDate.getValue().length());
+        String monthPart = numericDate.getValue().substring(numericDate.getValue().length() - 4, numericDate.getValue().length() - 2);
         return monthPart.equals("99") || dayPart.equals("99");
     }
 

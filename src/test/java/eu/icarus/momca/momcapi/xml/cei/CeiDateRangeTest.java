@@ -13,22 +13,22 @@ public class CeiDateRangeTest {
 
     @Test
     public void testGetFromValue() throws Exception {
-        assertEquals(CEI_DATE_RANGE.getFromValue(), new NumericDate("14970801"));
+        assertEquals(CEI_DATE_RANGE.getNumericFromDate(), new NumericDate("14970801"));
     }
 
     @Test
     public void testGetFromValueAsString() throws Exception {
-        assertEquals(CEI_DATE_RANGE.getFromValueAsString(), "14970801");
+        assertEquals(CEI_DATE_RANGE.getNumericFromDate().getValue(), "14970801");
     }
 
     @Test
     public void testGetToValue() throws Exception {
-        assertEquals(CEI_DATE_RANGE.getToValue(), new NumericDate("14970810"));
+        assertEquals(CEI_DATE_RANGE.getNumericToDate(), new NumericDate("14970810"));
     }
 
     @Test
     public void testGetToValueAsString() throws Exception {
-        assertEquals(CEI_DATE_RANGE.getToValueAsString(), "14970810");
+        assertEquals(CEI_DATE_RANGE.getNumericToDate().getValue(), "14970810");
     }
 
     @Test

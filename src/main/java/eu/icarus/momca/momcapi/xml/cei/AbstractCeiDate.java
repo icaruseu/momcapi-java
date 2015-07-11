@@ -14,7 +14,7 @@ public abstract class AbstractCeiDate extends Element {
     private final String literalDate;
 
     /**
-     * Instantiates a new Abstract cei date.
+     * Instantiates a new abstract cei-date.
      *
      * @param element     The root element, e.g. {@code cei:date} or {@code cei:dateRange}.
      * @param literalDate The literal date, e.g. {@code 2nd December 1678}.
