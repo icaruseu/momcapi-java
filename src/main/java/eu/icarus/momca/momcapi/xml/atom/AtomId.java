@@ -11,7 +11,7 @@ import java.util.Arrays;
 /**
  * Created by daniel on 25.06.2015.
  */
-class AtomId extends Element {
+public class AtomId extends Element {
 
     @NotNull
     private static final String DEFAULT_PREFIX = "tag:www.monasterium.net,2011:";

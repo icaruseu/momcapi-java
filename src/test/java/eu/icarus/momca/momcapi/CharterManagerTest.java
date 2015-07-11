@@ -1,6 +1,7 @@
 package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.resource.Charter;
+import eu.icarus.momca.momcapi.resource.CharterStatus;
 import eu.icarus.momca.momcapi.resource.User;
 import eu.icarus.momca.momcapi.xml.atom.AtomIdCharter;
 import org.testng.annotations.BeforeClass;
@@ -30,7 +31,7 @@ public class CharterManagerTest {
     public void testGetCharterInstancesForImportedCharter() throws Exception {
 
         AtomIdCharter id = new AtomIdCharter("RS-IAGNS", "Charters", "F1_fasc.16_sub_N_1513");
-        List<Charter> charters = charterManager.getCharterInstances(id);
+        List<Charter> charters = charterManager.getCharterInstances(id, CharterStatus.IMPORTED);
         assertEquals(charters.size(), 1);
         assertEquals(charters.get(0).getAtomId().toXML(), id.toXML());
 
@@ -40,7 +41,7 @@ public class CharterManagerTest {
     public void testGetCharterInstancesForPrivateCharter() throws Exception {
 
         AtomIdCharter id = new AtomIdCharter("ea13e5f1-03b2-4bfa-9dd5-8fb770f98d7b", "46bc10f3-bc35-4fa8-ab82-25827dc243f6");
-        List<Charter> charters = charterManager.getCharterInstances(id);
+        List<Charter> charters = charterManager.getCharterInstances(id, CharterStatus.PRIVATE);
         assertEquals(charters.size(), 1);
         assertEquals(charters.get(0).getAtomId().toXML(), id.toXML());
 
@@ -50,7 +51,7 @@ public class CharterManagerTest {
     public void testGetCharterInstancesForPublishedPrivateCharter() throws Exception {
 
         AtomIdCharter id = new AtomIdCharter("67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3", "425d3dba-714e-40c9-af41-7edeb12d1a25");
-        List<Charter> charters = charterManager.getCharterInstances(id);
+        List<Charter> charters = charterManager.getCharterInstances(id, null);
         assertEquals(charters.size(), 2);
         assertEquals(charters.get(0).getAtomId().toXML(), id.toXML());
 
@@ -60,8 +61,8 @@ public class CharterManagerTest {
     public void testGetCharterInstancesForSavedCharter() throws Exception {
 
         AtomIdCharter id = new AtomIdCharter("CH-KAE", "Urkunden", "KAE_Urkunde_Nr_2");
-        List<Charter> charters = charterManager.getCharterInstances(id);
-        assertEquals(charters.size(), 2);
+        List<Charter> charters = charterManager.getCharterInstances(id, CharterStatus.SAVED);
+        assertEquals(charters.size(), 1);
         assertEquals(charters.get(0).getAtomId().toXML(), id.toXML());
 
     }
@@ -70,7 +71,7 @@ public class CharterManagerTest {
     public void testGetCharterInstancesWithEncodeId() throws Exception {
 
         AtomIdCharter id = new AtomIdCharter("RS-IAGNS", "Charters", "IAGNS_F-.150_6605|193232"); // The | will be encoded
-        List<Charter> charters = charterManager.getCharterInstances(id);
+        List<Charter> charters = charterManager.getCharterInstances(id, null);
         assertEquals(charters.size(), 1);
         assertEquals(charters.get(0).getAtomId().toXML(), id.toXML());
 
@@ -79,7 +80,7 @@ public class CharterManagerTest {
     @Test
     public void testGetGetCharterInstancesCharterNotExisting() throws Exception {
         AtomIdCharter id = new AtomIdCharter("RS-IAGNS", "Charters", "NotExisting");
-        List<Charter> charters = charterManager.getCharterInstances(id);
+        List<Charter> charters = charterManager.getCharterInstances(id, null);
         assertTrue(charters.isEmpty());
     }
 
@@ -87,7 +88,7 @@ public class CharterManagerTest {
     public void testGetGetCharterInstancesForPublishedCharter() throws Exception {
 
         AtomIdCharter id = new AtomIdCharter("CH-KAE", "Urkunden", "KAE_Urkunde_Nr_1");
-        List<Charter> charters = charterManager.getCharterInstances(id);
+        List<Charter> charters = charterManager.getCharterInstances(id, CharterStatus.PUBLIC);
         assertEquals(charters.size(), 1);
         assertEquals(charters.get(0).getAtomId().toXML(), id.toXML());
 
