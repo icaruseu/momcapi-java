@@ -5,7 +5,7 @@ import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * A representation of the {@code atom:autor} XML element as defined by the <a href="http://atomenabled.org/developers/syndication/#person">Atom developer guidelines</a>. It uses only the {@code atom:email} child element.<br/><br/>
+ * A representation of the {@code atom:autor} XML element as defined by the <a href="http://atomenabled.org/developers/syndication/#recommendedFeedElements">Atom developer guidelines</a>. It uses only the {@code atom:email} child element.<br/><br/>
  * Example in XML:<br/>
  * {@code <atom:author><atom:email>author@example.com</atom:email></atom:author>}
  *

@@ -69,7 +69,7 @@ public class AtomIdTest {
     @Test
     public void testGetXml() throws Exception {
         AtomId id = new AtomId(ATOM_ID);
-        assertEquals(id.getXml().toXML(), XML.toXML());
+        assertEquals(id.toXML(), XML.toXML());
     }
 
 }
