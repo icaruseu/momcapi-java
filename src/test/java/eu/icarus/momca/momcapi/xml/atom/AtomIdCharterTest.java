@@ -48,6 +48,11 @@ public class AtomIdCharterTest {
         assertEquals(id.getAtomId(), FOND_CHARTER_ATOM_ID);
     }
 
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testConstructorWithIncorrectAtomId() throws Exception {
+        new AtomIdCharter("ThisIsNotACharter");
+    }
+
     @Test
     public void testGetArchiveId() throws Exception {
         AtomIdCharter id = new AtomIdCharter(FOND_CHARTER_ATOM_ID);
@@ -88,18 +93,6 @@ public class AtomIdCharterTest {
     public void testIsPartOfArchiveFondWithCollectionCharter() throws Exception {
         AtomIdCharter id = new AtomIdCharter(COLLECTION_CHARTER_ATOM_ID);
         assertFalse(id.isPartOfArchiveFond());
-    }
-
-    @Test
-    public void testIsPartOfCollection() throws Exception {
-        AtomIdCharter id = new AtomIdCharter(COLLECTION_CHARTER_ATOM_ID);
-        assertTrue(id.isPartOfCollection());
-    }
-
-    @Test
-    public void testIsPartOfCollectionWithFond() throws Exception {
-        AtomIdCharter id = new AtomIdCharter(FOND_CHARTER_ATOM_ID);
-        assertFalse(id.isPartOfCollection());
     }
 
 }
