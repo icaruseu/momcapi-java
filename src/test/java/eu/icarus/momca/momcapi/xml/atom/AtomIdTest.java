@@ -49,15 +49,26 @@ public class AtomIdTest {
     }
 
     @Test
-    public void testGetAtomId() throws Exception {
-        AtomId id = new AtomId(ATOM_ID);
-        assertEquals(id.getAtomId(), ATOM_ID);
+    public void testConstructorWithPrefix() throws Exception {
+        AtomId id = new AtomId(PREFIX, "charter", "Archive", "Fond", "Charter");
+        assertEquals(id.toXML(), "<atom:id xmlns:atom=\"http://www.w3.org/2005/Atom\">tag:www.monasterium.net,2011:/charter/Archive/Fond/Charter</atom:id>");
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testConstructorWithWrongAtomId() throws Exception {
+        new AtomId("Thisisnotanatomid");
     }
 
     @Test
-    public void testGetPrefix() throws Exception {
+    public void testConstructorWithoutPrefix() throws Exception {
+        AtomId id = new AtomId("charter", "Archive", "Fond", "Charter");
+        assertEquals(id.toXML(), "<atom:id xmlns:atom=\"http://www.w3.org/2005/Atom\">tag:www.monasterium.net,2011:/charter/Archive/Fond/Charter</atom:id>");
+    }
+
+    @Test
+    public void testGetAtomId() throws Exception {
         AtomId id = new AtomId(ATOM_ID);
-        assertEquals(id.getPrefix(), PREFIX);
+        assertEquals(id.getAtomId(), ATOM_ID);
     }
 
     @Test

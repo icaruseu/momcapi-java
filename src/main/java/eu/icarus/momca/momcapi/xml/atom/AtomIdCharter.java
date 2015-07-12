@@ -7,7 +7,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Optional;
 
 /**
- * Created by daniel on 25.06.2015.
+ * Represents the {@code atom:id} of a charter in MOM-CA, e.g. {@code tag:www.monasterium.net,2011:/charter/RS-IAGNS/Charters/IAGNS_F-.150_6605%7C193232}.
+ *
+ * @author Daniel Jeller
+ *         Created on 25.06.2015.
  */
 public class AtomIdCharter extends AtomId {
 
