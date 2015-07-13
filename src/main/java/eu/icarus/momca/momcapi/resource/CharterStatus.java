@@ -8,25 +8,10 @@ package eu.icarus.momca.momcapi.resource;
  */
 public enum CharterStatus {
 
-    /**
-     * An imported charter.
-     */
-    IMPORTED("metadata.charter.import"),
-
-    /**
-     * A charter created by a user.
-     */
-    PRIVATE("xrx.user"),
-
-    /**
-     * A publicly visible charter.
-     */
-    PUBLIC("metadata.charter.public"),
-
-    /**
-     * A saved charter.
-     */
-    SAVED("metadata.charter.saved");
+    IMPORTED(ResourceRoot.METADATA_CHARTER_IMPORT.getCollectionName()),
+    PRIVATE(ResourceRoot.XRX_USER.getCollectionName()),
+    PUBLIC(ResourceRoot.METADATA_CHARTER_PUBLIC.getCollectionName()),
+    SAVED(ResourceRoot.METADATA_CHARTER_SAVED.getCollectionName());
 
     private final String parentCollection;
 

@@ -1,7 +1,10 @@
 package eu.icarus.momca.momcapi.resource;
 
 /**
- * Created by daniel on 27.06.2015.
+ * The root collections used to store content in MOM-CA.
+ *
+ * @author Daniel Jeller
+ *         Created on 27.06.2015.
  */
 public enum ResourceRoot {
 
@@ -20,14 +23,17 @@ public enum ResourceRoot {
     XRX_I18N(" xrx.i18n"),
     XRX_USER("xrx.user");
 
-    private final String value;
+    private final String collectionName;
 
-    ResourceRoot(String value) {
-        this.value = value;
+    ResourceRoot(String collectionName) {
+        this.collectionName = collectionName;
     }
 
-    public String getValue() {
-        return value;
+    /**
+     * @return The name of the root collection in the database, e.g. {@code metadata.charter.public}.
+     */
+    public String getCollectionName() {
+        return collectionName;
     }
 
 }

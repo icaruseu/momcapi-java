@@ -102,7 +102,7 @@ public class ExistQueryFactory {
 
     @NotNull
     private static String getRootCollectionString(@Nullable ResourceRoot resourceRoot) {
-        return (resourceRoot == null) ? "" : ("/" + resourceRoot.getValue());
+        return (resourceRoot == null) ? "" : ("/" + resourceRoot.getCollectionName());
     }
 
 }

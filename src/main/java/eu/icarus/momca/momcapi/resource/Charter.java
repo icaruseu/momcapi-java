@@ -278,11 +278,11 @@ public class Charter extends ExistResource {
 
         CharterStatus status;
 
-        if (getParentUri().contains(ResourceRoot.METADATA_CHARTER_IMPORT.getValue())) {
+        if (getParentUri().contains(ResourceRoot.METADATA_CHARTER_IMPORT.getCollectionName())) {
             status = CharterStatus.IMPORTED;
-        } else if (getParentUri().contains(ResourceRoot.XRX_USER.getValue())) {
+        } else if (getParentUri().contains(ResourceRoot.XRX_USER.getCollectionName())) {
             status = CharterStatus.PRIVATE;
-        } else if (getParentUri().contains(ResourceRoot.METADATA_CHARTER_SAVED.getValue())) {
+        } else if (getParentUri().contains(ResourceRoot.METADATA_CHARTER_SAVED.getCollectionName())) {
             status = CharterStatus.SAVED;
         } else {
             status = CharterStatus.PUBLIC;
