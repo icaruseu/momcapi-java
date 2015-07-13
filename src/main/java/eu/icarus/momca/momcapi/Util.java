@@ -9,10 +9,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by daniel on 03.07.2015.
+ * Utility functions.
+ *
+ * @author Daniel Jeller
+ *         Created on 03.07.2015.
  */
 public class Util {
 
+    /**
+     * Decodes a string that is %-encoded, e.g. {@code user%40mail.com} gets decoded to {@code user@mail.com}.
+     *
+     * @param string The string to decode.
+     * @return The decoded string.
+     */
     @NotNull
     public static String decode(@NotNull String string) {
 
@@ -28,6 +37,12 @@ public class Util {
 
     }
 
+    /**
+     * %-encodes a string, e.g. {@code user@mail.com} gets encoded to {@code user%40mail.com}.
+     *
+     * @param string The string to encode.
+     * @return The encoded string.
+     */
     @NotNull
     public static String encode(@NotNull String string) {
 
