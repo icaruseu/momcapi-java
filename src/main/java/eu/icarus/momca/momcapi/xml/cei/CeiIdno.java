@@ -6,7 +6,12 @@ import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Created by daniel on 09.07.2015.
+ * Represents a {@code cei:idno}-Element as defined in the <a href="http://www.cei.lmu.de/element.php?ID=19">CEI-Schema</a>.<br/><br/>
+ * Example:<br/>
+ * {@code <cei:idno id="KAE_Urkunde_Nr_1" old="1">KAE, Urkunde Nr. 1</cei:idno>}
+ *
+ * @author Daniel Jeller
+ *         Created on 09.07.2015.
  */
 public class CeiIdno extends Element {
 
@@ -15,6 +20,13 @@ public class CeiIdno extends Element {
     @NotNull
     private final String text;
 
+
+    /**
+     * Instantiates a new CeiIdno.
+     *
+     * @param id   The {@code cei:idno/@id}-attribute.
+     * @param text The text content.
+     */
     public CeiIdno(@NotNull String id, @NotNull String text) {
 
         super("cei:idno", Namespace.CEI.getUri());
@@ -26,11 +38,17 @@ public class CeiIdno extends Element {
 
     }
 
+    /**
+     * @return The value of the {@code cei:idno/@id}-attribute.
+     */
     @NotNull
     public String getId() {
         return id;
     }
 
+    /**
+     * @return The text content.
+     */
     @NotNull
     public String getText() {
         return text;
