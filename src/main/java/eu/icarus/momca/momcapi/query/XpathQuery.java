@@ -1,12 +1,17 @@
 package eu.icarus.momca.momcapi.query;
 
 import eu.icarus.momca.momcapi.xml.Namespace;
+import nu.xom.XPathContext;
 
 import java.util.Arrays;
 import java.util.List;
 
 /**
- * Created by daniel on 27.06.2015.
+ * An XPath-query to use to query XOM XML documents.
+ *
+ * @author Daniel Jeller
+ *         Created on 27.06.2015.
+ * @see nu.xom.Node#query(String, XPathContext)
  */
 public enum XpathQuery {
 
@@ -34,10 +39,17 @@ public enum XpathQuery {
         this.namespaces = Arrays.asList(namespaces);
     }
 
+    /**
+     * @return A list of all namespaces used in the query.
+     * @see Namespace
+     */
     public List<Namespace> getNamespaces() {
         return namespaces;
     }
 
+    /**
+     * @return The xpath query.
+     */
     public String getQuery() {
         return query;
     }
