@@ -1,7 +1,10 @@
 package eu.icarus.momca.momcapi.xml;
 
 /**
- * Created by daniel on 27.06.2015.
+ * A namespace used in MOM-CA.
+ *
+ * @author Daniel Jeller
+ *         Created on 27.06.2015.
  */
 public enum Namespace {
 
@@ -19,10 +22,16 @@ public enum Namespace {
         this.uri = uri;
     }
 
+    /**
+     * @return The prefix for the namespace, e.g. {@code cei}.
+     */
     public String getPrefix() {
         return this.name().toLowerCase();
     }
 
+    /**
+     * @return The URI defined for the namespace, e.g. {@code "http://www.monasterium.net/NS/cei"}.
+     */
     public String getUri() {
         return uri;
     }
