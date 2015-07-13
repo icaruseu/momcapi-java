@@ -5,16 +5,19 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Optional;
 
 /**
- * Created by daniel on 25.06.2015.
+ * The type of a resource used in MOM-CA.
+ *
+ * @author Daniel Jeller
+ *         Createdon 25.06.2015.
  */
 public enum ResourceType {
 
     ANNOTATION_IMAGE("annotation-image"), ARCHIVE("archive"), CHARTER("charter"), COLLECTION("collection"), FOND("fond"), SVG("svg");
 
-    private final String value;
+    private final String atomIdName;
 
-    ResourceType(String value) {
-        this.value = value;
+    ResourceType(String atomIdName) {
+        this.atomIdName = atomIdName;
     }
 
     @NotNull
@@ -23,7 +26,7 @@ public enum ResourceType {
         Optional<ResourceType> type = Optional.empty();
 
         for (ResourceType t : ResourceType.values()) {
-            if (value.equals(t.getValue())) {
+            if (value.equals(t.getAtomIdName())) {
                 type = Optional.of(t);
             }
         }
@@ -32,8 +35,11 @@ public enum ResourceType {
 
     }
 
-    public String getValue() {
-        return value;
+    /**
+     * @return The name of the type as used in an {@code atom:id} used in MOM-CA, e.g. {@code charter} as in  {@code tag:www.monasterium.net,2011:/}<b>{@code charter}</b>{@code /CH-KAE/Urkunden/KAE_Urkunde_Nr_1}
+     */
+    public String getAtomIdName() {
+        return atomIdName;
     }
 
 }

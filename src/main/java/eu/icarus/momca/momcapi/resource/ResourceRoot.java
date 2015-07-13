@@ -1,7 +1,7 @@
 package eu.icarus.momca.momcapi.resource;
 
 /**
- * The root collections used to store content in MOM-CA.
+ * A root collection used to store content in MOM-CA.
  *
  * @author Daniel Jeller
  *         Created on 27.06.2015.

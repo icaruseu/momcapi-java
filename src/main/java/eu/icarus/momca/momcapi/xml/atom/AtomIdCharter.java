@@ -34,7 +34,7 @@ public class AtomIdCharter extends AtomId {
         super(atomIdString);
         String[] valueTokens = atomIdString.split("/");
 
-        if (!valueTokens[1].equals(ResourceType.CHARTER.getValue())) {
+        if (!valueTokens[1].equals(ResourceType.CHARTER.getAtomIdName())) {
             throw new IllegalArgumentException(String.format("'%s' identifies a '%s', not a charter.", atomIdString, valueTokens[1]));
         }
 
@@ -68,7 +68,7 @@ public class AtomIdCharter extends AtomId {
      */
     public AtomIdCharter(@NotNull String archiveId, @NotNull String fondId, @NotNull String charterId) {
 
-        super(ResourceType.CHARTER.getValue(), archiveId, fondId, charterId);
+        super(ResourceType.CHARTER.getAtomIdName(), archiveId, fondId, charterId);
         this.archiveId = Optional.of(archiveId);
         this.fondId = Optional.of(fondId);
         this.charterId = charterId;
@@ -84,7 +84,7 @@ public class AtomIdCharter extends AtomId {
      */
     public AtomIdCharter(@NotNull String collectionId, @NotNull String charterId) {
 
-        super(ResourceType.CHARTER.getValue(), collectionId, charterId);
+        super(ResourceType.CHARTER.getAtomIdName(), collectionId, charterId);
         this.collectionId = Optional.of(collectionId);
         this.charterId = charterId;
         this.archiveId = Optional.empty();
