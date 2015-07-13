@@ -50,10 +50,16 @@ public class CharterTest {
         assertEquals(charter.getAtomId().toXML(), CHARTER_ATOM_ID.toXML());
     }
 
+    @Test
+    public void testConstructorWithInvalidCei() throws Exception {
+        Charter charter = new Charter(new ExistResource(NAME, PARENT_URI, INVALID_XML_CONTENT));
+        assertEquals(charter.getValidationProblems().size(), 2);
+        assertEquals(charter.getValidationProblems().get(0).getMessage(), "cvc-pattern-valid: Value '09471027' is not facet-valid with respect to pattern '-?[129]?[0-9][0-9][0-9][019][0-9][01239][0-9]' for type 'normalizedDateValue'.");
+    }
+
     @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testConstructorWithWrongResource() throws Exception {
-        ExistResource wrongResource = new ExistResource(NAME, PARENT_URI, WRONG_XML_CONTENT);
-        new Charter(wrongResource);
+    public void testConstructorWithNonCei() throws Exception {
+        new Charter(new ExistResource(NAME, PARENT_URI, WRONG_XML_CONTENT));
     }
 
     @Test

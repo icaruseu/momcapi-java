@@ -2,6 +2,7 @@ package eu.icarus.momca.momcapi.resource;
 
 
 import eu.icarus.momca.momcapi.query.XpathQuery;
+import eu.icarus.momca.momcapi.xml.Namespace;
 import eu.icarus.momca.momcapi.xml.XmlValidationProblem;
 import eu.icarus.momca.momcapi.xml.atom.AtomAuthor;
 import eu.icarus.momca.momcapi.xml.atom.AtomIdCharter;
@@ -25,7 +26,10 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Created by daniel on 25.06.2015.
+ * Represents a charter in MOM-CA.
+ *
+ * @author Daniel Jeller
+ *         Created on 25.06.2015.
  */
 public class Charter extends ExistResource {
 
@@ -45,6 +49,7 @@ public class Charter extends ExistResource {
     private final CharterStatus status;
     @NotNull
     private final List<XmlValidationProblem> validationProblems = new ArrayList<>(0);
+
 
     private class SimpleErrorHandler implements ErrorHandler {
 
@@ -66,6 +71,11 @@ public class Charter extends ExistResource {
 
     }
 
+    /**
+     * Instantiates a new Charter.
+     *
+     * @param existResource The eXist-resource that the charter is based on. The XML-content is validated against the <a href="https://github.com/icaruseu/mom-ca/blob/master/my/XRX/src/mom/app/cei/xsd/cei10.xsd">CEI Schema</a>.
+     */
     public Charter(@NotNull ExistResource existResource) {
 
         super(existResource);
@@ -73,54 +83,79 @@ public class Charter extends ExistResource {
         try {
             validateCei(existResource);
         } catch (@NotNull SAXException | IOException | ParsingException | ParserConfigurationException e) {
-            throw new RuntimeException("Failed to validate the resource.", e);
+            throw new IllegalArgumentException("Failed to validate the resource.", e);
         }
 
-        this.status = initStatus();
+        status = initStatus();
 
-        this.atomId = initCharterAtomId();
-        this.atomAuthor = initAtomAuthor();
-        this.ceiIdno = initCeiIdno();
-        this.ceiDate = initCeiDate();
-        this.ceiWitnessOrigFigures = new ArrayList<>(initCeiWitnessOrigFigures());
+        atomId = initCharterAtomId();
+        atomAuthor = initAtomAuthor();
+        ceiIdno = initCeiIdno();
+        ceiDate = initCeiDate();
+        ceiWitnessOrigFigures = new ArrayList<>(initCeiWitnessOrigFigures());
 
     }
 
+    /**
+     * @return The AtomAuthor.
+     */
     @NotNull
     public Optional<AtomAuthor> getAtomAuthor() {
         return atomAuthor;
     }
 
+    /**
+     * @return The AtomId.
+     */
     @NotNull
     public AtomIdCharter getAtomId() {
         return atomId;
     }
 
+    /**
+     * @return The date.
+     */
     @NotNull
     public Optional<AbstractCeiDate> getCeiDate() {
         return ceiDate;
     }
 
+    /**
+     * @return The CeiIdno.
+     */
     @NotNull
     public CeiIdno getCeiIdno() {
         return ceiIdno;
     }
 
+    /**
+     * @return A list of all figures in {@code cei:witnessOrig}. They represent only the direct images of the charter.
+     */
     @NotNull
     public List<CeiFigure> getCeiWitnessOrigFigures() {
         return ceiWitnessOrigFigures;
     }
 
+    /**
+     * @return The charter's internal status (published, saved, etc.).
+     */
     @NotNull
     public CharterStatus getStatus() {
         return status;
     }
 
+    /**
+     * @return A list of all validation problems.
+     */
     @NotNull
     public List<XmlValidationProblem> getValidationProblems() {
         return validationProblems;
     }
 
+    /**
+     * @return {@code True} if there are any validation problems.
+     * @see #getValidationProblems
+     */
     public boolean isValidCei() {
         return validationProblems.isEmpty();
     }
@@ -285,10 +320,8 @@ public class Charter extends ExistResource {
         factory.setValidating(false);
         factory.setNamespaceAware(true);
 
-        SchemaFactory schemaFactory =
-                SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
-        factory.setSchema(schemaFactory.newSchema(
-                new Source[]{new StreamSource(CEI_SCHEMA_URL)}));
+        SchemaFactory schemaFactory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
+        factory.setSchema(schemaFactory.newSchema(new Source[]{new StreamSource(CEI_SCHEMA_URL)}));
 
         SAXParser parser = factory.newSAXParser();
         XMLReader reader = parser.getXMLReader();
@@ -303,7 +336,7 @@ public class Charter extends ExistResource {
         Element ceiText = (Element) ceiTextNodes.get(0);
 
         Builder builder = new Builder(reader);
-        builder.build(ceiText.toXML(), null);
+        builder.build(ceiText.toXML(), Namespace.CEI.getUri());
 
     }
 
