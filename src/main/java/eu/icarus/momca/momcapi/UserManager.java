@@ -19,7 +19,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Created by daniel on 03.07.2015.
+ * Manages a user in MOM-CA.
+ *
+ * @author Daniel Jeller
+ *         Created on 03.07.2015.
+ * @see
  */
 public class UserManager {
 
@@ -30,13 +34,32 @@ public class UserManager {
     @NotNull
     private final MomcaConnection momcaConnection;
 
+    /**
+     * Instantiates a new UserManager.
+     *
+     * @param momcaConnection The connection to the database.
+     */
     UserManager(@NotNull MomcaConnection momcaConnection) {
         this.momcaConnection = momcaConnection;
     }
 
+    /**
+     * Adds a new user to MOM-CA.
+     *
+     * @param userName      The name of the user.
+     * @param password      The password of the user.
+     * @param moderatorName The name of an existing moderator.
+     * @param firstName     The first name of the user.
+     * @param lastName      The last name of the user.
+     * @return The user just added to the database.
+     */
     public User addUser(@NotNull String userName, @NotNull String password, @NotNull String moderatorName, @NotNull String firstName, @NotNull String lastName) {
 
         if (!getUser(userName).isPresent()) {
+
+            if (!getUser(moderatorName).isPresent()) {
+                throw new IllegalArgumentException("Moderator '" + moderatorName + "' not existing in database.");
+            }
 
             String xmlContent = String.format(NEW_USER_CONTENT, firstName, lastName, userName, moderatorName);
             MomcaResource userResource = new MomcaResource(userName + ".xml", PATH_USER, xmlContent);
@@ -51,16 +74,37 @@ public class UserManager {
 
     }
 
+    /**
+     * Adds a new user to MOM-CA.
+     *
+     * @param userName      The name of the user.
+     * @param password      The password of the user.
+     * @param moderatorName The name of an existing moderator.
+     * @return The user just added to the database.
+     */
     public User addUser(@NotNull String userName, @NotNull String password, @NotNull String moderatorName) {
         return addUser(userName, password, moderatorName, "New", "User");
     }
 
+    /**
+     * Changes the moderator of an user.
+     *
+     * @param user         The user to change.
+     * @param newModerator The new moderator.
+     * @return The updated user.
+     */
     @NotNull
     public User changeModerator(@NotNull User user, @NotNull User newModerator) {
         momcaConnection.queryDatabase(ExistQueryFactory.replaceFirstOccurrenceInResource(user.getUri(), "xrx:moderator", String.format("<xrx:moderator>%s</xrx:moderator>", newModerator.getUserName())));
         return getUser(user.getUserName()).get();
     }
 
+    /**
+     * Changes the password of an user.
+     *
+     * @param user        The user to change.
+     * @param newPassword The new password.
+     */
     public void changeUserPassword(@NotNull User user, @NotNull String newPassword) {
 
         String userName = user.getUserName();
@@ -80,6 +124,11 @@ public class UserManager {
 
     }
 
+    /**
+     * Deletes an existing user from MOM-CA.
+     *
+     * @param user The user to delete.
+     */
     public void deleteUser(@NotNull User user) {
 
         momcaConnection.deleteExistResource(user);
@@ -90,12 +139,25 @@ public class UserManager {
 
     }
 
+    /**
+     * Gets a user from the database.
+     *
+     * @param userName The name of the user.
+     * @return The user.
+     */
     @NotNull
     public Optional<User> getUser(@NotNull String userName) {
         boolean isInitialized = isUserInitialized(userName);
         return momcaConnection.getExistResource(userName + ".xml", PATH_USER).flatMap(existResource -> Optional.of(new User(existResource, isInitialized)));
     }
 
+    /**
+     * Initializes a registered but uninitialized user. This happens if the User doesn't recieve the registration-email or doesn't click on the confirmation link. Before this, the user is added to {@code xrx.user} but not added as an eXist-account.
+     *
+     * @param uninitializedUser The uninitialized user.
+     * @param password          The password.
+     * @return The initialized user.
+     */
     public User initializeUser(@NotNull User uninitializedUser, @NotNull String password) {
 
         String userName = uninitializedUser.getUserName();
@@ -126,11 +188,19 @@ public class UserManager {
 
     }
 
+    /**
+     * @return A list of all registered users in the database.
+     */
     @NotNull
     public List<String> listUserNames() {
         return listUserResourceNames().stream().map(s -> s.replace(".xml", "")).collect(Collectors.toList());
     }
 
+    /**
+     * Deletes an eXist user account. This does not delete the MOM-CA-user file and collection in {@code xrx.user}.
+     *
+     * @param accountName The name of the account to delete.
+     */
     void deleteExistUserAccount(@NotNull String accountName) {
 
         try {
@@ -148,6 +218,12 @@ public class UserManager {
 
     }
 
+    /**
+     * Checks if a user is initialized (an eXist account with the same name is existing).
+     *
+     * @param userName The user name to test.
+     * @return {@code True} if the user is initialized.
+     */
     boolean isUserInitialized(@NotNull String userName) {
 
         try {

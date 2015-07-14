@@ -43,6 +43,16 @@ public class UserManagerTest {
 
     }
 
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testAddUserWithWrongModerator() throws Exception {
+
+        String userName = "newUser@dev.monasterium.net";
+        String password = "newPassword";
+        String moderator = "notExistingModerator";
+        userManager.addUser(userName, password, moderator);
+
+    }
+
     @Test
     public void testChangeModerator() throws Exception {
 
