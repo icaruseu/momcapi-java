@@ -2,7 +2,7 @@ package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.exception.MomcaException;
 import eu.icarus.momca.momcapi.query.ExistQuery;
-import eu.icarus.momca.momcapi.resource.ExistResource;
+import eu.icarus.momca.momcapi.resource.MomcaResource;
 import org.exist.xmldb.RemoteCollection;
 import org.exist.xmldb.RemoteCollectionManagementService;
 import org.exist.xmldb.RemoteUserManagementService;
@@ -19,7 +19,10 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Created by daniel on 24.06.2015.
+ * A connection to a MOM-CA database instance. Provides access to all manager classes.
+ *
+ * @author Daniel Jeller
+ *         Created on 24.06.2015.
  */
 public class MomcaConnection {
 
@@ -35,6 +38,13 @@ public class MomcaConnection {
     private final String password;
     private Collection rootCollection;
 
+    /**
+     * Instantiates a new MomcaConnection.
+     *
+     * @param dbRootUri The root URI of the database, e.g. {@code xmldb:exist://localhost:8181/xmlrpc}.
+     * @param admin     The name of the admin user, e.g. {@code admin}.
+     * @param password  The password of the admin user.
+     */
     public MomcaConnection(@NotNull String dbRootUri, @NotNull String admin, @NotNull String password) {
 
         this.dbRootUri = dbRootUri;
@@ -45,6 +55,9 @@ public class MomcaConnection {
 
     }
 
+    /**
+     * Close the Connection.
+     */
     public void closeConnection() {
 
         try {
@@ -55,30 +68,61 @@ public class MomcaConnection {
 
     }
 
+    /**
+     * @return A CharterManager instance.
+     */
     @NotNull
     public CharterManager getCharterManager() {
         return new CharterManager(this);
     }
 
+    /**
+     * @return A UserManager instance.
+     */
     @NotNull
     public UserManager getUserManager() {
         return new UserManager(this);
     }
 
+    /**
+     * Adds an empty eXist collection to the database.
+     *
+     * @param name      The name of the collection.
+     * @param parentUri The absolute URI of the collections parent collection, e.g. {@code /db/mom-data/metadata.fond.public}.
+     * @see Collection
+     */
     void addCollection(@NotNull String name, @NotNull String parentUri) {
         String encodedName = Util.encode(name);
         String encodedPath = Util.encode(parentUri);
         getCollection(encodedPath).ifPresent(parent -> createCollectionInExist(name, parentUri, encodedName, parent));
     }
 
+    /**
+     * Deletes an collection from the database.
+     *
+     * @param uri The absolute URI of the collection to delete, e.g. {@code /db/mom-data/metadata.fond.pubic/collectionToDelete}.
+     * @see Collection
+     */
     void deleteCollection(@NotNull String uri) {
         getCollection(uri).ifPresent(collection -> removeCollectionInExist(uri, collection));
     }
 
-    void deleteExistResource(@NotNull ExistResource resourceToDelete) {
+    /**
+     * Deletes an resource from the database.
+     *
+     * @param resourceToDelete The resource to delete.
+     */
+    void deleteExistResource(@NotNull MomcaResource resourceToDelete) {
         getCollection(resourceToDelete.getParentUri()).ifPresent(parent -> removeResourceInExist(resourceToDelete, parent));
     }
 
+    /**
+     * Tries to get a collection from the database.
+     *
+     * @param uri The absolute URI of the collection to get, e.g. {@code /db/mom-data/metadata.fond.pubic/collectionToGet}.
+     * @return The optional collection.
+     * @see Collection
+     */
     @NotNull
     Optional<Collection> getCollection(@NotNull String uri) {
 
@@ -90,17 +134,35 @@ public class MomcaConnection {
 
     }
 
+    /**
+     * Tries to get a resource from the database.
+     *
+     * @param resourceName         The name of the resource, e.g. {@code admin.xml}.
+     * @param parentCollectionPath The absolute URI of the parent collection in the database, e.g. {@code /db/mom-data/xrx.user}.
+     * @return The MomcaResource.
+     */
     @NotNull
-    Optional<ExistResource> getExistResource(@NotNull String resourceName, @NotNull String parentCollectionPath) {
+    Optional<MomcaResource> getExistResource(@NotNull String resourceName, @NotNull String parentCollectionPath) {
         return getCollection(parentCollectionPath)
                 .flatMap(collection -> getXMLResource(resourceName, collection)
                         .flatMap(resource -> createExistResourceFromXMLResource(resourceName, parentCollectionPath, resource)));
     }
 
+    /**
+     * Gets root collection of the database, {@code /db}.
+     *
+     * @return The root collection.
+     */
     Collection getRootCollection() {
         return rootCollection;
     }
 
+    /**
+     * Queries the database.
+     *
+     * @param existQuery The query to execute.
+     * @return A list with the resulting XML fragments as {@code String}.
+     */
     @NotNull
     List<String> queryDatabase(@NotNull ExistQuery existQuery) {
 
@@ -134,9 +196,11 @@ public class MomcaConnection {
     }
 
     /**
-     * @param resource the resource to write in the database. If a resource with the same uri is already existing, it gets overwritten.
+     * Stores a MomcaResource in the database.
+     *
+     * @param resource The resource to store in the database. If a resource with the same uri is already existing, it gets overwritten.
      */
-    void storeExistResource(@NotNull ExistResource resource) {
+    void storeExistResource(@NotNull MomcaResource resource) {
         getCollection(resource.getParentUri()).ifPresent(collection -> storeResourceInExist(resource, collection));
     }
 
@@ -158,7 +222,7 @@ public class MomcaConnection {
     }
 
     @NotNull
-    private Optional<ExistResource> createExistResourceFromXMLResource(@NotNull String resourceName, @NotNull String parentCollectionPath, @NotNull XMLResource resource) {
+    private Optional<MomcaResource> createExistResourceFromXMLResource(@NotNull String resourceName, @NotNull String parentCollectionPath, @NotNull XMLResource resource) {
 
         String content;
         try {
@@ -166,7 +230,7 @@ public class MomcaConnection {
         } catch (XMLDBException e) {
             throw new MomcaException(String.format("Failed to get content of resource '%s'.", resourceName), e);
         }
-        return Optional.of(new ExistResource(resourceName, parentCollectionPath, content));
+        return Optional.of(new MomcaResource(resourceName, parentCollectionPath, content));
 
     }
 
@@ -237,7 +301,7 @@ public class MomcaConnection {
 
     }
 
-    private void removeResourceInExist(@NotNull ExistResource resourceToDelete, @NotNull Collection collection) {
+    private void removeResourceInExist(@NotNull MomcaResource resourceToDelete, @NotNull Collection collection) {
 
         try {
             Resource res = collection.getResource(findMatchingResource(resourceToDelete.getResourceName(), collection.listResources()));
@@ -250,7 +314,7 @@ public class MomcaConnection {
 
     }
 
-    private void storeResourceInExist(@NotNull ExistResource resource, @NotNull Collection collection) {
+    private void storeResourceInExist(@NotNull MomcaResource resource, @NotNull Collection collection) {
 
         try {
 

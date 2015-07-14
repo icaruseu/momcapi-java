@@ -10,7 +10,7 @@ import static org.testng.Assert.assertEquals;
 /**
  * Created by daniel on 27.06.2015.
  */
-public class ExistResourceTest {
+public class MomcaResourceTest {
 
     @NotNull
     private static final String NAME = "admin.xml";
@@ -27,32 +27,32 @@ public class ExistResourceTest {
 
     @Test
     public void testConstructorWithExistResource() throws Exception {
-        ExistResource resOrig = new ExistResource(NAME, PARENT_URI, XML_CONTENT_WITH_NAMESPACE);
-        ExistResource resNew = new ExistResource(resOrig);
+        MomcaResource resOrig = new MomcaResource(NAME, PARENT_URI, XML_CONTENT_WITH_NAMESPACE);
+        MomcaResource resNew = new MomcaResource(resOrig);
         assertEquals(resNew.getUri(), resOrig.getUri());
     }
 
     @Test
     public void testConstructorWithNameCollectionAndContent() throws Exception {
-        ExistResource res = new ExistResource(NAME, PARENT_URI, XML_CONTENT_WITH_NAMESPACE);
+        MomcaResource res = new MomcaResource(NAME, PARENT_URI, XML_CONTENT_WITH_NAMESPACE);
         assertEquals(res.getUri(), URI);
     }
 
     @Test
     public void testGetParentCollectionUri() throws Exception {
-        ExistResource res = new ExistResource(NAME, PARENT_URI, XML_CONTENT_WITH_NAMESPACE);
+        MomcaResource res = new MomcaResource(NAME, PARENT_URI, XML_CONTENT_WITH_NAMESPACE);
         assertEquals(res.getParentUri(), PARENT_URI);
     }
 
     @Test
     public void testGetResourceName() throws Exception {
-        ExistResource res = new ExistResource(NAME, PARENT_URI, XML_CONTENT_WITH_NAMESPACE);
+        MomcaResource res = new MomcaResource(NAME, PARENT_URI, XML_CONTENT_WITH_NAMESPACE);
         assertEquals(res.getResourceName(), NAME);
     }
 
     @Test
     public void testGetUri() throws Exception {
-        ExistResource res = new ExistResource(NAME, PARENT_URI, XML_CONTENT_WITH_NAMESPACE);
+        MomcaResource res = new MomcaResource(NAME, PARENT_URI, XML_CONTENT_WITH_NAMESPACE);
         assertEquals(res.getUri(), URI);
     }
 
@@ -60,20 +60,20 @@ public class ExistResourceTest {
     public void testGetXmlAsDocument() throws Exception {
         Builder parser = new Builder();
         String origXml = parser.build(XML_CONTENT_WITH_NAMESPACE, null).toXML();
-        ExistResource res = new ExistResource(NAME, PARENT_URI, XML_CONTENT_WITH_NAMESPACE);
+        MomcaResource res = new MomcaResource(NAME, PARENT_URI, XML_CONTENT_WITH_NAMESPACE);
         assertEquals(res.getXmlAsDocument().toXML(), origXml);
     }
 
     @Test
     public void testQueryContentXmlWithNamespace() throws Exception {
-        ExistResource res = new ExistResource(NAME, PARENT_URI, XML_CONTENT_WITH_NAMESPACE);
+        MomcaResource res = new MomcaResource(NAME, PARENT_URI, XML_CONTENT_WITH_NAMESPACE);
         assertEquals(res.listQueryResultStrings(XpathQuery.QUERY_XRX_NAME).get(0), QUERY_RESULT);
 
     }
 
     @Test
     public void testQueryContentXmlWithoutNamespace() throws Exception {
-        ExistResource res = new ExistResource(NAME, PARENT_URI, XML_CONTENT_WITHOUT_NAMESPACE);
+        MomcaResource res = new MomcaResource(NAME, PARENT_URI, XML_CONTENT_WITHOUT_NAMESPACE);
         assertEquals(res.listQueryResultStrings(XpathQuery.QUERY_NAME).get(0), QUERY_RESULT);
     }
 

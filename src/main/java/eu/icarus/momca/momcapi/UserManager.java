@@ -2,7 +2,7 @@ package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.exception.MomcaException;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
-import eu.icarus.momca.momcapi.resource.ExistResource;
+import eu.icarus.momca.momcapi.resource.MomcaResource;
 import eu.icarus.momca.momcapi.resource.User;
 import org.exist.security.Account;
 import org.exist.security.Group;
@@ -39,7 +39,7 @@ public class UserManager {
         if (!getUser(userName).isPresent()) {
 
             String xmlContent = String.format(NEW_USER_CONTENT, firstName, lastName, userName, moderatorName);
-            ExistResource userResource = new ExistResource(userName + ".xml", PATH_USER, xmlContent);
+            MomcaResource userResource = new MomcaResource(userName + ".xml", PATH_USER, xmlContent);
 
             momcaConnection.storeExistResource(userResource);
 

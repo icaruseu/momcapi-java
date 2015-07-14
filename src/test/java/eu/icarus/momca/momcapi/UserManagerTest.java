@@ -1,7 +1,7 @@
 package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.query.XpathQuery;
-import eu.icarus.momca.momcapi.resource.ExistResource;
+import eu.icarus.momca.momcapi.resource.MomcaResource;
 import eu.icarus.momca.momcapi.resource.User;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -115,7 +115,7 @@ public class UserManagerTest {
         // create user resource
         String newUserName = "testuser@gmail.com";
         String newUserXml = "<xrx:user xmlns:xrx='http://www.monasterium.net/NS/xrx'> <xrx:username /> <xrx:password /> <xrx:firstname>Anna</xrx:firstname> <xrx:name>Madeo</xrx:name> <xrx:email>testuser@gmail.com</xrx:email> <xrx:moderator>admin</xrx:moderator> <xrx:street /> <xrx:zip /> <xrx:town /> <xrx:phone /> <xrx:institution /> <xrx:info /> <xrx:storage> <xrx:saved_list /> <xrx:bookmark_list /> </xrx:storage> </xrx:user>";
-        ExistResource userResource = new ExistResource(newUserName + ".xml", "/db/mom-data/xrx.user", newUserXml);
+        MomcaResource userResource = new MomcaResource(newUserName + ".xml", "/db/mom-data/xrx.user", newUserXml);
         momcaConnection.storeExistResource(userResource);
 
         // create new user without using momcaConnection.addUser()
@@ -131,10 +131,10 @@ public class UserManagerTest {
         assertTrue(initializedUser.isInitialized());
 
         // test initialization success directly in the database
-        Optional<ExistResource> resourceOptional = momcaConnection.getExistResource(newUserName + ".xml", parentCollection);
+        Optional<MomcaResource> resourceOptional = momcaConnection.getExistResource(newUserName + ".xml", parentCollection);
         assertTrue(resourceOptional.isPresent());
-        ExistResource res = resourceOptional.get();
-        Method queryContentXml = ExistResource.class.getDeclaredMethod("listQueryResultStrings", XpathQuery.class);
+        MomcaResource res = resourceOptional.get();
+        Method queryContentXml = MomcaResource.class.getDeclaredMethod("listQueryResultStrings", XpathQuery.class);
         queryContentXml.setAccessible(true);
         //noinspection unchecked
         assertEquals(((List<String>) queryContentXml.invoke(res, XpathQuery.QUERY_CONFIG_NAME)).get(0), newUserName);

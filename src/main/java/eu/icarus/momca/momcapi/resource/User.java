@@ -13,7 +13,7 @@ import java.util.List;
  * @author Daniel Jeller
  *         Created on 24.06.2015.
  */
-public class User extends ExistResource {
+public class User extends MomcaResource {
 
     private final boolean isInitialized;
     @NotNull
@@ -24,20 +24,20 @@ public class User extends ExistResource {
     /**
      * Instantiates a new User.
      *
-     * @param existResource The eXist Resource of the user in the database.
+     * @param momcaResource The eXist Resource of the user in the database.
      */
-    public User(@NotNull ExistResource existResource) {
-        this(existResource, false);
+    public User(@NotNull MomcaResource momcaResource) {
+        this(momcaResource, false);
     }
 
     /**
      * Instantiates a new User.
      *
-     * @param existResource The eXist Resource of the user in the database.
+     * @param momcaResource The eXist Resource of the user in the database.
      * @param isInitialized Whether or not the user is already initialized in the database.
      */
-    public User(@NotNull ExistResource existResource, boolean isInitialized) {
-        super(existResource);
+    public User(@NotNull MomcaResource momcaResource, boolean isInitialized) {
+        super(momcaResource);
         userName = queryUniqueFieldValue(XpathQuery.QUERY_XRX_EMAIL);
         moderator = queryUniqueFieldValue(XpathQuery.QUERY_XRX_MODERATOR);
         this.isInitialized = isInitialized;

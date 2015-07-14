@@ -16,7 +16,7 @@ import java.util.List;
  * @author Daniel Jeller
  *         Created on 24.06.2015.
  */
-public class ExistResource {
+public class MomcaResource {
 
     @NotNull
     private final String parentUri;
@@ -27,24 +27,24 @@ public class ExistResource {
 
 
     /**
-     * Instantiates a new ExistResource with an existing resource.
+     * Instantiates a new MomcaResource with an existing resource.
      *
-     * @param existResource The ExistResource to use.
+     * @param momcaResource The MomcaResource to use.
      */
-    ExistResource(@NotNull final ExistResource existResource) {
-        this.resourceName = existResource.getResourceName();
-        this.xmlAsDocument = existResource.getXmlAsDocument();
-        this.parentUri = existResource.getParentUri();
+    MomcaResource(@NotNull final MomcaResource momcaResource) {
+        this.resourceName = momcaResource.getResourceName();
+        this.xmlAsDocument = momcaResource.getXmlAsDocument();
+        this.parentUri = momcaResource.getParentUri();
     }
 
     /**
-     * Instantiates a new ExistResource.
+     * Instantiates a new MomcaResource.
      *
      * @param resourceName        The name of the resource, e.g. {@code user.xml}.
      * @param parentCollectionUri The URI of the collection, the resource is stored in in the database, e.g. {@code /db/mom-data/xrx.user}.
      * @param xmlContent          The xml content of the resource as {@code String}.
      */
-    public ExistResource(@NotNull final String resourceName, @NotNull final String parentCollectionUri, @NotNull final String xmlContent) {
+    public MomcaResource(@NotNull final String resourceName, @NotNull final String parentCollectionUri, @NotNull final String xmlContent) {
 
         try {
 
@@ -53,7 +53,7 @@ public class ExistResource {
             this.parentUri = Util.encode(parentCollectionUri);
 
         } catch (IOException e) {
-            throw new RuntimeException(String.format("Failed to create ExistResource for '%s'", resourceName), e);
+            throw new RuntimeException(String.format("Failed to create MomcaResource for '%s'", resourceName), e);
         } catch (ParsingException e) {
             throw new IllegalArgumentException(String.format("Failed to parse the xml content of resource '%s'", resourceName), e);
         }
@@ -129,7 +129,7 @@ public class ExistResource {
     @NotNull
     @Override
     public String toString() {
-        return "ExistResource{" +
+        return "MomcaResource{" +
                 "resourceName='" + resourceName + '\'' +
                 ", xmlAsDocument=" + xmlAsDocument +
                 ", parentUri='" + parentUri + '\'' +
