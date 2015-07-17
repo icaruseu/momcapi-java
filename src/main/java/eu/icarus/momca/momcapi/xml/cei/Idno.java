@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Daniel Jeller
  *         Created on 09.07.2015.
  */
-public class CeiIdno extends Element {
+public class Idno extends Element {
 
     @NotNull
     private final String id;
@@ -24,12 +24,12 @@ public class CeiIdno extends Element {
 
 
     /**
-     * Instantiates a new CeiIdno.
+     * Instantiates a new Idno.
      *
      * @param id   The {@code cei:idno/@id}-attribute.
      * @param text The text content.
      */
-    public CeiIdno(@NotNull String id, @NotNull String text) {
+    public Idno(@NotNull String id, @NotNull String text) {
 
         super("cei:idno", Namespace.CEI.getUri());
         addAttribute(new Attribute("id", id));
@@ -60,7 +60,7 @@ public class CeiIdno extends Element {
     @Override
     public String toString() {
 
-        return "CeiIdno{" +
+        return "Idno{" +
                 "id='" + id + '\'' +
                 ", text='" + text + '\'' +
                 "} " + super.toString();

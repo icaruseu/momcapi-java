@@ -14,6 +14,7 @@ public enum Namespace {
     CONFIG("http://exist-db.org/Configuration"),
     EAD("urn:isbn:1-931666-22-9"),
     EAG("http://www.archivgut-online.de/eag"),
+    EAP("http://www.monasterium.net/NS/eap"),
     XRX("http://www.monasterium.net/NS/xrx");
 
     private final String uri;

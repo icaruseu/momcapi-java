@@ -29,14 +29,19 @@ public class MomcaConnection {
     @NotNull
     private static final String DRIVER = "org.exist.xmldb.DatabaseImpl";
     @NotNull
-    private static final String ROOT_COLLECTION = "/db/mom-data";
-    @NotNull
     private final String admin;
+    @NotNull
+    private final CharterManager charterManager;
     @NotNull
     private final String dbRootUri;
     @NotNull
+    private final HierarchyManager hierarchyManager;
+    @NotNull
     private final String password;
-    private Collection rootCollection;
+    @NotNull
+    private final Collection rootCollection;
+    @NotNull
+    private final UserManager userManager;
 
     /**
      * Instantiates a new MomcaConnection.
@@ -51,7 +56,11 @@ public class MomcaConnection {
         this.admin = admin;
         this.password = password;
 
-        initDatabaseConnection();
+        rootCollection = initDatabaseConnection();
+
+        userManager = new UserManager(this);
+        hierarchyManager = new HierarchyManager(this);
+        charterManager = new CharterManager(this);
 
     }
 
@@ -69,19 +78,26 @@ public class MomcaConnection {
     }
 
     /**
-     * @return A CharterManager instance.
+     * @return The charter manager instance.
      */
     @NotNull
     public CharterManager getCharterManager() {
-        return new CharterManager(this);
+        return charterManager;
     }
 
     /**
-     * @return A UserManager instance.
+     * @return The hierarchy manager instance.
+     */
+    public HierarchyManager getHierarchyManager() {
+        return hierarchyManager;
+    }
+
+    /**
+     * @return The user manager.
      */
     @NotNull
     public UserManager getUserManager() {
-        return new UserManager(this);
+        return userManager;
     }
 
     /**
@@ -153,6 +169,7 @@ public class MomcaConnection {
      *
      * @return The root collection.
      */
+    @NotNull
     Collection getRootCollection() {
         return rootCollection;
     }
@@ -268,15 +285,13 @@ public class MomcaConnection {
     /**
      * Register the database
      */
-    private void initDatabaseConnection() {
+    private Collection initDatabaseConnection() {
 
         try {
 
             org.xmldb.api.base.Database dbDatabase = (org.xmldb.api.base.Database) Class.forName(DRIVER).newInstance();
             DatabaseManager.registerDatabase(dbDatabase);
-
-            Optional<Collection> root = getCollection("/db");
-            root.ifPresent(collection -> this.rootCollection = collection);
+            return getCollection("/db").get();
 
         } catch (@NotNull ClassNotFoundException | IllegalAccessException | InstantiationException e) {
             throw new MomcaException("Failed to initialize database connection.", e);

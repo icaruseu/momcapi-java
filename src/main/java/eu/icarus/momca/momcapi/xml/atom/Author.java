@@ -15,17 +15,17 @@ import org.jetbrains.annotations.NotNull;
  * @author Daniel Jeller
  *         Created on 09.07.2015.
  */
-public class AtomAuthor extends Element {
+public class Author extends Element {
 
     @NotNull
     private final String email;
 
     /**
-     * Instantiates a new AtomAuthor.
+     * Instantiates a new Author.
      *
      * @param email The author's email address used as identification.
      */
-    public AtomAuthor(@NotNull String email) {
+    public Author(@NotNull String email) {
 
         super("atom:author", Namespace.ATOM.getUri());
         Element atomEmail = new Element("atom:email", Namespace.ATOM.getUri());
@@ -47,7 +47,7 @@ public class AtomAuthor extends Element {
     @NotNull
     @Override
     public String toString() {
-        return "AtomAuthor{" +
+        return "Author{" +
                 "email='" + email + '\'' +
                 "} " + super.toString();
     }

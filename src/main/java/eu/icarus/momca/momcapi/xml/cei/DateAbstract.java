@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Daniel Jeller
  *         Created on 10.07.2015.
  */
-public abstract class AbstractCeiDate extends Element {
+public abstract class DateAbstract extends Element {
 
     private final String literalDate;
 
@@ -20,7 +20,7 @@ public abstract class AbstractCeiDate extends Element {
      * @param element     The root element, e.g. {@code cei:date} or {@code cei:dateRange}.
      * @param literalDate The literal date, e.g. {@code 2nd December 1678}.
      */
-    AbstractCeiDate(@NotNull Element element, @NotNull String literalDate) {
+    DateAbstract(@NotNull Element element, @NotNull String literalDate) {
         super(element);
         this.literalDate = literalDate;
         this.appendChild(literalDate);
@@ -53,7 +53,7 @@ public abstract class AbstractCeiDate extends Element {
 
     @Override
     public String toString() {
-        return "AbstractCeiDate{" +
+        return "DateAbstract{" +
                 "literalDate='" + literalDate + '\'' +
                 "} " + super.toString();
     }

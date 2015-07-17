@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
  * @author Daniel Jeller
  *         Created on 09.07.2015.
  */
-public class CeiFigure extends Element {
+public class Figure extends Element {
 
     @NotNull
     private final String n;
@@ -28,7 +28,7 @@ public class CeiFigure extends Element {
 
 
     /**
-     * Instantiates a new CeiFigure with a full set of metadata.
+     * Instantiates a new Figure with a full set of metadata.
      *
      * @param url  The {@code cei:figure/cei:grapic/@url}-attribute responsible for identifying the image in an
      *             external storage. Can be either just a relative URI (e.g. {@code image1.jpg}) or an
@@ -36,7 +36,7 @@ public class CeiFigure extends Element {
      * @param n    The {@code cei:figure/@n}-attribute.
      * @param text The text content of the {@code cei:figure/cei:graphic}-element.
      */
-    public CeiFigure(@NotNull String url, @Nullable String n, @Nullable String text) {
+    public Figure(@NotNull String url, @Nullable String n, @Nullable String text) {
 
         super("cei:figure", Namespace.CEI.getUri());
 
@@ -59,7 +59,7 @@ public class CeiFigure extends Element {
      *            external storage. Can be either just a relative URI (e.g. {@code image1.jpg}) or an
      *            absolute URL ({@code http://server.com/images/image1.jpg}).
      */
-    public CeiFigure(@NotNull String url) {
+    public Figure(@NotNull String url) {
         this(url, "", "");
     }
 
@@ -100,7 +100,7 @@ public class CeiFigure extends Element {
     @Override
     public String toString() {
 
-        return "CeiFigure{" +
+        return "Figure{" +
                 ", n='" + n + '\'' +
                 ", text='" + text + '\'' +
                 ", url='" + url + '\'' +

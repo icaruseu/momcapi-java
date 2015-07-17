@@ -7,9 +7,9 @@ import static org.testng.Assert.assertEquals;
 /**
  * Created by daniel on 09.07.2015.
  */
-public class AtomAuthorTest {
+public class AuthorTest {
 
-    private static final AtomAuthor ATOM_AUTHOR = new AtomAuthor("author@test.com");
+    private static final Author ATOM_AUTHOR = new Author("author@test.com");
 
     @Test
     public void testGetEmail() throws Exception {

@@ -13,7 +13,7 @@ import java.util.Optional;
  * @author Daniel Jeller
  *         Created on 25.06.2015.
  */
-public class AtomIdCharter extends AtomId {
+public class IdCharter extends Id {
 
     @NotNull
     private final Optional<String> archiveId;
@@ -30,7 +30,7 @@ public class AtomIdCharter extends AtomId {
      *
      * @param atomIdString A full {@code atom:id String}.
      */
-    public AtomIdCharter(@NotNull String atomIdString) {
+    public IdCharter(@NotNull String atomIdString) {
 
         super(atomIdString);
 
@@ -68,13 +68,13 @@ public class AtomIdCharter extends AtomId {
     }
 
     /**
-     * Instantiates a new AtomIdCharter for a charter that belongs to an archival fond.
+     * Instantiates a new IdCharter for a charter that belongs to an archival fond.
      *
      * @param archiveId The archive id.
      * @param fondId    The fond id.
      * @param charterId The charter id.
      */
-    public AtomIdCharter(@NotNull String archiveId, @NotNull String fondId, @NotNull String charterId) {
+    public IdCharter(@NotNull String archiveId, @NotNull String fondId, @NotNull String charterId) {
 
         super(ResourceType.CHARTER.getAtomIdPart(), archiveId, fondId, charterId);
 
@@ -86,12 +86,12 @@ public class AtomIdCharter extends AtomId {
     }
 
     /**
-     * Instantiates a new AtomIdCharter that belongs to a collection.
+     * Instantiates a new IdCharter that belongs to a collection.
      *
      * @param collectionId The collection id.
      * @param charterId    The charter id.
      */
-    public AtomIdCharter(@NotNull String collectionId, @NotNull String charterId) {
+    public IdCharter(@NotNull String collectionId, @NotNull String charterId) {
 
         super(ResourceType.CHARTER.getAtomIdPart(), collectionId, charterId);
 
@@ -153,7 +153,7 @@ public class AtomIdCharter extends AtomId {
     @Override
     public String toString() {
 
-        return "AtomIdCharter{" +
+        return "IdCharter{" +
                 "collectionId=" + collectionId +
                 ", archiveId=" + archiveId +
                 ", fondId=" + fondId +

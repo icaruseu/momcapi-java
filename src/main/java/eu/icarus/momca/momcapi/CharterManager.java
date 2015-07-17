@@ -6,7 +6,7 @@ import eu.icarus.momca.momcapi.resource.Charter;
 import eu.icarus.momca.momcapi.resource.CharterStatus;
 import eu.icarus.momca.momcapi.resource.ResourceRoot;
 import eu.icarus.momca.momcapi.resource.User;
-import eu.icarus.momca.momcapi.xml.atom.AtomIdCharter;
+import eu.icarus.momca.momcapi.xml.atom.IdCharter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,7 +26,7 @@ public class CharterManager {
     }
 
     @NotNull
-    public List<Charter> getCharterInstances(@NotNull AtomIdCharter atomIdCharter) {
+    public List<Charter> getCharterInstances(@NotNull IdCharter atomIdCharter) {
 
         return momcaConnection.queryDatabase(ExistQueryFactory.getResourceUri(atomIdCharter, null
         )).stream()
@@ -38,7 +38,7 @@ public class CharterManager {
     }
 
     @NotNull
-    public List<Charter> getCharterInstances(@NotNull AtomIdCharter atomIdCharter, @NotNull CharterStatus charterStatus) {
+    public List<Charter> getCharterInstances(@NotNull IdCharter atomIdCharter, @NotNull CharterStatus charterStatus) {
 
         return momcaConnection.queryDatabase(ExistQueryFactory.getResourceUri(atomIdCharter, charterStatus.getResourceRoot()
         )).stream()
@@ -50,7 +50,7 @@ public class CharterManager {
     }
 
     @NotNull
-    public List<AtomIdCharter> listErroneouslySavedCharters(@NotNull User user) {
+    public List<IdCharter> listErroneouslySavedCharters(@NotNull User user) {
         return user.listSavedCharterIds().stream()
                 .filter(charterAtomId -> !isCharterExisting(charterAtomId, ResourceRoot.METADATA_CHARTER_SAVED))
                 .collect(Collectors.toList());
@@ -73,7 +73,7 @@ public class CharterManager {
         return charterUri.substring(charterUri.lastIndexOf('/') + 1, charterUri.length());
     }
 
-    private boolean isCharterExisting(@NotNull AtomIdCharter atomIdCharter, @Nullable ResourceRoot resourceRoot) {
+    private boolean isCharterExisting(@NotNull IdCharter atomIdCharter, @Nullable ResourceRoot resourceRoot) {
         ExistQuery query = ExistQueryFactory.checkResourceExistence(atomIdCharter, resourceRoot);
         return !momcaConnection.queryDatabase(query).isEmpty();
     }

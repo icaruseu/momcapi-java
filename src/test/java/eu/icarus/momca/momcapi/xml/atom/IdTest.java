@@ -12,7 +12,7 @@ import static org.testng.Assert.assertEquals;
 /**
  * Created by daniel on 27.06.2015.
  */
-public class AtomIdTest {
+public class IdTest {
 
     @NotNull
     private static final String ATOM_ID = "tag:www.monasterium.net,2011:/charter/RS-IAGNS/Charters/AGNS_F.1_the_fascia_9_Sub_3499%7C1817";
@@ -30,7 +30,7 @@ public class AtomIdTest {
 
     @Test
     public void testConstructorWithAtomId() throws Exception {
-        AtomId id = new AtomId(ATOM_ID);
+        Id id = new Id(ATOM_ID);
         assertEquals(id.getAtomId(), ATOM_ID);
         assertEquals(id.toXML(), "<atom:id xmlns:atom=\"http://www.w3.org/2005/Atom\">tag:www.monasterium.net,2011:/charter/RS-IAGNS/Charters/AGNS_F.1_the_fascia_9_Sub_3499%7C1817</atom:id>");
     }
@@ -40,8 +40,8 @@ public class AtomIdTest {
 
         String expectedEasyAtomId = "tag:www.monasterium.net,2011:/charter/RS-IAGNS/Charters/F1_fasc.16_sub_N_1513";
         String expectedDifficultAtomId = "tag:www.monasterium.net,2011:/charter/RS-IAGNS/Charters/IAGNS_F-.150_6605%7C193232";
-        AtomId easyId = new AtomId("charter", "RS-IAGNS", "Charters", "F1_fasc.16_sub_N_1513");
-        AtomId difficultId = new AtomId("charter", "RS-IAGNS", "Charters", "IAGNS_F-.150_6605|193232"); // | should be replaced with %7C etc.
+        Id easyId = new Id("charter", "RS-IAGNS", "Charters", "F1_fasc.16_sub_N_1513");
+        Id difficultId = new Id("charter", "RS-IAGNS", "Charters", "IAGNS_F-.150_6605|193232"); // | should be replaced with %7C etc.
 
         assertEquals(easyId.getAtomId(), expectedEasyAtomId);
         assertEquals(difficultId.getAtomId(), expectedDifficultAtomId);
@@ -50,36 +50,36 @@ public class AtomIdTest {
 
     @Test
     public void testConstructorWithPrefix() throws Exception {
-        AtomId id = new AtomId(PREFIX, "charter", "Archive", "Fond", "Charter");
+        Id id = new Id(PREFIX, "charter", "Archive", "Fond", "Charter");
         assertEquals(id.toXML(), "<atom:id xmlns:atom=\"http://www.w3.org/2005/Atom\">tag:www.monasterium.net,2011:/charter/Archive/Fond/Charter</atom:id>");
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConstructorWithWrongAtomId() throws Exception {
-        new AtomId("Thisisnotanatomid");
+        new Id("Thisisnotanatomid");
     }
 
     @Test
     public void testConstructorWithoutPrefix() throws Exception {
-        AtomId id = new AtomId("charter", "Archive", "Fond", "Charter");
+        Id id = new Id("charter", "Archive", "Fond", "Charter");
         assertEquals(id.toXML(), "<atom:id xmlns:atom=\"http://www.w3.org/2005/Atom\">tag:www.monasterium.net,2011:/charter/Archive/Fond/Charter</atom:id>");
     }
 
     @Test
     public void testGetAtomId() throws Exception {
-        AtomId id = new AtomId(ATOM_ID);
+        Id id = new Id(ATOM_ID);
         assertEquals(id.getAtomId(), ATOM_ID);
     }
 
     @Test
     public void testGetType() throws Exception {
-        AtomId id = new AtomId(ATOM_ID);
+        Id id = new Id(ATOM_ID);
         assertEquals(id.getType(), TYPE);
     }
 
     @Test
     public void testGetXml() throws Exception {
-        AtomId id = new AtomId(ATOM_ID);
+        Id id = new Id(ATOM_ID);
         assertEquals(id.toXML(), XML.toXML());
     }
 

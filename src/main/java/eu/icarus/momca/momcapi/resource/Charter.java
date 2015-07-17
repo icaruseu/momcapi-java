@@ -5,8 +5,8 @@ import eu.icarus.momca.momcapi.exception.MomcaException;
 import eu.icarus.momca.momcapi.query.XpathQuery;
 import eu.icarus.momca.momcapi.xml.Namespace;
 import eu.icarus.momca.momcapi.xml.XmlValidationProblem;
-import eu.icarus.momca.momcapi.xml.atom.AtomAuthor;
-import eu.icarus.momca.momcapi.xml.atom.AtomIdCharter;
+import eu.icarus.momca.momcapi.xml.atom.Author;
+import eu.icarus.momca.momcapi.xml.atom.IdCharter;
 import eu.icarus.momca.momcapi.xml.cei.*;
 import nu.xom.*;
 import org.jetbrains.annotations.NotNull;
@@ -38,15 +38,15 @@ public class Charter extends MomcaResource {
     private static final String CEI_SCHEMA_URL =
             "https://raw.githubusercontent.com/icaruseu/mom-ca/master/my/XRX/src/mom/app/cei/xsd/cei10.xsd";
     @NotNull
-    private final Optional<AtomAuthor> atomAuthor;
+    private final Optional<Author> atomAuthor;
     @NotNull
-    private final AtomIdCharter atomId;
+    private final IdCharter atomId;
     @NotNull
-    private final Optional<AbstractCeiDate> ceiDate;
+    private final Optional<DateAbstract> ceiDate;
     @NotNull
-    private final CeiIdno ceiIdno;
+    private final List<Figure> ceiWitnessOrigFigures;
     @NotNull
-    private final List<CeiFigure> ceiWitnessOrigFigures;
+    private final Idno idno;
     @NotNull
     private final CharterStatus status;
     @NotNull
@@ -92,25 +92,25 @@ public class Charter extends MomcaResource {
 
         atomId = initCharterAtomId();
         atomAuthor = initAtomAuthor();
-        ceiIdno = initCeiIdno();
+        idno = initCeiIdno();
         ceiDate = initCeiDate();
         ceiWitnessOrigFigures = new ArrayList<>(initCeiWitnessOrigFigures());
 
     }
 
     /**
-     * @return The AtomAuthor.
+     * @return The Author.
      */
     @NotNull
-    public Optional<AtomAuthor> getAtomAuthor() {
+    public Optional<Author> getAtomAuthor() {
         return atomAuthor;
     }
 
     /**
-     * @return The AtomId.
+     * @return The Id.
      */
     @NotNull
-    public AtomIdCharter getAtomId() {
+    public IdCharter getAtomId() {
         return atomId;
     }
 
@@ -118,24 +118,24 @@ public class Charter extends MomcaResource {
      * @return The date.
      */
     @NotNull
-    public Optional<AbstractCeiDate> getCeiDate() {
+    public Optional<DateAbstract> getCeiDate() {
         return ceiDate;
-    }
-
-    /**
-     * @return The CeiIdno.
-     */
-    @NotNull
-    public CeiIdno getCeiIdno() {
-        return ceiIdno;
     }
 
     /**
      * @return A list of all figures in {@code cei:witnessOrig}. They represent only the direct images of the charter.
      */
     @NotNull
-    public List<CeiFigure> getCeiWitnessOrigFigures() {
+    public List<Figure> getCeiWitnessOrigFigures() {
         return ceiWitnessOrigFigures;
+    }
+
+    /**
+     * @return The Idno.
+     */
+    @NotNull
+    public Idno getIdno() {
+        return idno;
     }
 
     /**
@@ -169,28 +169,28 @@ public class Charter extends MomcaResource {
         return "Charter{" +
                 "atomAuthor=" + atomAuthor +
                 ", atomId=" + atomId +
-                ", ceiIdno=" + ceiIdno +
+                ", idno=" + idno +
                 ", ceiWitnessOrigFigures=" + ceiWitnessOrigFigures +
                 ", status=" + status +
                 "} " + super.toString();
 
     }
 
-    private Optional<AtomAuthor> initAtomAuthor() {
+    private Optional<Author> initAtomAuthor() {
 
-        Optional<AtomAuthor> atomAuthor = Optional.empty();
+        Optional<Author> atomAuthor = Optional.empty();
         String authorEmail = queryUniqueElement(XpathQuery.QUERY_ATOM_EMAIL);
         if (!authorEmail.isEmpty()) {
-            atomAuthor = Optional.of(new AtomAuthor(authorEmail));
+            atomAuthor = Optional.of(new Author(authorEmail));
         }
         return atomAuthor;
 
     }
 
     @NotNull
-    private Optional<AbstractCeiDate> initCeiDate() {
+    private Optional<DateAbstract> initCeiDate() {
 
-        Optional<AbstractCeiDate> ceiDateOptional = Optional.empty();
+        Optional<DateAbstract> ceiDateOptional = Optional.empty();
         Nodes ceiIssuedNodes = queryContentAsNodes(XpathQuery.QUERY_CEI_ISSUED);
 
         if (ceiIssuedNodes.size() != 0) {
@@ -204,7 +204,7 @@ public class Charter extends MomcaResource {
                 Element dateElement = dateElements.get(0);
                 String value = dateElement.getAttributeValue("value");
                 String literalDate = dateElement.getValue();
-                ceiDateOptional = Optional.of(new CeiDate(value, literalDate));
+                ceiDateOptional = Optional.of(new Date(value, literalDate));
 
             } else if (dateElements.size() == 0 && dateRangeElements.size() == 1) {
 
@@ -212,7 +212,7 @@ public class Charter extends MomcaResource {
                 String from = dateRangeElement.getAttributeValue("from");
                 String to = dateRangeElement.getAttributeValue("to");
                 String literalDate = dateRangeElement.getValue();
-                ceiDateOptional = Optional.of(new CeiDateRange(from, to, literalDate));
+                ceiDateOptional = Optional.of(new DateRange(from, to, literalDate));
 
             } else if (dateElements.size() == 1 && dateRangeElements.size() == 1) {
 
@@ -227,16 +227,16 @@ public class Charter extends MomcaResource {
     }
 
     @NotNull
-    private CeiIdno initCeiIdno() {
+    private Idno initCeiIdno() {
         String id = queryUniqueElement(XpathQuery.QUERY_CEI_BODY_IDNO_ID);
         String text = queryUniqueElement(XpathQuery.QUERY_CEI_BODY_IDNO_TEXT);
-        return new CeiIdno(id, text);
+        return new Idno(id, text);
     }
 
     @NotNull
-    private List<CeiFigure> initCeiWitnessOrigFigures() {
+    private List<Figure> initCeiWitnessOrigFigures() {
 
-        List<CeiFigure> ceiFigures = new ArrayList<>(0);
+        List<Figure> figures = new ArrayList<>(0);
         Nodes figureNodes = queryContentAsNodes(XpathQuery.QUERY_CEI_WITNESS_ORIG_FIGURE);
 
         for (int i = 0; i < figureNodes.size(); i++) {
@@ -255,7 +255,7 @@ public class Charter extends MomcaResource {
                     String urlAttribute = (graphicElement.getAttribute("url") == null)
                             ? "" : childElements.get(0).getAttribute("url").getValue();
                     String textContent = graphicElement.getValue();
-                    ceiFigures.add(new CeiFigure(urlAttribute, nAttribute, textContent));
+                    figures.add(new Figure(urlAttribute, nAttribute, textContent));
                     break;
 
                 default:
@@ -266,12 +266,12 @@ public class Charter extends MomcaResource {
 
         }
 
-        return ceiFigures;
+        return figures;
 
     }
 
     @NotNull
-    private AtomIdCharter initCharterAtomId() {
+    private IdCharter initCharterAtomId() {
 
         String idString = queryUniqueElement(XpathQuery.QUERY_ATOM_ID);
 
@@ -279,7 +279,7 @@ public class Charter extends MomcaResource {
             String errorMessage = String.format("No atom:id in xml content: '%s'", getXmlAsDocument().toXML());
             throw new IllegalArgumentException(errorMessage);
         } else {
-            return new AtomIdCharter(idString);
+            return new IdCharter(idString);
         }
 
     }

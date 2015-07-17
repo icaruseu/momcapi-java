@@ -16,10 +16,10 @@ import org.jetbrains.annotations.NotNull;
  * @author Daniel Jeller
  *         Created on 10.07.2015.
  */
-public class CeiDate extends AbstractCeiDate {
+public class Date extends DateAbstract {
 
     @NotNull
-    private final NumericDate numericDate;
+    private final DateValue dateValue;
 
     /**
      * Instantiates a new date.
@@ -27,23 +27,23 @@ public class CeiDate extends AbstractCeiDate {
      * @param numericDate The numeric date value, e.g. {@code 12970311}.
      * @param literalDate The literal date value, e.g. {@code 11th March 1297}.
      */
-    public CeiDate(@NotNull String numericDate, @NotNull String literalDate) {
+    public Date(@NotNull String numericDate, @NotNull String literalDate) {
         super(new Element("cei:date", Namespace.CEI.getUri()), literalDate);
         addAttribute(new Attribute("value", numericDate));
-        this.numericDate = new NumericDate(numericDate);
+        this.dateValue = new DateValue(numericDate);
     }
 
     @Override
     public boolean couldBeOtherDateType() {
 
-        String dayPart = numericDate.getValue()
+        String dayPart = dateValue.getValue()
                 .substring(
-                        numericDate.getValue().length() - 2,
-                        numericDate.getValue().length());
-        String monthPart = numericDate.getValue()
+                        dateValue.getValue().length() - 2,
+                        dateValue.getValue().length());
+        String monthPart = dateValue.getValue()
                 .substring(
-                        numericDate.getValue().length() - 4,
-                        numericDate.getValue().length() - 2);
+                        dateValue.getValue().length() - 4,
+                        dateValue.getValue().length() - 2);
 
         return monthPart.equals("99") || dayPart.equals("99");
 
@@ -53,19 +53,19 @@ public class CeiDate extends AbstractCeiDate {
      * @return The numeric date value, e.g. {@code 12970311} (== {@code cei:date/@value}).
      */
     @NotNull
-    public NumericDate getNumericDate() {
-        return numericDate;
+    public DateValue getDateValue() {
+        return dateValue;
     }
 
     @Override
     public boolean isValid() {
-        return numericDate.isValid();
+        return dateValue.isValid();
     }
 
     @Override
     public String toString() {
-        return "CeiDate{" +
-                "numericDate=" + numericDate +
+        return "Date{" +
+                "dateValue=" + dateValue +
                 "} " + super.toString();
     }
 

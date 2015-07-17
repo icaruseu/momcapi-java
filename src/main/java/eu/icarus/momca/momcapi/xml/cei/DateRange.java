@@ -16,65 +16,65 @@ import org.jetbrains.annotations.NotNull;
  * @author Daniel Jeller
  *         Created on 10.07.2015.
  */
-public class CeiDateRange extends AbstractCeiDate {
+public class DateRange extends DateAbstract {
 
     @NotNull
-    private final NumericDate numericFromDate;
+    private final DateValue fromDateValue;
     @NotNull
-    private final NumericDate numericToDate;
+    private final DateValue toDateValue;
 
 
     /**
      * Instantiates a new ceiDateRange.
      *
-     * @param numericFromDate The numeric {@code from} date value, e.q. {@code 12970301}.
-     * @param numericToDate   The numeric {@code to} date value, e.q. {@code 12970331}.
+     * @param fromDateValue The numeric {@code from} date value, e.q. {@code 12970301}.
+     * @param toDateValue   The numeric {@code to} date value, e.q. {@code 12970331}.
      * @param literalDate     The literal date value, e.g. {@code March 1297}.
      */
-    public CeiDateRange(@NotNull String numericFromDate, @NotNull String numericToDate, @NotNull String literalDate) {
+    public DateRange(@NotNull String fromDateValue, @NotNull String toDateValue, @NotNull String literalDate) {
 
         super(new Element("cei:dateRange", Namespace.CEI.getUri()), literalDate);
 
-        addAttribute(new Attribute("from", numericFromDate));
-        addAttribute(new Attribute("to", numericToDate));
+        addAttribute(new Attribute("from", fromDateValue));
+        addAttribute(new Attribute("to", toDateValue));
 
-        this.numericFromDate = new NumericDate(numericFromDate);
-        this.numericToDate = new NumericDate(numericToDate);
+        this.fromDateValue = new DateValue(fromDateValue);
+        this.toDateValue = new DateValue(toDateValue);
 
     }
 
     @Override
     public boolean couldBeOtherDateType() {
-        return numericFromDate.equals(numericToDate);
+        return fromDateValue.equals(toDateValue);
     }
 
     /**
      * @return The numeric {@code from} date value, e.g. {@code 12970301} (== {@code cei:dateRange/@from}).
      */
     @NotNull
-    public NumericDate getNumericFromDate() {
-        return numericFromDate;
+    public DateValue getFromDateValue() {
+        return fromDateValue;
     }
 
-    /**
+    /**^
      * @return The numeric {@code to} date value, e.g. {@code 12970331} (== {@code cei:dateRange/@from}).
      */
     @NotNull
-    public NumericDate getNumericToDate() {
-        return numericToDate;
+    public DateValue getToDateValue() {
+        return toDateValue;
     }
 
     @Override
     public boolean isValid() {
-        return numericFromDate.isValid() && numericToDate.isValid();
+        return fromDateValue.isValid() && toDateValue.isValid();
     }
 
     @Override
     public String toString() {
 
-        return "CeiDateRange{" +
-                "numericFromDate=" + numericFromDate +
-                ", numericToDate=" + numericToDate +
+        return "DateRange{" +
+                "fromDateValue=" + fromDateValue +
+                ", toDateValue=" + toDateValue +
                 "} " + super.toString();
 
     }

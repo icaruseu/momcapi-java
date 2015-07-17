@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Daniel Jeller
  *         Created on 10.07.2015.
  */
-public class NumericDate {
+public class DateValue {
 
     private final boolean isValid;
     @NotNull
@@ -21,11 +21,11 @@ public class NumericDate {
     /**
      * Instantiates a new Numeric date.
      *
-     * @param value The date value, e.g. {@code 12970918}.
+     * @param dateValue The date value, e.g. {@code 12970918}.
      */
-    public NumericDate(@NotNull String value) {
-        this.value = value;
-        this.isValid = validateNumericDate(value);
+    public DateValue(@NotNull String dateValue) {
+        this.value = dateValue;
+        this.isValid = validateNumericDate(dateValue);
     }
 
     /**
@@ -42,9 +42,9 @@ public class NumericDate {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        NumericDate numericDate = (NumericDate) o;
+        DateValue dateValue = (DateValue) o;
 
-        return value.equals(numericDate.value);
+        return value.equals(dateValue.value);
 
     }
 
@@ -70,7 +70,7 @@ public class NumericDate {
 
     @Override
     public String toString() {
-        return "NumericDate{" +
+        return "DateValue{" +
                 "value='" + value + '\'' +
                 '}';
     }

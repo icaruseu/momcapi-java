@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Daniel Jeller
  *         Created on 25.06.2015.
  */
-public class AtomId extends Element {
+public class Id extends Element {
 
     @NotNull
     public static final String DEFAULT_PREFIX = "tag:www.monasterium.net,2011:";
@@ -29,21 +29,21 @@ public class AtomId extends Element {
     private final ResourceType type;
 
     /**
-     * Instantiates a new AtomId from an existing {@code atom:id} or by providing the individual parts to use for
+     * Instantiates a new Id from an existing {@code atom:id} or by providing the individual parts to use for
      * creation. Doesn't need to include the prefix {@code tag:www.monasterium.net,2011:}. The parts are encoded using
      * {@link Util}.<br/>
      * <br/>
      * Example:<br/>
      * <ul>
-     * <li>{@code new AtomId("tag:www.monasterium.net,2011:/charter/RS-IAGNS/Charters/IAGNS_F-.150_6605%7C193232")}</li>
-     * <li>{@code new AtomId("charter", "RS-IAGNS", "Charters", "IAGNS_F-.150_6605|193232"}</li>
-     * <li>{@code new AtomId("tag:www.monasterium.net,2011:", "charter", "RS-IAGNS", "Charters", "IAGNS_F-.150_6605|193232"}</li>
+     * <li>{@code new Id("tag:www.monasterium.net,2011:/charter/RS-IAGNS/Charters/IAGNS_F-.150_6605%7C193232")}</li>
+     * <li>{@code new Id("charter", "RS-IAGNS", "Charters", "IAGNS_F-.150_6605|193232"}</li>
+     * <li>{@code new Id("tag:www.monasterium.net,2011:", "charter", "RS-IAGNS", "Charters", "IAGNS_F-.150_6605|193232"}</li>
      * </ul>
      * Result: {@code <atom:id>tag:www.monasterium.net,2011:/charter/RS-IAGNS/Charters/IAGNS_F-.150_6605%7C193232<atom:id>}
      *
      * @param idParts The id parts to use for the id construction in their correct order.
      */
-    AtomId(@NotNull String... idParts) {
+    Id(@NotNull String... idParts) {
 
         super("atom:id", Namespace.ATOM.getUri());
 
@@ -66,7 +66,7 @@ public class AtomId extends Element {
     }
 
     /**
-     * @return The AtomId text content, e.g.
+     * @return The Id text content, e.g.
      * {@code tag:www.monasterium.net,2011:/charter/RS-IAGNS/Charters/IAGNS_F-.150_6605%7C193232}.
      */
     @NotNull

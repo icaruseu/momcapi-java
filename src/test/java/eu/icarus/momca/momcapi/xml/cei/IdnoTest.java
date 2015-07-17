@@ -7,9 +7,9 @@ import static org.testng.Assert.assertEquals;
 /**
  * Created by daniel on 09.07.2015.
  */
-public class CeiIdnoTest {
+public class IdnoTest {
 
-    private static final CeiIdno CEI_IDNO = new CeiIdno("id", "text");
+    private static final Idno CEI_IDNO = new Idno("id", "text");
 
     @Test
     public void testGetId() throws Exception {

@@ -2,7 +2,7 @@ package eu.icarus.momca.momcapi.query;
 
 import eu.icarus.momca.momcapi.resource.ResourceRoot;
 import eu.icarus.momca.momcapi.xml.Namespace;
-import eu.icarus.momca.momcapi.xml.atom.AtomId;
+import eu.icarus.momca.momcapi.xml.atom.Id;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,7 +29,7 @@ public class ExistQueryFactory {
      * specified {@code resourceRoot}.
      */
     @NotNull
-    public static ExistQuery checkResourceExistence(@NotNull AtomId resourceId, @Nullable ResourceRoot resourceRoot) {
+    public static ExistQuery checkResourceExistence(@NotNull Id resourceId, @Nullable ResourceRoot resourceRoot) {
 
         return new ExistQuery(String.format(
                 "%s collection('/db/mom-data%s')//atom:entry[.//atom:id/text()='%s'][1]",
@@ -47,7 +47,7 @@ public class ExistQueryFactory {
      * matching {@code resourceId} in {@code ResourceRoot} in the database.
      */
     @NotNull
-    public static ExistQuery getResourceUri(@NotNull AtomId resourceId, @Nullable ResourceRoot resourceRoot) {
+    public static ExistQuery getResourceUri(@NotNull Id resourceId, @Nullable ResourceRoot resourceRoot) {
 
         return new ExistQuery(String.format(
                 "%s let $nodes := collection('/db/mom-data%s')//atom:entry[.//atom:id/text()='%s']" +

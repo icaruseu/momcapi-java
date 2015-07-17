@@ -7,13 +7,13 @@ import static org.testng.Assert.*;
 /**
  * Created by daniel on 09.07.2015.
  */
-public class CeiFigureTest {
+public class FigureTest {
 
-    private static final CeiFigure CEI_FIGURE = new CeiFigure("urlvalue", "nvalue", "textvalue");
+    private static final Figure CEI_FIGURE = new Figure("urlvalue", "nvalue", "textvalue");
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConstructorEmptyUrl() throws Exception {
-        new CeiFigure("");
+        new Figure("");
     }
 
     @Test
@@ -23,7 +23,7 @@ public class CeiFigureTest {
 
     @Test
     public void testConstructorWithOnlyUrl() throws Exception {
-        assertEquals(new CeiFigure("onlyUrl").toXML(), "<cei:figure xmlns:cei=\"http://www.monasterium.net/NS/cei\"><cei:graphic url=\"onlyUrl\" /></cei:figure>");
+        assertEquals(new Figure("onlyUrl").toXML(), "<cei:figure xmlns:cei=\"http://www.monasterium.net/NS/cei\"><cei:graphic url=\"onlyUrl\" /></cei:figure>");
     }
 
     @Test
@@ -44,7 +44,7 @@ public class CeiFigureTest {
     @Test
     public void testHasAbsoluteUrl() throws Exception {
         assertFalse(CEI_FIGURE.hasAbsoluteUrl());
-        assertTrue(new CeiFigure("http://images.monasterium.net/img/AT-DASP/Urkunden/Urk1_r.jpg").hasAbsoluteUrl());
+        assertTrue(new Figure("http://images.monasterium.net/img/AT-DASP/Urkunden/Urk1_r.jpg").hasAbsoluteUrl());
     }
 
 }
