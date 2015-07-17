@@ -8,23 +8,23 @@ package eu.icarus.momca.momcapi.resource;
  */
 public enum CharterStatus {
 
-    IMPORTED(ResourceRoot.METADATA_CHARTER_IMPORT.getCollectionName()),
-    PRIVATE(ResourceRoot.XRX_USER.getCollectionName()),
-    PUBLIC(ResourceRoot.METADATA_CHARTER_PUBLIC.getCollectionName()),
-    SAVED(ResourceRoot.METADATA_CHARTER_SAVED.getCollectionName());
+    IMPORTED(ResourceRoot.METADATA_CHARTER_IMPORT),
+    PRIVATE(ResourceRoot.XRX_USER),
+    PUBLIC(ResourceRoot.METADATA_CHARTER_PUBLIC),
+    SAVED(ResourceRoot.METADATA_CHARTER_SAVED);
 
-    private final String parentCollection;
+    private final ResourceRoot resourceRoot;
 
-    CharterStatus(String parentCollection) {
-        this.parentCollection = parentCollection;
+    CharterStatus(ResourceRoot resourceRoot) {
+        this.resourceRoot = resourceRoot;
     }
 
     /**
      * @return The name of the root collection associated with the charter status, e.g. {@code metadata.charter.saved}
      * for a {@code SAVED} charter.
      */
-    public String getRootCollection() {
-        return parentCollection;
+    public ResourceRoot getResourceRoot() {
+        return resourceRoot;
     }
 
 }

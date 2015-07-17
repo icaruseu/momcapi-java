@@ -26,28 +26,22 @@ public class CharterManager {
     }
 
     @NotNull
-    public List<Charter> getCharterInstances(@NotNull AtomIdCharter atomIdCharter, @Nullable CharterStatus charterStatus) {
+    public List<Charter> getCharterInstances(@NotNull AtomIdCharter atomIdCharter) {
 
-        ResourceRoot root = null;
+        return momcaConnection.queryDatabase(ExistQueryFactory.getResourceUri(atomIdCharter, null
+        )).stream()
+                .map(this::getCharterFromUri)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
 
-        if (charterStatus != null) {
-            switch (charterStatus) {
-                case IMPORTED:
-                    root = ResourceRoot.METADATA_CHARTER_IMPORT;
-                    break;
-                case PRIVATE:
-                    root = ResourceRoot.XRX_USER;
-                    break;
-                case PUBLIC:
-                    root = ResourceRoot.METADATA_CHARTER_PUBLIC;
-                    break;
-                case SAVED:
-                    root = ResourceRoot.METADATA_CHARTER_SAVED;
-                    break;
-            }
-        }
+    }
 
-        return momcaConnection.queryDatabase(ExistQueryFactory.getResourceUri(atomIdCharter, root)).stream()
+    @NotNull
+    public List<Charter> getCharterInstances(@NotNull AtomIdCharter atomIdCharter, @NotNull CharterStatus charterStatus) {
+
+        return momcaConnection.queryDatabase(ExistQueryFactory.getResourceUri(atomIdCharter, charterStatus.getResourceRoot()
+        )).stream()
                 .map(this::getCharterFromUri)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
