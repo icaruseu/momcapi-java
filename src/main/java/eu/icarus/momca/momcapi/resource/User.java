@@ -4,8 +4,8 @@ import eu.icarus.momca.momcapi.query.XpathQuery;
 import eu.icarus.momca.momcapi.xml.atom.AtomIdCharter;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Represents a user in MOM-CA.
@@ -37,10 +37,13 @@ public class User extends MomcaResource {
      * @param isInitialized Whether or not the user is already initialized in the database.
      */
     public User(@NotNull MomcaResource momcaResource, boolean isInitialized) {
+
         super(momcaResource);
-        userName = queryUniqueFieldValue(XpathQuery.QUERY_XRX_EMAIL);
-        moderator = queryUniqueFieldValue(XpathQuery.QUERY_XRX_MODERATOR);
+
+        this.userName = queryUniqueFieldValue(XpathQuery.QUERY_XRX_EMAIL);
+        this.moderator = queryUniqueFieldValue(XpathQuery.QUERY_XRX_MODERATOR);
         this.isInitialized = isInitialized;
+
     }
 
     /**
@@ -71,7 +74,8 @@ public class User extends MomcaResource {
      */
     @NotNull
     public List<AtomIdCharter> listBookmarkedCharterIds() {
-        return parseToCharterIds(listQueryResultStrings(XpathQuery.QUERY_XRX_BOOKMARK));
+        return queryContentAsList(XpathQuery.QUERY_XRX_BOOKMARK).stream()
+                .map(AtomIdCharter::new).collect(Collectors.toList());
     }
 
     /**
@@ -79,24 +83,20 @@ public class User extends MomcaResource {
      */
     @NotNull
     public List<AtomIdCharter> listSavedCharterIds() {
-        return parseToCharterIds(listQueryResultStrings(XpathQuery.QUERY_XRX_SAVED_ID));
-    }
-
-    @NotNull
-    private List<AtomIdCharter> parseToCharterIds(@NotNull List<String> idStrings) {
-        List<AtomIdCharter> ids = new ArrayList<>();
-        idStrings.forEach(s -> ids.add(new AtomIdCharter(s)));
-        return ids;
+        return queryContentAsList(XpathQuery.QUERY_XRX_SAVED_ID).stream()
+                .map(AtomIdCharter::new).collect(Collectors.toList());
     }
 
     @NotNull
     private String queryUniqueFieldValue(@NotNull XpathQuery query) {
 
-        List<String> queryResults = listQueryResultStrings(query);
+        List<String> queryResults = queryContentAsList(query);
+
         if (queryResults.size() == 1) {
             return queryResults.get(0);
         } else {
-            throw new IllegalArgumentException("The XML content of the resource doesn't have an xrx:name element. It's probably not a valid user resource.");
+            throw new IllegalArgumentException("The XML content of the resource doesn't have an 'xrx:name' element. " +
+                    "It's probably not a valid user resource.");
         }
 
     }

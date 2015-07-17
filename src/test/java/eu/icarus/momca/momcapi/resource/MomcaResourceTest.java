@@ -67,14 +67,14 @@ public class MomcaResourceTest {
     @Test
     public void testQueryContentXmlWithNamespace() throws Exception {
         MomcaResource res = new MomcaResource(NAME, PARENT_URI, XML_CONTENT_WITH_NAMESPACE);
-        assertEquals(res.listQueryResultStrings(XpathQuery.QUERY_XRX_NAME).get(0), QUERY_RESULT);
+        assertEquals(res.queryContentAsList(XpathQuery.QUERY_XRX_NAME).get(0), QUERY_RESULT);
 
     }
 
     @Test
     public void testQueryContentXmlWithoutNamespace() throws Exception {
         MomcaResource res = new MomcaResource(NAME, PARENT_URI, XML_CONTENT_WITHOUT_NAMESPACE);
-        assertEquals(res.listQueryResultStrings(XpathQuery.QUERY_NAME).get(0), QUERY_RESULT);
+        assertEquals(res.queryContentAsList(XpathQuery.QUERY_NAME).get(0), QUERY_RESULT);
     }
 
 }

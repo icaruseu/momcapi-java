@@ -12,13 +12,21 @@ import org.jetbrains.annotations.NotNull;
 public class MomcaException extends RuntimeException {
 
     /**
-     * Instantiates a new MomCA-exception from another exception.
+     * Instantiates a new MomCA-Exception from another exception.
      *
-     * @param message the message
-     * @param e       the original exception
+     * @param message The message
+     * @param e       The original exception
      */
     public MomcaException(@NotNull String message, @NotNull Exception e) {
         super(message, e);
     }
 
+    /**
+     * Instantiates a new MomCa-Exception.
+     *
+     * @param message The message.
+     */
+    public MomcaException(@NotNull String message) {
+        super(message);
+    }
 }

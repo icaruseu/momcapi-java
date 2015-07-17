@@ -3,7 +3,9 @@ package eu.icarus.momca.momcapi.xml.cei;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Represents a numeric date value as specified by the <a href="https://github.com/icaruseu/mom-ca/blob/master/my/XRX/src/mom/app/cei/xsd/cei.xsd#L5207">CEI-Schema</a>.<br/><br/>
+ * Represents a numeric date value as specified by the
+ * <a href="https://github.com/icaruseu/mom-ca/blob/master/my/XRX/src/mom/app/cei/xsd/cei.xsd#L5207">CEI-Schema</a>.<br/>
+ * <br/>
  * Example: {@code 12970918}
  *
  * @author Daniel Jeller
@@ -28,7 +30,8 @@ public class NumericDate {
 
     /**
      * @param numericDate The numeric date to validate.
-     * @return {@code True}, if the numeric date is a valid date as specified by the <a href="https://github.com/icaruseu/mom-ca/blob/master/my/XRX/src/mom/app/cei/xsd/cei.xsd#L5207">CEI-Schema</a>.
+     * @return {@code True}, if the numeric date is a valid date as specified by the
+     * <a href="https://github.com/icaruseu/mom-ca/blob/master/my/XRX/src/mom/app/cei/xsd/cei.xsd#L5207">CEI-Schema</a>.
      */
     public static boolean validateNumericDate(@NotNull String numericDate) {
         return numericDate.matches("-?[129]?[0-9][0-9][0-9][019][0-9][01239][0-9]");

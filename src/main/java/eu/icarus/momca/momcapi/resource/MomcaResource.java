@@ -31,7 +31,7 @@ public class MomcaResource {
      *
      * @param momcaResource The MomcaResource to use.
      */
-    MomcaResource(@NotNull final MomcaResource momcaResource) {
+    MomcaResource(@NotNull MomcaResource momcaResource) {
         this.resourceName = momcaResource.getResourceName();
         this.xmlAsDocument = momcaResource.getXmlAsDocument();
         this.parentUri = momcaResource.getParentUri();
@@ -41,10 +41,11 @@ public class MomcaResource {
      * Instantiates a new MomcaResource.
      *
      * @param resourceName        The name of the resource, e.g. {@code user.xml}.
-     * @param parentCollectionUri The URI of the collection, the resource is stored in in the database, e.g. {@code /db/mom-data/xrx.user}.
+     * @param parentCollectionUri The URI of the collection, the resource is stored in in the database,
+     *                            e.g. {@code /db/mom-data/xrx.user}.
      * @param xmlContent          The xml content of the resource as {@code String}.
      */
-    public MomcaResource(@NotNull final String resourceName, @NotNull final String parentCollectionUri, @NotNull final String xmlContent) {
+    public MomcaResource(@NotNull String resourceName, @NotNull String parentCollectionUri, @NotNull String xmlContent) {
 
         try {
 
@@ -53,26 +54,12 @@ public class MomcaResource {
             this.parentUri = Util.encode(parentCollectionUri);
 
         } catch (IOException e) {
-            throw new RuntimeException(String.format("Failed to create MomcaResource for '%s'", resourceName), e);
+            String errorMessage = String.format("Failed to create MomcaResource for '%s'", resourceName);
+            throw new RuntimeException(errorMessage, e);
         } catch (ParsingException e) {
-            throw new IllegalArgumentException(String.format("Failed to parse the xml content of resource '%s'", resourceName), e);
+            String errorMessage = String.format("Failed to parse the xml content of resource '%s'", resourceName);
+            throw new IllegalArgumentException(errorMessage, e);
         }
-
-    }
-
-    /**
-     * Query the resource's XML content.
-     *
-     * @param query The Xpath Query to execute on the content.
-     * @return The nodes containing the results.
-     */
-    @NotNull
-    final Nodes listQueryResultNodes(@NotNull XpathQuery query) {
-
-        Element root = getXmlAsDocument().getRootElement();
-        XPathContext context = XPathContext.makeNamespaceContext(root);
-        query.getNamespaces().forEach(n -> context.addNamespace(n.getPrefix(), n.getUri()));
-        return getXmlAsDocument().getRootElement().query(query.getQuery(), context);
 
     }
 
@@ -83,14 +70,33 @@ public class MomcaResource {
      * @return A list of the results as strings.
      */
     @NotNull
-    final List<String> listQueryResultStrings(@NotNull XpathQuery query) {
+    final List<String> queryContentAsList(@NotNull XpathQuery query) {
 
-        Nodes nodes = listQueryResultNodes(query);
+        Nodes nodes = queryContentAsNodes(query);
         List<String> results = new LinkedList<>();
+
         for (int i = 0; i < nodes.size(); i++) {
             results.add(nodes.get(i).getValue());
         }
+
         return results;
+
+    }
+
+    /**
+     * Query the resource's XML content.
+     *
+     * @param query The Xpath Query to execute on the content.
+     * @return The nodes containing the results.
+     */
+    @NotNull
+    final Nodes queryContentAsNodes(@NotNull XpathQuery query) {
+
+        Element rootElement = getXmlAsDocument().getRootElement();
+        String queryString = query.asString();
+        XPathContext context = getxPathContext(rootElement, query);
+
+        return rootElement.query(queryString, context);
 
     }
 
@@ -137,9 +143,15 @@ public class MomcaResource {
     }
 
     @NotNull
+    private XPathContext getxPathContext(@NotNull Element root, @NotNull XpathQuery query) {
+        XPathContext context = XPathContext.makeNamespaceContext(root);
+        query.getNamespaces().forEach(n -> context.addNamespace(n.getPrefix(), n.getUri()));
+        return context;
+    }
+
+    @NotNull
     private Document parseXmlString(@NotNull String xmlAsString) throws ParsingException, IOException {
-        Builder parser = new Builder();
-        return parser.build(xmlAsString, null);
+        return new Builder().build(xmlAsString, null);
     }
 
 }

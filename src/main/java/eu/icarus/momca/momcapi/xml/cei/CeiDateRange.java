@@ -6,7 +6,10 @@ import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Represents a {@code cei:dateRange} date as specified in the <a href="http://www.cei.lmu.de/element.php?ID=221">CEI specification</a>. It consists of a literal date as well as numeric to and from date values.<br/><br/>
+ * Represents a {@code cei:dateRange} date as specified in the
+ * <a href="http://www.cei.lmu.de/element.php?ID=221">CEI specification</a>. It consists of a literal date as well as
+ * numeric to and from date values.<br/>
+ * <br/>
  * Example in XML-form:<br/>
  * {@code <cei:dateRange from="12970301" to="12970331">March 1297</cei:date>}
  *
@@ -31,12 +34,18 @@ public class CeiDateRange extends AbstractCeiDate {
     public CeiDateRange(@NotNull String numericFromDate, @NotNull String numericToDate, @NotNull String literalDate) {
 
         super(new Element("cei:dateRange", Namespace.CEI.getUri()), literalDate);
+
         addAttribute(new Attribute("from", numericFromDate));
         addAttribute(new Attribute("to", numericToDate));
 
         this.numericFromDate = new NumericDate(numericFromDate);
         this.numericToDate = new NumericDate(numericToDate);
 
+    }
+
+    @Override
+    public boolean couldBeOtherDateType() {
+        return numericFromDate.equals(numericToDate);
     }
 
     /**
@@ -58,11 +67,6 @@ public class CeiDateRange extends AbstractCeiDate {
     @Override
     public boolean isValid() {
         return numericFromDate.isValid() && numericToDate.isValid();
-    }
-
-    @Override
-    public boolean isWrongDateType() {
-        return numericFromDate.equals(numericToDate);
     }
 
     @Override

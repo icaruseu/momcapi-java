@@ -40,9 +40,9 @@ public class CeiDateRangeTest {
 
     @Test
     public void testIsWrongDateType() throws Exception {
-        assertFalse(CEI_DATE_RANGE.isWrongDateType());
+        assertFalse(CEI_DATE_RANGE.couldBeOtherDateType());
         CeiDateRange wrongDateRange = new CeiDateRange("14970801", "14970801", "01. August 1497");
-        assertTrue(wrongDateRange.isWrongDateType());
+        assertTrue(wrongDateRange.couldBeOtherDateType());
     }
 
 }

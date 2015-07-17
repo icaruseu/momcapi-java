@@ -7,7 +7,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Optional;
 
 /**
- * Represents the {@code atom:id} of a charter in MOM-CA, e.g. {@code tag:www.monasterium.net,2011:/charter/RS-IAGNS/Charters/IAGNS_F-.150_6605%7C193232}.
+ * Represents the {@code atom:id} of a charter in MOM-CA, e.g.
+ * {@code tag:www.monasterium.net,2011:/charter/RS-IAGNS/Charters/IAGNS_F-.150_6605%7C193232}.
  *
  * @author Daniel Jeller
  *         Created on 25.06.2015.
@@ -32,28 +33,35 @@ public class AtomIdCharter extends AtomId {
     public AtomIdCharter(@NotNull String atomIdString) {
 
         super(atomIdString);
-        String[] valueTokens = atomIdString.split("/");
 
-        if (!valueTokens[1].equals(ResourceType.CHARTER.getAtomIdName())) {
-            throw new IllegalArgumentException(String.format("'%s' identifies a '%s', not a charter.", atomIdString, valueTokens[1]));
+        if (!isCharterId()) {
+            String message = String.format("'%s' has the wrong ResourceType identifier, not %s.",
+                    atomIdString,
+                    ResourceType.CHARTER.getAtomIdPart());
+            throw new IllegalArgumentException(message);
         }
 
-        switch (valueTokens.length) {
+        String[] idParts = atomIdString.split("/");
+
+        switch (idParts.length) {
 
             case 4:
-                this.collectionId = Optional.of(Util.decode(valueTokens[2]));
-                this.charterId = Util.decode(valueTokens[3]);
+                this.collectionId = Optional.of(Util.decode(idParts[2]));
+                this.charterId = Util.decode(idParts[3]);
                 this.archiveId = Optional.empty();
                 this.fondId = Optional.empty();
                 break;
+
             case 5:
-                this.archiveId = Optional.of(Util.decode(valueTokens[2]));
-                this.fondId = Optional.of(Util.decode(valueTokens[3]));
-                this.charterId = Util.decode(valueTokens[4]);
+                this.archiveId = Optional.of(Util.decode(idParts[2]));
+                this.fondId = Optional.of(Util.decode(idParts[3]));
+                this.charterId = Util.decode(idParts[4]);
                 this.collectionId = Optional.empty();
                 break;
+
             default:
-                throw new IllegalArgumentException(String.format("'%s' is not a valid charterId.", atomIdString));
+                String message = String.format("'%s' is not a valid charterId.", atomIdString);
+                throw new IllegalArgumentException(message);
 
         }
 
@@ -68,7 +76,8 @@ public class AtomIdCharter extends AtomId {
      */
     public AtomIdCharter(@NotNull String archiveId, @NotNull String fondId, @NotNull String charterId) {
 
-        super(ResourceType.CHARTER.getAtomIdName(), archiveId, fondId, charterId);
+        super(ResourceType.CHARTER.getAtomIdPart(), archiveId, fondId, charterId);
+
         this.archiveId = Optional.of(archiveId);
         this.fondId = Optional.of(fondId);
         this.charterId = charterId;
@@ -84,7 +93,8 @@ public class AtomIdCharter extends AtomId {
      */
     public AtomIdCharter(@NotNull String collectionId, @NotNull String charterId) {
 
-        super(ResourceType.CHARTER.getAtomIdName(), collectionId, charterId);
+        super(ResourceType.CHARTER.getAtomIdPart(), collectionId, charterId);
+
         this.collectionId = Optional.of(collectionId);
         this.charterId = charterId;
         this.archiveId = Optional.empty();
@@ -150,6 +160,11 @@ public class AtomIdCharter extends AtomId {
                 ", charterId='" + charterId + '\'' +
                 '}';
 
+    }
+
+    private boolean isCharterId() {
+        String typeToken = this.getAtomId().split("/")[1];
+        return typeToken.equals(ResourceType.CHARTER.getAtomIdPart());
     }
 
 }

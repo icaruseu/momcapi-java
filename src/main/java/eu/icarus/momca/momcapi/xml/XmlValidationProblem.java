@@ -11,23 +11,31 @@ import org.jetbrains.annotations.NotNull;
 public class XmlValidationProblem {
 
     private final int column;
-    @NotNull
-    private final Level level;
     private final int line;
     @NotNull
     private final String message;
+    @NotNull
+    private final SeverityLevel severityLevel;
 
     /**
-     * The enum Level.
+     * The enum SeverityLevel.
      */
-    public enum Level {
+    public enum SeverityLevel {
+        WARNING,
         ERROR,
-        FATAL_ERROR,
-        WARNING
+        FATAL_ERROR
     }
 
-    public XmlValidationProblem(@NotNull Level level, int line, int column, @NotNull String message) {
-        this.level = level;
+    /**
+     * Instantiates a new XmlValidationProblem.
+     *
+     * @param severityLevel The severity level.
+     * @param line          The line the problem appeared on.
+     * @param column        The column the problem appeared on.
+     * @param message       The message by the validator, indicating the problem.
+     */
+    public XmlValidationProblem(@NotNull SeverityLevel severityLevel, int line, int column, @NotNull String message) {
+        this.severityLevel = severityLevel;
         this.line = line;
         this.column = column;
         this.message = message;
@@ -38,14 +46,6 @@ public class XmlValidationProblem {
      */
     public int getColumn() {
         return column;
-    }
-
-    /**
-     * @return The problem level.
-     */
-    @NotNull
-    public Level getLevel() {
-        return level;
     }
 
     /**
@@ -61,5 +61,13 @@ public class XmlValidationProblem {
     @NotNull
     public String getMessage() {
         return message;
+    }
+
+    /**
+     * @return The problem severityLevel.
+     */
+    @NotNull
+    public SeverityLevel getSeverityLevel() {
+        return severityLevel;
     }
 }

@@ -7,9 +7,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * A representation of the {@code cei:figure} element that is used to represents images of the documents.<br/><br/>
+ * A representation of the {@code cei:figure} element that is used to represents images of the documents.<br/>
+ * <br/>
  * Example:<br/>
- * {@code <figure n="RS-IAGNS_F1.-fasc.16,-sub.-N-1513_1"><graphic url="RS-IAGNS_F1.-fasc.16,-sub.-N-1513_1.jpg">RS-IAGNS_F1.-fasc.16,-sub.-N-1513_1.jpg</graphic></figure>}
+ * {@code <figure n="RS-IAGNS_F1.-fasc.16,-sub.-N-1513_1">
+ * <graphic url="RS-IAGNS_F1.-fasc.16,-sub.-N-1513_1.jpg">RS-IAGNS_F1.-fasc.16,-sub.-N-1513_1.jpg</graphic>
+ * </figure>}
  *
  * @author Daniel Jeller
  *         Created on 09.07.2015.
@@ -27,7 +30,9 @@ public class CeiFigure extends Element {
     /**
      * Instantiates a new CeiFigure with a full set of metadata.
      *
-     * @param url  The {@code cei:figure/cei:grapic/@url}-attribute responsible for identifying the image in an external storage. Can be either just a relative URI (e.g. {@code image1.jpg}) or an absolute URL ({@code http://server.com/images/image1.jpg}).
+     * @param url  The {@code cei:figure/cei:grapic/@url}-attribute responsible for identifying the image in an
+     *             external storage. Can be either just a relative URI (e.g. {@code image1.jpg}) or an
+     *             absolute URL ({@code http://server.com/images/image1.jpg}).
      * @param n    The {@code cei:figure/@n}-attribute.
      * @param text The text content of the {@code cei:figure/cei:graphic}-element.
      */
@@ -50,7 +55,9 @@ public class CeiFigure extends Element {
     /**
      * Instantiates a new Cei figure.
      *
-     * @param url The {@code cei:figure/cei:grapic/@url}-attribute responsible for identifying the image in an external storage. Can be either just a relative URI (e.g. {@code image1.jpg}) or an absolute URL ({@code http://server.com/images/image1.jpg}).
+     * @param url The {@code cei:figure/cei:grapic/@url}-attribute responsible for identifying the image in an
+     *            external storage. Can be either just a relative URI (e.g. {@code image1.jpg}) or an
+     *            absolute URL ({@code http://server.com/images/image1.jpg}).
      */
     public CeiFigure(@NotNull String url) {
         this(url, "", "");
@@ -82,7 +89,8 @@ public class CeiFigure extends Element {
     }
 
     /**
-     * @return {@code True} if the {@code cei:figure/cei:grapic/@url}-Attribute is an absolute URL (starting with {@code http://} or {@code https://}).
+     * @return {@code True} if the {@code cei:figure/cei:grapic/@url}-Attribute is an absolute URL (starting
+     * with {@code http://} or {@code https://}).
      */
     public boolean hasAbsoluteUrl() {
         return url.startsWith("http://") || url.startsWith("https://");

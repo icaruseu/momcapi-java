@@ -1,6 +1,7 @@
 package eu.icarus.momca.momcapi.resource;
 
 
+import eu.icarus.momca.momcapi.exception.MomcaException;
 import eu.icarus.momca.momcapi.query.XpathQuery;
 import eu.icarus.momca.momcapi.xml.Namespace;
 import eu.icarus.momca.momcapi.xml.XmlValidationProblem;
@@ -34,7 +35,8 @@ import java.util.Optional;
 public class Charter extends MomcaResource {
 
     @NotNull
-    private static final String CEI_SCHEMA_URL = "https://raw.githubusercontent.com/icaruseu/mom-ca/master/my/XRX/src/mom/app/cei/xsd/cei10.xsd";
+    private static final String CEI_SCHEMA_URL =
+            "https://raw.githubusercontent.com/icaruseu/mom-ca/master/my/XRX/src/mom/app/cei/xsd/cei10.xsd";
     @NotNull
     private final Optional<AtomAuthor> atomAuthor;
     @NotNull
@@ -54,19 +56,19 @@ public class Charter extends MomcaResource {
     private class SimpleErrorHandler implements ErrorHandler {
 
         public void error(@NotNull SAXParseException e) throws SAXException {
-            addToXmlValidationProblem(XmlValidationProblem.Level.ERROR, e);
+            addToXmlValidationProblem(XmlValidationProblem.SeverityLevel.ERROR, e);
         }
 
         public void fatalError(@NotNull SAXParseException e) throws SAXException {
-            addToXmlValidationProblem(XmlValidationProblem.Level.FATAL_ERROR, e);
+            addToXmlValidationProblem(XmlValidationProblem.SeverityLevel.FATAL_ERROR, e);
         }
 
         public void warning(@NotNull SAXParseException e) throws SAXException {
-            addToXmlValidationProblem(XmlValidationProblem.Level.WARNING, e);
+            addToXmlValidationProblem(XmlValidationProblem.SeverityLevel.WARNING, e);
         }
 
-        private void addToXmlValidationProblem(@NotNull XmlValidationProblem.Level level, @NotNull SAXParseException e) {
-            validationProblems.add(new XmlValidationProblem(level, e.getLineNumber(), e.getColumnNumber(), e.getMessage()));
+        private void addToXmlValidationProblem(@NotNull XmlValidationProblem.SeverityLevel severityLevel, @NotNull SAXParseException e) {
+            validationProblems.add(new XmlValidationProblem(severityLevel, e.getLineNumber(), e.getColumnNumber(), e.getMessage()));
         }
 
     }
@@ -189,15 +191,13 @@ public class Charter extends MomcaResource {
     private Optional<AbstractCeiDate> initCeiDate() {
 
         Optional<AbstractCeiDate> ceiDateOptional = Optional.empty();
+        Nodes ceiIssuedNodes = queryContentAsNodes(XpathQuery.QUERY_CEI_ISSUED);
 
-        Nodes ceiIssuedNodes = listQueryResultNodes(XpathQuery.QUERY_CEI_ISSUED);
         if (ceiIssuedNodes.size() != 0) {
 
             Element ceiIssued = (Element) ceiIssuedNodes.get(0);
-
-            Elements dateElements = ceiIssued.getChildElements("date", eu.icarus.momca.momcapi.xml.Namespace.CEI.getUri());
-            Elements dateRangeElements = ceiIssued.getChildElements("dateRange", eu.icarus.momca.momcapi.xml.Namespace.CEI.getUri());
-
+            Elements dateElements = ceiIssued.getChildElements("date", Namespace.CEI.getUri());
+            Elements dateRangeElements = ceiIssued.getChildElements("dateRange", Namespace.CEI.getUri());
 
             if (dateElements.size() == 1 && dateRangeElements.size() == 0) {
 
@@ -214,30 +214,36 @@ public class Charter extends MomcaResource {
                 String literalDate = dateRangeElement.getValue();
                 ceiDateOptional = Optional.of(new CeiDateRange(from, to, literalDate));
 
+            } else if (dateElements.size() == 1 && dateRangeElements.size() == 1) {
+
+                throw new MomcaException("Both 'cei:date' and 'cei:dateRange' present in charter XML content.");
+
             }
 
         }
 
         return ceiDateOptional;
+
     }
 
     @NotNull
     private CeiIdno initCeiIdno() {
-        return new CeiIdno(queryUniqueElement(XpathQuery.QUERY_CEI_BODY_IDNO_ID), queryUniqueElement(XpathQuery.QUERY_CEI_BODY_IDNO_TEXT));
+        String id = queryUniqueElement(XpathQuery.QUERY_CEI_BODY_IDNO_ID);
+        String text = queryUniqueElement(XpathQuery.QUERY_CEI_BODY_IDNO_TEXT);
+        return new CeiIdno(id, text);
     }
 
     @NotNull
     private List<CeiFigure> initCeiWitnessOrigFigures() {
 
-        List<CeiFigure> results = new ArrayList<>(0);
+        List<CeiFigure> ceiFigures = new ArrayList<>(0);
+        Nodes figureNodes = queryContentAsNodes(XpathQuery.QUERY_CEI_WITNESS_ORIG_FIGURE);
 
-        Nodes figures = listQueryResultNodes(XpathQuery.QUERY_CEI_WITNESS_ORIG_FIGURE);
+        for (int i = 0; i < figureNodes.size(); i++) {
 
-        for (int i = 0; i < figures.size(); i++) {
-
-            Element figure = (Element) figures.get(i);
-            String n = figure.getAttribute("n") == null ? "" : figure.getAttribute("n").getValue();
-            Elements childElements = figure.getChildElements("graphic", eu.icarus.momca.momcapi.xml.Namespace.CEI.getUri());
+            Element figureElement = (Element) figureNodes.get(i);
+            String nAttribute = figureElement.getAttribute("n") == null ? "" : figureElement.getAttribute("n").getValue();
+            Elements childElements = figureElement.getChildElements("graphic", Namespace.CEI.getUri());
 
             switch (childElements.size()) {
 
@@ -245,20 +251,22 @@ public class Charter extends MomcaResource {
                     break;
 
                 case 1:
-                    Element graphic = childElements.get(0);
-                    String url = graphic.getAttribute("url") == null ? "" : childElements.get(0).getAttribute("url").getValue();
-                    String text = graphic.getValue();
-                    results.add(new CeiFigure(url, n, text));
+                    Element graphicElement = childElements.get(0);
+                    String urlAttribute = (graphicElement.getAttribute("url") == null)
+                            ? "" : childElements.get(0).getAttribute("url").getValue();
+                    String textContent = graphicElement.getValue();
+                    ceiFigures.add(new CeiFigure(urlAttribute, nAttribute, textContent));
                     break;
 
                 default:
-                    throw new IllegalArgumentException("More than one child-elements of 'cei:figure'. Only one allowed, 'cei:graphic'.");
+                    throw new IllegalArgumentException(
+                            "More than one child-elements of 'cei:figure'. Only one allowed, 'cei:graphic'.");
 
             }
 
         }
 
-        return results;
+        return ceiFigures;
 
     }
 
@@ -266,8 +274,10 @@ public class Charter extends MomcaResource {
     private AtomIdCharter initCharterAtomId() {
 
         String idString = queryUniqueElement(XpathQuery.QUERY_ATOM_ID);
+
         if (idString.isEmpty()) {
-            throw new IllegalArgumentException(String.format("No atom:id in xml content: '%s'", getXmlAsDocument().toXML()));
+            String errorMessage = String.format("No atom:id in xml content: '%s'", getXmlAsDocument().toXML());
+            throw new IllegalArgumentException(errorMessage);
         } else {
             return new AtomIdCharter(idString);
         }
@@ -295,26 +305,32 @@ public class Charter extends MomcaResource {
     @NotNull
     private String queryUniqueElement(@NotNull XpathQuery query) {
 
-        List<String> atomQueryResults = listQueryResultStrings(query);
+        List<String> atomQueryResults = queryContentAsList(query);
 
         String result;
 
         switch (atomQueryResults.size()) {
+
             case 0:
                 result = "";
                 break;
+
             case 1:
                 result = atomQueryResults.get(0);
                 break;
+
             default:
-                throw new IllegalArgumentException(String.format("More than one results for Query '%s'", query.getQuery()));
+                String errorMessage = String.format("More than one results for Query '%s'", query.asString());
+                throw new IllegalArgumentException(errorMessage);
+
         }
 
         return result;
 
     }
 
-    private void validateCei(@NotNull MomcaResource resource) throws SAXException, ParserConfigurationException, ParsingException, IOException {
+    private void validateCei(@NotNull MomcaResource resource)
+            throws SAXException, ParserConfigurationException, ParsingException, IOException {
 
         SAXParserFactory factory = SAXParserFactory.newInstance();
         factory.setValidating(false);
@@ -327,16 +343,17 @@ public class Charter extends MomcaResource {
         XMLReader reader = parser.getXMLReader();
         reader.setErrorHandler(new SimpleErrorHandler());
 
-        Nodes ceiTextNodes = resource.listQueryResultNodes(XpathQuery.QUERY_CEI_TEXT);
+        Nodes ceiTextNodes = resource.queryContentAsNodes(XpathQuery.QUERY_CEI_TEXT);
 
         if (ceiTextNodes.size() != 1) {
-            throw new IllegalArgumentException("XML content has no 'cei:text' element therefor it is probably not a mom-ca charter.");
+            throw new IllegalArgumentException("XML content has no 'cei:text' element therefor it is probably not" +
+                    " a mom-ca charter.");
         }
 
-        Element ceiText = (Element) ceiTextNodes.get(0);
+        Element ceiTextElement = (Element) ceiTextNodes.get(0);
 
         Builder builder = new Builder(reader);
-        builder.build(ceiText.toXML(), Namespace.CEI.getUri());
+        builder.build(ceiTextElement.toXML(), Namespace.CEI.getUri());
 
     }
 

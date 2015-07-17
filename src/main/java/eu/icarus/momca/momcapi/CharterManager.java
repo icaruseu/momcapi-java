@@ -1,5 +1,6 @@
 package eu.icarus.momca.momcapi;
 
+import eu.icarus.momca.momcapi.query.ExistQuery;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
 import eu.icarus.momca.momcapi.resource.Charter;
 import eu.icarus.momca.momcapi.resource.CharterStatus;
@@ -63,13 +64,24 @@ public class CharterManager {
 
     @NotNull
     private Optional<Charter> getCharterFromUri(@NotNull String charterUri) {
-        String resourceName = charterUri.substring(charterUri.lastIndexOf('/') + 1, charterUri.length());
-        String parentUri = charterUri.substring(0, charterUri.lastIndexOf('/'));
+        String resourceName = getResourceName(charterUri);
+        String parentUri = getParentUri(charterUri);
         return momcaConnection.getExistResource(resourceName, parentUri).map(Charter::new);
     }
 
+    @NotNull
+    private String getParentUri(@NotNull String charterUri) {
+        return charterUri.substring(0, charterUri.lastIndexOf('/'));
+    }
+
+    @NotNull
+    private String getResourceName(@NotNull String charterUri) {
+        return charterUri.substring(charterUri.lastIndexOf('/') + 1, charterUri.length());
+    }
+
     private boolean isCharterExisting(@NotNull AtomIdCharter atomIdCharter, @Nullable ResourceRoot resourceRoot) {
-        return !momcaConnection.queryDatabase(ExistQueryFactory.checkResourceExistence(atomIdCharter, resourceRoot)).isEmpty();
+        ExistQuery query = ExistQueryFactory.checkResourceExistence(atomIdCharter, resourceRoot);
+        return !momcaConnection.queryDatabase(query).isEmpty();
     }
 
 }

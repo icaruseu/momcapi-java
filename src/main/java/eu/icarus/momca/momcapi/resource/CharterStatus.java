@@ -20,7 +20,8 @@ public enum CharterStatus {
     }
 
     /**
-     * @return The name of the root collection associated with the charter status, e.g. {@code metadata.charter.saved} for a {@code SAVED} charter.
+     * @return The name of the root collection associated with the charter status, e.g. {@code metadata.charter.saved}
+     * for a {@code SAVED} charter.
      */
     public String getRootCollection() {
         return parentCollection;

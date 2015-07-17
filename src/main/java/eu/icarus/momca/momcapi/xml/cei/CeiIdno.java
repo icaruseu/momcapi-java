@@ -6,7 +6,9 @@ import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Represents a {@code cei:idno}-Element as defined in the <a href="http://www.cei.lmu.de/element.php?ID=19">CEI-Schema</a>.<br/><br/>
+ * Represents a {@code cei:idno}-Element as defined in the
+ * <a href="http://www.cei.lmu.de/element.php?ID=19">CEI-Schema</a>.<br/>
+ * <br/>
  * Example:<br/>
  * {@code <cei:idno id="KAE_Urkunde_Nr_1" old="1">KAE, Urkunde Nr. 1</cei:idno>}
  *

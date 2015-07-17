@@ -13,7 +13,7 @@ public class ResourceTypeTest {
     @NotNull
     private static final ResourceType TYPE = ResourceType.ANNOTATION_IMAGE;
     @NotNull
-    private static final String VALUE = TYPE.getAtomIdName();
+    private static final String VALUE = TYPE.getAtomIdPart();
 
     @Test
     public void testCreateFromValue() throws Exception {
@@ -28,7 +28,7 @@ public class ResourceTypeTest {
 
     @Test
     public void testGetValue() throws Exception {
-        assertEquals(TYPE.getAtomIdName(), VALUE);
+        assertEquals(TYPE.getAtomIdPart(), VALUE);
     }
 
 }

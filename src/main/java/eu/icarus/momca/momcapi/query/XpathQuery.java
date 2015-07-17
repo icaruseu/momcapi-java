@@ -40,18 +40,18 @@ public enum XpathQuery {
     }
 
     /**
+     * @return The xpath query.
+     */
+    public String asString() {
+        return query;
+    }
+
+    /**
      * @return A list of all namespaces used in the query.
      * @see Namespace
      */
     public List<Namespace> getNamespaces() {
         return namespaces;
-    }
-
-    /**
-     * @return The xpath query.
-     */
-    public String getQuery() {
-        return query;
     }
 
 }

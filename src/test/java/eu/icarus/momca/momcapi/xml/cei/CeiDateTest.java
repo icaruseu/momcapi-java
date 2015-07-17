@@ -39,8 +39,8 @@ public class CeiDateTest {
 
     @Test
     public void testIsWrongDateType() throws Exception {
-        assertTrue(new CeiDate("12310899", "August 1231").isWrongDateType());
-        assertTrue(new CeiDate("9319999", "1231").isWrongDateType());
+        assertTrue(new CeiDate("12310899", "August 1231").couldBeOtherDateType());
+        assertTrue(new CeiDate("9319999", "1231").couldBeOtherDateType());
     }
 
 }

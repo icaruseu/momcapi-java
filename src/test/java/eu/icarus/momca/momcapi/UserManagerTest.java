@@ -144,7 +144,7 @@ public class UserManagerTest {
         Optional<MomcaResource> resourceOptional = momcaConnection.getExistResource(newUserName + ".xml", parentCollection);
         assertTrue(resourceOptional.isPresent());
         MomcaResource res = resourceOptional.get();
-        Method queryContentXml = MomcaResource.class.getDeclaredMethod("listQueryResultStrings", XpathQuery.class);
+        Method queryContentXml = MomcaResource.class.getDeclaredMethod("queryContentAsList", XpathQuery.class);
         queryContentXml.setAccessible(true);
         //noinspection unchecked
         assertEquals(((List<String>) queryContentXml.invoke(res, XpathQuery.QUERY_CONFIG_NAME)).get(0), newUserName);
