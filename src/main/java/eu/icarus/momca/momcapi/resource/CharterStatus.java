@@ -20,7 +20,7 @@ public enum CharterStatus {
     }
 
     /**
-     * @return The name of the root collection associated with the charter status, e.g. {@code metadata.charter.saved}
+     * @return The ResourceRoot associated with the charter status, e.g. {@code METADATA_CHARTER_SAVED}
      * for a {@code SAVED} charter.
      */
     public ResourceRoot getResourceRoot() {
