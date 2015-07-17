@@ -31,11 +31,24 @@ public class ExistQueryFactory {
     @NotNull
     public static ExistQuery checkResourceExistence(@NotNull Id resourceId, @Nullable ResourceRoot resourceRoot) {
 
-        return new ExistQuery(String.format(
+        String query = String.format(
                 "%s collection('/db/mom-data%s')//atom:entry[.//atom:id/text()='%s'][1]",
                 getNamespaceDeclaration(Namespace.ATOM),
                 getRootCollectionString(resourceRoot),
-                resourceId.getAtomId()));
+                resourceId.getAtomId());
+        return new ExistQuery(query);
+
+    }
+
+    @NotNull
+    public static ExistQuery getCountryXml(@NotNull String code) {
+
+        String query = String.format(
+                "%s doc('/db/mom-data/%s/mom.portal.xml')//eap:country[lower-case(eap:code)=lower-case('%s')]",
+                getNamespaceDeclaration(Namespace.EAP),
+                ResourceRoot.METADATA_PORTAL_PUBLIC.getCollectionName(),
+                code);
+        return new ExistQuery(query);
 
     }
 
@@ -49,13 +62,26 @@ public class ExistQueryFactory {
     @NotNull
     public static ExistQuery getResourceUri(@NotNull Id resourceId, @Nullable ResourceRoot resourceRoot) {
 
-        return new ExistQuery(String.format(
+        String query = String.format(
                 "%s let $nodes := collection('/db/mom-data%s')//atom:entry[.//atom:id/text()='%s']" +
                         " for $node in $nodes" +
                         " return concat(util:collection-name($node), '/', util:document-name($node))",
                 getNamespaceDeclaration(Namespace.ATOM),
                 getRootCollectionString(resourceRoot),
-                resourceId.getAtomId()));
+                resourceId.getAtomId());
+        return new ExistQuery(query);
+
+    }
+
+    @NotNull
+    public static ExistQuery listCountries() {
+
+        String query = String.format(
+                "%s doc('/db/mom-data/%s/mom.portal.xml')//eap:country/eap:code/text()",
+                getNamespaceDeclaration(Namespace.EAP),
+                ResourceRoot.METADATA_PORTAL_PUBLIC.getCollectionName());
+
+        return new ExistQuery(query);
 
     }
 
@@ -70,11 +96,13 @@ public class ExistQueryFactory {
     public static ExistQuery replaceFirstInResource(@NotNull String resourceUri, @NotNull String elementToReplace,
                                                     @NotNull String newElement) {
 
-        return new ExistQuery(String.format("%s update replace doc('%s')//%s[1] with %s",
+        String query = String.format(
+                "%s update replace doc('%s')//%s[1] with %s",
                 getNamespaceDeclaration(elementToReplace),
                 resourceUri,
                 elementToReplace,
-                newElement));
+                newElement);
+        return new ExistQuery(query);
 
     }
 
@@ -84,7 +112,9 @@ public class ExistQueryFactory {
         StringBuilder declarationBuilder = new StringBuilder();
 
         for (Namespace namespace : namespaces) {
-            declarationBuilder.append(String.format("declare namespace %s='%s';", namespace.getPrefix(),
+            declarationBuilder.append(String.format(
+                    "declare namespace %s='%s';",
+                    namespace.getPrefix(),
                     namespace.getUri()));
         }
 
