@@ -16,9 +16,15 @@ public class Country extends EapAbstract {
     private final List<Subdivision> subdivisions;
 
     public Country(@NotNull String code, @NotNull String nativeForm, @NotNull List<Subdivision> subdivisions) {
-        super(code, nativeForm);
-        appendChild(new Element("eap:subdivisions", Namespace.EAP.getUri()));
+
+        super("country", code, nativeForm);
+
+        Element subdivisionsElement = new Element("eap:subdivisions", Namespace.EAP.getUri());
+        subdivisions.forEach(subdivisionsElement::appendChild);
+        appendChild(subdivisionsElement);
+
         this.subdivisions = subdivisions;
+
     }
 
     @NotNull

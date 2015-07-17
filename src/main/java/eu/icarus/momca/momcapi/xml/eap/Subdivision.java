@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 public class Subdivision extends EapAbstract {
 
     public Subdivision(@NotNull String code, @NotNull String nativeForm) {
-        super(code, nativeForm);
+        super("subdivision", code, nativeForm);
     }
 
 }
