@@ -27,6 +27,28 @@ public class HierarchyManagerTest {
     }
 
     @Test
+    public void testAddCountry() throws Exception {
+
+        String code = "AT";
+        String nativeform = "Österreich";
+
+        Country newCountry = hierarchyManager.addCountry(code, nativeform);
+
+        assertEquals(newCountry.getCode(), code);
+        assertEquals(newCountry.getNativeform(), nativeform);
+
+        hierarchyManager.deleteCountry(code);
+
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testAddCountryThatExists() throws Exception {
+        String existingCode = "DE";
+        String nativeform = "Österreich";
+        hierarchyManager.addCountry(existingCode, nativeform);
+    }
+
+    @Test
     public void testChangeCountryCode() throws Exception {
 
         String originalCode = "CH";
@@ -92,6 +114,12 @@ public class HierarchyManagerTest {
                 .filter(subdivision -> subdivision.getNativeform().equals(newNativeform)).count(), 1);
 
 
+    }
+
+    @Test
+    public void testDeleteCountry() throws Exception {
+        // TODO add code
+        assertTrue(false);
     }
 
     @Test

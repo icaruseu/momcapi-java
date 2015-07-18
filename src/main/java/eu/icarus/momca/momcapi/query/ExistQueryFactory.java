@@ -21,6 +21,21 @@ public class ExistQueryFactory {
     private ExistQueryFactory() {
     }
 
+    @NotNull
+    public static ExistQuery appendElement(@NotNull String resourceUri, @NotNull String qualifiedParentName,
+                                           @NotNull String elementToInsert) {
+
+        String query = String.format(
+                "%s update insert %s into doc('%s')//%s",
+                getNamespaceDeclaration(qualifiedParentName),
+                elementToInsert,
+                resourceUri,
+                qualifiedParentName);
+
+        return new ExistQuery(query);
+
+    }
+
     /**
      * @param resourceId   The resource's {@code atom:id}.
      * @param resourceRoot The resource root of the resource the search should be restricted to. If {@code null},

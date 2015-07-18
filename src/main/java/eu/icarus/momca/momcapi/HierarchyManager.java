@@ -1,10 +1,12 @@
 package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.exception.MomcaException;
+import eu.icarus.momca.momcapi.query.ExistQuery;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
 import eu.icarus.momca.momcapi.resource.ResourceRoot;
 import eu.icarus.momca.momcapi.xml.Namespace;
 import eu.icarus.momca.momcapi.xml.eap.Country;
+import eu.icarus.momca.momcapi.xml.eap.EapAbstract;
 import eu.icarus.momca.momcapi.xml.eap.Subdivision;
 import nu.xom.Builder;
 import nu.xom.Element;
@@ -29,6 +31,28 @@ public class HierarchyManager {
 
     HierarchyManager(@NotNull MomcaConnection momcaConnection) {
         this.momcaConnection = momcaConnection;
+    }
+
+    /**
+     * Adds a new country to the database.
+     *
+     * @param code       The code of the new country to add. Throws an IllegalArgumentException if the code already exists.
+     * @param nativeform The name of the country in its own language, e.g. {@code Sverige}.
+     * @return The new country.
+     */
+    @NotNull
+    public Country addCountry(@NotNull String code, @NotNull String nativeform) {
+
+        if (isCodeAlreadyExisting(code)) {
+            throw new IllegalArgumentException(String.format("Country code '%s' is already existing.", code));
+        }
+
+        Country newCountry = new Country(code, nativeform, new ArrayList<Subdivision>(0));
+        ExistQuery query = ExistQueryFactory.appendElement(MOM_PORTAL_XML_URI, "eap:countries", newCountry.toXML());
+        momcaConnection.queryDatabase(query);
+
+        return getCountry(code).orElseThrow(RuntimeException::new);
+
     }
 
     /**
@@ -88,6 +112,13 @@ public class HierarchyManager {
         momcaConnection.queryDatabase(ExistQueryFactory
                 .updateElementText(MOM_PORTAL_XML_URI, "eap:nativeform", currentNativeform, newNativeform));
         return getCountry(country.getCode()).orElseThrow(RuntimeException::new);
+    }
+
+    @NotNull
+    public void deleteCountry(@NotNull String code) {
+
+        // TODO add code
+
     }
 
     @NotNull
@@ -168,6 +199,29 @@ public class HierarchyManager {
         }
 
         return subdivisions;
+
+    }
+
+    private boolean isCodeAlreadyExisting(String code) {
+
+        List<String> allCountryCodes = momcaConnection.queryDatabase(ExistQueryFactory.listCountryCodes());
+
+        if (allCountryCodes.stream().anyMatch(countryCode -> countryCode.equals(code))) {
+
+            return true;
+
+        } else {
+
+            for (String countryCode : allCountryCodes) {
+                Country country = getCountry(countryCode).get();
+                if (country.getSubdivisions().stream().map(EapAbstract::getCode).anyMatch(s -> s.equals(code))) {
+                    return true;
+                }
+            }
+
+        }
+
+        return false;
 
     }
 
