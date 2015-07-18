@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class DateAbstract extends Element {
 
+    @NotNull
     private final String literalDate;
 
     /**
@@ -42,6 +43,7 @@ public abstract class DateAbstract extends Element {
     /**
      * @return The literal date.
      */
+    @NotNull
     public String getLiteralDate() {
         return literalDate;
     }

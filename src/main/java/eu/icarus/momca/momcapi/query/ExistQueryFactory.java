@@ -40,11 +40,15 @@ public class ExistQueryFactory {
 
     }
 
+    /**
+     * @param code The code of the country.
+     * @return A query to get the complete XML content of the {@code eap:country}-element specified by {@code code}.
+     */
     @NotNull
     public static ExistQuery getCountryXml(@NotNull String code) {
 
         String query = String.format(
-                "%s doc('/db/mom-data/%s/mom.portal.xml')//eap:country[lower-case(eap:code)=lower-case('%s')]",
+                "%s doc('/db/mom-data/%s/mom.portal.xml')//eap:country[eap:code='%s']",
                 getNamespaceDeclaration(Namespace.EAP),
                 ResourceRoot.METADATA_PORTAL_PUBLIC.getCollectionName(),
                 code);
@@ -73,8 +77,12 @@ public class ExistQueryFactory {
 
     }
 
+    /**
+     * @return A query to get a list of the text content of all {@code eap:country/eap:code} elements. This is
+     * effectively a list of all countries registered in the portal.
+     */
     @NotNull
-    public static ExistQuery listCountries() {
+    public static ExistQuery listCountryCodes() {
 
         String query = String.format(
                 "%s doc('/db/mom-data/%s/mom.portal.xml')//eap:country/eap:code/text()",
@@ -102,6 +110,33 @@ public class ExistQueryFactory {
                 resourceUri,
                 elementToReplace,
                 newElement);
+        return new ExistQuery(query);
+
+    }
+
+    /**
+     * @param resourceUri      The URI of the resource to update.
+     * @param qualifiedElement The qualified name of the element to update, e.g. {@code eap:nativeform}.
+     * @param currentText      The text content of the element to replace. If this is {@code null} or {@code ""}, the
+     *                         returned query  targets all elements specified by {@code resourceUri} and
+     *                         {@code qualifiedElement}.
+     * @param newText          The text to replace currentText with.
+     * @return A query to update the text content of all elements specified by {@code resourceUri},
+     * {@code qualifiedElement} and {@code currentText} with {@code newText}.
+     */
+    @NotNull
+    public static ExistQuery updateElementText(@NotNull String resourceUri, @NotNull String qualifiedElement,
+                                               @Nullable String currentText, @NotNull String newText) {
+
+        String predicate = (currentText == null || currentText.isEmpty())
+                ? "" : String.format("[text()='%s']", currentText);
+        String query = String.format(
+                "%s update replace doc('%s')//%s%s/text() with '%s'",
+                getNamespaceDeclaration(qualifiedElement),
+                resourceUri,
+                qualifiedElement,
+                predicate,
+                newText);
         return new ExistQuery(query);
 
     }

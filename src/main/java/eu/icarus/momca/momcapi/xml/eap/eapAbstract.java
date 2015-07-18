@@ -15,9 +15,9 @@ public class EapAbstract extends Element {
     @NotNull
     private final String nativeForm;
 
-    public EapAbstract(@NotNull String code, @NotNull String nativeForm) {
+    public EapAbstract(@NotNull String localRootElementName, @NotNull String code, @NotNull String nativeForm) {
 
-        super("eap:country", Namespace.EAP.getUri());
+        super(new Element("eap:" + localRootElementName, Namespace.EAP.getUri()));
         initXml(code, nativeForm);
 
         this.code = code;
@@ -42,7 +42,7 @@ public class EapAbstract extends Element {
         appendChild(codeElement);
 
         Element nativeFormElement = new Element("eap:nativeform", Namespace.EAP.getUri());
-        codeElement.appendChild(nativeForm);
+        nativeFormElement.appendChild(nativeForm);
         appendChild(nativeFormElement);
 
 

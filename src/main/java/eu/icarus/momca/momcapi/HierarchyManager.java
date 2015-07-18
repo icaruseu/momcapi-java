@@ -2,6 +2,7 @@ package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.exception.MomcaException;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
+import eu.icarus.momca.momcapi.resource.ResourceRoot;
 import eu.icarus.momca.momcapi.xml.Namespace;
 import eu.icarus.momca.momcapi.xml.eap.Country;
 import eu.icarus.momca.momcapi.xml.eap.Subdivision;
@@ -22,11 +23,41 @@ import java.util.Optional;
  */
 public class HierarchyManager {
 
+    public static final String MOM_PORTAL_XML_URI = String.format("/db/mom-data/%s/mom.portal.xml", ResourceRoot.METADATA_PORTAL_PUBLIC.getCollectionName());
     @NotNull
     private final MomcaConnection momcaConnection;
 
     HierarchyManager(@NotNull MomcaConnection momcaConnection) {
         this.momcaConnection = momcaConnection;
+    }
+
+    /**
+     * Updates the code of a country.
+     *
+     * @param country The country.
+     * @param newCode The new code.
+     * @return The updated country.
+     */
+    @NotNull
+    public Country changeCountryCode(@NotNull Country country, @NotNull String newCode) {
+        momcaConnection.queryDatabase(ExistQueryFactory
+                .updateElementText(MOM_PORTAL_XML_URI, "eap:code", country.getCode(), newCode));
+        return getCountry(newCode).orElseThrow(RuntimeException::new);
+    }
+
+    /**
+     * Updates the code of a subdivision of a country.
+     *
+     * @param country     The country.
+     * @param currentCode The current code of the subdivision.
+     * @param newCode     The new code.
+     * @return The updated country.
+     */
+    @NotNull
+    public Country changeSubdivisionCode(@NotNull Country country, @NotNull String currentCode, @NotNull String newCode) {
+        momcaConnection.queryDatabase(ExistQueryFactory
+                .updateElementText(MOM_PORTAL_XML_URI, "eap:code", currentCode, newCode));
+        return getCountry(country.getCode()).orElseThrow(RuntimeException::new);
     }
 
     @NotNull
@@ -52,7 +83,7 @@ public class HierarchyManager {
                 country = Optional.of(new Country(code, nativeForm, subdivisions));
             }
 
-        } catch (ParsingException | IOException e) {
+        } catch (@NotNull ParsingException | IOException e) {
             String message = String.format("Failed to parse xml for country %s", code);
             throw new MomcaException(message);
         }
@@ -63,7 +94,7 @@ public class HierarchyManager {
 
     @NotNull
     public List<String> listCountries() {
-        return momcaConnection.queryDatabase(ExistQueryFactory.listCountries());
+        return momcaConnection.queryDatabase(ExistQueryFactory.listCountryCodes());
     }
 
     @NotNull

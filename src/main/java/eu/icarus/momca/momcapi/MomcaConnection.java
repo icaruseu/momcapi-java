@@ -88,6 +88,7 @@ public class MomcaConnection {
     /**
      * @return The hierarchy manager instance.
      */
+    @NotNull
     public HierarchyManager getHierarchyManager() {
         return hierarchyManager;
     }

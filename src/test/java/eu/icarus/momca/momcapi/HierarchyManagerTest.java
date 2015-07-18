@@ -27,6 +27,38 @@ public class HierarchyManagerTest {
     }
 
     @Test
+    public void testChangeCountryCode() throws Exception {
+
+        String originalCode = "CH";
+        Country country = hierarchyManager.getCountry(originalCode).get();
+
+        String newCode = "Schw";
+        Country updatedCountry = hierarchyManager.changeCountryCode(country, newCode);
+
+        assertEquals(updatedCountry.getCode(), newCode);
+
+        hierarchyManager.changeCountryCode(updatedCountry, originalCode);
+
+    }
+
+    @Test
+    public void testChangeSubdivisionCode() throws Exception {
+
+        String countryCode = "DE";
+        Country country = hierarchyManager.getCountry(countryCode).get();
+
+        String originalSubdivisionCode = "DE-BY";
+        String newSubdivisionCode = "DE-BAY";
+        Country updatedCountry = hierarchyManager.changeSubdivisionCode(country, originalSubdivisionCode, newSubdivisionCode);
+
+        assertEquals(updatedCountry.getSubdivisions().stream()
+                .filter(subdivision -> subdivision.getCode().equals(newSubdivisionCode)).count(), 1);
+
+        hierarchyManager.changeSubdivisionCode(updatedCountry, newSubdivisionCode, originalSubdivisionCode);
+
+    }
+
+    @Test
     public void testGetCountry() throws Exception {
 
         Optional<Country> countryOptional = hierarchyManager.getCountry("DE");

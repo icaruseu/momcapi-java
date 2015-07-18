@@ -2,6 +2,7 @@ package eu.icarus.momca.momcapi.query;
 
 import eu.icarus.momca.momcapi.xml.Namespace;
 import nu.xom.XPathContext;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -31,6 +32,7 @@ public enum XpathQuery {
     QUERY_XRX_NAME("//xrx:name/text()", Namespace.XRX),
     QUERY_XRX_SAVED_ID("//xrx:saved/xrx:id/text()", Namespace.XRX);
 
+    @NotNull
     private final List<Namespace> namespaces;
     private final String query;
 
@@ -50,6 +52,7 @@ public enum XpathQuery {
      * @return A list of all namespaces used in the query.
      * @see Namespace
      */
+    @NotNull
     public List<Namespace> getNamespaces() {
         return namespaces;
     }
