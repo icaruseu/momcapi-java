@@ -36,6 +36,7 @@ public class ExistQueryFactory {
                 getNamespaceDeclaration(Namespace.ATOM),
                 getRootCollectionString(resourceRoot),
                 resourceId.getAtomId());
+
         return new ExistQuery(query);
 
     }
@@ -52,6 +53,7 @@ public class ExistQueryFactory {
                 getNamespaceDeclaration(Namespace.EAP),
                 ResourceRoot.METADATA_PORTAL_PUBLIC.getCollectionName(),
                 code);
+
         return new ExistQuery(query);
 
     }
@@ -73,6 +75,7 @@ public class ExistQueryFactory {
                 getNamespaceDeclaration(Namespace.ATOM),
                 getRootCollectionString(resourceRoot),
                 resourceId.getAtomId());
+
         return new ExistQuery(query);
 
     }
@@ -110,6 +113,7 @@ public class ExistQueryFactory {
                 resourceUri,
                 elementToReplace,
                 newElement);
+
         return new ExistQuery(query);
 
     }
@@ -137,6 +141,7 @@ public class ExistQueryFactory {
                 qualifiedElement,
                 predicate,
                 newText);
+
         return new ExistQuery(query);
 
     }

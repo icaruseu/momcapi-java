@@ -13,15 +13,15 @@ public class EapAbstract extends Element {
     @NotNull
     private final String code;
     @NotNull
-    private final String nativeForm;
+    private final String nativeform;
 
-    public EapAbstract(@NotNull String localRootElementName, @NotNull String code, @NotNull String nativeForm) {
+    public EapAbstract(@NotNull String localRootElementName, @NotNull String code, @NotNull String nativeform) {
 
         super(new Element("eap:" + localRootElementName, Namespace.EAP.getUri()));
-        initXml(code, nativeForm);
+        initXml(code, nativeform);
 
         this.code = code;
-        this.nativeForm = nativeForm;
+        this.nativeform = nativeform;
 
     }
 
@@ -31,8 +31,8 @@ public class EapAbstract extends Element {
     }
 
     @NotNull
-    public String getNativeForm() {
-        return nativeForm;
+    public String getNativeform() {
+        return nativeform;
     }
 
     private void initXml(@NotNull String code, @NotNull String nativeForm) {
