@@ -30,14 +30,30 @@ public class HierarchyManagerTest {
     public void testChangeCountryCode() throws Exception {
 
         String originalCode = "CH";
-        Country country = hierarchyManager.getCountry(originalCode).get();
+        Country originalCountry = hierarchyManager.getCountry(originalCode).get();
 
         String newCode = "Schw";
-        Country updatedCountry = hierarchyManager.changeCountryCode(country, newCode);
+
+        Country updatedCountry = hierarchyManager.changeCountryCode(originalCountry, newCode);
+        hierarchyManager.changeCountryCode(updatedCountry, originalCode);
 
         assertEquals(updatedCountry.getCode(), newCode);
 
-        hierarchyManager.changeCountryCode(updatedCountry, originalCode);
+    }
+
+    @Test
+    public void testChangeCountryNativeform() throws Exception {
+
+        String code = "CH";
+        Country originalCountry = hierarchyManager.getCountry(code).get();
+
+        String originalNativeform = "Schweiz";
+        String newNativeform = "Svizzera";
+
+        Country updatedCountry = hierarchyManager.changeCountryNativeform(originalCountry, newNativeform);
+        hierarchyManager.changeCountryNativeform(updatedCountry, originalNativeform);
+
+        assertEquals(updatedCountry.getNativeform(), newNativeform);
 
     }
 
@@ -45,16 +61,36 @@ public class HierarchyManagerTest {
     public void testChangeSubdivisionCode() throws Exception {
 
         String countryCode = "DE";
-        Country country = hierarchyManager.getCountry(countryCode).get();
+        Country originalCountry = hierarchyManager.getCountry(countryCode).get();
 
         String originalSubdivisionCode = "DE-BY";
         String newSubdivisionCode = "DE-BAY";
-        Country updatedCountry = hierarchyManager.changeSubdivisionCode(country, originalSubdivisionCode, newSubdivisionCode);
+
+        Country updatedCountry = hierarchyManager
+                .changeSubdivisionCode(originalCountry, originalSubdivisionCode, newSubdivisionCode);
+        hierarchyManager.changeSubdivisionCode(updatedCountry, newSubdivisionCode, originalSubdivisionCode);
 
         assertEquals(updatedCountry.getSubdivisions().stream()
                 .filter(subdivision -> subdivision.getCode().equals(newSubdivisionCode)).count(), 1);
 
-        hierarchyManager.changeSubdivisionCode(updatedCountry, newSubdivisionCode, originalSubdivisionCode);
+
+    }
+
+    @Test
+    public void testChangeSubdivisionNativeform() throws Exception {
+        String code = "DE";
+        Country originalCountry = hierarchyManager.getCountry(code).get();
+
+        String originalNativeform = "Bayern";
+        String newNativeform = "Bavaria";
+
+        Country updatedCountry = hierarchyManager
+                .changeSubdivisionNativeform(originalCountry, originalNativeform, newNativeform);
+        hierarchyManager.changeSubdivisionNativeform(updatedCountry, newNativeform, originalNativeform);
+
+        assertEquals(updatedCountry.getSubdivisions().stream()
+                .filter(subdivision -> subdivision.getNativeform().equals(newNativeform)).count(), 1);
+
 
     }
 
@@ -66,7 +102,7 @@ public class HierarchyManagerTest {
 
         Country country = countryOptional.get();
         assertEquals(country.getCode(), "DE");
-        assertEquals(country.getNativeForm(), "Deutschland");
+        assertEquals(country.getNativeform(), "Deutschland");
         assertEquals(country.toXML(), "<eap:country xmlns:eap=\"http://www.monasterium.net/NS/eap\">" +
                 "<eap:code>DE</eap:code><eap:nativeform>Deutschland</eap:nativeform>" +
                 "<eap:subdivisions><eap:subdivision><eap:code>DE-BW</eap:code><eap:nativeform>" +
@@ -77,11 +113,11 @@ public class HierarchyManagerTest {
         assertEquals(subdivisions.size(), 2);
 
         assertEquals(subdivisions.get(0).getCode(), "DE-BW");
-        assertEquals(subdivisions.get(0).getNativeForm(), "Baden-Württemberg");
+        assertEquals(subdivisions.get(0).getNativeform(), "Baden-Württemberg");
 
 
         assertEquals(subdivisions.get(1).getCode(), "DE-BY");
-        assertEquals(subdivisions.get(1).getNativeForm(), "Bayern");
+        assertEquals(subdivisions.get(1).getNativeform(), "Bayern");
 
     }
 

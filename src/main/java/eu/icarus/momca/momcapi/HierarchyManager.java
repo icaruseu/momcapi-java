@@ -46,6 +46,20 @@ public class HierarchyManager {
     }
 
     /**
+     * Updates the nativeform (== its name in its own language) of a country.
+     *
+     * @param country       The country.
+     * @param newNativeform The new nativeform.
+     * @return The updated country.
+     */
+    @NotNull
+    public Country changeCountryNativeform(@NotNull Country country, @NotNull String newNativeform) {
+        momcaConnection.queryDatabase(ExistQueryFactory
+                .updateElementText(MOM_PORTAL_XML_URI, "eap:nativeform", country.getNativeform(), newNativeform));
+        return getCountry(country.getCode()).orElseThrow(RuntimeException::new);
+    }
+
+    /**
      * Updates the code of a subdivision of a country.
      *
      * @param country     The country.
@@ -57,6 +71,22 @@ public class HierarchyManager {
     public Country changeSubdivisionCode(@NotNull Country country, @NotNull String currentCode, @NotNull String newCode) {
         momcaConnection.queryDatabase(ExistQueryFactory
                 .updateElementText(MOM_PORTAL_XML_URI, "eap:code", currentCode, newCode));
+        return getCountry(country.getCode()).orElseThrow(RuntimeException::new);
+    }
+
+    /**
+     * Updates the nativeform (== its name in its own language) of a country.
+     *
+     * @param country           The country.
+     * @param currentNativeform the current native form.
+     * @param newNativeform     The new nativeform.
+     * @return The updated country.
+     */
+    @NotNull
+    public Country changeSubdivisionNativeform(@NotNull Country country, @NotNull String currentNativeform,
+                                               @NotNull String newNativeform) {
+        momcaConnection.queryDatabase(ExistQueryFactory
+                .updateElementText(MOM_PORTAL_XML_URI, "eap:nativeform", currentNativeform, newNativeform));
         return getCountry(country.getCode()).orElseThrow(RuntimeException::new);
     }
 
