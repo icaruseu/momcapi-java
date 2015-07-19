@@ -21,21 +21,6 @@ public class ExistQueryFactory {
     private ExistQueryFactory() {
     }
 
-    @NotNull
-    public static ExistQuery appendElement(@NotNull String resourceUri, @NotNull String qualifiedParentName,
-                                           @NotNull String elementToInsert) {
-
-        String query = String.format(
-                "%s update insert %s into doc('%s')//%s",
-                getNamespaceDeclaration(qualifiedParentName),
-                elementToInsert,
-                resourceUri,
-                qualifiedParentName);
-
-        return new ExistQuery(query);
-
-    }
-
     /**
      * @param resourceId   The resource's {@code atom:id}.
      * @param resourceRoot The resource root of the resource the search should be restricted to. If {@code null},
@@ -109,6 +94,33 @@ public class ExistQueryFactory {
                 getNamespaceDeclaration(Namespace.ATOM),
                 getRootCollectionString(resourceRoot),
                 resourceId.getAtomId());
+
+        return new ExistQuery(query);
+
+    }
+
+    /**
+     * @param resourceUri         The URI of the resource to update.
+     * @param qualifiedParentName The name of the parent, usually either {@code eap:country} or {@code eap:subdivision}.
+     * @param code                The code of the element to append into, can be "" or null to target all elements.
+     * @param elementToInsert     The XML code to append.
+     * @return A query to append an eap element tree into all matching parent eap elements. The element is appended
+     * after all other child-elements.
+     */
+    @NotNull
+    public static ExistQuery insertEapElement(@NotNull String resourceUri, @NotNull String qualifiedParentName,
+                                              @Nullable String code, @NotNull String elementToInsert) {
+
+        String predicate = (code == null || code.isEmpty()) ? "" : String.format("/eap:country[eap:code='%s']", code);
+
+        String query = String.format(
+                "%s update insert %s into doc('%s')/%s/%s",
+                getNamespaceDeclaration(qualifiedParentName),
+                elementToInsert,
+                resourceUri,
+                predicate,
+                qualifiedParentName
+        );
 
         return new ExistQuery(query);
 

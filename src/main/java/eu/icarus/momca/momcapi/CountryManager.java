@@ -48,10 +48,36 @@ public class CountryManager {
         }
 
         Country newCountry = new Country(code, nativeform, new ArrayList<>(0));
-        ExistQuery query = ExistQueryFactory.appendElement(MOM_PORTAL_XML_URI, "eap:countries", newCountry.toXML());
+        ExistQuery query = ExistQueryFactory
+                .insertEapElement(MOM_PORTAL_XML_URI, "eap:countries", null, newCountry.toXML());
         momcaConnection.queryDatabase(query);
 
         return getCountry(code).orElseThrow(RuntimeException::new);
+
+    }
+
+    /**
+     * Adds a subdivision to the selected country.
+     *
+     * @param country    The country to add the subdivision to.
+     * @param code       The code of the subdivision, e.g. {@code AT-NÖ}.
+     * @param nativeform The nativeform of the subdivision in its native language, e.g. {@code Niederösterreich}.
+     * @return The updated country.
+     * @see Subdivision
+     */
+    @NotNull
+    public Country addSubdivision(@NotNull Country country, @NotNull String code, @NotNull String nativeform) {
+
+        if (isCodeAlreadyExisting(code)) {
+            throw new IllegalArgumentException(String.format("Subdivision code '%s' is already existing.", code));
+        }
+
+        Subdivision subdivision = new Subdivision(code, nativeform);
+        ExistQuery query = ExistQueryFactory.insertEapElement(
+                MOM_PORTAL_XML_URI, "eap:subdivisions", country.getCode(), subdivision.toXML());
+        momcaConnection.queryDatabase(query);
+
+        return getCountry(country.getCode()).orElseThrow(RuntimeException::new);
 
     }
 
@@ -90,6 +116,7 @@ public class CountryManager {
      * @param currentCode The current code of the subdivision.
      * @param newCode     The new code.
      * @return The updated country.
+     * @see Subdivision
      */
     @NotNull
     public Country changeSubdivisionCode(@NotNull Country country, @NotNull String currentCode, @NotNull String newCode) {
@@ -105,6 +132,7 @@ public class CountryManager {
      * @param currentNativeform the current native form.
      * @param newNativeform     The new nativeform.
      * @return The updated country.
+     * @see Subdivision
      */
     @NotNull
     public Country changeSubdivisionNativeform(@NotNull Country country, @NotNull String currentNativeform,
@@ -124,12 +152,26 @@ public class CountryManager {
     }
 
     /**
+     * Deletes a subdivison from a country.
+     *
+     * @param country The country to delete from.
+     * @param code    The code of the subdivision to delete.
+     * @return The updated country.
+     * @see Subdivision
+     */
+    @NotNull
+    public Country deleteSubdivision(@NotNull Country country, @NotNull String code) {
+        ExistQuery query = ExistQueryFactory.deleteEapElement(code);
+        momcaConnection.queryDatabase(query);
+        return getCountry(country.getCode()).orElseThrow(RuntimeException::new);
+    }
+
+    /**
      * Gets a country from the database.
      *
      * @param code The code of the country, e.g. {@code DE}.
      * @return The country.
      */
-
     @NotNull
     public Optional<Country> getCountry(@NotNull String code) {
 
@@ -143,7 +185,6 @@ public class CountryManager {
             String message = String.format("More than one countries for code '%s' existing. This is not allowed.", code);
             throw new MomcaException(message);
         }
-
 
         try {
 

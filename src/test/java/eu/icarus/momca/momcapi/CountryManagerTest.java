@@ -49,6 +49,26 @@ public class CountryManagerTest {
     }
 
     @Test
+    public void testAddSubdivision() throws Exception {
+
+        Country country = countryManager.getCountry("RS").get();
+        String subdivision = "RS-BG";
+
+        country = countryManager.addSubdivision(country, subdivision, "Beograd");
+
+        assertFalse(country.getSubdivisions().isEmpty());
+
+        countryManager.deleteSubdivision(country, subdivision);
+
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testAddSubdivisionAlreadyExisting() throws Exception {
+        Country country = countryManager.getCountry("DE").get();
+        countryManager.addSubdivision(country, "DE-BW", "Baden-Württemberg");
+    }
+
+    @Test
     public void testChangeCountryCode() throws Exception {
 
         String originalCode = "CH";
@@ -122,6 +142,18 @@ public class CountryManagerTest {
         countryManager.addCountry(code, "Sverige");
         countryManager.deleteCountry(code);
         assertFalse(countryManager.getCountry(code).isPresent());
+
+    }
+
+    @Test
+    public void testDeleteSubdivision() throws Exception {
+
+        Country country = countryManager.getCountry("CH").get();
+        String subdivision = "CH-SG";
+        country = countryManager.addSubdivision(country, subdivision, "Sankt Gallen");
+        country = countryManager.deleteSubdivision(country, subdivision);
+
+        assertTrue(country.getSubdivisions().isEmpty());
 
     }
 
