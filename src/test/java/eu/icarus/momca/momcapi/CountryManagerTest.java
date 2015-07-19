@@ -14,16 +14,16 @@ import static org.testng.Assert.*;
  * @author daniel
  *         Created on 17.07.2015.
  */
-public class HierarchyManagerTest {
+public class CountryManagerTest {
 
-    private HierarchyManager hierarchyManager;
+    private CountryManager countryManager;
     private MomcaConnection momcaConnection;
 
     @BeforeClass
     public void setUp() throws Exception {
         momcaConnection = TestUtils.initMomcaConnection();
-        hierarchyManager = momcaConnection.getHierarchyManager();
-        assertNotNull(hierarchyManager, "MOM-CA connection not initialized.");
+        countryManager = momcaConnection.getCountryManager();
+        assertNotNull(countryManager, "MOM-CA connection not initialized.");
     }
 
     @Test
@@ -32,12 +32,12 @@ public class HierarchyManagerTest {
         String code = "AT";
         String nativeform = "Österreich";
 
-        Country newCountry = hierarchyManager.addCountry(code, nativeform);
+        Country newCountry = countryManager.addCountry(code, nativeform);
 
         assertEquals(newCountry.getCode(), code);
         assertEquals(newCountry.getNativeform(), nativeform);
 
-        hierarchyManager.deleteCountry(code);
+        countryManager.deleteCountry(code);
 
     }
 
@@ -45,19 +45,19 @@ public class HierarchyManagerTest {
     public void testAddCountryThatExists() throws Exception {
         String existingCode = "DE";
         String nativeform = "Österreich";
-        hierarchyManager.addCountry(existingCode, nativeform);
+        countryManager.addCountry(existingCode, nativeform);
     }
 
     @Test
     public void testChangeCountryCode() throws Exception {
 
         String originalCode = "CH";
-        Country originalCountry = hierarchyManager.getCountry(originalCode).get();
+        Country originalCountry = countryManager.getCountry(originalCode).get();
 
         String newCode = "Schw";
 
-        Country updatedCountry = hierarchyManager.changeCountryCode(originalCountry, newCode);
-        hierarchyManager.changeCountryCode(updatedCountry, originalCode);
+        Country updatedCountry = countryManager.changeCountryCode(originalCountry, newCode);
+        countryManager.changeCountryCode(updatedCountry, originalCode);
 
         assertEquals(updatedCountry.getCode(), newCode);
 
@@ -67,13 +67,13 @@ public class HierarchyManagerTest {
     public void testChangeCountryNativeform() throws Exception {
 
         String code = "CH";
-        Country originalCountry = hierarchyManager.getCountry(code).get();
+        Country originalCountry = countryManager.getCountry(code).get();
 
         String originalNativeform = "Schweiz";
         String newNativeform = "Svizzera";
 
-        Country updatedCountry = hierarchyManager.changeCountryNativeform(originalCountry, newNativeform);
-        hierarchyManager.changeCountryNativeform(updatedCountry, originalNativeform);
+        Country updatedCountry = countryManager.changeCountryNativeform(originalCountry, newNativeform);
+        countryManager.changeCountryNativeform(updatedCountry, originalNativeform);
 
         assertEquals(updatedCountry.getNativeform(), newNativeform);
 
@@ -83,49 +83,52 @@ public class HierarchyManagerTest {
     public void testChangeSubdivisionCode() throws Exception {
 
         String countryCode = "DE";
-        Country originalCountry = hierarchyManager.getCountry(countryCode).get();
+        Country originalCountry = countryManager.getCountry(countryCode).get();
 
         String originalSubdivisionCode = "DE-BY";
         String newSubdivisionCode = "DE-BAY";
 
-        Country updatedCountry = hierarchyManager
+        Country updatedCountry = countryManager
                 .changeSubdivisionCode(originalCountry, originalSubdivisionCode, newSubdivisionCode);
-        hierarchyManager.changeSubdivisionCode(updatedCountry, newSubdivisionCode, originalSubdivisionCode);
+        countryManager.changeSubdivisionCode(updatedCountry, newSubdivisionCode, originalSubdivisionCode);
 
         assertEquals(updatedCountry.getSubdivisions().stream()
                 .filter(subdivision -> subdivision.getCode().equals(newSubdivisionCode)).count(), 1);
-
 
     }
 
     @Test
     public void testChangeSubdivisionNativeform() throws Exception {
+
         String code = "DE";
-        Country originalCountry = hierarchyManager.getCountry(code).get();
+        Country originalCountry = countryManager.getCountry(code).get();
 
         String originalNativeform = "Bayern";
         String newNativeform = "Bavaria";
 
-        Country updatedCountry = hierarchyManager
+        Country updatedCountry = countryManager
                 .changeSubdivisionNativeform(originalCountry, originalNativeform, newNativeform);
-        hierarchyManager.changeSubdivisionNativeform(updatedCountry, newNativeform, originalNativeform);
+        countryManager.changeSubdivisionNativeform(updatedCountry, newNativeform, originalNativeform);
 
         assertEquals(updatedCountry.getSubdivisions().stream()
                 .filter(subdivision -> subdivision.getNativeform().equals(newNativeform)).count(), 1);
-
 
     }
 
     @Test
     public void testDeleteCountry() throws Exception {
-        // TODO add code
-        assertTrue(false);
+
+        String code = "SE";
+        countryManager.addCountry(code, "Sverige");
+        countryManager.deleteCountry(code);
+        assertFalse(countryManager.getCountry(code).isPresent());
+
     }
 
     @Test
     public void testGetCountry() throws Exception {
 
-        Optional<Country> countryOptional = hierarchyManager.getCountry("DE");
+        Optional<Country> countryOptional = countryManager.getCountry("DE");
         assertTrue(countryOptional.isPresent());
 
         Country country = countryOptional.get();
@@ -150,8 +153,13 @@ public class HierarchyManagerTest {
     }
 
     @Test
+    public void testGetCountryNotExisting() throws Exception {
+        assertFalse(countryManager.getCountry("notExisting").isPresent());
+    }
+
+    @Test
     public void testListCountries() throws Exception {
-        assertEquals(hierarchyManager.listCountries().toString(), "[CH, DE, RS]");
+        assertEquals(countryManager.listCountries().toString(), "[CH, DE, RS]");
     }
 
 

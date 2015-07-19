@@ -23,13 +23,13 @@ import java.util.Optional;
  * @author daniel
  *         Created on 17.07.2015.
  */
-public class HierarchyManager {
+public class CountryManager {
 
     public static final String MOM_PORTAL_XML_URI = String.format("/db/mom-data/%s/mom.portal.xml", ResourceRoot.METADATA_PORTAL_PUBLIC.getCollectionName());
     @NotNull
     private final MomcaConnection momcaConnection;
 
-    HierarchyManager(@NotNull MomcaConnection momcaConnection) {
+    CountryManager(@NotNull MomcaConnection momcaConnection) {
         this.momcaConnection = momcaConnection;
     }
 
@@ -47,7 +47,7 @@ public class HierarchyManager {
             throw new IllegalArgumentException(String.format("Country code '%s' is already existing.", code));
         }
 
-        Country newCountry = new Country(code, nativeform, new ArrayList<Subdivision>(0));
+        Country newCountry = new Country(code, nativeform, new ArrayList<>(0));
         ExistQuery query = ExistQueryFactory.appendElement(MOM_PORTAL_XML_URI, "eap:countries", newCountry.toXML());
         momcaConnection.queryDatabase(query);
 
@@ -114,17 +114,30 @@ public class HierarchyManager {
         return getCountry(country.getCode()).orElseThrow(RuntimeException::new);
     }
 
-    @NotNull
+    /**
+     * Deletes a country.
+     *
+     * @param code The code of the country to delete, e.g. {@code DE}.
+     */
     public void deleteCountry(@NotNull String code) {
-
-        // TODO add code
-
+        momcaConnection.queryDatabase(ExistQueryFactory.deleteEapElement(code));
     }
+
+    /**
+     * Gets a country from the database.
+     *
+     * @param code The code of the country, e.g. {@code DE}.
+     * @return The country.
+     */
 
     @NotNull
     public Optional<Country> getCountry(@NotNull String code) {
 
         List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.getCountryXml(code));
+
+        if (queryResults.isEmpty()) {
+            return Optional.empty();
+        }
 
         if (queryResults.size() > 1) {
             String message = String.format("More than one countries for code '%s' existing. This is not allowed.", code);
@@ -132,27 +145,24 @@ public class HierarchyManager {
         }
 
 
-        Optional<Country> country = Optional.empty();
-
         try {
 
             Element xml = new Builder().build(queryResults.get(0), null).getRootElement();
             String nativeForm = getNativeform(xml);
             List<Subdivision> subdivisions = getSubdivisions(xml);
 
-            if (!nativeForm.isEmpty()) {
-                country = Optional.of(new Country(code, nativeForm, subdivisions));
-            }
+            return Optional.of(new Country(code, nativeForm, subdivisions));
 
         } catch (@NotNull ParsingException | IOException e) {
             String message = String.format("Failed to parse xml for country %s", code);
             throw new MomcaException(message);
         }
 
-        return country;
-
     }
 
+    /**
+     * @return A list of the codes (e.g. {@code ["DE", "SE", "AT"]) of all countries in the database.
+     */
     @NotNull
     public List<String> listCountries() {
         return momcaConnection.queryDatabase(ExistQueryFactory.listCountryCodes());
