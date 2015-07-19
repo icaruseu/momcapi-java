@@ -25,7 +25,9 @@ import java.util.Optional;
  */
 public class CountryManager {
 
-    private static final String MOM_PORTAL_XML_URI = String.format("/db/mom-data/%s/mom.portal.xml", ResourceRoot.METADATA_PORTAL_PUBLIC.getCollectionName());
+    @NotNull
+    private static final String MOM_PORTAL_XML_URI = String
+            .format("/db/mom-data/%s/mom.portal.xml", ResourceRoot.METADATA_PORTAL_PUBLIC.getCollectionName());
     @NotNull
     private final MomcaConnection momcaConnection;
 
