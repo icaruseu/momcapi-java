@@ -33,7 +33,7 @@ public class IdCharterTest {
     public void testConstructorForAtomId() throws Exception {
         IdCharter id = new IdCharter(FOND_CHARTER_ATOM_ID);
         assertEquals(id.getAtomId(), FOND_CHARTER_ATOM_ID);
-        assertEquals(id.getCharterId(), FOND_CHARTER_ID);
+        assertEquals(id.getCharterIdentifier(), FOND_CHARTER_ID);
     }
 
     @Test
@@ -56,7 +56,7 @@ public class IdCharterTest {
     @Test
     public void testGetArchiveId() throws Exception {
         IdCharter id = new IdCharter(FOND_CHARTER_ATOM_ID);
-        assertEquals(id.getArchiveId(), Optional.of(ARCHIVE_ID));
+        assertEquals(id.getArchiveIdentifier(), Optional.of(ARCHIVE_ID));
     }
 
     @Test
@@ -68,19 +68,19 @@ public class IdCharterTest {
     @Test
     public void testGetCharterId() throws Exception {
         IdCharter id = new IdCharter(COLLECTION_CHARTER_ATOM_ID);
-        assertEquals(id.getCharterId(), COLLECTION_CHARTER_ID);
+        assertEquals(id.getCharterIdentifier(), COLLECTION_CHARTER_ID);
     }
 
     @Test
     public void testGetCollectionId() throws Exception {
         IdCharter id = new IdCharter(COLLECTION_CHARTER_ATOM_ID);
-        assertEquals(id.getCollectionId(), Optional.of(COLLECTION_ID));
+        assertEquals(id.getCollectionIdentifier(), Optional.of(COLLECTION_ID));
     }
 
     @Test
     public void testGetFondId() throws Exception {
         IdCharter id = new IdCharter(FOND_CHARTER_ATOM_ID);
-        assertEquals(id.getFondId(), Optional.of(FOND_ID));
+        assertEquals(id.getFondIdentifier(), Optional.of(FOND_ID));
     }
 
     @Test

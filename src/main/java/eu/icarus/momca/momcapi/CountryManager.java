@@ -20,7 +20,9 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * @author daniel
+ * Manages countries in MOM-CA.
+ *
+ * @author Daniel Jeller
  *         Created on 17.07.2015.
  */
 public class CountryManager {

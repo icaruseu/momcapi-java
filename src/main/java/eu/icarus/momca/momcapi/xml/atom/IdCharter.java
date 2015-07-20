@@ -15,14 +15,16 @@ import java.util.Optional;
  */
 public class IdCharter extends Id {
 
+    private static final int MAX_ID_PARTS = 5;
+    private static final int MIN_ID_PARTS = 4;
     @NotNull
-    private final Optional<String> archiveId;
+    private final Optional<String> archiveIdentifier;
     @NotNull
-    private final String charterId;
+    private final String charterIdentifier;
     @NotNull
-    private final Optional<String> collectionId;
+    private final Optional<String> collectionIdentifier;
     @NotNull
-    private final Optional<String> fondId;
+    private final Optional<String> fondIdentifier;
 
 
     /**
@@ -45,22 +47,22 @@ public class IdCharter extends Id {
 
         switch (idParts.length) {
 
-            case 4:
-                this.collectionId = Optional.of(Util.decode(idParts[2]));
-                this.charterId = Util.decode(idParts[3]);
-                this.archiveId = Optional.empty();
-                this.fondId = Optional.empty();
+            case MIN_ID_PARTS:
+                this.collectionIdentifier = Optional.of(Util.decode(idParts[2]));
+                this.charterIdentifier = Util.decode(idParts[3]);
+                this.archiveIdentifier = Optional.empty();
+                this.fondIdentifier = Optional.empty();
                 break;
 
-            case 5:
-                this.archiveId = Optional.of(Util.decode(idParts[2]));
-                this.fondId = Optional.of(Util.decode(idParts[3]));
-                this.charterId = Util.decode(idParts[4]);
-                this.collectionId = Optional.empty();
+            case MAX_ID_PARTS:
+                this.archiveIdentifier = Optional.of(Util.decode(idParts[2]));
+                this.fondIdentifier = Optional.of(Util.decode(idParts[3]));
+                this.charterIdentifier = Util.decode(idParts[4]);
+                this.collectionIdentifier = Optional.empty();
                 break;
 
             default:
-                String message = String.format("'%s' is not a valid charterId.", atomIdString);
+                String message = String.format("'%s' is not a valid charterIdentifier.", atomIdString);
                 throw new IllegalArgumentException(message);
 
         }
@@ -70,44 +72,44 @@ public class IdCharter extends Id {
     /**
      * Instantiates a new IdCharter for a charter that belongs to an archival fond.
      *
-     * @param archiveId The archive id.
-     * @param fondId    The fond id.
-     * @param charterId The charter id.
+     * @param archiveIdentifier The archive id.
+     * @param fondIdentifier    The fond id.
+     * @param charterIdentifier The charter id.
      */
-    public IdCharter(@NotNull String archiveId, @NotNull String fondId, @NotNull String charterId) {
+    public IdCharter(@NotNull String archiveIdentifier, @NotNull String fondIdentifier, @NotNull String charterIdentifier) {
 
-        super(ResourceType.CHARTER.getAtomIdPart(), archiveId, fondId, charterId);
+        super(ResourceType.CHARTER.getAtomIdPart(), archiveIdentifier, fondIdentifier, charterIdentifier);
 
-        this.archiveId = Optional.of(archiveId);
-        this.fondId = Optional.of(fondId);
-        this.charterId = charterId;
-        this.collectionId = Optional.empty();
+        this.archiveIdentifier = Optional.of(archiveIdentifier);
+        this.fondIdentifier = Optional.of(fondIdentifier);
+        this.charterIdentifier = charterIdentifier;
+        this.collectionIdentifier = Optional.empty();
 
     }
 
     /**
      * Instantiates a new IdCharter that belongs to a collection.
      *
-     * @param collectionId The collection id.
-     * @param charterId    The charter id.
+     * @param collectionIdentifier The collection id.
+     * @param charterIdentifier    The charter id.
      */
-    public IdCharter(@NotNull String collectionId, @NotNull String charterId) {
+    public IdCharter(@NotNull String collectionIdentifier, @NotNull String charterIdentifier) {
 
-        super(ResourceType.CHARTER.getAtomIdPart(), collectionId, charterId);
+        super(ResourceType.CHARTER.getAtomIdPart(), collectionIdentifier, charterIdentifier);
 
-        this.collectionId = Optional.of(collectionId);
-        this.charterId = charterId;
-        this.archiveId = Optional.empty();
-        this.fondId = Optional.empty();
+        this.collectionIdentifier = Optional.of(collectionIdentifier);
+        this.charterIdentifier = charterIdentifier;
+        this.archiveIdentifier = Optional.empty();
+        this.fondIdentifier = Optional.empty();
 
     }
 
     /**
-     * @return The archive id.
+     * @return The archive identifier, e.g. {@code CH-KAE}.
      */
     @NotNull
-    public Optional<String> getArchiveId() {
-        return archiveId;
+    public Optional<String> getArchiveIdentifier() {
+        return archiveIdentifier;
     }
 
     /**
@@ -115,38 +117,39 @@ public class IdCharter extends Id {
      */
     @NotNull
     public String getBasePath() {
-        return isPartOfArchiveFond() ? getArchiveId().get() + "/" + getFondId().get() : getCollectionId().get();
+        return isPartOfArchiveFond()
+                ? getArchiveIdentifier().get() + "/" + getFondIdentifier().get() : getCollectionIdentifier().get();
     }
 
     /**
-     * @return The charter id.
+     * @return The charter identifier (mostly its signature).
      */
     @NotNull
-    public String getCharterId() {
-        return charterId;
+    public String getCharterIdentifier() {
+        return charterIdentifier;
     }
 
     /**
-     * @return The collection id.
+     * @return The collection identifier.
      */
     @NotNull
-    public Optional<String> getCollectionId() {
-        return collectionId;
+    public Optional<String> getCollectionIdentifier() {
+        return collectionIdentifier;
     }
 
     /**
-     * @return The fond id.
+     * @return The fond identifier.
      */
     @NotNull
-    public Optional<String> getFondId() {
-        return fondId;
+    public Optional<String> getFondIdentifier() {
+        return fondIdentifier;
     }
 
     /**
      * @return {@code True} if part of an archival fond (as opposed to being part of a collection).
      */
     public boolean isPartOfArchiveFond() {
-        return (archiveId.isPresent() && fondId.isPresent()) && !collectionId.isPresent();
+        return (archiveIdentifier.isPresent() && fondIdentifier.isPresent()) && !collectionIdentifier.isPresent();
     }
 
     @NotNull
@@ -154,10 +157,10 @@ public class IdCharter extends Id {
     public String toString() {
 
         return "IdCharter{" +
-                "collectionId=" + collectionId +
-                ", archiveId=" + archiveId +
-                ", fondId=" + fondId +
-                ", charterId='" + charterId + '\'' +
+                "collectionIdentifier=" + collectionIdentifier +
+                ", archiveIdentifier=" + archiveIdentifier +
+                ", fondIdentifier=" + fondIdentifier +
+                ", charterIdentifier='" + charterIdentifier + '\'' +
                 '}';
 
     }

@@ -20,7 +20,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Manages a user in MOM-CA.
+ * Manages users in MOM-CA.
  *
  * @author Daniel Jeller
  *         Created on 03.07.2015.

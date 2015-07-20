@@ -22,7 +22,10 @@ import org.jetbrains.annotations.NotNull;
 public class Id extends Element {
 
     @NotNull
-    public static final String DEFAULT_PREFIX = "tag:www.monasterium.net,2011:";
+    private static final String DEFAULT_PREFIX = "tag:www.monasterium.net,2011:";
+    private static final int MAX_ID_PARTS = 5;
+    private static final int MIN_ID_PARTS_WITHOUT_PREFIX = 2;
+    private static final int MIN_ID_PARTS_WITH_PREFIX = 3;
     @NotNull
     private final String atomId;
     @NotNull
@@ -51,7 +54,11 @@ public class Id extends Element {
             idParts = splitIntoParts(idParts[0]);
         }
 
-        if (idParts.length >= 3) {
+        if (
+                (
+                        ((idParts.length >= MIN_ID_PARTS_WITH_PREFIX) && idParts[0].equals(DEFAULT_PREFIX))
+                                || ((idParts.length >= MIN_ID_PARTS_WITHOUT_PREFIX) && !idParts[0].equals(DEFAULT_PREFIX)))
+                        && (idParts.length <= MAX_ID_PARTS)) {
 
             type = (idParts[0].equals(DEFAULT_PREFIX))
                     ? ResourceType.createFromValue(idParts[1]) : ResourceType.createFromValue(idParts[0]);
