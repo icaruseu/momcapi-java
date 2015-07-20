@@ -17,6 +17,7 @@ public enum ResourceType {
     CHARTER("charter"),
     COLLECTION("collection"),
     FOND("fond"),
+    MY_COLLECTION("mycollection"),
     SVG("svg");
 
     private final String atomIdName;
