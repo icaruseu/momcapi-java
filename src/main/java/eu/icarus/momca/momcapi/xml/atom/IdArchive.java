@@ -28,12 +28,16 @@ public class IdArchive extends Id {
 
         String[] idParts = archiveIdentifier.split("/");
 
-        if (idParts.length != 1 && idParts.length != VALID_ID_PARTS) {
+        if (!isArchiveId(idParts)) {
             throw new IllegalArgumentException("Number of id parts not correct for an archive atom-id.");
         }
 
         this.archiveIdentifier = archiveIdentifier.split("/")[archiveIdentifier.split("/").length - 1];
 
+    }
+
+    private boolean isArchiveId(String[] idParts) {
+        return idParts.length == 1 || idParts.length == VALID_ID_PARTS;
     }
 
     /**
