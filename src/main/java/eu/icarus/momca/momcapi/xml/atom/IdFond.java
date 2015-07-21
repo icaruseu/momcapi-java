@@ -20,9 +20,8 @@ public class IdFond extends Id {
     /**
      * Instantiates a new fond id using archiveIdentifier and fondIdentifier.
      *
-     * @param archiveIdentifier The archiveIdentifier, e.g.
-     *                          .
-     * @param fondIdentifier    The fondIdentifier, e.g.
+     * @param archiveIdentifier The archiveIdentifier, e.g. {@code RS-IAGNS}
+     * @param fondIdentifier    The fondIdentifier, e.g. {@code Charters}
      *                          .
      */
     public IdFond(@NotNull String archiveIdentifier, @NotNull String fondIdentifier) {
@@ -35,14 +34,14 @@ public class IdFond extends Id {
      * Instantiates a new fond id using another fond atom:id.
      *
      * @param fondAtomId The atom:id, e.g.
-     *                   .
+     *                   {@code tag:www.monasterium.net,2011:/fond/RS-IAGNS/Charters}.
      */
     public IdFond(@NotNull String fondAtomId) {
 
         super(fondAtomId);
 
         if (!isFondId(fondAtomId)) {
-            String message = String.format("The provided atom:id '%s' is not a valid fond id.", fondAtomId);
+            String message = String.format("'%s' is not a valid fond atom:id.", fondAtomId);
             throw new IllegalArgumentException(message);
         }
 
@@ -71,7 +70,7 @@ public class IdFond extends Id {
 
     private boolean isFondId(@NotNull String fondAtomId) {
         String[] idParts = fondAtomId.split("/");
-        return idParts.length == VALID_FOND_ID_PART_COUNT;
+        return getType() == ResourceType.FOND && idParts.length == VALID_FOND_ID_PART_COUNT;
     }
 
 }

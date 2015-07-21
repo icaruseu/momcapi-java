@@ -27,8 +27,14 @@ public class IdCollectionTest {
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConstructorWithWrongId() throws Exception {
-        String wrongAtomId = "tag:www.monasterium.net,2011:/archive/CH-KAE/Urkunden/Urkunde_1";
-        new IdCollection(wrongAtomId);
+        String archiveAtomId = "tag:www.monasterium.net,2011:/archive/CH-KAE";
+        new IdCollection(archiveAtomId);
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testConstructorWithFaultyId() throws Exception {
+        String faultyAtomId = "tag:www.monasterium.net,2011:/collection/CH-KAE/Urkunden/Urkunde_1";
+        new IdCollection(faultyAtomId);
     }
 
     @Test

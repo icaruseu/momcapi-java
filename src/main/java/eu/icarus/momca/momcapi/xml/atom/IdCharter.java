@@ -36,7 +36,7 @@ public class IdCharter extends Id {
 
         super(atomIdString);
 
-        if (!isCharterId()) {
+        if (getType() != ResourceType.CHARTER) {
             String message = String.format("'%s' has the wrong ResourceType identifier, not %s.",
                     atomIdString,
                     ResourceType.CHARTER.getAtomIdPart());
@@ -62,7 +62,10 @@ public class IdCharter extends Id {
                 break;
 
             default:
-                String message = String.format("'%s' is not a valid charterIdentifier.", atomIdString);
+                String message = String.format(
+                        "'%s' is not a valid charter atom:id, it has the wrong number of id parts: %s",
+                        atomIdString,
+                        idParts.length);
                 throw new IllegalArgumentException(message);
 
         }
@@ -163,11 +166,6 @@ public class IdCharter extends Id {
                 ", charterIdentifier='" + charterIdentifier + '\'' +
                 '}';
 
-    }
-
-    private boolean isCharterId() {
-        String typeToken = this.getAtomId().split("/")[1];
-        return typeToken.equals(ResourceType.CHARTER.getAtomIdPart());
     }
 
 }

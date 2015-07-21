@@ -49,8 +49,15 @@ public class IdCharterTest {
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testConstructorWithIncorrectAtomId() throws Exception {
-        new IdCharter("ThisIsNotACharter");
+    public void testConstructorWithWrongAtomId() throws Exception {
+        String collectionAtomId = "tag:www.monasterium.net,2011:/collection/MedDocBulgEmp";
+        new IdCharter(collectionAtomId);
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testConstructorWithFaultyAtomId() throws Exception {
+        String faultyAtomId = "tag:www.monasterium.net,2011:/charter/RS-IAGNS";
+        new IdCharter(faultyAtomId);
     }
 
     @Test

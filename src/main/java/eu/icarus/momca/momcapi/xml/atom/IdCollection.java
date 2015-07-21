@@ -32,8 +32,7 @@ public class IdCollection extends Id {
 
 
         if (isAtomId(collectionIdentifier) && !isCollectionId(collectionIdentifier)) {
-            String message = String.format("Number of id parts (%d) not correct for an collection atom-id.",
-                    collectionIdentifier.split("/").length);
+            String message = String.format("'%s' is not a valid collection atom:id.", collectionIdentifier);
             throw new IllegalArgumentException(message);
         }
 
@@ -44,7 +43,7 @@ public class IdCollection extends Id {
 
     private boolean isCollectionId(@NotNull String collectionAtomId) {
         String[] idParts = collectionAtomId.split("/");
-        return idParts.length == VALID_ID_PARTS;
+        return getType() == ResourceType.COLLECTION && idParts.length == VALID_ID_PARTS;
     }
 
     /**
@@ -57,6 +56,13 @@ public class IdCollection extends Id {
 
     private boolean isAtomId(String collectionIdentifier) {
         return collectionIdentifier.contains("/");
+    }
+
+    @Override
+    public String toString() {
+        return "IdCollection{" +
+                "collectionIdentifier='" + collectionIdentifier + '\'' +
+                "} " + super.toString();
     }
 
 }
