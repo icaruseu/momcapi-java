@@ -23,21 +23,21 @@ public class IdArchive extends Id {
      *                          {@code tag:www.monasterium.net,2011:/archive/CH-KAE}
      */
     public IdArchive(@NotNull String archiveIdentifier) {
+
         super(archiveIdentifier.split("/").length == VALID_ID_PARTS
                 ? archiveIdentifier : String.format("%s/%s", ResourceType.ARCHIVE.getAtomIdPart(), archiveIdentifier));
 
-        String[] idParts = archiveIdentifier.split("/");
+        if (isAtomId(archiveIdentifier) && !isArchiveAtomId(archiveIdentifier)) {
 
-        if (!isArchiveId(idParts)) {
-            throw new IllegalArgumentException("Number of id parts not correct for an archive atom-id.");
+            String message = String.format("Number of id parts (%d) not correct for an archive atom-id.",
+                    archiveIdentifier.split("/").length);
+            throw new IllegalArgumentException(message);
+
         }
 
-        this.archiveIdentifier = archiveIdentifier.split("/")[archiveIdentifier.split("/").length - 1];
+        String[] idParts = archiveIdentifier.split("/");
+        this.archiveIdentifier = idParts[idParts.length - 1];
 
-    }
-
-    private boolean isArchiveId(String[] idParts) {
-        return idParts.length == 1 || idParts.length == VALID_ID_PARTS;
     }
 
     /**
@@ -46,6 +46,15 @@ public class IdArchive extends Id {
     @NotNull
     public String getArchiveIdentifier() {
         return archiveIdentifier;
+    }
+
+    private boolean isArchiveAtomId(@NotNull String archiveAtomId) {
+        String[] idParts = archiveAtomId.split("/");
+        return (idParts.length == VALID_ID_PARTS);
+    }
+
+    private boolean isAtomId(String archiveIdentifier) {
+        return archiveIdentifier.contains("/");
     }
 
 }

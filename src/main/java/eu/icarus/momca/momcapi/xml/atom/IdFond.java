@@ -69,7 +69,7 @@ public class IdFond extends Id {
         return fondIdentifier;
     }
 
-    private boolean isFondId(String fondAtomId) {
+    private boolean isFondId(@NotNull String fondAtomId) {
         String[] idParts = fondAtomId.split("/");
         return idParts.length == VALID_FOND_ID_PART_COUNT;
     }
