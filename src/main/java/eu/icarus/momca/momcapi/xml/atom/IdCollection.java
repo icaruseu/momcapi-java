@@ -27,8 +27,9 @@ public class IdCollection extends Id {
      */
     public IdCollection(@NotNull String collectionIdentifier) {
 
-        super(collectionIdentifier.split("/").length == VALID_ID_PARTS
-                ? collectionIdentifier : String.format("%s/%s", ResourceType.COLLECTION.getAtomIdPart(), collectionIdentifier));
+        super((collectionIdentifier.split("/").length == VALID_ID_PARTS)
+                ? collectionIdentifier
+                : String.format("%s/%s", ResourceType.COLLECTION.getAtomIdPart(), collectionIdentifier));
 
 
         if (isAtomId(collectionIdentifier) && !isCollectionId(collectionIdentifier)) {
