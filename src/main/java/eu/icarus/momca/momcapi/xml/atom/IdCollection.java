@@ -1,0 +1,62 @@
+package eu.icarus.momca.momcapi.xml.atom;
+
+import eu.icarus.momca.momcapi.resource.ResourceType;
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * Represents the {@code atom:id} of a collection in MOM-CA, e.g.
+ * {@code tag:www.monasterium.net,2011:/collection/MedDocBulgEmp}. This is not the id of an user defined collection
+ * but of an external collection imported by a metadata manager.
+ *
+ * @author Daniel Jeller
+ *         Created on 21.07.2015.
+ * @see IdMyCollection
+ */
+public class IdCollection extends Id {
+
+    private static final int VALID_ID_PARTS = 3;
+    @NotNull
+    private final String collectionIdentifier;
+
+    /**
+     * Instantiates a new collection atom id.
+     *
+     * @param collectionIdentifier The identifier to use. Can be either just the identifier of the collection,
+     *                             e.g. {@code MedDocBulgEmp} or a full collection atom:id, e.g.
+     *                             {@code tag:www.monasterium.net,2011:/collection/MedDocBulgEmp}
+     */
+    public IdCollection(@NotNull String collectionIdentifier) {
+
+        super(collectionIdentifier.split("/").length == VALID_ID_PARTS
+                ? collectionIdentifier : String.format("%s/%s", ResourceType.COLLECTION.getAtomIdPart(), collectionIdentifier));
+
+
+        if (isAtomId(collectionIdentifier) && !isCollectionId(collectionIdentifier)) {
+            String message = String.format("Number of id parts (%d) not correct for an collection atom-id.",
+                    collectionIdentifier.split("/").length);
+            throw new IllegalArgumentException(message);
+        }
+
+        String[] idParts = collectionIdentifier.split("/");
+        this.collectionIdentifier = idParts[idParts.length - 1];
+
+    }
+
+    private boolean isCollectionId(@NotNull String collectionAtomId) {
+        String[] idParts = collectionAtomId.split("/");
+        return idParts.length == VALID_ID_PARTS;
+    }
+
+    /**
+     * @return The identifier of the collection, e.g. {@code MedDocBulgEmp}.
+     */
+    @NotNull
+    public String getCollectionIdentifier() {
+        return collectionIdentifier;
+    }
+
+    private boolean isAtomId(String collectionIdentifier) {
+        return collectionIdentifier.contains("/");
+    }
+
+}

@@ -28,7 +28,7 @@ public class IdArchiveTest {
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConstructorWithWrongId() throws Exception {
         String wrongAtomId = "tag:www.monasterium.net,2011:/archive/CH-KAE/Urkunden/Urkunde_1";
-        IdArchive id2 = new IdArchive(wrongAtomId);
+        new IdArchive(wrongAtomId);
     }
 
     @Test
