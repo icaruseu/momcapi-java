@@ -143,6 +143,33 @@ public class MomcaResource {
     }
 
     @NotNull
+    String queryUniqueElement(@NotNull XpathQuery query) {
+
+        List<String> atomQueryResults = queryContentAsList(query);
+
+        String result;
+
+        switch (atomQueryResults.size()) {
+
+            case 0:
+                result = "";
+                break;
+
+            case 1:
+                result = atomQueryResults.get(0);
+                break;
+
+            default:
+                String errorMessage = String.format("More than one results for Query '%s'", query.asString());
+                throw new IllegalArgumentException(errorMessage);
+
+        }
+
+        return result;
+
+    }
+
+    @NotNull
     private XPathContext getxPathContext(@NotNull Element root, @NotNull XpathQuery query) {
         XPathContext context = XPathContext.makeNamespaceContext(root);
         query.getNamespaces().forEach(n -> context.addNamespace(n.getPrefix(), n.getUri()));

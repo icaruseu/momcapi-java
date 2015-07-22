@@ -90,7 +90,7 @@ public class Charter extends MomcaResource {
 
         status = initStatus();
 
-        atomId = initCharterAtomId();
+        atomId = initAtomId();
         atomAuthor = initAtomAuthor();
         idno = initCeiIdno();
         ceiDate = initCeiDate();
@@ -188,6 +188,20 @@ public class Charter extends MomcaResource {
     }
 
     @NotNull
+    private IdCharter initAtomId() {
+
+        String idString = queryUniqueElement(XpathQuery.QUERY_ATOM_ID);
+
+        if (idString.isEmpty()) {
+            String errorMessage = String.format("No atom:id in xml content: '%s'", getXmlAsDocument().toXML());
+            throw new IllegalArgumentException(errorMessage);
+        } else {
+            return new IdCharter(idString);
+        }
+
+    }
+
+    @NotNull
     private Optional<DateAbstract> initCeiDate() {
 
         Optional<DateAbstract> ceiDateOptional = Optional.empty();
@@ -270,20 +284,6 @@ public class Charter extends MomcaResource {
 
     }
 
-    @NotNull
-    private IdCharter initCharterAtomId() {
-
-        String idString = queryUniqueElement(XpathQuery.QUERY_ATOM_ID);
-
-        if (idString.isEmpty()) {
-            String errorMessage = String.format("No atom:id in xml content: '%s'", getXmlAsDocument().toXML());
-            throw new IllegalArgumentException(errorMessage);
-        } else {
-            return new IdCharter(idString);
-        }
-
-    }
-
     private CharterStatus initStatus() {
 
         CharterStatus status;
@@ -299,33 +299,6 @@ public class Charter extends MomcaResource {
         }
 
         return status;
-
-    }
-
-    @NotNull
-    private String queryUniqueElement(@NotNull XpathQuery query) {
-
-        List<String> atomQueryResults = queryContentAsList(query);
-
-        String result;
-
-        switch (atomQueryResults.size()) {
-
-            case 0:
-                result = "";
-                break;
-
-            case 1:
-                result = atomQueryResults.get(0);
-                break;
-
-            default:
-                String errorMessage = String.format("More than one results for Query '%s'", query.asString());
-                throw new IllegalArgumentException(errorMessage);
-
-        }
-
-        return result;
 
     }
 
