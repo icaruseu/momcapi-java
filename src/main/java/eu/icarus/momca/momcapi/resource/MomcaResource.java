@@ -3,10 +3,12 @@ package eu.icarus.momca.momcapi.resource;
 
 import eu.icarus.momca.momcapi.Util;
 import eu.icarus.momca.momcapi.query.XpathQuery;
-import nu.xom.*;
+import nu.xom.Document;
+import nu.xom.Element;
+import nu.xom.Nodes;
+import nu.xom.XPathContext;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -47,19 +49,9 @@ public class MomcaResource {
      */
     public MomcaResource(@NotNull String resourceName, @NotNull String parentCollectionUri, @NotNull String xmlContent) {
 
-        try {
-
-            this.resourceName = Util.encode(resourceName);
-            this.xmlAsDocument = parseXmlString(xmlContent);
-            this.parentUri = Util.encode(parentCollectionUri);
-
-        } catch (IOException e) {
-            String errorMessage = String.format("Failed to create MomcaResource for '%s'", resourceName);
-            throw new RuntimeException(errorMessage, e);
-        } catch (ParsingException e) {
-            String errorMessage = String.format("Failed to parse the xml content of resource '%s'", resourceName);
-            throw new IllegalArgumentException(errorMessage, e);
-        }
+        this.resourceName = Util.encode(resourceName);
+        this.xmlAsDocument = Util.parseXml(xmlContent).getDocument();
+        this.parentUri = Util.encode(parentCollectionUri);
 
     }
 
@@ -147,11 +139,6 @@ public class MomcaResource {
         XPathContext context = XPathContext.makeNamespaceContext(root);
         query.getNamespaces().forEach(n -> context.addNamespace(n.getPrefix(), n.getUri()));
         return context;
-    }
-
-    @NotNull
-    private Document parseXmlString(@NotNull String xmlAsString) throws ParsingException, IOException {
-        return new Builder().build(xmlAsString, null);
     }
 
 }

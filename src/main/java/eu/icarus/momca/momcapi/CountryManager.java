@@ -8,13 +8,10 @@ import eu.icarus.momca.momcapi.xml.Namespace;
 import eu.icarus.momca.momcapi.xml.eap.Country;
 import eu.icarus.momca.momcapi.xml.eap.EapAbstract;
 import eu.icarus.momca.momcapi.xml.eap.Subdivision;
-import nu.xom.Builder;
 import nu.xom.Element;
 import nu.xom.Elements;
-import nu.xom.ParsingException;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -190,18 +187,11 @@ public class CountryManager {
             throw new MomcaException(message);
         }
 
-        try {
+        Element xml = Util.parseXml(queryResults.get(0));
+        String nativeForm = getNativeform(xml);
+        List<Subdivision> subdivisions = getSubdivisions(xml);
 
-            Element xml = new Builder().build(queryResults.get(0), null).getRootElement();
-            String nativeForm = getNativeform(xml);
-            List<Subdivision> subdivisions = getSubdivisions(xml);
-
-            return Optional.of(new Country(code, nativeForm, subdivisions));
-
-        } catch (@NotNull ParsingException | IOException e) {
-            String message = String.format("Failed to parse xml for country %s", code);
-            throw new MomcaException(message);
-        }
+        return Optional.of(new Country(code, nativeForm, subdivisions));
 
     }
 

@@ -1,7 +1,11 @@
 package eu.icarus.momca.momcapi;
 
+import nu.xom.Builder;
+import nu.xom.Element;
+import nu.xom.ParsingException;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -55,6 +59,22 @@ public class Util {
             }
         }
         return String.join("/", encodedTokens);
+
+    }
+
+    @NotNull
+    public static Element parseXml(@NotNull String xml) {
+
+        Builder builder = new Builder();
+        try {
+
+            return builder.build(xml, null).getRootElement();
+
+        } catch (ParsingException e) {
+            throw new IllegalArgumentException("Failed to parse xml.", e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 

@@ -1,7 +1,7 @@
 package eu.icarus.momca.momcapi.resource;
 
+import eu.icarus.momca.momcapi.Util;
 import eu.icarus.momca.momcapi.query.XpathQuery;
-import nu.xom.Builder;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
 
@@ -58,8 +58,7 @@ public class MomcaResourceTest {
 
     @Test
     public void testGetXmlAsDocument() throws Exception {
-        Builder parser = new Builder();
-        String origXml = parser.build(XML_CONTENT_WITH_NAMESPACE, null).toXML();
+        String origXml = Util.parseXml(XML_CONTENT_WITH_NAMESPACE).getDocument().toXML();
         MomcaResource res = new MomcaResource(NAME, PARENT_URI, XML_CONTENT_WITH_NAMESPACE);
         assertEquals(res.getXmlAsDocument().toXML(), origXml);
     }
