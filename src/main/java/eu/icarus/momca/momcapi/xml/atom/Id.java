@@ -66,7 +66,9 @@ public class Id extends Element {
             appendChild(this.atomId);
 
         } else {
-            String message = String.format("'%s' has not the right amount of parts; probably not a valid atom:id", idParts);
+            String message = String.format(
+                    "'%s' has not the right amount of parts; probably not a valid atom:id",
+                    new Object[]{idParts});
             throw new IllegalArgumentException(message);
         }
 
