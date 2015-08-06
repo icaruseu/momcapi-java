@@ -38,4 +38,23 @@ public class UtilTest {
 
     }
 
+    @Test
+    public void testGetLastUriPart() throws Exception {
+        String uri = "/db/mom-data/xrx.user/admin.xml";
+        String resourceName = "admin.xml";
+        assertEquals(Util.getLastUriPart(uri), resourceName);
+    }
+
+    @Test
+    public void testGetParentUri() throws Exception {
+        String uri = "/db/mom-data/xrx.user/admin.xml";
+        String parentUri = "/db/mom-data/xrx.user";
+        assertEquals(Util.getParentUri(uri), parentUri);
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testTestIfUri() throws Exception {
+        Util.getParentUri("not_an_uri");
+    }
+
 }

@@ -61,19 +61,9 @@ public class CharterManager {
 
     @NotNull
     private Optional<Charter> getCharterFromUri(@NotNull String charterUri) {
-        String resourceName = getResourceName(charterUri);
-        String parentUri = getParentUri(charterUri);
+        String resourceName = Util.getLastUriPart(charterUri);
+        String parentUri = Util.getParentUri(charterUri);
         return momcaConnection.getExistResource(resourceName, parentUri).map(Charter::new);
-    }
-
-    @NotNull
-    private String getParentUri(@NotNull String charterUri) {
-        return charterUri.substring(0, charterUri.lastIndexOf('/'));
-    }
-
-    @NotNull
-    private String getResourceName(@NotNull String charterUri) {
-        return charterUri.substring(charterUri.lastIndexOf('/') + 1, charterUri.length());
     }
 
     private boolean isCharterExisting(@NotNull IdCharter atomIdCharter, @Nullable ResourceRoot resourceRoot) {
