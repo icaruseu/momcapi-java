@@ -107,6 +107,13 @@ public class XpathQueryTest {
     }
 
     @Test
+    public void testQUERY_EAG_AUTFORM() throws Exception {
+        List<String> result = queryContentAsList(resource, XpathQuery.QUERY_EAG_AUTFORM);
+        String expectedResult = "Klosterarchiv Einsiedeln";
+        assertEquals(result.get(0), expectedResult);
+    }
+
+    @Test
     public void testQUERY_EAG_DESC() throws Exception {
         List<String> result = queryContentAsList(resource, XpathQuery.QUERY_EAG_DESC);
         assertEquals(result.size(), 1);
