@@ -1,5 +1,6 @@
 package eu.icarus.momca.momcapi.query;
 
+import eu.icarus.momca.momcapi.TestUtils;
 import eu.icarus.momca.momcapi.resource.MomcaResource;
 import nu.xom.Nodes;
 import org.jetbrains.annotations.NotNull;
@@ -23,12 +24,15 @@ public class XpathQueryTest {
     @NotNull
     private static final String PARENT_URI = "/db/mom-data/";
     @NotNull
-    private static final String XML_CONTENT = "<testxml> <atom:atom xmlns:atom='http://www.w3.org/2005/Atom'> <atom:email>atomemail</atom:email> <atom:id>atomid</atom:id> </atom:atom> <cei:text xmlns:cei='http://www.monasterium.net/NS/cei'> <cei:body> <cei:idno id='idnoid'>idnotext</cei:idno> </cei:body> <cei:issued>ceiissued</cei:issued> <cei:witnessOrig> <cei:figure n='nvalue1'> <cei:graphic url='urlvalue1'>textvalue1</cei:graphic> </cei:figure> <cei:figure> <cei:graphic url='urlvalue1' /> </cei:figure> </cei:witnessOrig> </cei:text> <config:config xmlns:config='http://exist-db.org/Configuration'> <config:name>configname</config:name> <config:group name='atom' /> <config:group name='guest' /> </config:config> <name>name</name> <xrx:xrx xmlns:xrx='http://www.monasterium.net/NS/xrx'> <xrx:bookmark>xrxbookmark</xrx:bookmark> <xrx:email>xrxemail</xrx:email> <xrx:moderator>xrxmoderator</xrx:moderator> <xrx:name>xrxname</xrx:name> <xrx:saved> <xrx:id>xrxsaved</xrx:id> </xrx:saved> </xrx:xrx> </testxml>";
+    private String XML_CONTENT = "";
     private MomcaResource resource;
 
     @BeforeClass
     public void setUp() throws Exception {
+
+        XML_CONTENT = TestUtils.getXmlFromResource("XpathQueryTestXml.xml").toXML();
         resource = new MomcaResource(NAME, PARENT_URI, XML_CONTENT);
+
     }
 
     @Test
@@ -68,10 +72,18 @@ public class XpathQueryTest {
     @Test
     public void testQUERY_CEI_WITNESS_ORIG_FIGURE() throws Exception {
 
+        String expected1 = "<cei:figure n=\"nvalue1\">\n" +
+                "                <cei:graphic url=\"urlvalue1\">textvalue1</cei:graphic>\n" +
+                "            </cei:figure>";
+        String expected2 = "<cei:figure>\n" +
+                "                <cei:graphic url=\"urlvalue1\" />\n" +
+                "            </cei:figure>";
+
         Nodes result = queryContentAsNodes(resource, XpathQuery.QUERY_CEI_WITNESS_ORIG_FIGURE);
+
         assertEquals(result.size(), 2);
-        assertEquals(result.get(0).toXML(), "<cei:figure n=\"nvalue1\"> <cei:graphic url=\"urlvalue1\">textvalue1</cei:graphic> </cei:figure>");
-        assertEquals(result.get(1).toXML(), "<cei:figure> <cei:graphic url=\"urlvalue1\" /> </cei:figure>");
+        assertEquals(result.get(0).toXML(), expected1);
+        assertEquals(result.get(1).toXML(), expected2);
 
     }
 

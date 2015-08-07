@@ -1,12 +1,12 @@
 package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.exception.MomcaException;
+import nu.xom.Builder;
+import nu.xom.Document;
+import nu.xom.ParsingException;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.util.Properties;
 
@@ -15,7 +15,7 @@ import static org.testng.Assert.assertNotNull;
 /**
  * Created by daniel on 03.07.2015.
  */
-class TestUtils {
+public class TestUtils {
 
     @NotNull
     private static final String SERVER_PROPERTIES_PATH = "/server.properties";
@@ -25,7 +25,17 @@ class TestUtils {
     private static final String password = "momcapitest";
 
     @NotNull
-    static MomcaConnection initMomcaConnection() throws MomcaException {
+    public static Document getXmlFromResource(@NotNull String resourceName) throws ParsingException, IOException {
+
+        try (InputStream is = TestUtils.class.getClassLoader().getResourceAsStream(resourceName)) {
+            Builder parser = new Builder();
+            return parser.build(is);
+        }
+
+    }
+
+    @NotNull
+    public static MomcaConnection initMomcaConnection() throws MomcaException {
 
         URL serverPropertiesUrl = TestUtils.class.getResource(SERVER_PROPERTIES_PATH);
         assertNotNull(TestUtils.class.getResource(SERVER_PROPERTIES_PATH), "Test file missing");
