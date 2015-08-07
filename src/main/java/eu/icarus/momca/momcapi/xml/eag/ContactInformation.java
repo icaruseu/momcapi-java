@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by daniel on 22.07.2015.
  */
-public class Communications {
+public class ContactInformation {
 
     @NotNull
     private final String email;
@@ -16,7 +16,7 @@ public class Communications {
     @NotNull
     private final String webpage;
 
-    public Communications(@NotNull String webpage, @NotNull String fax, @NotNull String telephone, @NotNull String email) {
+    public ContactInformation(@NotNull String webpage, @NotNull String fax, @NotNull String telephone, @NotNull String email) {
         this.telephone = telephone;
         this.fax = fax;
         this.email = email;
@@ -28,7 +28,7 @@ public class Communications {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Communications that = (Communications) o;
+        ContactInformation that = (ContactInformation) o;
 
         if (!email.equals(that.email)) return false;
         if (!fax.equals(that.fax)) return false;
@@ -68,7 +68,7 @@ public class Communications {
 
     @Override
     public String toString() {
-        return "Communications{" +
+        return "ContactInformation{" +
                 "email='" + email + '\'' +
                 ", fax='" + fax + '\'' +
                 ", telephone='" + telephone + '\'' +

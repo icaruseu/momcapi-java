@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.jar.Attributes;
 
 /**
  * An XPath-query to use to query XOM XML documents.
@@ -24,6 +25,7 @@ public enum XpathQuery {
     QUERY_CEI_ISSUED("//cei:issued", Namespace.CEI),
     QUERY_CEI_TEXT("//cei:text", Namespace.CEI),
     QUERY_EAG_AUTFORM("//eag:autform/text()", Namespace.EAG),
+    QUERY_EAG_COUNTRYCODE("//eag:repositorid/@countrycode", Namespace.EAG),
     QUERY_EAG_DESC("//eag:desc", Namespace.EAG),
     QUERY_EAG_REPOSITORID("//eag:repositorid/text()", Namespace.EAG),
     QUERY_CONFIG_GROUP_NAME("//config:group/@name", Namespace.CONFIG),

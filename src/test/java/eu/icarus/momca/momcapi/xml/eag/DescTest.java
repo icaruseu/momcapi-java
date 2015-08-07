@@ -22,10 +22,10 @@ public class DescTest {
         String countryName = "Schweiz";
         String subdivisionName = "Schwyz";
         Address address = new Address("Einsiedeln", "CH-8840", "0041 55 4186111");
-        Communications communications = new Communications("http://www.klosterarchiv.ch", "0041 55 4186112",
+        ContactInformation contactInformation = new ContactInformation("http://www.klosterarchiv.ch", "0041 55 4186112",
                 "0041 55 4186111", "archivar@klosterarchiv.ch");
 
-        Desc desc = new Desc(countryName, subdivisionName, address, communications);
+        Desc desc = new Desc(countryName, subdivisionName, address, contactInformation);
 
         assertEquals(desc.toXML(), CORRECT_XML);
 
@@ -44,7 +44,7 @@ public class DescTest {
 
     @Test
     public void testGetCommunications() throws Exception {
-        assertEquals(DESC.getCommunications(), new Communications("http://www.klosterarchiv.ch", "0041 55 4186112",
+        assertEquals(DESC.getContactInformation(), new ContactInformation("http://www.klosterarchiv.ch", "0041 55 4186112",
                 "0041 55 4186111", "archivar@klosterarchiv.ch"));
     }
 

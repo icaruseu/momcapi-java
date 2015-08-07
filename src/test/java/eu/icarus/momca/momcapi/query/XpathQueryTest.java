@@ -128,6 +128,13 @@ public class XpathQueryTest {
     }
 
     @Test
+    public void testQUERY_EAG_COUNTRYCODE() throws Exception {
+        List<String> result = queryContentAsList(resource, XpathQuery.QUERY_EAG_COUNTRYCODE);
+        assertEquals(result.size(), 1);
+        assertEquals(result.get(0), "CH");
+    }
+
+    @Test
     public void testQUERY_NAME() throws Exception {
         List<String> result = queryContentAsList(resource, XpathQuery.QUERY_NAME);
         assertEquals(result.size(), 1);
