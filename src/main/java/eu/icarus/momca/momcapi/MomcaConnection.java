@@ -105,7 +105,7 @@ public class MomcaConnection {
     }
 
     /**
-     * @return The user manager.
+     * @return The user manager instance.
      */
     @NotNull
     public UserManager getUserManager() {

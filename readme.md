@@ -14,5 +14,28 @@ Features
 
 Momcapi is not yet feature complete in regards of all features of MOM-CA. The following functionalities are available:
 
-* Management of users
-* Management of countries
+_User manager_
+
+* List all users
+* Get specific user from the database
+* Add new user
+* Delete existing user
+* Change moderator
+* Change password
+* Initialize user (for instance if the user didn't get the confirmation link after sign-up
+
+_Country manager_
+
+* List all countries
+* Get specific country from the database
+* Add new country
+* Add new subdivision to country
+
+_Hierarchy manager_
+
+* Get specific archive from the database
+
+_Charter Manager_
+
+* Get all instances (`imported`, `private`, `public` and `saved`) of a charter from the database
+* Get a specific charter instance, e.g. `saved` from the database

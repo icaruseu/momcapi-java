@@ -14,11 +14,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+
 /**
- * Manages charters in MOM-CA.
- *
- * @author Daniel Jeller
- *         Created on 03.07.2015.
+ * Created by daniel on 03.07.2015.
  */
 public class CharterManager {
 
