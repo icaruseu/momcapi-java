@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Manages countries in MOM-CA.
@@ -144,16 +145,25 @@ public class CountryManager {
     }
 
     /**
-     * Deletes a country.
+     * Deletes a country. If there are still archives using this country in the database, a
+     * {@code MomcaException} is thrown.
      *
      * @param code The code of the country to delete, e.g. {@code DE}.
      */
     public void deleteCountry(@NotNull String code) {
+
+        List<String> archivesForCode = momcaConnection.queryDatabase(ExistQueryFactory.listArchivesForCountry(code));
+        if (!archivesForCode.isEmpty()) {
+            throw new MomcaException("There are existing archives for country '" + code + "'.");
+        }
+
         momcaConnection.queryDatabase(ExistQueryFactory.deleteEapElement(code));
+
     }
 
     /**
-     * Deletes a subdivison from a country.
+     * Deletes a subdivison from a country. If there are still archives using this subdivision in the database, a
+     * {@code MomcaException} is thrown.
      *
      * @param country The country to delete from.
      * @param code    The code of the subdivision to delete.
@@ -162,9 +172,25 @@ public class CountryManager {
      */
     @NotNull
     public Country deleteSubdivision(@NotNull Country country, @NotNull String code) {
+
+        List<Subdivision> matchingSubdivisions = country.getSubdivisions().stream()
+                .filter(s -> s.getCode().equals(code)).collect(Collectors.toList());
+
+        if (!matchingSubdivisions.isEmpty()) {
+
+            String nativeForm = matchingSubdivisions.get(0).getNativeform();
+            ExistQuery query = ExistQueryFactory.listArchivesForSubdivision(nativeForm);
+
+            if (!momcaConnection.queryDatabase(query).isEmpty()) {
+                throw new MomcaException("There are existing archives for subdivision '" + code + "'.");
+            }
+
+        }
+
         ExistQuery query = ExistQueryFactory.deleteEapElement(code);
         momcaConnection.queryDatabase(query);
         return getCountry(country.getCode()).orElseThrow(RuntimeException::new);
+
     }
 
     /**

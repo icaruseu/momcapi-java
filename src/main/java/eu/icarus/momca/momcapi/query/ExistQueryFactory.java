@@ -127,6 +127,44 @@ public class ExistQueryFactory {
     }
 
     /**
+     * @param countryCode The code of a country, e.g. {@code DE}.
+     * @return A query to list all archives that use the country code in their XML.
+     */
+    @NotNull
+    public static ExistQuery listArchivesForCountry(@NotNull String countryCode) {
+
+        String query = String.format(
+                "%s let $repositoridNodes := collection('/db/mom-data/metadata.archive.public')//eag:repositorid[@countrycode='%s']\n" +
+                        "for $node in $repositoridNodes\n" +
+                        "return concat(util:collection-name($node), '/', util:document-name($node))",
+                getNamespaceDeclaration(Namespace.EAG),
+                countryCode
+        );
+
+        return new ExistQuery(query);
+
+    }
+
+    /**
+     * @param subdivisionName The native name of a subdivision, e.g. {@code Bayern}.
+     * @return A query to list all archives that use the name of a subdivision in their XML.
+     */
+    @NotNull
+    public static ExistQuery listArchivesForSubdivision(@NotNull String subdivisionName) {
+
+        String query = String.format(
+                "%s let $repositoridNodes := collection('/db/mom-data/metadata.archive.public')//eag:firstdem[text()='%s']\n" +
+                        "for $node in $repositoridNodes\n" +
+                        "return concat(util:collection-name($node), '/', util:document-name($node))",
+                getNamespaceDeclaration(Namespace.EAG),
+                subdivisionName
+        );
+
+        return new ExistQuery(query);
+
+    }
+
+    /**
      * @return A query to get a list of the text content of all {@code eap:country/eap:code} elements. This is
      * effectively a list of all countries registered in the portal.
      */

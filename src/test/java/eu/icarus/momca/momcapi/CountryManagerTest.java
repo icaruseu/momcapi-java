@@ -1,5 +1,7 @@
 package eu.icarus.momca.momcapi;
 
+import eu.icarus.momca.momcapi.exception.MomcaException;
+import eu.icarus.momca.momcapi.query.ExistQueryFactory;
 import eu.icarus.momca.momcapi.xml.eap.Country;
 import eu.icarus.momca.momcapi.xml.eap.Subdivision;
 import org.testng.annotations.BeforeClass;
@@ -145,6 +147,11 @@ public class CountryManagerTest {
 
     }
 
+    @Test(expectedExceptions = MomcaException.class)
+    public void testDeleteCountryWithExistingArchives() throws Exception {
+        countryManager.deleteCountry("CH");
+    }
+
     @Test
     public void testDeleteSubdivision() throws Exception {
 
@@ -155,6 +162,13 @@ public class CountryManagerTest {
 
         assertTrue(country.getSubdivisions().isEmpty());
 
+    }
+
+    @Test(expectedExceptions = MomcaException.class)
+    public void testDeleteSubdivisionWithExistingArchives() throws Exception {
+        Country country = countryManager.getCountry("DE").get();
+        String subdivision = "DE-BY";
+        countryManager.deleteSubdivision(country, subdivision);
     }
 
     @Test
