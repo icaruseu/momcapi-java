@@ -18,6 +18,17 @@
             </cei:figure>
         </cei:witnessOrig>
     </cei:text>
+    <eag:eag xmlns:eag="http://www.archivgut-online.de/eag">
+        <eag:archguide>
+            <eag:identity>
+                <eag:repositorid
+                        countrycode="CH">CH-KAE
+                </eag:repositorid>
+                <eag:autform>Klosterarchiv Einsiedeln</eag:autform>
+            </eag:identity>
+            <eag:desc>eagdesc</eag:desc>
+        </eag:archguide>
+    </eag:eag>
     <config:config xmlns:config="http://exist-db.org/Configuration">
         <config:name>configname</config:name>
         <config:group name="atom"/>

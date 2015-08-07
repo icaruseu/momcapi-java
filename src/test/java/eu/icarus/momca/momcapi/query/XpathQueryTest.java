@@ -23,16 +23,12 @@ public class XpathQueryTest {
     private static final String NAME = "testfile.xml";
     @NotNull
     private static final String PARENT_URI = "/db/mom-data/";
-    @NotNull
-    private String XML_CONTENT = "";
     private MomcaResource resource;
 
     @BeforeClass
     public void setUp() throws Exception {
-
-        XML_CONTENT = TestUtils.getXmlFromResource("XpathQueryTestXml.xml").toXML();
-        resource = new MomcaResource(NAME, PARENT_URI, XML_CONTENT);
-
+        String testXml = TestUtils.getXmlFromResource("XpathQueryTestXml.xml").toXML();
+        resource = new MomcaResource(NAME, PARENT_URI, testXml);
     }
 
     @Test
@@ -108,6 +104,13 @@ public class XpathQueryTest {
         List<String> result = queryContentAsList(resource, XpathQuery.QUERY_CONFIG_NAME);
         String expectedResult = "configname";
         assertEquals(result.get(0), expectedResult);
+    }
+
+    @Test
+    public void testQUERY_EAG_DESC() throws Exception {
+        List<String> result = queryContentAsList(resource, XpathQuery.QUERY_EAG_DESC);
+        assertEquals(result.size(), 1);
+        assertEquals(result.get(0), "eagdesc");
     }
 
     @Test
