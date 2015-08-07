@@ -27,7 +27,7 @@ public class Desc extends Element {
     @NotNull
     private Address address = new Address("", "", "");
     @NotNull
-    private Communications communications = new Communications("", "", "", "");
+    private ContactInformation contactInformation = new ContactInformation("", "", "", "");
     @NotNull
     private String countryName = "";
     @NotNull
@@ -46,13 +46,13 @@ public class Desc extends Element {
     }
 
     public Desc(@NotNull String countryName, @NotNull String subdivisionName, @NotNull Address address,
-                @NotNull Communications communications) {
+                @NotNull ContactInformation contactInformation) {
 
-        super(createXml(countryName, subdivisionName, address, communications));
+        super(createXml(countryName, subdivisionName, address, contactInformation));
 
         this.countryName = countryName;
         this.address = address;
-        this.communications = communications;
+        this.contactInformation = contactInformation;
         this.subdivisionName = subdivisionName;
 
         String ns = Namespace.EAG.getUri();
@@ -61,7 +61,7 @@ public class Desc extends Element {
 
     @NotNull
     private static Element createXml(@NotNull String countryName, @NotNull String subdivisionName,
-                                     @NotNull Address address, @NotNull Communications communications) {
+                                     @NotNull Address address, @NotNull ContactInformation contactInformation) {
 
         String xml = String.format(
                 XML_TEMPLATE,
@@ -70,10 +70,10 @@ public class Desc extends Element {
                 address.getStreet(),
                 address.getPostalcode(),
                 address.getMunicipality(),
-                communications.getTelephone(),
-                communications.getFax(),
-                communications.getEmail(),
-                communications.getWebpage()
+                contactInformation.getTelephone(),
+                contactInformation.getFax(),
+                contactInformation.getEmail(),
+                contactInformation.getWebpage()
         );
 
         return Util.parseXml(xml);
@@ -86,8 +86,8 @@ public class Desc extends Element {
     }
 
     @NotNull
-    public Communications getCommunications() {
-        return communications;
+    public ContactInformation getContactInformation() {
+        return contactInformation;
     }
 
     @NotNull
@@ -150,7 +150,7 @@ public class Desc extends Element {
             }
 
             this.address = new Address(municipality, postalcode, street);
-            this.communications = new Communications(webpage, fax, telephone, email);
+            this.contactInformation = new ContactInformation(webpage, fax, telephone, email);
 
         }
 
