@@ -62,20 +62,6 @@ public class Util {
 
     }
 
-<<<<<<< HEAD
-    @NotNull
-    public static Element parseXml(@NotNull String xml) {
-
-        Builder builder = new Builder();
-        try {
-
-            return builder.build(xml, null).getRootElement();
-
-        } catch (ParsingException e) {
-            throw new IllegalArgumentException("Failed to parse xml.", e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-=======
     /**
      * @param uri An URI.
      * @return The last URI part, e.g. {@code admin.xml} for {@code /db/mom-data/user.xrx/admin.xml}
@@ -97,12 +83,27 @@ public class Util {
         return uri.substring(0, uri.lastIndexOf('/'));
     }
 
+    @NotNull
+    public static Element parseXml(@NotNull String xml) {
+
+        Builder builder = new Builder();
+        try {
+
+            return builder.build(xml, null).getRootElement();
+
+        } catch (ParsingException e) {
+            throw new IllegalArgumentException("Failed to parse xml.", e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
     private static void testIfUri(@NotNull String possibleUri) {
 
         if (!possibleUri.contains("/")) {
             String message = String.format("'%s' is probably not a valid uri, it doesn't contain '/'.", possibleUri);
             throw new IllegalArgumentException(message);
->>>>>>> MAPI-4
         }
 
     }

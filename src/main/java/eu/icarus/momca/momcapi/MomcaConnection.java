@@ -96,11 +96,6 @@ public class MomcaConnection {
         return countryManager;
     }
 
-    @NotNull
-    public HierarchyManager getHierarchyManager() {
-        return hierarchyManager;
-    }
-
     /**
      * @return The hierarchy manager instance.
      */
