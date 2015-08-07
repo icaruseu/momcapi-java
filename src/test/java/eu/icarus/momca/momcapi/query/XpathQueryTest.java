@@ -114,6 +114,13 @@ public class XpathQueryTest {
     }
 
     @Test
+    public void testQUERY_EAG_REPOSITORID() throws Exception {
+        List<String> result = queryContentAsList(resource, XpathQuery.QUERY_EAG_REPOSITORID);
+        assertEquals(result.size(), 1);
+        assertEquals(result.get(0), "CH-KAE");
+    }
+
+    @Test
     public void testQUERY_NAME() throws Exception {
         List<String> result = queryContentAsList(resource, XpathQuery.QUERY_NAME);
         assertEquals(result.size(), 1);

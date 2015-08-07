@@ -24,6 +24,7 @@ public enum XpathQuery {
     QUERY_CEI_ISSUED("//cei:issued", Namespace.CEI),
     QUERY_CEI_TEXT("//cei:text", Namespace.CEI),
     QUERY_EAG_DESC("//eag:desc", Namespace.EAG),
+    QUERY_EAG_REPOSITORID("//eag:repositorid/text()", Namespace.EAG),
     QUERY_CONFIG_GROUP_NAME("//config:group/@name", Namespace.CONFIG),
     QUERY_CONFIG_NAME("//config:name", Namespace.CONFIG),
     QUERY_NAME("//name/text()"),
