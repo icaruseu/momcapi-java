@@ -30,6 +30,8 @@ _Country manager_
 * Get specific country from the database
 * Add new country
 * Add new subdivision to country
+* Delete a country that has no attached archives
+* Delete a subdivision that has no attached archives
 
 _Hierarchy manager_
 
