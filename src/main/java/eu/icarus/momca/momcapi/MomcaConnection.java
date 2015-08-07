@@ -37,6 +37,8 @@ public class MomcaConnection {
     @NotNull
     private final String dbRootUri;
     @NotNull
+    private final HierarchyManager hierarchyManager;
+    @NotNull
     private final String password;
     @NotNull
     private final Collection rootCollection;
@@ -61,6 +63,7 @@ public class MomcaConnection {
         userManager = new UserManager(this);
         countryManager = new CountryManager(this);
         charterManager = new CharterManager(this);
+        hierarchyManager = new HierarchyManager(this);
 
     }
 
@@ -91,6 +94,11 @@ public class MomcaConnection {
     @NotNull
     public CountryManager getCountryManager() {
         return countryManager;
+    }
+
+    @NotNull
+    public HierarchyManager getHierarchyManager() {
+        return hierarchyManager;
     }
 
     /**
