@@ -23,6 +23,7 @@ public class Desc extends Element {
                     "<eag:fax>%s</eag:fax>" +
                     "<eag:email>%s</eag:email>" +
                     "<eag:webpage>%s</eag:webpage>" +
+                    "<eag:extptr href='%s' />" +
                     "</eag:desc>";
     @NotNull
     private Address address = new Address("", "", "");
@@ -30,6 +31,8 @@ public class Desc extends Element {
     private ContactInformation contactInformation = new ContactInformation("", "", "", "");
     @NotNull
     private String countryName = "";
+    @NotNull
+    private String logoUrl = "";
     @NotNull
     private String subdivisionName = "";
 
@@ -46,14 +49,15 @@ public class Desc extends Element {
     }
 
     public Desc(@NotNull String countryName, @NotNull String subdivisionName, @NotNull Address address,
-                @NotNull ContactInformation contactInformation) {
+                @NotNull ContactInformation contactInformation, @NotNull String logoUrl) {
 
-        super(createXml(countryName, subdivisionName, address, contactInformation));
+        super(createXml(countryName, subdivisionName, address, contactInformation, logoUrl));
 
         this.countryName = countryName;
         this.address = address;
         this.contactInformation = contactInformation;
         this.subdivisionName = subdivisionName;
+        this.logoUrl = logoUrl;
 
         String ns = Namespace.EAG.getUri();
 
@@ -61,7 +65,8 @@ public class Desc extends Element {
 
     @NotNull
     private static Element createXml(@NotNull String countryName, @NotNull String subdivisionName,
-                                     @NotNull Address address, @NotNull ContactInformation contactInformation) {
+                                     @NotNull Address address, @NotNull ContactInformation contactInformation,
+                                     @NotNull String logoUrl) {
 
         String xml = String.format(
                 XML_TEMPLATE,
@@ -73,7 +78,8 @@ public class Desc extends Element {
                 contactInformation.getTelephone(),
                 contactInformation.getFax(),
                 contactInformation.getEmail(),
-                contactInformation.getWebpage()
+                contactInformation.getWebpage(),
+                logoUrl
         );
 
         return Util.parseXml(xml);
@@ -93,6 +99,11 @@ public class Desc extends Element {
     @NotNull
     public String getCountryName() {
         return countryName;
+    }
+
+    @NotNull
+    public String getLogoUrl() {
+        return logoUrl;
     }
 
     @NotNull
@@ -144,6 +155,8 @@ public class Desc extends Element {
                 case "webpage":
                     webpage = element.getValue();
                     break;
+                case "extptr":
+                    this.logoUrl = element.getAttributeValue("href");
                 default:
                     break;
 
