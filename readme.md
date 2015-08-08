@@ -33,20 +33,22 @@ _Country manager_
 * Get archive metadata (e.g. country, address, logo Url)
 * Add new country
 * Add new subdivision to country
-* Delete a country that has no attached archives
-* Delete a subdivision that has no attached archives
+* Delete country that has no attached archives
+* Delete subdivision that has no attached archives
 
 _Hierarchy manager_
 
 * List all archives
 * List all archives belonging to a specific country
 * List all archvies belonging to a specific subdivision
+* List all fonds belonging to a specific archive
 * Get specific archive from the database
 * Add new archive
+* Delete archive
 
 _Charter Manager_
 
 * Get all instances (`imported`, `private`, `public` and `saved`) of a charter from the database
-* Get a specific charter instance, e.g. `saved` from the database
+* Get specific charter instance, e.g. `saved` from the database
 * Get charter medadata like the list of all figures
-* Check if a charter is a valid `CEI` document and list the validation problems if it's not
+* Check if charter is a valid `CEI` document and list the validation problems if it's not
