@@ -26,6 +26,28 @@ public class HierarchyManagerTest {
     @Test
     public void testDeleteArchive() throws Exception {
 
+        String author = "admin";
+        Country country = mc.getCountryManager().getCountry("DE").get();
+        Subdivision subdivision = country.getSubdivisions().stream().filter(s -> s.getCode().equals("DE-BW")).findFirst().get();
+        String shortName = "DE-HStASt";
+        String name = "Landesarchiv Baden-Württemberg, Abt. Hauptstaatsarchiv Stuttgart";
+        Address address = new Address("Stuttgart", "0123334", "Somewhere else");
+        ContactInformation contactInformation =
+                new ContactInformation("http://example.com", "01234557", "0123458952", "alpha@example.com");
+        String logoUrl = "http://example.com/image.png";
+
+        Archive newArchive = hm.addArchive(author, shortName, name, country, subdivision, address, contactInformation, logoUrl);
+        hm.deleteArchive(newArchive);
+
+        assertFalse(hm.getArchive(newArchive.getId()).isPresent());
+
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testDeleteArchiveWithExistingFonds() throws Exception {
+        IdArchive id = new IdArchive("CH-KAE");
+        Archive archive = hm.getArchive(id).get();
+        hm.deleteArchive(archive);
     }
 
     @Test
@@ -59,7 +81,7 @@ public class HierarchyManagerTest {
         Subdivision subdivision = country.getSubdivisions().stream().filter(s -> s.getCode().equals("DE-BW")).findFirst().get();
         String shortName = "DE-GLAK";
         String name = "Landesarchiv Baden-Württemberg, Abt. Generallandesarchiv Karlsruhe";
-        Address address = new Address("Stuttgart", "01234", "Somewhere");
+        Address address = new Address("Karlsruhe", "01234", "Somewhere");
         ContactInformation contactInformation =
                 new ContactInformation("http://example.com", "01234557", "0123458952", "alpha@example.com");
         String logoUrl = "http://example.com/image.png";

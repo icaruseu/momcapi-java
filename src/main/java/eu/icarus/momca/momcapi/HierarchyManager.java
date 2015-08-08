@@ -36,13 +36,6 @@ public class HierarchyManager {
     }
 
     @NotNull
-    public List<IdFond> listFondsForArchive(@NotNull Archive archive) {
-        List<String> queryResults = momcaConnection.queryDatabase(
-                ExistQueryFactory.listFondsForArchive(archive.getId().getArchiveIdentifier()));
-        return queryResults.stream().map(IdFond::new).collect(Collectors.toList());
-    }
-
-    @NotNull
     public Archive addArchive(@NotNull String authorEmail, @NotNull String shortName, @NotNull String name, @NotNull Country country,
                               @Nullable Subdivision subdivision, @NotNull Address address,
                               @NotNull ContactInformation contactInformation, @NotNull String logoUrl) {
@@ -77,7 +70,15 @@ public class HierarchyManager {
     }
 
     public void deleteArchive(@NotNull Archive archive) {
-        // TODO implement
+
+        if (!listFondsForArchive(archive).isEmpty()) {
+            String message = String.format("The archive '%s',  that is to be deleted still has associated fonds.",
+                    archive.getShortName());
+            throw new IllegalArgumentException(message);
+        }
+
+        momcaConnection.deleteCollection("/db/mom-data/metadata.archive.public/" + archive.getId().getArchiveIdentifier());
+
     }
 
     @NotNull
@@ -112,6 +113,13 @@ public class HierarchyManager {
         List<String> queryResults = momcaConnection.queryDatabase(
                 ExistQueryFactory.listIdArchivesForSubdivision(subdivision.getNativeform()));
         return queryResults.stream().map(IdArchive::new).collect(Collectors.toList());
+    }
+
+    @NotNull
+    public List<IdFond> listFondsForArchive(@NotNull Archive archive) {
+        List<String> queryResults = momcaConnection.queryDatabase(
+                ExistQueryFactory.listFondsForArchive(archive.getId().getArchiveIdentifier()));
+        return queryResults.stream().map(IdFond::new).collect(Collectors.toList());
     }
 
     @NotNull
