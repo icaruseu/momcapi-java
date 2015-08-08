@@ -12,9 +12,14 @@ import static org.testng.Assert.assertEquals;
 public class DescTest {
 
     @NotNull
-    private static final String CORRECT_XML = "<eag:desc xmlns:eag=\"http://www.archivgut-online.de/eag\"><eag:country>Schweiz</eag:country><eag:firstdem>Schwyz</eag:firstdem><eag:street>0041 55 4186111</eag:street><eag:postalcode>CH-8840</eag:postalcode><eag:municipality>Einsiedeln</eag:municipality><eag:telephone>0041 55 4186111</eag:telephone><eag:fax>0041 55 4186112</eag:fax><eag:email>archivar@klosterarchiv.ch</eag:email><eag:webpage>http://www.klosterarchiv.ch</eag:webpage></eag:desc>";
+    private static final String CORRECT_XML = "<eag:desc xmlns:eag=\"http://www.archivgut-online.de/eag\"><eag:country>Schweiz</eag:country><eag:firstdem>Schwyz</eag:firstdem><eag:street>0041 55 4186111</eag:street><eag:postalcode>CH-8840</eag:postalcode><eag:municipality>Einsiedeln</eag:municipality><eag:telephone>0041 55 4186111</eag:telephone><eag:fax>0041 55 4186112</eag:fax><eag:email>archivar@klosterarchiv.ch</eag:email><eag:webpage>http://www.klosterarchiv.ch</eag:webpage><eag:extptr href=\"http://example.com/img.png\" /></eag:desc>";
     @NotNull
     private static final Desc DESC = new Desc(Util.parseXml(CORRECT_XML));
+
+    @Test
+    public void testGetLogoUrl() throws Exception {
+        assertEquals(DESC.getLogoUrl(), "http://example.com/img.png");
+    }
 
     @Test
     public void testConstructorWithDetails() throws Exception {
@@ -24,8 +29,9 @@ public class DescTest {
         Address address = new Address("Einsiedeln", "CH-8840", "0041 55 4186111");
         ContactInformation contactInformation = new ContactInformation("http://www.klosterarchiv.ch", "0041 55 4186112",
                 "0041 55 4186111", "archivar@klosterarchiv.ch");
+        String logoUrl = "http://example.com/img.png";
 
-        Desc desc = new Desc(countryName, subdivisionName, address, contactInformation);
+        Desc desc = new Desc(countryName, subdivisionName, address, contactInformation, logoUrl);
 
         assertEquals(desc.toXML(), CORRECT_XML);
 
@@ -43,7 +49,7 @@ public class DescTest {
     }
 
     @Test
-    public void testGetCommunications() throws Exception {
+    public void testGetContactInformation() throws Exception {
         assertEquals(DESC.getContactInformation(), new ContactInformation("http://www.klosterarchiv.ch", "0041 55 4186112",
                 "0041 55 4186111", "archivar@klosterarchiv.ch"));
     }

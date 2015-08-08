@@ -28,6 +28,7 @@ _Country manager_
 
 * List all countries
 * Get specific country from the database
+* Get archive metadata (e.g. country, address, logo Url)
 * Add new country
 * Add new subdivision to country
 * Delete a country that has no attached archives

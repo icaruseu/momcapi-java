@@ -75,6 +75,11 @@ public class Archive extends MomcaResource {
     }
 
     @NotNull
+    public String getLogoUrl() {
+        return desc.getLogoUrl();
+    }
+
+    @NotNull
     public String getName() {
         return name;
     }
