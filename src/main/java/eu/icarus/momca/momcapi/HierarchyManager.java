@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Created by daniel on 20.07.2015.
@@ -33,6 +34,12 @@ public class HierarchyManager {
 
         return archiveUris.isEmpty() ? Optional.empty() : getArchiveFromUri(archiveUris.get(0));
 
+    }
+
+    @NotNull
+    public List<IdArchive> listArchives(){
+        List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listIdArchives());
+        return queryResults.stream().map(IdArchive::new).collect(Collectors.toList());
     }
 
     @NotNull

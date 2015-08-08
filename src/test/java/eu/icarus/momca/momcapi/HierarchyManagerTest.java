@@ -22,6 +22,11 @@ public class HierarchyManagerTest {
     private HierarchyManager hierarchyManager;
     private MomcaConnection momcaConnection;
 
+    @Test
+    public void testListArchives() throws Exception {
+        assertEquals(hierarchyManager.listArchives().size(), 3);
+    }
+
     @BeforeClass
     public void setUp() throws Exception {
         momcaConnection = TestUtils.initMomcaConnection();

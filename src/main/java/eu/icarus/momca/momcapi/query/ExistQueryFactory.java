@@ -127,6 +127,21 @@ public class ExistQueryFactory {
     }
 
     /**
+     * @return A query that lists the ids of all archives in the database as strings.
+     */
+    @NotNull
+    public static ExistQuery listIdArchives() {
+
+        String query = String.format(
+                "%s collection('/db/mom-data/metadata.archive.public')//atom:id/text()",
+                getNamespaceDeclaration(Namespace.ATOM)
+        );
+
+        return new ExistQuery(query);
+
+    }
+
+    /**
      * @param countryCode The code of a country, e.g. {@code DE}.
      * @return A query to list all archives that use the country code in their XML.
      */
