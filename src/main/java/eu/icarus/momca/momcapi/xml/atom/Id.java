@@ -27,7 +27,7 @@ public class Id extends Element {
     private static final int MIN_ID_PARTS_WITHOUT_PREFIX = 2;
     private static final int MIN_ID_PARTS_WITH_PREFIX = 3;
     @NotNull
-    private final String atomId;
+    private final String id;
     @NotNull
     private final ResourceType type;
 
@@ -62,8 +62,8 @@ public class Id extends Element {
 
             type = (idParts[0].equals(DEFAULT_PREFIX))
                     ? ResourceType.createFromValue(idParts[1]) : ResourceType.createFromValue(idParts[0]);
-            this.atomId = createIdFromParts(idParts);
-            appendChild(this.atomId);
+            this.id = createIdFromParts(idParts);
+            appendChild(this.id);
 
         } else {
             String message = String.format(
@@ -79,8 +79,8 @@ public class Id extends Element {
      * {@code tag:www.monasterium.net,2011:/charter/RS-IAGNS/Charters/IAGNS_F-.150_6605%7C193232}.
      */
     @NotNull
-    public String getAtomId() {
-        return atomId;
+    public String getId() {
+        return id;
     }
 
     /**
@@ -108,8 +108,8 @@ public class Id extends Element {
     }
 
     @NotNull
-    private String[] splitIntoParts(@NotNull String atomId) {
-        return atomId.replace(DEFAULT_PREFIX + "/", "").split("/");
+    private String[] splitIntoParts(@NotNull String id) {
+        return id.replace(DEFAULT_PREFIX + "/", "").split("/");
     }
 
 }

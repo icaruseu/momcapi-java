@@ -42,3 +42,5 @@ _Charter Manager_
 
 * Get all instances (`imported`, `private`, `public` and `saved`) of a charter from the database
 * Get a specific charter instance, e.g. `saved` from the database
+* Get charter medadata like the list of all figures
+* Check if a charter is a valid `CEI` document and list the validation problems if it's not

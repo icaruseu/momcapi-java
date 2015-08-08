@@ -182,10 +182,10 @@ public class UserManager {
 
                 RemoteUserManagementService service = getUserService();
 
-                Group atomGroup = new GroupAider("atom");
-                service.addGroup(atomGroup);
+                Group group = new GroupAider("atom");
+                service.addGroup(group);
 
-                Account newAccount = new UserAider(userName, atomGroup);
+                Account newAccount = new UserAider(userName, group);
                 newAccount.setPassword(password);
                 service.addAccount(newAccount);
                 service.addAccountToGroup(userName, "guest");

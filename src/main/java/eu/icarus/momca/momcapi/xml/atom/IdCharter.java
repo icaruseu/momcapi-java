@@ -28,22 +28,22 @@ public class IdCharter extends Id {
 
 
     /**
-     * Instantiates a new Atom id charter with an existing {@code atom:id String}.
+     * Instantiates a new IdCharter with an existing {@code atom:id String}.
      *
-     * @param atomIdString A full {@code atom:id String}.
+     * @param idString A full {@code atom:id String}.
      */
-    public IdCharter(@NotNull String atomIdString) {
+    public IdCharter(@NotNull String idString) {
 
-        super(atomIdString);
+        super(idString);
 
         if (getType() != ResourceType.CHARTER) {
             String message = String.format("'%s' has the wrong ResourceType identifier, not %s.",
-                    atomIdString,
-                    ResourceType.CHARTER.getAtomIdPart());
+                    idString,
+                    ResourceType.CHARTER.getNameInId());
             throw new IllegalArgumentException(message);
         }
 
-        String[] idParts = atomIdString.split("/");
+        String[] idParts = idString.split("/");
 
         switch (idParts.length) {
 
@@ -64,7 +64,7 @@ public class IdCharter extends Id {
             default:
                 String message = String.format(
                         "'%s' is not a valid charter atom:id, it has the wrong number of id parts: %s",
-                        atomIdString,
+                        idString,
                         idParts.length);
                 throw new IllegalArgumentException(message);
 
@@ -81,7 +81,7 @@ public class IdCharter extends Id {
      */
     public IdCharter(@NotNull String archiveIdentifier, @NotNull String fondIdentifier, @NotNull String charterIdentifier) {
 
-        super(ResourceType.CHARTER.getAtomIdPart(), archiveIdentifier, fondIdentifier, charterIdentifier);
+        super(ResourceType.CHARTER.getNameInId(), archiveIdentifier, fondIdentifier, charterIdentifier);
 
         this.archiveIdentifier = Optional.of(archiveIdentifier);
         this.fondIdentifier = Optional.of(fondIdentifier);
@@ -98,7 +98,7 @@ public class IdCharter extends Id {
      */
     public IdCharter(@NotNull String collectionIdentifier, @NotNull String charterIdentifier) {
 
-        super(ResourceType.CHARTER.getAtomIdPart(), collectionIdentifier, charterIdentifier);
+        super(ResourceType.CHARTER.getNameInId(), collectionIdentifier, charterIdentifier);
 
         this.collectionIdentifier = Optional.of(collectionIdentifier);
         this.charterIdentifier = charterIdentifier;

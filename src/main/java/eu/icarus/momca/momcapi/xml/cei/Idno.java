@@ -7,7 +7,8 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents a {@code cei:idno}-Element as defined in the
- * <a href="http://www.cei.lmu.de/element.php?ID=19">CEI-Schema</a>.<br/>
+ * <a href="http://www.cei.lmu.de/element.php?ID=19">CEI-Schema</a>.<br/> This information represents the concept of a
+ * {@code signature} used to identify the charter in it's archival context.
  * <br/>
  * Example:<br/>
  * {@code <cei:idno id="KAE_Urkunde_Nr_1" old="1">KAE, Urkunde Nr. 1</cei:idno>}

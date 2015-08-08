@@ -15,7 +15,7 @@ import static org.testng.Assert.assertEquals;
 public class IdTest {
 
     @NotNull
-    private static final String ATOM_ID = "tag:www.monasterium.net,2011:/charter/RS-IAGNS/Charters/AGNS_F.1_the_fascia_9_Sub_3499%7C1817";
+    private static final String ID = "tag:www.monasterium.net,2011:/charter/RS-IAGNS/Charters/AGNS_F.1_the_fascia_9_Sub_3499%7C1817";
     @NotNull
     private static final String PREFIX = "tag:www.monasterium.net,2011:";
     @NotNull
@@ -25,26 +25,26 @@ public class IdTest {
 
     @BeforeClass
     public void setUp() throws Exception {
-        XML.appendChild(ATOM_ID);
+        XML.appendChild(ID);
     }
 
     @Test
-    public void testConstructorWithAtomId() throws Exception {
-        Id id = new Id(ATOM_ID);
-        assertEquals(id.getAtomId(), ATOM_ID);
+    public void testConstructorWithId() throws Exception {
+        Id id = new Id(ID);
+        assertEquals(id.getId(), ID);
         assertEquals(id.toXML(), "<atom:id xmlns:atom=\"http://www.w3.org/2005/Atom\">tag:www.monasterium.net,2011:/charter/RS-IAGNS/Charters/AGNS_F.1_the_fascia_9_Sub_3499%7C1817</atom:id>");
     }
 
     @Test
     public void testConstructorWithIdParts() throws Exception {
 
-        String expectedEasyAtomId = "tag:www.monasterium.net,2011:/charter/RS-IAGNS/Charters/F1_fasc.16_sub_N_1513";
-        String expectedDifficultAtomId = "tag:www.monasterium.net,2011:/charter/RS-IAGNS/Charters/IAGNS_F-.150_6605%7C193232";
+        String expectedEasyId = "tag:www.monasterium.net,2011:/charter/RS-IAGNS/Charters/F1_fasc.16_sub_N_1513";
+        String expectedDifficultId = "tag:www.monasterium.net,2011:/charter/RS-IAGNS/Charters/IAGNS_F-.150_6605%7C193232"; // %7C is difficult
         Id easyId = new Id("charter", "RS-IAGNS", "Charters", "F1_fasc.16_sub_N_1513");
         Id difficultId = new Id("charter", "RS-IAGNS", "Charters", "IAGNS_F-.150_6605|193232"); // | should be replaced with %7C etc.
 
-        assertEquals(easyId.getAtomId(), expectedEasyAtomId);
-        assertEquals(difficultId.getAtomId(), expectedDifficultAtomId);
+        assertEquals(easyId.getId(), expectedEasyId);
+        assertEquals(difficultId.getId(), expectedDifficultId);
 
     }
 
@@ -55,7 +55,7 @@ public class IdTest {
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testConstructorWithWrongAtomId() throws Exception {
+    public void testConstructorWithWrongId() throws Exception {
         new Id("Thisisnotanatomid");
     }
 
@@ -66,20 +66,20 @@ public class IdTest {
     }
 
     @Test
-    public void testGetAtomId() throws Exception {
-        Id id = new Id(ATOM_ID);
-        assertEquals(id.getAtomId(), ATOM_ID);
+    public void testGetId() throws Exception {
+        Id id = new Id(ID);
+        assertEquals(id.getId(), ID);
     }
 
     @Test
     public void testGetType() throws Exception {
-        Id id = new Id(ATOM_ID);
+        Id id = new Id(ID);
         assertEquals(id.getType(), TYPE);
     }
 
     @Test
     public void testGetXml() throws Exception {
-        Id id = new Id(ATOM_ID);
+        Id id = new Id(ID);
         assertEquals(id.toXML(), XML.toXML());
     }
 

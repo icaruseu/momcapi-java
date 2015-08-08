@@ -38,13 +38,13 @@ public class Charter extends MomcaResource {
     private static final String CEI_SCHEMA_URL =
             "https://raw.githubusercontent.com/icaruseu/mom-ca/master/my/XRX/src/mom/app/cei/xsd/cei10.xsd";
     @NotNull
-    private final Optional<Author> atomAuthor;
+    private final Optional<Author> author;
     @NotNull
-    private final IdCharter atomId;
+    private final IdCharter id;
     @NotNull
-    private final Optional<DateAbstract> ceiDate;
+    private final Optional<DateAbstract> date;
     @NotNull
-    private final List<Figure> ceiWitnessOrigFigures;
+    private final List<Figure> figures;
     @NotNull
     private final Idno idno;
     @NotNull
@@ -90,11 +90,11 @@ public class Charter extends MomcaResource {
 
         status = initStatus();
 
-        atomId = initAtomId();
-        atomAuthor = initAtomAuthor();
-        idno = initCeiIdno();
-        ceiDate = initCeiDate();
-        ceiWitnessOrigFigures = new ArrayList<>(initCeiWitnessOrigFigures());
+        id = initId();
+        author = initAuthor();
+        idno = initIdno();
+        date = initDate();
+        figures = new ArrayList<>(initFigures());
 
     }
 
@@ -102,32 +102,32 @@ public class Charter extends MomcaResource {
      * @return The Author.
      */
     @NotNull
-    public Optional<Author> getAtomAuthor() {
-        return atomAuthor;
+    public Optional<Author> getAuthor() {
+        return author;
     }
 
     /**
      * @return The Id.
      */
     @NotNull
-    public IdCharter getAtomId() {
-        return atomId;
+    public IdCharter getId() {
+        return id;
     }
 
     /**
      * @return The date.
      */
     @NotNull
-    public Optional<DateAbstract> getCeiDate() {
-        return ceiDate;
+    public Optional<DateAbstract> getDate() {
+        return date;
     }
 
     /**
-     * @return A list of all figures in {@code cei:witnessOrig}. They represent only the direct images of the charter.
+     * @return A list of all figures in the charter.
      */
     @NotNull
-    public List<Figure> getCeiWitnessOrigFigures() {
-        return ceiWitnessOrigFigures;
+    public List<Figure> getFigures() {
+        return figures;
     }
 
     /**
@@ -167,28 +167,28 @@ public class Charter extends MomcaResource {
     public String toString() {
 
         return "Charter{" +
-                "atomAuthor=" + atomAuthor +
-                ", atomId=" + atomId +
+                "author=" + author +
+                ", id=" + id +
                 ", idno=" + idno +
-                ", ceiWitnessOrigFigures=" + ceiWitnessOrigFigures +
+                ", figures=" + figures +
                 ", status=" + status +
                 "} " + super.toString();
 
     }
 
-    private Optional<Author> initAtomAuthor() {
+    private Optional<Author> initAuthor() {
 
-        Optional<Author> atomAuthor = Optional.empty();
+        Optional<Author> author = Optional.empty();
         String authorEmail = queryUniqueElement(XpathQuery.QUERY_ATOM_EMAIL);
         if (!authorEmail.isEmpty()) {
-            atomAuthor = Optional.of(new Author(authorEmail));
+            author = Optional.of(new Author(authorEmail));
         }
-        return atomAuthor;
+        return author;
 
     }
 
     @NotNull
-    private IdCharter initAtomId() {
+    private IdCharter initId() {
 
         String idString = queryUniqueElement(XpathQuery.QUERY_ATOM_ID);
 
@@ -202,7 +202,7 @@ public class Charter extends MomcaResource {
     }
 
     @NotNull
-    private Optional<DateAbstract> initCeiDate() {
+    private Optional<DateAbstract> initDate() {
 
         Optional<DateAbstract> ceiDateOptional = Optional.empty();
         Nodes ceiIssuedNodes = queryContentAsNodes(XpathQuery.QUERY_CEI_ISSUED);
@@ -241,14 +241,14 @@ public class Charter extends MomcaResource {
     }
 
     @NotNull
-    private Idno initCeiIdno() {
+    private Idno initIdno() {
         String id = queryUniqueElement(XpathQuery.QUERY_CEI_BODY_IDNO_ID);
         String text = queryUniqueElement(XpathQuery.QUERY_CEI_BODY_IDNO_TEXT);
         return new Idno(id, text);
     }
 
     @NotNull
-    private List<Figure> initCeiWitnessOrigFigures() {
+    private List<Figure> initFigures() {
 
         List<Figure> figures = new ArrayList<>(0);
         Nodes figureNodes = queryContentAsNodes(XpathQuery.QUERY_CEI_WITNESS_ORIG_FIGURE);

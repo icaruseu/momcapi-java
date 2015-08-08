@@ -34,9 +34,9 @@ public class ArchiveTest {
     }
 
     @Test
-    public void testGetAtomId() throws Exception {
+    public void testGetId() throws Exception {
         String correctId = "tag:www.monasterium.net,2011:/archive/CH-KAE";
-        assertEquals(correctArchive.getAtomId().getAtomId(), correctId);
+        assertEquals(correctArchive.getId().getId(), correctId);
     }
 
     @Test

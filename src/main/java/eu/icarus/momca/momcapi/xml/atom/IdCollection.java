@@ -19,7 +19,7 @@ public class IdCollection extends Id {
     private final String collectionIdentifier;
 
     /**
-     * Instantiates a new collection atom id.
+     * Instantiates a new collection id.
      *
      * @param collectionIdentifier The identifier to use. Can be either just the identifier of the collection,
      *                             e.g. {@code MedDocBulgEmp} or a full collection atom:id, e.g.
@@ -29,10 +29,10 @@ public class IdCollection extends Id {
 
         super((collectionIdentifier.split("/").length == VALID_ID_PARTS)
                 ? collectionIdentifier
-                : String.format("%s/%s", ResourceType.COLLECTION.getAtomIdPart(), collectionIdentifier));
+                : String.format("%s/%s", ResourceType.COLLECTION.getNameInId(), collectionIdentifier));
 
 
-        if (isAtomId(collectionIdentifier) && !isCollectionId(collectionIdentifier)) {
+        if (isId(collectionIdentifier) && !isCollectionId(collectionIdentifier)) {
             String message = String.format("'%s' is not a valid collection atom:id.", collectionIdentifier);
             throw new IllegalArgumentException(message);
         }
@@ -42,8 +42,8 @@ public class IdCollection extends Id {
 
     }
 
-    private boolean isCollectionId(@NotNull String collectionAtomId) {
-        String[] idParts = collectionAtomId.split("/");
+    private boolean isCollectionId(@NotNull String collectionId) {
+        String[] idParts = collectionId.split("/");
         return getType() == ResourceType.COLLECTION && idParts.length == VALID_ID_PARTS;
     }
 
@@ -55,7 +55,7 @@ public class IdCollection extends Id {
         return collectionIdentifier;
     }
 
-    private boolean isAtomId(String collectionIdentifier) {
+    private boolean isId(String collectionIdentifier) {
         return collectionIdentifier.contains("/");
     }
 

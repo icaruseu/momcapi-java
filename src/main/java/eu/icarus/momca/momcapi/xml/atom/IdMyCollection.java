@@ -19,7 +19,7 @@ public class IdMyCollection extends Id {
     private final String myCollectionIdentifier;
 
     /**
-     * Instantiates a new collection atom id.
+     * Instantiates a new collection id.
      *
      * @param myCollectionIdentifier The identifier to use. Can be either just the identifier of the myCollection,
      *                               e.g. {@code 67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3} or a full myCollection atom:id, e.g.
@@ -29,9 +29,9 @@ public class IdMyCollection extends Id {
 
         super((myCollectionIdentifier.split("/").length == VALID_ID_PARTS)
                 ? myCollectionIdentifier
-                : String.format("%s/%s", ResourceType.MY_COLLECTION.getAtomIdPart(), myCollectionIdentifier));
+                : String.format("%s/%s", ResourceType.MY_COLLECTION.getNameInId(), myCollectionIdentifier));
 
-        if (isAtomId(myCollectionIdentifier) && !isMyCollectionId(myCollectionIdentifier)) {
+        if (isId(myCollectionIdentifier) && !isMyCollectionId(myCollectionIdentifier)) {
             String message = String.format("'%s' is not a valid myCollection atom:id.", myCollectionIdentifier);
             throw new IllegalArgumentException(message);
         }
@@ -41,8 +41,8 @@ public class IdMyCollection extends Id {
 
     }
 
-    private boolean isMyCollectionId(@NotNull String myCollectionAtomId) {
-        String[] idParts = myCollectionAtomId.split("/");
+    private boolean isMyCollectionId(@NotNull String myCollectionId) {
+        String[] idParts = myCollectionId.split("/");
         return getType() == ResourceType.MY_COLLECTION && idParts.length == VALID_ID_PARTS;
     }
 
@@ -54,7 +54,7 @@ public class IdMyCollection extends Id {
         return myCollectionIdentifier;
     }
 
-    private boolean isAtomId(String myCollectionIdentifier) {
+    private boolean isId(String myCollectionIdentifier) {
         return myCollectionIdentifier.contains("/");
     }
 

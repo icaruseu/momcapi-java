@@ -12,13 +12,12 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 /**
- * @author daniel
- *         Created on 17.07.2015.
+ * Created by daniel on 17.07.2015.
  */
 public class Archive extends MomcaResource {
 
     @NotNull
-    private final IdArchive atomId;
+    private final IdArchive id;
     @NotNull
     private final String countryCode;
     @NotNull
@@ -30,7 +29,7 @@ public class Archive extends MomcaResource {
 
     public Archive(@NotNull MomcaResource momcaResource) {
         super(momcaResource);
-        atomId = initAtomId();
+        id = initId();
 
         List<String> shortNameList = momcaResource.queryContentAsList(XpathQuery.QUERY_EAG_REPOSITORID);
         List<String> nameList = momcaResource.queryContentAsList(XpathQuery.QUERY_EAG_AUTFORM);
@@ -55,8 +54,8 @@ public class Archive extends MomcaResource {
     }
 
     @NotNull
-    public IdArchive getAtomId() {
-        return atomId;
+    public IdArchive getId() {
+        return id;
     }
 
     @NotNull
@@ -89,7 +88,7 @@ public class Archive extends MomcaResource {
         return shortName;
     }
 
-    private IdArchive initAtomId() {
+    private IdArchive initId() {
 
         String idString = queryUniqueElement(XpathQuery.QUERY_ATOM_ID);
 

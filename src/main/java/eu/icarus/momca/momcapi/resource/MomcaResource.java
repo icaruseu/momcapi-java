@@ -137,18 +137,18 @@ public class MomcaResource {
     @NotNull
     String queryUniqueElement(@NotNull XpathQuery query) {
 
-        List<String> atomQueryResults = queryContentAsList(query);
+        List<String> queryResults = queryContentAsList(query);
 
         String result;
 
-        switch (atomQueryResults.size()) {
+        switch (queryResults.size()) {
 
             case 0:
                 result = "";
                 break;
 
             case 1:
-                result = atomQueryResults.get(0);
+                result = queryResults.get(0);
                 break;
 
             default:

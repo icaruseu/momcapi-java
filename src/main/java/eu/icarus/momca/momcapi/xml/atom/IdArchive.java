@@ -25,9 +25,9 @@ public class IdArchive extends Id {
     public IdArchive(@NotNull String archiveIdentifier) {
 
         super(archiveIdentifier.split("/").length == VALID_ID_PARTS
-                ? archiveIdentifier : String.format("%s/%s", ResourceType.ARCHIVE.getAtomIdPart(), archiveIdentifier));
+                ? archiveIdentifier : String.format("%s/%s", ResourceType.ARCHIVE.getNameInId(), archiveIdentifier));
 
-        if (isAtomId(archiveIdentifier) && !isArchiveAtomId(archiveIdentifier)) {
+        if (isId(archiveIdentifier) && !isIdArchive(archiveIdentifier)) {
             String message = String.format("'%s' is not a valid archive atom:id.", archiveIdentifier);
             throw new IllegalArgumentException(message);
         }
@@ -45,12 +45,12 @@ public class IdArchive extends Id {
         return archiveIdentifier;
     }
 
-    private boolean isArchiveAtomId(@NotNull String archiveAtomId) {
-        String[] idParts = archiveAtomId.split("/");
+    private boolean isIdArchive(@NotNull String idArchive) {
+        String[] idParts = idArchive.split("/");
         return (getType() == ResourceType.ARCHIVE && idParts.length == VALID_ID_PARTS);
     }
 
-    private boolean isAtomId(String archiveIdentifier) {
+    private boolean isId(String archiveIdentifier) {
         return archiveIdentifier.contains("/");
     }
 

@@ -27,9 +27,9 @@ public class CharterManager {
     }
 
     @NotNull
-    public List<Charter> getCharterInstances(@NotNull IdCharter atomIdCharter) {
+    public List<Charter> getCharterInstances(@NotNull IdCharter idCharter) {
 
-        return momcaConnection.queryDatabase(ExistQueryFactory.getResourceUri(atomIdCharter, null
+        return momcaConnection.queryDatabase(ExistQueryFactory.getResourceUri(idCharter, null
         )).stream()
                 .map(this::getCharterFromUri)
                 .filter(Optional::isPresent)
@@ -39,9 +39,9 @@ public class CharterManager {
     }
 
     @NotNull
-    public List<Charter> getCharterInstances(@NotNull IdCharter atomIdCharter, @NotNull CharterStatus charterStatus) {
+    public List<Charter> getCharterInstances(@NotNull IdCharter idCharter, @NotNull CharterStatus charterStatus) {
 
-        return momcaConnection.queryDatabase(ExistQueryFactory.getResourceUri(atomIdCharter, charterStatus.getResourceRoot()
+        return momcaConnection.queryDatabase(ExistQueryFactory.getResourceUri(idCharter, charterStatus.getResourceRoot()
         )).stream()
                 .map(this::getCharterFromUri)
                 .filter(Optional::isPresent)
@@ -53,7 +53,7 @@ public class CharterManager {
     @NotNull
     public List<IdCharter> listErroneouslySavedCharters(@NotNull User user) {
         return user.listSavedCharterIds().stream()
-                .filter(charterAtomId -> !isCharterExisting(charterAtomId, ResourceRoot.METADATA_CHARTER_SAVED))
+                .filter(idCharter -> !isCharterExisting(idCharter, ResourceRoot.METADATA_CHARTER_SAVED))
                 .collect(Collectors.toList());
     }
 
@@ -64,8 +64,8 @@ public class CharterManager {
         return momcaConnection.getExistResource(resourceName, parentUri).map(Charter::new);
     }
 
-    private boolean isCharterExisting(@NotNull IdCharter atomIdCharter, @Nullable ResourceRoot resourceRoot) {
-        ExistQuery query = ExistQueryFactory.checkResourceExistence(atomIdCharter, resourceRoot);
+    private boolean isCharterExisting(@NotNull IdCharter idCharter, @Nullable ResourceRoot resourceRoot) {
+        ExistQuery query = ExistQueryFactory.checkResourceExistence(idCharter, resourceRoot);
         return !momcaConnection.queryDatabase(query).isEmpty();
     }
 

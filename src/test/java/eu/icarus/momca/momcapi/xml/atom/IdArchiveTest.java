@@ -13,41 +13,41 @@ public class IdArchiveTest {
     public void testConstructor() throws Exception {
 
         String archiveIdentifier = "CH-KAE";
-        String archiveAtomId = "tag:www.monasterium.net,2011:/archive/CH-KAE";
+        String idArchive = "tag:www.monasterium.net,2011:/archive/CH-KAE";
         String correctXml = "<atom:id xmlns:atom=\"http://www.w3.org/2005/Atom\">" +
                 "tag:www.monasterium.net,2011:/archive/CH-KAE</atom:id>";
 
         IdArchive id1 = new IdArchive(archiveIdentifier);
         assertEquals(id1.toXML(), correctXml);
 
-        IdArchive id2 = new IdArchive(archiveAtomId);
+        IdArchive id2 = new IdArchive(idArchive);
         assertEquals(id2.toXML(), correctXml);
 
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConstructorWithWrongId() throws Exception {
-        String charterAtomId = "tag:www.monasterium.net,2011:/charter/CH-KAE/Urkunden/Urkunde_1";
-        new IdArchive(charterAtomId);
+        String idCharter = "tag:www.monasterium.net,2011:/charter/CH-KAE/Urkunden/Urkunde_1";
+        new IdArchive(idCharter);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConstructorWithFaultyId() throws Exception {
-        String faultyAtomId = "tag:www.monasterium.net,2011:/archive/CH-KAE/Urkunden/";
-        new IdArchive(faultyAtomId);
+        String faultyId = "tag:www.monasterium.net,2011:/archive/CH-KAE/Urkunden/";
+        new IdArchive(faultyId);
     }
 
     @Test
     public void testGetArchiveIdentifier() throws Exception {
 
         String archiveIdentifier = "CH-KAE";
-        String archiveAtomId = "tag:www.monasterium.net,2011:/archive/CH-KAE";
+        String idArchive = "tag:www.monasterium.net,2011:/archive/CH-KAE";
 
         IdArchive id1 = new IdArchive(archiveIdentifier);
         assertEquals(id1.getArchiveIdentifier(), archiveIdentifier);
 
 
-        IdArchive id2 = new IdArchive(archiveAtomId);
+        IdArchive id2 = new IdArchive(idArchive);
         assertEquals(id2.getArchiveIdentifier(), archiveIdentifier);
 
     }

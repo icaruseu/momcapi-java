@@ -20,10 +20,10 @@ public enum ResourceType {
     MY_COLLECTION("mycollection"),
     SVG("svg");
 
-    private final String atomIdName;
+    private final String nameInId;
 
-    ResourceType(String atomIdName) {
-        this.atomIdName = atomIdName;
+    ResourceType(String nameInId) {
+        this.nameInId = nameInId;
     }
 
     /**
@@ -36,7 +36,7 @@ public enum ResourceType {
         Optional<ResourceType> type = Optional.empty();
 
         for (ResourceType t : ResourceType.values()) {
-            if (value.equals(t.getAtomIdPart())) {
+            if (value.equals(t.getNameInId())) {
                 type = Optional.of(t);
             }
         }
@@ -49,8 +49,8 @@ public enum ResourceType {
      * @return The type as used in an {@code atom:id} in MOM-CA, e.g. {@code charter} as in
      * {@code tag:www.monasterium.net,2011:/}<b>{@code charter}</b>{@code /CH-KAE/Urkunden/KAE_Urkunde_Nr_1}
      */
-    public String getAtomIdPart() {
-        return atomIdName;
+    public String getNameInId() {
+        return nameInId;
     }
 
 }

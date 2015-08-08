@@ -13,40 +13,40 @@ public class IdCollectionTest {
     public void testConstructor() throws Exception {
 
         String collectionIdentifier = "MedDocBulgEmp";
-        String collectionAtomId = "tag:www.monasterium.net,2011:/collection/MedDocBulgEmp";
+        String collectionId = "tag:www.monasterium.net,2011:/collection/MedDocBulgEmp";
         String correctXml = "<atom:id xmlns:atom=\"http://www.w3.org/2005/Atom\">" +
                 "tag:www.monasterium.net,2011:/collection/MedDocBulgEmp</atom:id>";
 
         IdCollection id1 = new IdCollection(collectionIdentifier);
         assertEquals(id1.toXML(), correctXml);
 
-        IdCollection id2 = new IdCollection(collectionAtomId);
+        IdCollection id2 = new IdCollection(collectionId);
         assertEquals(id2.toXML(), correctXml);
 
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConstructorWithWrongId() throws Exception {
-        String archiveAtomId = "tag:www.monasterium.net,2011:/archive/CH-KAE";
-        new IdCollection(archiveAtomId);
+        String archiveId = "tag:www.monasterium.net,2011:/archive/CH-KAE";
+        new IdCollection(archiveId);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConstructorWithFaultyId() throws Exception {
-        String faultyAtomId = "tag:www.monasterium.net,2011:/collection/CH-KAE/Urkunden/Urkunde_1";
-        new IdCollection(faultyAtomId);
+        String faultyId = "tag:www.monasterium.net,2011:/collection/CH-KAE/Urkunden/Urkunde_1";
+        new IdCollection(faultyId);
     }
 
     @Test
     public void testGetCollectionIdentifier() throws Exception {
 
         String collectionIdentifier = "MedDocBulgEmp";
-        String collectionAtomId = "tag:www.monasterium.net,2011:/collection/MedDocBulgEmp";
+        String collectionId = "tag:www.monasterium.net,2011:/collection/MedDocBulgEmp";
 
         IdCollection id1 = new IdCollection(collectionIdentifier);
         assertEquals(id1.getCollectionIdentifier(), collectionIdentifier);
 
-        IdCollection id2 = new IdCollection(collectionAtomId);
+        IdCollection id2 = new IdCollection(collectionId);
         assertEquals(id2.getCollectionIdentifier(), collectionIdentifier);
 
     }

@@ -12,14 +12,14 @@ public class IdFondTest {
     @Test
     public void testConstructor() throws Exception {
 
-        String fondAtomId = "tag:www.monasterium.net,2011:/fond/CH-KAE/Urkunden";
+        String fondId = "tag:www.monasterium.net,2011:/fond/CH-KAE/Urkunden";
         String archiveIdentifier = "CH-KAE";
         String fondIdentifier = "Urkunden";
 
         String correctXml = "<atom:id xmlns:atom=\"http://www.w3.org/2005/Atom\">" +
                 "tag:www.monasterium.net,2011:/fond/CH-KAE/Urkunden</atom:id>";
 
-        IdFond id1 = new IdFond(fondAtomId);
+        IdFond id1 = new IdFond(fondId);
         IdFond id2 = new IdFond(archiveIdentifier, fondIdentifier);
 
         assertEquals(id1.toXML(), correctXml);
@@ -29,24 +29,24 @@ public class IdFondTest {
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConstructorWithWrongId() throws Exception {
-        String charterAtomId = "tag:www.monasterium.net,2011:/archive/CH-KAE/Urkunden/Urkunde_1";
-        new IdFond(charterAtomId);
+        String charterId = "tag:www.monasterium.net,2011:/archive/CH-KAE/Urkunden/Urkunde_1";
+        new IdFond(charterId);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConstructorWithFaultyId() throws Exception {
-        String faultyAtomId = "tag:www.monasterium.net,2011:/fond/CH-KAE";
-        new IdFond(faultyAtomId);
+        String faultyId = "tag:www.monasterium.net,2011:/fond/CH-KAE";
+        new IdFond(faultyId);
     }
 
     @Test
     public void testGetArchiveIdentifier() throws Exception {
 
-        String fondAtomId = "tag:www.monasterium.net,2011:/fond/CH-KAE/Urkunden";
+        String fondId = "tag:www.monasterium.net,2011:/fond/CH-KAE/Urkunden";
         String archiveIdentifier = "CH-KAE";
         String fondIdentifier = "Urkunden";
 
-        IdFond id1 = new IdFond(fondAtomId);
+        IdFond id1 = new IdFond(fondId);
         IdFond id2 = new IdFond(archiveIdentifier, fondIdentifier);
 
         assertEquals(id1.getArchiveIdentifier(), archiveIdentifier);
@@ -57,11 +57,11 @@ public class IdFondTest {
     @Test
     public void testGetFondIdentifier() throws Exception {
 
-        String fondAtomId = "tag:www.monasterium.net,2011:/fond/CH-KAE/Urkunden";
+        String fondId = "tag:www.monasterium.net,2011:/fond/CH-KAE/Urkunden";
         String archiveIdentifier = "CH-KAE";
         String fondIdentifier = "Urkunden";
 
-        IdFond id1 = new IdFond(fondAtomId);
+        IdFond id1 = new IdFond(fondId);
         IdFond id2 = new IdFond(archiveIdentifier, fondIdentifier);
 
         assertEquals(id1.getFondIdentifier(), fondIdentifier);

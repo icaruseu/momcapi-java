@@ -35,7 +35,7 @@ public class ExistQueryFactory {
                 "%s collection('/db/mom-data%s')//atom:entry[.//atom:id/text()='%s'][1]",
                 getNamespaceDeclaration(Namespace.ATOM),
                 getRootCollectionString(resourceRoot),
-                resourceId.getAtomId());
+                resourceId.getId());
 
         return new ExistQuery(query);
 
@@ -93,7 +93,7 @@ public class ExistQueryFactory {
                         " return concat(util:collection-name($node), '/', util:document-name($node))",
                 getNamespaceDeclaration(Namespace.ATOM),
                 getRootCollectionString(resourceRoot),
-                resourceId.getAtomId());
+                resourceId.getId());
 
         return new ExistQuery(query);
 
