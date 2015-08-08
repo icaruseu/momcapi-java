@@ -152,7 +152,7 @@ public class CountryManager {
      */
     public void deleteCountry(@NotNull String code) {
 
-        List<String> archivesForCode = momcaConnection.queryDatabase(ExistQueryFactory.listArchivesForCountry(code));
+        List<String> archivesForCode = momcaConnection.queryDatabase(ExistQueryFactory.listIdArchivesForCountry(code));
         if (!archivesForCode.isEmpty()) {
             throw new MomcaException("There are existing archives for country '" + code + "'.");
         }
@@ -179,7 +179,7 @@ public class CountryManager {
         if (!matchingSubdivisions.isEmpty()) {
 
             String nativeForm = matchingSubdivisions.get(0).getNativeform();
-            ExistQuery query = ExistQueryFactory.listArchivesForSubdivision(nativeForm);
+            ExistQuery query = ExistQueryFactory.listIdArchivesForSubdivision(nativeForm);
 
             if (!momcaConnection.queryDatabase(query).isEmpty()) {
                 throw new MomcaException("There are existing archives for subdivision '" + code + "'.");

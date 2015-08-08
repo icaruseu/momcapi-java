@@ -127,40 +127,6 @@ public class ExistQueryFactory {
     }
 
     /**
-     * @param countryCode The code of a country, e.g. {@code DE}.
-     * @return A query to list all archives that use the country code in their XML.
-     */
-    @NotNull
-    public static ExistQuery listArchivesForCountry(@NotNull String countryCode) {
-
-        String query = String.format(
-                "%s collection('/db/mom-data/metadata.archive.public')//atom:entry[.//eag:repositorid/@countrycode='%s']/atom:id/text()",
-                getNamespaceDeclaration(Namespace.ATOM, Namespace.EAG),
-                countryCode
-        );
-
-        return new ExistQuery(query);
-
-    }
-
-    /**
-     * @param subdivisionName The native name of a subdivision, e.g. {@code Bayern}.
-     * @return A query to list the ids of all archives that use the name of a subdivision in their XML.
-     */
-    @NotNull
-    public static ExistQuery listArchivesForSubdivision(@NotNull String subdivisionName) {
-
-        String query = String.format(
-                "%s collection('/db/mom-data/metadata.archive.public')//atom:entry[.//eag:firstdem/text()='%s']/atom:id/text()",
-                getNamespaceDeclaration(Namespace.ATOM, Namespace.EAG),
-                subdivisionName
-        );
-
-        return new ExistQuery(query);
-
-    }
-
-    /**
      * @return A query to get a list of the text content of all {@code eap:country/eap:code} elements. This is
      * effectively a list of all countries registered in the portal.
      */
@@ -185,6 +151,40 @@ public class ExistQueryFactory {
         String query = String.format(
                 "%s collection('/db/mom-data/metadata.archive.public')//atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM)
+        );
+
+        return new ExistQuery(query);
+
+    }
+
+    /**
+     * @param countryCode The code of a country, e.g. {@code DE}.
+     * @return A query to list all archives that use the country code in their XML.
+     */
+    @NotNull
+    public static ExistQuery listIdArchivesForCountry(@NotNull String countryCode) {
+
+        String query = String.format(
+                "%s collection('/db/mom-data/metadata.archive.public')//atom:entry[.//eag:repositorid/@countrycode='%s']/atom:id/text()",
+                getNamespaceDeclaration(Namespace.ATOM, Namespace.EAG),
+                countryCode
+        );
+
+        return new ExistQuery(query);
+
+    }
+
+    /**
+     * @param subdivisionNativeform The native name of a subdivision, e.g. {@code Bayern}.
+     * @return A query to list the ids of all archives that use the name of a subdivision in their XML.
+     */
+    @NotNull
+    public static ExistQuery listIdArchivesForSubdivision(@NotNull String subdivisionNativeform) {
+
+        String query = String.format(
+                "%s collection('/db/mom-data/metadata.archive.public')//atom:entry[.//eag:firstdem/text()='%s']/atom:id/text()",
+                getNamespaceDeclaration(Namespace.ATOM, Namespace.EAG),
+                subdivisionNativeform
         );
 
         return new ExistQuery(query);

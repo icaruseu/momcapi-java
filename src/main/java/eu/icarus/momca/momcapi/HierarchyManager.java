@@ -4,6 +4,8 @@ import eu.icarus.momca.momcapi.exception.MomcaException;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
 import eu.icarus.momca.momcapi.resource.Archive;
 import eu.icarus.momca.momcapi.xml.atom.IdArchive;
+import eu.icarus.momca.momcapi.xml.eap.Country;
+import eu.icarus.momca.momcapi.xml.eap.Subdivision;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -37,8 +39,22 @@ public class HierarchyManager {
     }
 
     @NotNull
-    public List<IdArchive> listArchives(){
+    public List<IdArchive> listArchives() {
         List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listIdArchives());
+        return queryResults.stream().map(IdArchive::new).collect(Collectors.toList());
+    }
+
+    @NotNull
+    public List<IdArchive> listArchivesForCountry(@NotNull Country country) {
+        List<String> queryResults = momcaConnection.queryDatabase(
+                ExistQueryFactory.listIdArchivesForCountry(country.getCode()));
+        return queryResults.stream().map(IdArchive::new).collect(Collectors.toList());
+    }
+
+    @NotNull
+    public List<IdArchive> listArchivesForSubdivision(@NotNull Subdivision subdivision) {
+        List<String> queryResults = momcaConnection.queryDatabase(
+                ExistQueryFactory.listIdArchivesForSubdivision(subdivision.getNativeform()));
         return queryResults.stream().map(IdArchive::new).collect(Collectors.toList());
     }
 

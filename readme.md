@@ -9,6 +9,8 @@ Usage
 1. Create a new `MomcaConnection` object providing the URL of the databases' xmlrpc, e.g. `xmldb:exist://localhost:8181/xmlrpc` and admin credentials.
 2. Use the various *manager* classes, e.g. `CharterManager`, provided by MomcaConnection to access and modify data.
 
+To run the unit tests, a new MOM-CA instance must be created and the backup data in `/src/test/resources/test_database_backup.zip` needs to be restored.
+
 Features
 --------
 
