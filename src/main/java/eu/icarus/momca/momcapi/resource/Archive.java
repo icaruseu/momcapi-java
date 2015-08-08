@@ -2,8 +2,6 @@ package eu.icarus.momca.momcapi.resource;
 
 import eu.icarus.momca.momcapi.query.XpathQuery;
 import eu.icarus.momca.momcapi.xml.atom.IdArchive;
-import eu.icarus.momca.momcapi.xml.eag.Address;
-import eu.icarus.momca.momcapi.xml.eag.ContactInformation;
 import eu.icarus.momca.momcapi.xml.eag.Desc;
 import nu.xom.Element;
 import nu.xom.Nodes;
@@ -69,7 +67,7 @@ public class Archive extends MomcaResource {
     }
 
     @NotNull
-    public String getCountrySubdivision() {
+    public String getSubdivisionNativeForm() {
         return desc.getSubdivisionName();
     }
 
@@ -99,6 +97,18 @@ public class Archive extends MomcaResource {
             return new IdArchive(idString);
         }
 
+    }
+
+    @Override
+    public String toString() {
+
+        return "Archive{" +
+                "id=" + id +
+                ", countryCode='" + countryCode + '\'' +
+                ", desc=" + desc +
+                ", name='" + name + '\'' +
+                ", shortName='" + shortName + '\'' +
+                "} " + super.toString();
     }
 
 }

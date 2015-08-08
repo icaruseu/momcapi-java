@@ -1,7 +1,5 @@
 package eu.icarus.momca.momcapi.resource;
 
-import eu.icarus.momca.momcapi.xml.eag.Address;
-import eu.icarus.momca.momcapi.xml.eag.ContactInformation;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -59,7 +57,7 @@ public class ArchiveTest {
 
     @Test
     public void testGetCountrySubdivision() throws Exception {
-        assertEquals(correctArchive.getCountrySubdivision(), "Schwyz");
+        assertEquals(correctArchive.getSubdivisionNativeForm(), "Schwyz");
     }
 
     @Test

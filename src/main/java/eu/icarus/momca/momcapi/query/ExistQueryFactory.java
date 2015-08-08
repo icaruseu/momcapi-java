@@ -158,6 +158,14 @@ public class ExistQueryFactory {
     }
 
     /**
+     * @return Returns the {@code xs:dateTime} (with timezone) from the database.
+     */
+    @NotNull
+    public static ExistQuery getCurrentDateTime() {
+        return new ExistQuery("current-dateTime()");
+    }
+
+    /**
      * @param countryCode The code of a country, e.g. {@code DE}.
      * @return A query to list all archives that use the country code in their XML.
      */

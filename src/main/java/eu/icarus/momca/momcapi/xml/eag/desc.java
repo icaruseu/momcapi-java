@@ -1,6 +1,8 @@
 package eu.icarus.momca.momcapi.xml.eag;
 
 import eu.icarus.momca.momcapi.Util;
+import eu.icarus.momca.momcapi.resource.Address;
+import eu.icarus.momca.momcapi.resource.ContactInformation;
 import eu.icarus.momca.momcapi.xml.Namespace;
 import nu.xom.Element;
 import nu.xom.Elements;

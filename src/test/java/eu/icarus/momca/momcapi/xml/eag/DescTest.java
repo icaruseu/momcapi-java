@@ -1,6 +1,8 @@
 package eu.icarus.momca.momcapi.xml.eag;
 
 import eu.icarus.momca.momcapi.Util;
+import eu.icarus.momca.momcapi.resource.Address;
+import eu.icarus.momca.momcapi.resource.ContactInformation;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
 
