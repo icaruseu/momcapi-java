@@ -206,7 +206,7 @@ public class MomcaConnection {
         try {
             resultSet = queryService.query(existQuery.getQuery());
         } catch (XMLDBException e) {
-            throw new MomcaException(String.format("Failed to execute query '%s'", existQuery), e);
+            throw new MomcaException(String.format("Failed to execute query '%s'", existQuery.getQuery()), e);
         }
 
         List<String> resultList = new ArrayList<>(0);

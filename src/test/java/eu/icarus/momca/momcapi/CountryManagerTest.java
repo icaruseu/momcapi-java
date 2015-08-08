@@ -1,12 +1,12 @@
 package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.exception.MomcaException;
-import eu.icarus.momca.momcapi.query.ExistQueryFactory;
 import eu.icarus.momca.momcapi.xml.eap.Country;
 import eu.icarus.momca.momcapi.xml.eap.Subdivision;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,9 +23,17 @@ public class CountryManagerTest {
 
     @BeforeClass
     public void setUp() throws Exception {
+
+
         momcaConnection = TestUtils.initMomcaConnection();
         countryManager = momcaConnection.getCountryManager();
         assertNotNull(countryManager, "MOM-CA connection not initialized.");
+
+        countryManager.deleteCountry("AT");
+        countryManager.deleteCountry("SE");
+        countryManager.deleteSubdivision(new Country("CH", "Schweiz", new ArrayList<>(0)), "CH-SG");
+        countryManager.deleteSubdivision(new Country("RS", "Serbia", new ArrayList<>(0)), "RS-BG");
+
     }
 
     @Test

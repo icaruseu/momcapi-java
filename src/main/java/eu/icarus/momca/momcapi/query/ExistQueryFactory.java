@@ -127,21 +127,6 @@ public class ExistQueryFactory {
     }
 
     /**
-     * @return A query that lists the ids of all archives in the database as strings.
-     */
-    @NotNull
-    public static ExistQuery listIdArchives() {
-
-        String query = String.format(
-                "%s collection('/db/mom-data/metadata.archive.public')//atom:id/text()",
-                getNamespaceDeclaration(Namespace.ATOM)
-        );
-
-        return new ExistQuery(query);
-
-    }
-
-    /**
      * @param countryCode The code of a country, e.g. {@code DE}.
      * @return A query to list all archives that use the country code in their XML.
      */
@@ -149,10 +134,8 @@ public class ExistQueryFactory {
     public static ExistQuery listArchivesForCountry(@NotNull String countryCode) {
 
         String query = String.format(
-                "%s let $repositoridNodes := collection('/db/mom-data/metadata.archive.public')//eag:repositorid[@countrycode='%s']\n" +
-                        "for $node in $repositoridNodes\n" +
-                        "return concat(util:collection-name($node), '/', util:document-name($node))",
-                getNamespaceDeclaration(Namespace.EAG),
+                "%s collection('/db/mom-data/metadata.archive.public')//atom:entry[.//eag:repositorid/@countrycode='%s']/atom:id/text()",
+                getNamespaceDeclaration(Namespace.ATOM, Namespace.EAG),
                 countryCode
         );
 
@@ -162,16 +145,14 @@ public class ExistQueryFactory {
 
     /**
      * @param subdivisionName The native name of a subdivision, e.g. {@code Bayern}.
-     * @return A query to list all archives that use the name of a subdivision in their XML.
+     * @return A query to list the ids of all archives that use the name of a subdivision in their XML.
      */
     @NotNull
     public static ExistQuery listArchivesForSubdivision(@NotNull String subdivisionName) {
 
         String query = String.format(
-                "%s let $repositoridNodes := collection('/db/mom-data/metadata.archive.public')//eag:firstdem[text()='%s']\n" +
-                        "for $node in $repositoridNodes\n" +
-                        "return concat(util:collection-name($node), '/', util:document-name($node))",
-                getNamespaceDeclaration(Namespace.EAG),
+                "%s collection('/db/mom-data/metadata.archive.public')//atom:entry[.//eag:firstdem/text()='%s']/atom:id/text()",
+                getNamespaceDeclaration(Namespace.ATOM, Namespace.EAG),
                 subdivisionName
         );
 
@@ -190,6 +171,21 @@ public class ExistQueryFactory {
                 "%s doc('/db/mom-data/%s/mom.portal.xml')//eap:country/eap:code/text()",
                 getNamespaceDeclaration(Namespace.EAP),
                 ResourceRoot.METADATA_PORTAL_PUBLIC.getCollectionName());
+
+        return new ExistQuery(query);
+
+    }
+
+    /**
+     * @return A query that lists the ids of all archives in the database as strings.
+     */
+    @NotNull
+    public static ExistQuery listIdArchives() {
+
+        String query = String.format(
+                "%s collection('/db/mom-data/metadata.archive.public')//atom:id/text()",
+                getNamespaceDeclaration(Namespace.ATOM)
+        );
 
         return new ExistQuery(query);
 
