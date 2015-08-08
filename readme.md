@@ -38,7 +38,11 @@ _Country manager_
 
 _Hierarchy manager_
 
+* List all archives
+* List all archives belonging to a specific country
+* List all archvies belonging to a specific subdivision
 * Get specific archive from the database
+* Add new archive
 
 _Charter Manager_
 
