@@ -4,12 +4,14 @@ import eu.icarus.momca.momcapi.resource.Address;
 import eu.icarus.momca.momcapi.resource.Archive;
 import eu.icarus.momca.momcapi.resource.ContactInformation;
 import eu.icarus.momca.momcapi.xml.atom.IdArchive;
+import eu.icarus.momca.momcapi.xml.atom.IdFond;
 import eu.icarus.momca.momcapi.xml.eap.Country;
 import eu.icarus.momca.momcapi.xml.eap.Subdivision;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.testng.Assert.*;
 
@@ -20,6 +22,27 @@ public class HierarchyManagerTest {
 
     private HierarchyManager hm;
     private MomcaConnection mc;
+
+    @Test
+    public void testDeleteArchive() throws Exception {
+
+    }
+
+    @Test
+    public void testListFondsForArchive() throws Exception {
+
+        IdArchive id1 = new IdArchive("CH-KAE");
+        Archive archive1 = hm.getArchive(id1).get();
+        List<IdFond> resultList1 = hm.listFondsForArchive(archive1);
+        assertEquals(resultList1.size(), 1);
+        assertEquals(resultList1.get(0).getFondIdentifier(), "Urkunden");
+
+        IdArchive id2 = new IdArchive("DE-BayHStA");
+        Archive archive2 = hm.getArchive(id2).get();
+        List<IdFond> resultList2 = hm.listFondsForArchive(archive2);
+        assertEquals(resultList2.size(), 0);
+
+    }
 
     @BeforeClass
     public void setUp() throws Exception {
@@ -42,6 +65,7 @@ public class HierarchyManagerTest {
         String logoUrl = "http://example.com/image.png";
 
         Archive newArchive = hm.addArchive(author, shortName, name, country, subdivision, address, contactInformation, logoUrl);
+        hm.deleteArchive(newArchive);
 
         assertEquals(newArchive.getId().getArchiveIdentifier(), shortName);
 
@@ -54,8 +78,6 @@ public class HierarchyManagerTest {
         assertEquals(newArchive.getAddress(), address);
         assertEquals(newArchive.getContactInformation(), contactInformation);
         assertEquals(newArchive.getLogoUrl(), logoUrl);
-
-        hm.deleteArchive(newArchive);
 
     }
 

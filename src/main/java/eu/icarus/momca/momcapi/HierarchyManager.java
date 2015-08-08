@@ -10,6 +10,7 @@ import eu.icarus.momca.momcapi.xml.Namespace;
 import eu.icarus.momca.momcapi.xml.atom.Author;
 import eu.icarus.momca.momcapi.xml.atom.Entry;
 import eu.icarus.momca.momcapi.xml.atom.IdArchive;
+import eu.icarus.momca.momcapi.xml.atom.IdFond;
 import eu.icarus.momca.momcapi.xml.eag.Desc;
 import eu.icarus.momca.momcapi.xml.eap.Country;
 import eu.icarus.momca.momcapi.xml.eap.Subdivision;
@@ -32,6 +33,13 @@ public class HierarchyManager {
 
     public HierarchyManager(@NotNull MomcaConnection momcaConnection) {
         this.momcaConnection = momcaConnection;
+    }
+
+    @NotNull
+    public List<IdFond> listFondsForArchive(@NotNull Archive archive) {
+        List<String> queryResults = momcaConnection.queryDatabase(
+                ExistQueryFactory.listFondsForArchive(archive.getId().getArchiveIdentifier()));
+        return queryResults.stream().map(IdFond::new).collect(Collectors.toList());
     }
 
     @NotNull

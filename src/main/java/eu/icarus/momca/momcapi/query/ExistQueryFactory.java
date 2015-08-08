@@ -119,8 +119,7 @@ public class ExistQueryFactory {
                 elementToInsert,
                 resourceUri,
                 predicate,
-                qualifiedParentName
-        );
+                qualifiedParentName);
 
         return new ExistQuery(query);
 
@@ -150,8 +149,7 @@ public class ExistQueryFactory {
 
         String query = String.format(
                 "%s collection('/db/mom-data/metadata.archive.public')//atom:id/text()",
-                getNamespaceDeclaration(Namespace.ATOM)
-        );
+                getNamespaceDeclaration(Namespace.ATOM));
 
         return new ExistQuery(query);
 
@@ -175,8 +173,23 @@ public class ExistQueryFactory {
         String query = String.format(
                 "%s collection('/db/mom-data/metadata.archive.public')//atom:entry[.//eag:repositorid/@countrycode='%s']/atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM, Namespace.EAG),
-                countryCode
-        );
+                countryCode);
+
+        return new ExistQuery(query);
+
+    }
+
+    /**
+     * @param archiveIdentifier The archive the fonds to list need to belong to, e.g. {@code CH-KAE}
+     * @return A query to list the ids of all fonds that belong to a specific archive.
+     */
+    @NotNull
+    public static ExistQuery listFondsForArchive(@NotNull String archiveIdentifier) {
+
+        String query = String.format(
+                "%s collection('/db/mom-data/metadata.fond.public')//atom:id[contains(., '%s')]/text()",
+                getNamespaceDeclaration(Namespace.ATOM),
+                archiveIdentifier);
 
         return new ExistQuery(query);
 
@@ -192,8 +205,7 @@ public class ExistQueryFactory {
         String query = String.format(
                 "%s collection('/db/mom-data/metadata.archive.public')//atom:entry[.//eag:firstdem/text()='%s']/atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM, Namespace.EAG),
-                subdivisionNativeform
-        );
+                subdivisionNativeform);
 
         return new ExistQuery(query);
 
