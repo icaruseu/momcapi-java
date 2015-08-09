@@ -30,13 +30,6 @@ public class IdCharterTest {
     private static final String BASE_PATH = String.format("%s/%s", ARCHIVE_ID, FOND_ID);
 
     @Test
-    public void testConstructorForId() throws Exception {
-        IdCharter id = new IdCharter(FOND_CHARTER_ID);
-        assertEquals(id.getId(), FOND_CHARTER_ID);
-        assertEquals(id.getCharterIdentifier(), FOND_CHARTER_IDNO);
-    }
-
-    @Test
     public void testConstructorForCollectionCharter() throws Exception {
         IdCharter id = new IdCharter(COLLECTION_ID, COLLECTION_CHARTER_IDNO);
         assertEquals(id.getId(), COLLECTION_CHARTER_ID);
@@ -48,16 +41,23 @@ public class IdCharterTest {
         assertEquals(id.getId(), FOND_CHARTER_ID);
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testConstructorWithWrongId() throws Exception {
-        String collectionId = "tag:www.monasterium.net,2011:/collection/MedDocBulgEmp";
-        new IdCharter(collectionId);
+    @Test
+    public void testConstructorForId() throws Exception {
+        IdCharter id = new IdCharter(FOND_CHARTER_ID);
+        assertEquals(id.getId(), FOND_CHARTER_ID);
+        assertEquals(id.getCharterIdentifier(), FOND_CHARTER_IDNO);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConstructorWithFaultyId() throws Exception {
         String faultyId = "tag:www.monasterium.net,2011:/charter/RS-IAGNS";
         new IdCharter(faultyId);
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testConstructorWithWrongId() throws Exception {
+        String collectionId = "tag:www.monasterium.net,2011:/collection/MedDocBulgEmp";
+        new IdCharter(collectionId);
     }
 
     @Test

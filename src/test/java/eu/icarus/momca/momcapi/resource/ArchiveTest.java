@@ -3,7 +3,7 @@ package eu.icarus.momca.momcapi.resource;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
 
 /**
  * Created by djell on 07/08/2015.
@@ -32,12 +32,6 @@ public class ArchiveTest {
     }
 
     @Test
-    public void testGetId() throws Exception {
-        String correctId = "tag:www.monasterium.net,2011:/archive/CH-KAE";
-        assertEquals(correctArchive.getId().getId(), correctId);
-    }
-
-    @Test
     public void testGetContactInformation() throws Exception {
 
         ContactInformation correctContactInformation =
@@ -58,6 +52,12 @@ public class ArchiveTest {
     @Test
     public void testGetCountrySubdivision() throws Exception {
         assertEquals(correctArchive.getSubdivisionNativeForm(), "Schwyz");
+    }
+
+    @Test
+    public void testGetId() throws Exception {
+        String correctId = "tag:www.monasterium.net,2011:/archive/CH-KAE";
+        assertEquals(correctArchive.getId().getId(), correctId);
     }
 
     @Test

@@ -28,15 +28,15 @@ public class IdFondTest {
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testConstructorWithWrongId() throws Exception {
-        String charterId = "tag:www.monasterium.net,2011:/archive/CH-KAE/Urkunden/Urkunde_1";
-        new IdFond(charterId);
-    }
-
-    @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConstructorWithFaultyId() throws Exception {
         String faultyId = "tag:www.monasterium.net,2011:/fond/CH-KAE";
         new IdFond(faultyId);
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testConstructorWithWrongId() throws Exception {
+        String charterId = "tag:www.monasterium.net,2011:/archive/CH-KAE/Urkunden/Urkunde_1";
+        new IdFond(charterId);
     }
 
     @Test

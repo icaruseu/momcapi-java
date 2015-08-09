@@ -69,12 +69,6 @@ public class CharterTest {
     }
 
     @Test
-    public void testGetId() throws Exception {
-        Charter charter = new Charter(resource);
-        assertEquals(charter.getId().toXML(), ID_CHARTER.toXML());
-    }
-
-    @Test
     public void testGetCeiDate() throws Exception {
 
         Charter charterWithDate = new Charter(resource);
@@ -100,6 +94,12 @@ public class CharterTest {
         assertEquals(figures.get(0).toXML(), "<cei:figure xmlns:cei=\"http://www.monasterium.net/NS/cei\" n=\"KAE_A_BI_1-v\"><cei:graphic url=\"KAE_A_BI_1-v.jpg\">KAE_A_BI_1-v</cei:graphic></cei:figure>");
         assertEquals(figures.get(1).toXML(), "<cei:figure xmlns:cei=\"http://www.monasterium.net/NS/cei\"><cei:graphic url=\"KAE_A_BI_1-r.jpg\" /></cei:figure>");
 
+    }
+
+    @Test
+    public void testGetId() throws Exception {
+        Charter charter = new Charter(resource);
+        assertEquals(charter.getId().toXML(), ID_CHARTER.toXML());
     }
 
     @Test

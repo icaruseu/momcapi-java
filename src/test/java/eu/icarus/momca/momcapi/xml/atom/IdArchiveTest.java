@@ -26,15 +26,15 @@ public class IdArchiveTest {
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testConstructorWithWrongId() throws Exception {
-        String idCharter = "tag:www.monasterium.net,2011:/charter/CH-KAE/Urkunden/Urkunde_1";
-        new IdArchive(idCharter);
-    }
-
-    @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConstructorWithFaultyId() throws Exception {
         String faultyId = "tag:www.monasterium.net,2011:/archive/CH-KAE/Urkunden/";
         new IdArchive(faultyId);
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testConstructorWithWrongId() throws Exception {
+        String idCharter = "tag:www.monasterium.net,2011:/charter/CH-KAE/Urkunden/Urkunde_1";
+        new IdArchive(idCharter);
     }
 
     @Test

@@ -1,10 +1,14 @@
 package eu.icarus.momca.momcapi;
 
-import eu.icarus.momca.momcapi.exception.MomcaException;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
-import eu.icarus.momca.momcapi.resource.*;
+import eu.icarus.momca.momcapi.resource.Address;
+import eu.icarus.momca.momcapi.resource.Archive;
+import eu.icarus.momca.momcapi.resource.ContactInformation;
+import eu.icarus.momca.momcapi.resource.MomcaResource;
 import eu.icarus.momca.momcapi.xml.Namespace;
-import eu.icarus.momca.momcapi.xml.atom.*;
+import eu.icarus.momca.momcapi.xml.atom.Author;
+import eu.icarus.momca.momcapi.xml.atom.Entry;
+import eu.icarus.momca.momcapi.xml.atom.IdArchive;
 import eu.icarus.momca.momcapi.xml.eag.Desc;
 import eu.icarus.momca.momcapi.xml.eap.Country;
 import eu.icarus.momca.momcapi.xml.eap.Subdivision;
@@ -20,13 +24,10 @@ import java.util.stream.Collectors;
 /**
  * Created by daniel on 20.07.2015.
  */
-public class HierarchyManager {
+public class ArchiveManager extends AbstractManager {
 
-    @NotNull
-    private final MomcaConnection momcaConnection;
-
-    public HierarchyManager(@NotNull MomcaConnection momcaConnection) {
-        this.momcaConnection = momcaConnection;
+    public ArchiveManager(@NotNull MomcaConnection momcaConnection) {
+        super(momcaConnection);
     }
 
     @NotNull
@@ -65,7 +66,7 @@ public class HierarchyManager {
 
     public void deleteArchive(@NotNull Archive archive) {
 
-        if (!listFondsForArchive(archive).isEmpty()) {
+        if (!momcaConnection.getFondManager().listFondsForArchive(archive).isEmpty()) {
             String message = String.format("The archive '%s',  that is to be deleted still has associated fonds.",
                     archive.getShortName());
             throw new IllegalArgumentException(message);
@@ -80,25 +81,6 @@ public class HierarchyManager {
         return getMomcaResource(idArchive).map(Archive::new);
     }
 
-    @NotNull
-    public Optional<Fond> getFond(@NotNull IdFond idFond) {
-
-        Optional<Fond> fond = Optional.empty();
-
-        Optional<MomcaResource> fondResource = getMomcaResource(idFond);
-
-        if (fondResource.isPresent()) {
-
-            String prefsUrl = fondResource.get().getUri().replace("ead", "preferences");
-            Optional<MomcaResource> fondPrefs = getMomcaResource(prefsUrl);
-
-            fond = Optional.of(new Fond(fondResource.get(), fondPrefs));
-
-        }
-
-        return fond;
-
-    }
 
     @NotNull
     public List<IdArchive> listArchives() {
@@ -120,12 +102,6 @@ public class HierarchyManager {
         return queryResults.stream().map(IdArchive::new).collect(Collectors.toList());
     }
 
-    @NotNull
-    public List<IdFond> listFondsForArchive(@NotNull Archive archive) {
-        List<String> queryResults = momcaConnection.queryDatabase(
-                ExistQueryFactory.listFondsForArchive(archive.getId().getArchiveIdentifier()));
-        return queryResults.stream().map(IdFond::new).collect(Collectors.toList());
-    }
 
     @NotNull
     private Element createEagElement(@NotNull String shortName, @NotNull String archiveName,
@@ -175,33 +151,5 @@ public class HierarchyManager {
 
     }
 
-    @NotNull
-    private Optional<MomcaResource> getMomcaResource(@NotNull Id id) {
-
-        List<String> resourceUris = momcaConnection.queryDatabase(ExistQueryFactory.getResourceUri(id, null));
-
-        Optional<MomcaResource> resource = Optional.empty();
-
-        if (!resourceUris.isEmpty()) {
-
-            if (resourceUris.size() > 1) {
-                String message = String.format("More than one result for id '%s'", id.getId());
-                throw new MomcaException(message);
-            }
-
-            resource = getMomcaResource(resourceUris.get(0));
-
-        }
-
-        return resource;
-
-    }
-
-    @NotNull
-    private Optional<MomcaResource> getMomcaResource(@NotNull String resourceUri) {
-        String resourceName = Util.getLastUriPart(resourceUri);
-        String parentUri = Util.getParentUri(resourceUri);
-        return momcaConnection.getExistResource(resourceName, parentUri);
-    }
 
 }

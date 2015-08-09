@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
  *         Created on 03.07.2015.
  * @see
  */
-public class UserManager {
+public class UserManager extends AbstractManager {
 
     @NotNull
     private static final String NEW_USER_CONTENT = "<xrx:user xmlns:xrx=\"http://www.monasterium.net/NS/xrx\">" +
@@ -36,8 +36,6 @@ public class UserManager {
             " </xrx:storage> </xrx:user>";
     @NotNull
     private static final String PATH_USER = "/db/mom-data/xrx.user";
-    @NotNull
-    private final MomcaConnection momcaConnection;
 
     /**
      * Instantiates a new UserManager.
@@ -45,7 +43,7 @@ public class UserManager {
      * @param momcaConnection The connection to the database.
      */
     UserManager(@NotNull MomcaConnection momcaConnection) {
-        this.momcaConnection = momcaConnection;
+        super(momcaConnection);
     }
 
     /**

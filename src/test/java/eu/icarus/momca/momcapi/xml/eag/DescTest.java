@@ -19,11 +19,6 @@ public class DescTest {
     private static final Desc DESC = new Desc(Util.parseXml(CORRECT_XML));
 
     @Test
-    public void testGetLogoUrl() throws Exception {
-        assertEquals(DESC.getLogoUrl(), "http://example.com/img.png");
-    }
-
-    @Test
     public void testConstructorWithDetails() throws Exception {
 
         String countryName = "Schweiz";
@@ -59,6 +54,11 @@ public class DescTest {
     @Test
     public void testGetCountryName() throws Exception {
         assertEquals(DESC.getCountryName(), "Schweiz");
+    }
+
+    @Test
+    public void testGetLogoUrl() throws Exception {
+        assertEquals(DESC.getLogoUrl(), "http://example.com/img.png");
     }
 
     @Test

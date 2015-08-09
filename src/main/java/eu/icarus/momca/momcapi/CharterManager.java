@@ -18,12 +18,10 @@ import java.util.stream.Collectors;
 /**
  * Created by daniel on 03.07.2015.
  */
-public class CharterManager {
-
-    private final MomcaConnection momcaConnection;
+public class CharterManager extends AbstractManager {
 
     CharterManager(MomcaConnection momcaConnection) {
-        this.momcaConnection = momcaConnection;
+        super(momcaConnection);
     }
 
     @NotNull

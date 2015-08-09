@@ -2,7 +2,7 @@ package eu.icarus.momca.momcapi.xml.atom;
 
 import org.testng.annotations.Test;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
 
 /**
  * Created by daniel on 21.07.2015.
@@ -26,15 +26,15 @@ public class IdMyCollectionTest {
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testConstructorWithWrongId() throws Exception {
-        String archiveId = "tag:www.monasterium.net,2011:/collection/MedBulgEmp";
-        new IdMyCollection(archiveId);
-    }
-
-    @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConstructorWithFaultyId() throws Exception {
         String faultyId = "tag:www.monasterium.net,2011:/mycollection/CH-KAE/Urkunden/Urkunde_1";
         new IdMyCollection(faultyId);
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testConstructorWithWrongId() throws Exception {
+        String archiveId = "tag:www.monasterium.net,2011:/collection/MedBulgEmp";
+        new IdMyCollection(archiveId);
     }
 
     @Test

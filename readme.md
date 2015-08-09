@@ -36,16 +36,19 @@ _Country manager_
 * Delete country that has no attached archives
 * Delete subdivision that has no attached archives
 
-_Hierarchy manager_
+_Archive manager_
 
 * List all archives
 * List all archives belonging to a specific country
 * List all archvies belonging to a specific subdivision
-* List all fonds belonging to a specific archive
 * Get specific archive from the database
-* Get specific fond from the database
 * Add new archive
 * Delete archive
+
+_Fond manager_
+
+* List all fonds belonging to a specific archive
+* Get specific fond from the database
 
 _Charter Manager_
 
