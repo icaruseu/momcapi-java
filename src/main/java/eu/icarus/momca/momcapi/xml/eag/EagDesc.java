@@ -3,7 +3,6 @@ package eu.icarus.momca.momcapi.xml.eag;
 import eu.icarus.momca.momcapi.Util;
 import eu.icarus.momca.momcapi.resource.Address;
 import eu.icarus.momca.momcapi.resource.ContactInformation;
-import eu.icarus.momca.momcapi.xml.Namespace;
 import nu.xom.Element;
 import nu.xom.Elements;
 import org.jetbrains.annotations.NotNull;
@@ -11,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by daniel on 22.07.2015.
  */
-public class Desc extends Element {
+public class EagDesc extends Element {
 
     @NotNull
     private static final String XML_TEMPLATE =
@@ -38,7 +37,7 @@ public class Desc extends Element {
     @NotNull
     private String subdivisionName = "";
 
-    public Desc(@NotNull Element descElement) {
+    public EagDesc(@NotNull Element descElement) {
 
         super(descElement);
 
@@ -50,8 +49,8 @@ public class Desc extends Element {
 
     }
 
-    public Desc(@NotNull String countryName, @NotNull String subdivisionName, @NotNull Address address,
-                @NotNull ContactInformation contactInformation, @NotNull String logoUrl) {
+    public EagDesc(@NotNull String countryName, @NotNull String subdivisionName, @NotNull Address address,
+                   @NotNull ContactInformation contactInformation, @NotNull String logoUrl) {
 
         super(createXml(countryName, subdivisionName, address, contactInformation, logoUrl));
 
@@ -60,8 +59,6 @@ public class Desc extends Element {
         this.contactInformation = contactInformation;
         this.subdivisionName = subdivisionName;
         this.logoUrl = logoUrl;
-
-        String ns = Namespace.EAG.getUri();
 
     }
 
