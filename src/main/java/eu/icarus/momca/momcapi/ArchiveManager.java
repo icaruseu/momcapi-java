@@ -9,7 +9,7 @@ import eu.icarus.momca.momcapi.xml.Namespace;
 import eu.icarus.momca.momcapi.xml.atom.Author;
 import eu.icarus.momca.momcapi.xml.atom.Entry;
 import eu.icarus.momca.momcapi.xml.atom.IdArchive;
-import eu.icarus.momca.momcapi.xml.eag.EagDesc;
+import eu.icarus.momca.momcapi.xml.eag.Desc;
 import eu.icarus.momca.momcapi.xml.eap.Country;
 import eu.icarus.momca.momcapi.xml.eap.Subdivision;
 import nu.xom.Attribute;
@@ -105,7 +105,7 @@ public class ArchiveManager extends AbstractManager {
 
     @NotNull
     private Element createEagElement(@NotNull String shortName, @NotNull String archiveName,
-                                     @NotNull String countrycode, @NotNull EagDesc eagDesc) {
+                                     @NotNull String countrycode, @NotNull Desc desc) {
 
         String eagUri = Namespace.EAG.getUri();
 
@@ -126,7 +126,7 @@ public class ArchiveManager extends AbstractManager {
         eagIdentity.appendChild(eagAutform);
         eagAutform.appendChild(archiveName);
 
-        eagArchguide.appendChild(eagDesc);
+        eagArchguide.appendChild(desc);
 
         return eagEag;
 
@@ -144,8 +144,8 @@ public class ArchiveManager extends AbstractManager {
         String now = momcaConnection.queryDatabase(ExistQueryFactory.getCurrentDateTime()).get(0);
 
         String subdivisionNativeform = subdivision == null ? "" : subdivision.getNativeform();
-        EagDesc eagDesc = new EagDesc(country.getNativeform(), subdivisionNativeform, address, contactInformation, logoUrl);
-        Element eag = createEagElement(shortName, name, country.getCode(), eagDesc);
+        Desc desc = new Desc(country.getNativeform(), subdivisionNativeform, address, contactInformation, logoUrl);
+        Element eag = createEagElement(shortName, name, country.getCode(), desc);
 
         return new Entry(id, author, now, eag);
 

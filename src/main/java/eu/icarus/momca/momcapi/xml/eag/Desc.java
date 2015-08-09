@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by daniel on 22.07.2015.
  */
-public class EagDesc extends Element {
+public class Desc extends Element {
 
     @NotNull
     private static final String XML_TEMPLATE =
@@ -37,7 +37,7 @@ public class EagDesc extends Element {
     @NotNull
     private String subdivisionName = "";
 
-    public EagDesc(@NotNull Element descElement) {
+    public Desc(@NotNull Element descElement) {
 
         super(descElement);
 
@@ -49,8 +49,8 @@ public class EagDesc extends Element {
 
     }
 
-    public EagDesc(@NotNull String countryName, @NotNull String subdivisionName, @NotNull Address address,
-                   @NotNull ContactInformation contactInformation, @NotNull String logoUrl) {
+    public Desc(@NotNull String countryName, @NotNull String subdivisionName, @NotNull Address address,
+                @NotNull ContactInformation contactInformation, @NotNull String logoUrl) {
 
         super(createXml(countryName, subdivisionName, address, contactInformation, logoUrl));
 

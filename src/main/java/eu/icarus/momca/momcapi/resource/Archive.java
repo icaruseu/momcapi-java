@@ -2,7 +2,7 @@ package eu.icarus.momca.momcapi.resource;
 
 import eu.icarus.momca.momcapi.query.XpathQuery;
 import eu.icarus.momca.momcapi.xml.atom.IdArchive;
-import eu.icarus.momca.momcapi.xml.eag.EagDesc;
+import eu.icarus.momca.momcapi.xml.eag.Desc;
 import nu.xom.Element;
 import nu.xom.Nodes;
 import org.jetbrains.annotations.NotNull;
@@ -17,7 +17,7 @@ public class Archive extends MomcaResource {
     @NotNull
     private final String countryCode;
     @NotNull
-    private final EagDesc eagDesc;
+    private final Desc desc;
     @NotNull
     private final IdArchive id;
     @NotNull
@@ -42,18 +42,18 @@ public class Archive extends MomcaResource {
         shortName = shortNameList.get(0);
         name = nameList.get(0);
         countryCode = countryCodeList.get(0);
-        eagDesc = new EagDesc((Element) descNodes.get(0));
+        desc = new Desc((Element) descNodes.get(0));
 
     }
 
     @NotNull
     public Address getAddress() {
-        return eagDesc.getAddress();
+        return desc.getAddress();
     }
 
     @NotNull
     public ContactInformation getContactInformation() {
-        return eagDesc.getContactInformation();
+        return desc.getContactInformation();
     }
 
     @NotNull
@@ -68,7 +68,7 @@ public class Archive extends MomcaResource {
 
     @NotNull
     public String getLogoUrl() {
-        return eagDesc.getLogoUrl();
+        return desc.getLogoUrl();
     }
 
     @NotNull
@@ -83,7 +83,7 @@ public class Archive extends MomcaResource {
 
     @NotNull
     public String getSubdivisionNativeForm() {
-        return eagDesc.getSubdivisionName();
+        return desc.getSubdivisionName();
     }
 
     @NotNull
@@ -93,7 +93,7 @@ public class Archive extends MomcaResource {
         return "Archive{" +
                 "id=" + id +
                 ", countryCode='" + countryCode + '\'' +
-                ", eagDesc=" + eagDesc +
+                ", desc=" + desc +
                 ", name='" + name + '\'' +
                 ", shortName='" + shortName + '\'' +
                 "} " + super.toString();
