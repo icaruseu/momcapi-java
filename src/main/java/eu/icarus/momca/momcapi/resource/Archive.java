@@ -15,11 +15,11 @@ import java.util.List;
 public class Archive extends MomcaResource {
 
     @NotNull
-    private final IdArchive id;
-    @NotNull
     private final String countryCode;
     @NotNull
     private final Desc desc;
+    @NotNull
+    private final IdArchive id;
     @NotNull
     private final String name;
     @NotNull
@@ -52,11 +52,6 @@ public class Archive extends MomcaResource {
     }
 
     @NotNull
-    public IdArchive getId() {
-        return id;
-    }
-
-    @NotNull
     public ContactInformation getContactInformation() {
         return desc.getContactInformation();
     }
@@ -67,8 +62,8 @@ public class Archive extends MomcaResource {
     }
 
     @NotNull
-    public String getSubdivisionNativeForm() {
-        return desc.getSubdivisionName();
+    public IdArchive getId() {
+        return id;
     }
 
     @NotNull
@@ -86,17 +81,9 @@ public class Archive extends MomcaResource {
         return shortName;
     }
 
-    private IdArchive initId() {
-
-        String idString = queryUniqueElement(XpathQuery.QUERY_ATOM_ID);
-
-        if (idString.isEmpty()) {
-            String errorMessage = String.format("No atom:id in xml content: '%s'", getXmlAsDocument().toXML());
-            throw new IllegalArgumentException(errorMessage);
-        } else {
-            return new IdArchive(idString);
-        }
-
+    @NotNull
+    public String getSubdivisionNativeForm() {
+        return desc.getSubdivisionName();
     }
 
     @Override
@@ -109,6 +96,19 @@ public class Archive extends MomcaResource {
                 ", name='" + name + '\'' +
                 ", shortName='" + shortName + '\'' +
                 "} " + super.toString();
+    }
+
+    private IdArchive initId() {
+
+        String idString = queryUniqueElement(XpathQuery.QUERY_ATOM_ID);
+
+        if (idString.isEmpty()) {
+            String errorMessage = String.format("No atom:id in xml content: '%s'", getXmlAsDocument().toXML());
+            throw new IllegalArgumentException(errorMessage);
+        } else {
+            return new IdArchive(idString);
+        }
+
     }
 
 }

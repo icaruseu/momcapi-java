@@ -40,11 +40,11 @@ public class Charter extends MomcaResource {
     @NotNull
     private final Optional<Author> author;
     @NotNull
-    private final IdCharter id;
-    @NotNull
     private final Optional<DateAbstract> date;
     @NotNull
     private final List<Figure> figures;
+    @NotNull
+    private final IdCharter id;
     @NotNull
     private final Idno idno;
     @NotNull
@@ -107,14 +107,6 @@ public class Charter extends MomcaResource {
     }
 
     /**
-     * @return The Id.
-     */
-    @NotNull
-    public IdCharter getId() {
-        return id;
-    }
-
-    /**
      * @return The date.
      */
     @NotNull
@@ -128,6 +120,14 @@ public class Charter extends MomcaResource {
     @NotNull
     public List<Figure> getFigures() {
         return figures;
+    }
+
+    /**
+     * @return The Id.
+     */
+    @NotNull
+    public IdCharter getId() {
+        return id;
     }
 
     /**
@@ -188,20 +188,6 @@ public class Charter extends MomcaResource {
     }
 
     @NotNull
-    private IdCharter initId() {
-
-        String idString = queryUniqueElement(XpathQuery.QUERY_ATOM_ID);
-
-        if (idString.isEmpty()) {
-            String errorMessage = String.format("No atom:id in xml content: '%s'", getXmlAsDocument().toXML());
-            throw new IllegalArgumentException(errorMessage);
-        } else {
-            return new IdCharter(idString);
-        }
-
-    }
-
-    @NotNull
     private Optional<DateAbstract> initDate() {
 
         Optional<DateAbstract> ceiDateOptional = Optional.empty();
@@ -241,13 +227,6 @@ public class Charter extends MomcaResource {
     }
 
     @NotNull
-    private Idno initIdno() {
-        String id = queryUniqueElement(XpathQuery.QUERY_CEI_BODY_IDNO_ID);
-        String text = queryUniqueElement(XpathQuery.QUERY_CEI_BODY_IDNO_TEXT);
-        return new Idno(id, text);
-    }
-
-    @NotNull
     private List<Figure> initFigures() {
 
         List<Figure> figures = new ArrayList<>(0);
@@ -282,6 +261,27 @@ public class Charter extends MomcaResource {
 
         return figures;
 
+    }
+
+    @NotNull
+    private IdCharter initId() {
+
+        String idString = queryUniqueElement(XpathQuery.QUERY_ATOM_ID);
+
+        if (idString.isEmpty()) {
+            String errorMessage = String.format("No atom:id in xml content: '%s'", getXmlAsDocument().toXML());
+            throw new IllegalArgumentException(errorMessage);
+        } else {
+            return new IdCharter(idString);
+        }
+
+    }
+
+    @NotNull
+    private Idno initIdno() {
+        String id = queryUniqueElement(XpathQuery.QUERY_CEI_BODY_IDNO_ID);
+        String text = queryUniqueElement(XpathQuery.QUERY_CEI_BODY_IDNO_TEXT);
+        return new Idno(id, text);
     }
 
     private CharterStatus initStatus() {

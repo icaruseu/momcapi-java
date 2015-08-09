@@ -1,25 +1,42 @@
 package eu.icarus.momca.momcapi.resource;
 
+import eu.icarus.momca.momcapi.query.XpathQuery;
+import eu.icarus.momca.momcapi.xml.atom.IdArchive;
+import eu.icarus.momca.momcapi.xml.atom.IdFond;
+import org.jetbrains.annotations.NotNull;
+
 /**
- * @author daniel
- *         Created on 17.07.2015.
+ * Created by daniel on 17.07.2015.
  */
-public class Fond {
+public class Fond extends MomcaResource {
 
-    private final FondEad fondEad;
+    @NotNull
     private final FondPreferences fondPreferences;
+    @NotNull
+    private final IdFond id;
 
-    public Fond(FondEad fondEad, FondPreferences fondPreferences) {
-        this.fondEad = fondEad;
+    public Fond(@NotNull MomcaResource fondResource, @NotNull FondPreferences fondPreferences) {
+        super(fondResource);
+        id = initId();
         this.fondPreferences = fondPreferences;
     }
 
-    public FondEad getFondEad() {
-        return fondEad;
+    @NotNull
+    public IdFond getId() {
+        return id;
     }
 
-    public FondPreferences getFondPreferences() {
-        return fondPreferences;
+    private IdFond initId() {
+
+        String idString = queryUniqueElement(XpathQuery.QUERY_ATOM_ID);
+
+        if (idString.isEmpty()) {
+            String errorMessage = String.format("No atom:id in xml content: '%s'", getXmlAsDocument().toXML());
+            throw new IllegalArgumentException(errorMessage);
+        } else {
+            return new IdFond(idString);
+        }
+
     }
 
 }

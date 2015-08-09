@@ -1,8 +1,10 @@
 package eu.icarus.momca.momcapi;
 
+import eu.icarus.momca.momcapi.exception.MomcaException;
 import eu.icarus.momca.momcapi.resource.Address;
 import eu.icarus.momca.momcapi.resource.Archive;
 import eu.icarus.momca.momcapi.resource.ContactInformation;
+import eu.icarus.momca.momcapi.resource.Fond;
 import eu.icarus.momca.momcapi.xml.atom.IdArchive;
 import eu.icarus.momca.momcapi.xml.atom.IdFond;
 import eu.icarus.momca.momcapi.xml.eap.Country;
@@ -12,6 +14,7 @@ import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.testng.Assert.*;
 
@@ -22,6 +25,25 @@ public class HierarchyManagerTest {
 
     private HierarchyManager hm;
     private MomcaConnection mc;
+
+    @Test
+    public void testGetFond() throws Exception {
+
+        IdFond idNotExisting = new IdFond("CH-KAE", "Not existing fond");
+        assertFalse(hm.getFond(idNotExisting).isPresent());
+
+        IdFond idExisting = new IdFond("CH-KAE", "Urkunden");
+        Optional<Fond> fond = hm.getFond(idExisting);
+        assertTrue(fond.isPresent());
+        assertEquals(fond.get().getId().toXML(), idExisting.toXML());
+
+    }
+
+    @Test(expectedExceptions = MomcaException.class)
+    public void testGetFondWithMissingPrefs() throws Exception {
+        IdFond id = new IdFond("CH-KAE", "ErrorUrkunden");
+        hm.getFond(id);
+    }
 
     @Test
     public void testDeleteArchive() throws Exception {
@@ -56,7 +78,7 @@ public class HierarchyManagerTest {
         IdArchive id1 = new IdArchive("CH-KAE");
         Archive archive1 = hm.getArchive(id1).get();
         List<IdFond> resultList1 = hm.listFondsForArchive(archive1);
-        assertEquals(resultList1.size(), 1);
+        assertEquals(resultList1.size(), 2);
         assertEquals(resultList1.get(0).getFondIdentifier(), "Urkunden");
 
         IdArchive id2 = new IdArchive("DE-BayHStA");

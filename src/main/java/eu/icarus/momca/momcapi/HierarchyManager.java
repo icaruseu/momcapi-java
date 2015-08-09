@@ -2,15 +2,9 @@ package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.exception.MomcaException;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
-import eu.icarus.momca.momcapi.resource.Address;
-import eu.icarus.momca.momcapi.resource.Archive;
-import eu.icarus.momca.momcapi.resource.ContactInformation;
-import eu.icarus.momca.momcapi.resource.MomcaResource;
+import eu.icarus.momca.momcapi.resource.*;
 import eu.icarus.momca.momcapi.xml.Namespace;
-import eu.icarus.momca.momcapi.xml.atom.Author;
-import eu.icarus.momca.momcapi.xml.atom.Entry;
-import eu.icarus.momca.momcapi.xml.atom.IdArchive;
-import eu.icarus.momca.momcapi.xml.atom.IdFond;
+import eu.icarus.momca.momcapi.xml.atom.*;
 import eu.icarus.momca.momcapi.xml.eag.Desc;
 import eu.icarus.momca.momcapi.xml.eap.Country;
 import eu.icarus.momca.momcapi.xml.eap.Subdivision;
@@ -36,8 +30,8 @@ public class HierarchyManager {
     }
 
     @NotNull
-    public Archive addArchive(@NotNull String authorEmail, @NotNull String shortName, @NotNull String name, @NotNull Country country,
-                              @Nullable Subdivision subdivision, @NotNull Address address,
+    public Archive addArchive(@NotNull String authorEmail, @NotNull String shortName, @NotNull String name,
+                              @NotNull Country country, @Nullable Subdivision subdivision, @NotNull Address address,
                               @NotNull ContactInformation contactInformation, @NotNull String logoUrl) {
 
         IdArchive id = new IdArchive(shortName);
@@ -82,16 +76,31 @@ public class HierarchyManager {
     }
 
     @NotNull
-    public Optional<Archive> getArchive(@NotNull IdArchive archiveId) {
+    public Optional<Archive> getArchive(@NotNull IdArchive idArchive) {
+        return getMomcaResource(idArchive).map(Archive::new);
+    }
 
-        List<String> archiveUris = momcaConnection.queryDatabase(ExistQueryFactory.getResourceUri(archiveId, null));
+    @NotNull
+    public Optional<Fond> getFond(@NotNull IdFond idFond) {
 
-        if (archiveUris.size() > 1) {
-            String message = String.format("More than one result for archive '%s'", archiveId.getArchiveIdentifier());
-            throw new MomcaException(message);
+        Optional<Fond> fond = Optional.empty();
+
+        Optional<MomcaResource> fondResource = getMomcaResource(idFond);
+
+        if (fondResource.isPresent()) {
+
+            String prefsUrl = fondResource.get().getUri().replace("ead", "preferences");
+            Optional<FondPreferences> fondPrefs = getMomcaResource(prefsUrl).map(FondPreferences::new);
+
+            if (!fondPrefs.isPresent()) {
+                throw new MomcaException("There is no preferences file existing for fond " + idFond.getId());
+            }
+
+            fond = Optional.of(new Fond(fondResource.get(), fondPrefs.get()));
+
         }
 
-        return archiveUris.isEmpty() ? Optional.empty() : getArchiveFromUri(archiveUris.get(0));
+        return fond;
 
     }
 
@@ -123,7 +132,8 @@ public class HierarchyManager {
     }
 
     @NotNull
-    private Element createEagElement(@NotNull String shortName, @NotNull String archiveName, @NotNull String countrycode, @NotNull Desc desc) {
+    private Element createEagElement(@NotNull String shortName, @NotNull String archiveName,
+                                     @NotNull String countrycode, @NotNull Desc desc) {
 
         String eagUri = Namespace.EAG.getUri();
 
@@ -154,7 +164,8 @@ public class HierarchyManager {
     private Element createNewArchiveResourceContent(@NotNull String authorEmail, @NotNull String shortName,
                                                     @NotNull String name, @NotNull Country country,
                                                     @Nullable Subdivision subdivision, @NotNull Address address,
-                                                    @NotNull ContactInformation contactInformation, @NotNull String logoUrl) {
+                                                    @NotNull ContactInformation contactInformation,
+                                                    @NotNull String logoUrl) {
 
         IdArchive id = new IdArchive(shortName);
         Author author = new Author(authorEmail);
@@ -169,10 +180,32 @@ public class HierarchyManager {
     }
 
     @NotNull
-    private Optional<Archive> getArchiveFromUri(@NotNull String archiveUri) {
-        String resourceName = Util.getLastUriPart(archiveUri);
-        String parentUri = Util.getParentUri(archiveUri);
-        return momcaConnection.getExistResource(resourceName, parentUri).map(Archive::new);
+    private Optional<MomcaResource> getMomcaResource(@NotNull Id id) {
+
+        List<String> resourceUris = momcaConnection.queryDatabase(ExistQueryFactory.getResourceUri(id, null));
+
+        Optional<MomcaResource> resource = Optional.empty();
+
+        if (!resourceUris.isEmpty()) {
+
+            if (resourceUris.size() > 1) {
+                String message = String.format("More than one result for id '%s'", id.getId());
+                throw new MomcaException(message);
+            }
+
+            resource = getMomcaResource(resourceUris.get(0));
+
+        }
+
+        return resource;
+
+    }
+
+    @NotNull
+    private Optional<MomcaResource> getMomcaResource(@NotNull String resourceUri) {
+        String resourceName = Util.getLastUriPart(resourceUri);
+        String parentUri = Util.getParentUri(resourceUri);
+        return momcaConnection.getExistResource(resourceName, parentUri);
     }
 
 }
