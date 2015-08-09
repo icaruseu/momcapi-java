@@ -43,6 +43,7 @@ _Hierarchy manager_
 * List all archvies belonging to a specific subdivision
 * List all fonds belonging to a specific archive
 * Get specific archive from the database
+* Get specific fond from the database
 * Add new archive
 * Delete archive
 
