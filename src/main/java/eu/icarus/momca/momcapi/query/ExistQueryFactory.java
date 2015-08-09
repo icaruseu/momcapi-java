@@ -78,6 +78,14 @@ public class ExistQueryFactory {
     }
 
     /**
+     * @return Returns the {@code xs:dateTime} (with timezone) from the database.
+     */
+    @NotNull
+    public static ExistQuery getCurrentDateTime() {
+        return new ExistQuery("current-dateTime()");
+    }
+
+    /**
      * @param resourceId   The {@code atom:id} of the resource to locate.
      * @param resourceRoot The resource root of the resource the search should be restricted to. If {@code null},
      *                     the whole database is searched.
@@ -142,6 +150,22 @@ public class ExistQueryFactory {
     }
 
     /**
+     * @param archiveIdentifier The archive the fonds to list need to belong to, e.g. {@code CH-KAE}
+     * @return A query to list the ids of all fonds that belong to a specific archive.
+     */
+    @NotNull
+    public static ExistQuery listFondsForArchive(@NotNull String archiveIdentifier) {
+
+        String query = String.format(
+                "%s collection('/db/mom-data/metadata.fond.public')//atom:id[contains(., '%s')]/text()",
+                getNamespaceDeclaration(Namespace.ATOM),
+                archiveIdentifier);
+
+        return new ExistQuery(query);
+
+    }
+
+    /**
      * @return A query that lists the ids of all archives in the database as strings.
      */
     @NotNull
@@ -156,14 +180,6 @@ public class ExistQueryFactory {
     }
 
     /**
-     * @return Returns the {@code xs:dateTime} (with timezone) from the database.
-     */
-    @NotNull
-    public static ExistQuery getCurrentDateTime() {
-        return new ExistQuery("current-dateTime()");
-    }
-
-    /**
      * @param countryCode The code of a country, e.g. {@code DE}.
      * @return A query to list all archives that use the country code in their XML.
      */
@@ -174,22 +190,6 @@ public class ExistQueryFactory {
                 "%s collection('/db/mom-data/metadata.archive.public')//atom:entry[.//eag:repositorid/@countrycode='%s']/atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM, Namespace.EAG),
                 countryCode);
-
-        return new ExistQuery(query);
-
-    }
-
-    /**
-     * @param archiveIdentifier The archive the fonds to list need to belong to, e.g. {@code CH-KAE}
-     * @return A query to list the ids of all fonds that belong to a specific archive.
-     */
-    @NotNull
-    public static ExistQuery listFondsForArchive(@NotNull String archiveIdentifier) {
-
-        String query = String.format(
-                "%s collection('/db/mom-data/metadata.fond.public')//atom:id[contains(., '%s')]/text()",
-                getNamespaceDeclaration(Namespace.ATOM),
-                archiveIdentifier);
 
         return new ExistQuery(query);
 

@@ -42,11 +42,6 @@ public class IdCollection extends Id {
 
     }
 
-    private boolean isCollectionId(@NotNull String collectionId) {
-        String[] idParts = collectionId.split("/");
-        return getType() == ResourceType.COLLECTION && idParts.length == VALID_ID_PARTS;
-    }
-
     /**
      * @return The identifier of the collection, e.g. {@code MedDocBulgEmp}.
      */
@@ -55,15 +50,21 @@ public class IdCollection extends Id {
         return collectionIdentifier;
     }
 
-    private boolean isId(String collectionIdentifier) {
-        return collectionIdentifier.contains("/");
-    }
-
     @Override
+    @NotNull
     public String toString() {
         return "IdCollection{" +
                 "collectionIdentifier='" + collectionIdentifier + '\'' +
                 "} " + super.toString();
+    }
+
+    private boolean isCollectionId(@NotNull String collectionId) {
+        String[] idParts = collectionId.split("/");
+        return getType() == ResourceType.COLLECTION && idParts.length == VALID_ID_PARTS;
+    }
+
+    private boolean isId(@NotNull String collectionIdentifier) {
+        return collectionIdentifier.contains("/");
     }
 
 }

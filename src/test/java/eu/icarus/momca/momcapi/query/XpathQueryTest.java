@@ -46,6 +46,34 @@ public class XpathQueryTest {
     }
 
     @Test
+    public void testQUERY_EAD_UNITTITLE() throws Exception {
+        List<String> result = queryContentAsList(resource, XpathQuery.QUERY_EAD_UNITTITLE);
+        assertEquals(result.size(), 1);
+        assertEquals(result.get(0), "eadunittitle");
+    }
+
+    @Test
+    public void testQUERY_XRX_IMAGE_ACCESS() throws Exception {
+        List<String> result = queryContentAsList(resource, XpathQuery.QUERY_XRX_IMAGE_ACCESS);
+        assertEquals(result.size(), 1);
+        assertEquals(result.get(0), "free");
+    }
+
+    @Test
+    public void testQUERY_XRX_DUMMY_IMAGE_URL() throws Exception {
+        List<String> result = queryContentAsList(resource, XpathQuery.QUERY_XRX_DUMMY_IMAGE_URL);
+        assertEquals(result.size(), 1);
+        assertEquals(result.get(0), "http://example.com/dummy.png");
+    }
+
+    @Test
+    public void testQUERY_XRX_IMAGE_SERVER_BASE_URL() throws Exception {
+        List<String> result = queryContentAsList(resource, XpathQuery.QUERY_XRX_IMAGE_SERVER_BASE_URL);
+        assertEquals(result.size(), 1);
+        assertEquals(result.get(0), "http://example.com/images");
+    }
+
+    @Test
     public void testQUERY_CEI_BODY_IDNO_TEXT() throws Exception {
         List<String> result = queryContentAsList(resource, XpathQuery.QUERY_CEI_BODY_IDNO_TEXT);
         assertEquals(result.size(), 1);

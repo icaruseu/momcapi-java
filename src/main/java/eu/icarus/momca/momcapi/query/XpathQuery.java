@@ -6,7 +6,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.jar.Attributes;
 
 /**
  * An XPath-query to use to query XOM XML documents.
@@ -24,6 +23,7 @@ public enum XpathQuery {
     QUERY_CEI_BODY_IDNO_TEXT("//cei:body/cei:idno/text()", Namespace.CEI),
     QUERY_CEI_ISSUED("//cei:issued", Namespace.CEI),
     QUERY_CEI_TEXT("//cei:text", Namespace.CEI),
+    QUERY_EAD_UNITTITLE("//ead:unittitle/text()", Namespace.EAD),
     QUERY_EAG_AUTFORM("//eag:autform/text()", Namespace.EAG),
     QUERY_EAG_COUNTRYCODE("//eag:repositorid/@countrycode", Namespace.EAG),
     QUERY_EAG_DESC("//eag:desc", Namespace.EAG),
@@ -33,6 +33,9 @@ public enum XpathQuery {
     QUERY_NAME("//name/text()"),
     QUERY_XRX_BOOKMARK("//xrx:bookmark/text()", Namespace.XRX),
     QUERY_XRX_EMAIL("//xrx:email/text()", Namespace.XRX),
+    QUERY_XRX_IMAGE_ACCESS("//xrx:param[@name='image-access']/text()", Namespace.XRX),
+    QUERY_XRX_DUMMY_IMAGE_URL("//xrx:param[@name='dummy-image-url']/text()", Namespace.XRX),
+    QUERY_XRX_IMAGE_SERVER_BASE_URL("//xrx:param[@name='image-server-base-url']/text()", Namespace.XRX),
     QUERY_XRX_MODERATOR("//xrx:moderator/text()", Namespace.XRX),
     QUERY_XRX_NAME("//xrx:name/text()", Namespace.XRX),
     QUERY_XRX_SAVED_ID("//xrx:saved/xrx:id/text()", Namespace.XRX);

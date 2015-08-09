@@ -86,6 +86,7 @@ public class Archive extends MomcaResource {
         return desc.getSubdivisionName();
     }
 
+    @NotNull
     @Override
     public String toString() {
 
@@ -98,6 +99,7 @@ public class Archive extends MomcaResource {
                 "} " + super.toString();
     }
 
+    @NotNull
     private IdArchive initId() {
 
         String idString = queryUniqueElement(XpathQuery.QUERY_ATOM_ID);

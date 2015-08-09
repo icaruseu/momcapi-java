@@ -1,10 +1,7 @@
 package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.exception.MomcaException;
-import eu.icarus.momca.momcapi.resource.Address;
-import eu.icarus.momca.momcapi.resource.Archive;
-import eu.icarus.momca.momcapi.resource.ContactInformation;
-import eu.icarus.momca.momcapi.resource.Fond;
+import eu.icarus.momca.momcapi.resource.*;
 import eu.icarus.momca.momcapi.xml.atom.IdArchive;
 import eu.icarus.momca.momcapi.xml.atom.IdFond;
 import eu.icarus.momca.momcapi.xml.eap.Country;
@@ -32,17 +29,37 @@ public class HierarchyManagerTest {
         IdFond idNotExisting = new IdFond("CH-KAE", "Not existing fond");
         assertFalse(hm.getFond(idNotExisting).isPresent());
 
-        IdFond idExisting = new IdFond("CH-KAE", "Urkunden");
-        Optional<Fond> fond = hm.getFond(idExisting);
-        assertTrue(fond.isPresent());
-        assertEquals(fond.get().getId().toXML(), idExisting.toXML());
+        IdFond id1 = new IdFond("CH-KAE", "Urkunden");
+        Optional<Fond> fondOptional1 = hm.getFond(id1);
+        assertTrue(fondOptional1.isPresent());
+        Fond fond1 = fondOptional1.get();
+        assertEquals(fond1.getId().toXML(), id1.toXML());
+        assertEquals(fond1.getName(), "Urkunden (0947-1483)");
+        assertEquals(fond1.getImageAccess(), ImageAccess.FREE);
+        assertFalse(fond1.getDummyImageUrl().isPresent());
+        assertEquals(fond1.getImagesUrl().get().toExternalForm(), "http://www.klosterarchiv.ch/urkunden/urkunden-3000");
+
+        IdFond id2 = new IdFond("CH-KASchwyz", "Urkunden");
+        Optional<Fond> fondOptional2 = hm.getFond(id2);
+        assertTrue(fondOptional2.isPresent());
+        Fond fond2 = fondOptional2.get();
+        assertEquals(fond2.getId().toXML(), id2.toXML());
+        assertEquals(fond2.getName(), "Urkunden");
+        assertEquals(fond2.getImageAccess(), ImageAccess.RESTRICTED);
+        assertEquals(fond2.getDummyImageUrl().get().toExternalForm(), "http://example.com/dummy.png");
+        assertFalse(fond2.getImagesUrl().isPresent());
 
     }
 
-    @Test(expectedExceptions = MomcaException.class)
-    public void testGetFondWithMissingPrefs() throws Exception {
-        IdFond id = new IdFond("CH-KAE", "ErrorUrkunden");
-        hm.getFond(id);
+    @Test
+    public void testGetFondWithoutPreferences() throws Exception {
+        
+        IdFond id = new IdFond("CH-KAE", "UrkundenWithoutPrefs");
+        Fond fond = hm.getFond(id).get();
+        assertEquals(fond.getImageAccess(), ImageAccess.UNDEFINED);
+        assertFalse(fond.getDummyImageUrl().isPresent());
+        assertFalse(fond.getImagesUrl().isPresent());
+
     }
 
     @Test
@@ -81,10 +98,10 @@ public class HierarchyManagerTest {
         assertEquals(resultList1.size(), 2);
         assertEquals(resultList1.get(0).getFondIdentifier(), "Urkunden");
 
-        IdArchive id2 = new IdArchive("DE-BayHStA");
+        IdArchive id2 = new IdArchive("DE-SAMuenchen");
         Archive archive2 = hm.getArchive(id2).get();
         List<IdFond> resultList2 = hm.listFondsForArchive(archive2);
-        assertEquals(resultList2.size(), 0);
+        assertTrue(resultList2.isEmpty());
 
     }
 
@@ -168,13 +185,13 @@ public class HierarchyManagerTest {
 
     @Test
     public void testListArchives() throws Exception {
-        assertEquals(hm.listArchives().size(), 3);
+        assertEquals(hm.listArchives().size(), 5);
     }
 
     @Test
     public void testListArchivesForCountry() throws Exception {
         assertTrue(hm.listArchivesForCountry(new Country("AT", "Österreich", new ArrayList<>(0))).isEmpty());
-        assertEquals(hm.listArchivesForCountry(new Country("CH", "Schweiz", new ArrayList<>(0))).size(), 1);
+        assertEquals(hm.listArchivesForCountry(new Country("CH", "Schweiz", new ArrayList<>(0))).size(), 2);
     }
 
     @Test

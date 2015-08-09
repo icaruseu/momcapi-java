@@ -18,6 +18,9 @@
             </cei:figure>
         </cei:witnessOrig>
     </cei:text>
+    <ead:ead xmlns:ead="urn:isbn:1-931666-22-9">
+        <ead:unittitle>eadunittitle</ead:unittitle>
+    </ead:ead>
     <eag:eag xmlns:eag="http://www.archivgut-online.de/eag">
         <eag:archguide>
             <eag:identity>
@@ -41,5 +44,8 @@
         <xrx:saved>
             <xrx:id>xrxsaved</xrx:id>
         </xrx:saved>
+        <xrx:param name="image-access">free</xrx:param>
+        <xrx:param name="dummy-image-url">http://example.com/dummy.png</xrx:param>
+        <xrx:param name="image-server-base-url">http://example.com/images</xrx:param>
     </xrx:xrx>
 </testxml>

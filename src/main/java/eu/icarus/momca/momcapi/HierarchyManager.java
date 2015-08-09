@@ -90,13 +90,9 @@ public class HierarchyManager {
         if (fondResource.isPresent()) {
 
             String prefsUrl = fondResource.get().getUri().replace("ead", "preferences");
-            Optional<FondPreferences> fondPrefs = getMomcaResource(prefsUrl).map(FondPreferences::new);
+            Optional<MomcaResource> fondPrefs = getMomcaResource(prefsUrl);
 
-            if (!fondPrefs.isPresent()) {
-                throw new MomcaException("There is no preferences file existing for fond " + idFond.getId());
-            }
-
-            fond = Optional.of(new Fond(fondResource.get(), fondPrefs.get()));
+            fond = Optional.of(new Fond(fondResource.get(), fondPrefs));
 
         }
 

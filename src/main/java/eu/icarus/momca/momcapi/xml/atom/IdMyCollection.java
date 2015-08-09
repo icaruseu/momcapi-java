@@ -41,11 +41,6 @@ public class IdMyCollection extends Id {
 
     }
 
-    private boolean isMyCollectionId(@NotNull String myCollectionId) {
-        String[] idParts = myCollectionId.split("/");
-        return getType() == ResourceType.MY_COLLECTION && idParts.length == VALID_ID_PARTS;
-    }
-
     /**
      * @return The identifier of the myCollection, e.g. {@code 67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3}.
      */
@@ -54,8 +49,13 @@ public class IdMyCollection extends Id {
         return myCollectionIdentifier;
     }
 
-    private boolean isId(String myCollectionIdentifier) {
+    private boolean isId(@NotNull String myCollectionIdentifier) {
         return myCollectionIdentifier.contains("/");
+    }
+
+    private boolean isMyCollectionId(@NotNull String myCollectionId) {
+        String[] idParts = myCollectionId.split("/");
+        return getType() == ResourceType.MY_COLLECTION && idParts.length == VALID_ID_PARTS;
     }
 
 }

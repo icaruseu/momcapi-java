@@ -1,6 +1,7 @@
 package eu.icarus.momca.momcapi.xml.cei;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Represents a numeric date value as specified by the
@@ -38,7 +39,7 @@ public class DateValue {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
@@ -69,6 +70,7 @@ public class DateValue {
     }
 
     @Override
+    @NotNull
     public String toString() {
         return "DateValue{" +
                 "value='" + value + '\'' +

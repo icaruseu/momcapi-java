@@ -1,9 +1,12 @@
 package eu.icarus.momca.momcapi.resource;
 
 import eu.icarus.momca.momcapi.query.XpathQuery;
-import eu.icarus.momca.momcapi.xml.atom.IdArchive;
 import eu.icarus.momca.momcapi.xml.atom.IdFond;
 import org.jetbrains.annotations.NotNull;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Optional;
 
 /**
  * Created by daniel on 17.07.2015.
@@ -11,14 +14,34 @@ import org.jetbrains.annotations.NotNull;
 public class Fond extends MomcaResource {
 
     @NotNull
-    private final FondPreferences fondPreferences;
+    private final Optional<URL> dummyImageUrl;
+    @NotNull
+    private final Optional<MomcaResource> fondPreferences;
     @NotNull
     private final IdFond id;
+    @NotNull
+    private final ImageAccess imageAccess;
+    @NotNull
+    private final Optional<URL> imagesUrl;
+    @NotNull
+    private final String name;
 
-    public Fond(@NotNull MomcaResource fondResource, @NotNull FondPreferences fondPreferences) {
+    public Fond(@NotNull MomcaResource fondResource, @NotNull Optional<MomcaResource> fondPreferences) {
+
         super(fondResource);
+
         id = initId();
         this.fondPreferences = fondPreferences;
+        this.name = queryUniqueElement(XpathQuery.QUERY_EAD_UNITTITLE);
+        this.imageAccess = initImageAccess();
+        this.dummyImageUrl = initDummyImageUrl();
+        this.imagesUrl = initImagesUrl();
+
+    }
+
+    @NotNull
+    public Optional<URL> getDummyImageUrl() {
+        return dummyImageUrl;
     }
 
     @NotNull
@@ -26,6 +49,55 @@ public class Fond extends MomcaResource {
         return id;
     }
 
+    @NotNull
+    public ImageAccess getImageAccess() {
+        return imageAccess;
+    }
+
+    @NotNull
+    public Optional<URL> getImagesUrl() {
+        return imagesUrl;
+    }
+
+    @NotNull
+    public String getName() {
+        return name;
+    }
+
+    @NotNull
+    private Optional<URL> createUrl(@NotNull String urlString) {
+
+        Optional<URL> url = Optional.empty();
+
+        try {
+
+            if (!urlString.isEmpty()) {
+                url = Optional.of(new URL(urlString));
+            }
+
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException(urlString + " is not a valid URL.");
+        }
+
+        return url;
+
+    }
+
+    @NotNull
+    private Optional<URL> initDummyImageUrl() {
+
+        Optional<URL> url = Optional.empty();
+
+        if (fondPreferences.isPresent()) {
+            String urlString = fondPreferences.get().queryUniqueElement(XpathQuery.QUERY_XRX_DUMMY_IMAGE_URL);
+            url = createUrl(urlString);
+        }
+
+        return url;
+
+    }
+
+    @NotNull
     private IdFond initId() {
 
         String idString = queryUniqueElement(XpathQuery.QUERY_ATOM_ID);
@@ -36,6 +108,35 @@ public class Fond extends MomcaResource {
         } else {
             return new IdFond(idString);
         }
+
+    }
+
+    @NotNull
+    private ImageAccess initImageAccess() {
+
+        ImageAccess access = ImageAccess.UNDEFINED;
+
+        if (fondPreferences.isPresent()) {
+
+            String imageAccessString = fondPreferences.get().queryUniqueElement(XpathQuery.QUERY_XRX_IMAGE_ACCESS);
+            access = ImageAccess.fromText(imageAccessString);
+
+        }
+
+        return access;
+    }
+
+    @NotNull
+    private Optional<URL> initImagesUrl() {
+
+        Optional<URL> url = Optional.empty();
+
+        if (fondPreferences.isPresent()) {
+            String urlString = fondPreferences.get().queryUniqueElement(XpathQuery.QUERY_XRX_IMAGE_SERVER_BASE_URL);
+            url = createUrl(urlString);
+        }
+
+        return url;
 
     }
 

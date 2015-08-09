@@ -54,6 +54,7 @@ public abstract class DateAbstract extends Element {
     public abstract boolean isValid();
 
     @Override
+    @NotNull
     public String toString() {
         return "DateAbstract{" +
                 "literalDate='" + literalDate + '\'' +

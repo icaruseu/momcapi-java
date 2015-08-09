@@ -45,20 +45,21 @@ public class IdArchive extends Id {
         return archiveIdentifier;
     }
 
-    private boolean isIdArchive(@NotNull String idArchive) {
-        String[] idParts = idArchive.split("/");
-        return (getType() == ResourceType.ARCHIVE && idParts.length == VALID_ID_PARTS);
-    }
-
-    private boolean isId(String archiveIdentifier) {
-        return archiveIdentifier.contains("/");
-    }
-
     @Override
+    @NotNull
     public String toString() {
         return "IdArchive{" +
                 "archiveIdentifier='" + archiveIdentifier + '\'' +
                 "} " + super.toString();
+    }
+
+    private boolean isId(@NotNull String archiveIdentifier) {
+        return archiveIdentifier.contains("/");
+    }
+
+    private boolean isIdArchive(@NotNull String idArchive) {
+        String[] idParts = idArchive.split("/");
+        return (getType() == ResourceType.ARCHIVE && idParts.length == VALID_ID_PARTS);
     }
 
 }

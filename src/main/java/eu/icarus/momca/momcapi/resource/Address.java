@@ -1,6 +1,7 @@
 package eu.icarus.momca.momcapi.resource;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Created by daniel on 22.07.2015.
@@ -21,7 +22,7 @@ public class Address {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
@@ -57,6 +58,7 @@ public class Address {
     }
 
     @Override
+    @NotNull
     public String toString() {
         return "Address{" +
                 "municipality='" + municipality + '\'' +

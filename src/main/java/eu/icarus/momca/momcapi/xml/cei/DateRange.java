@@ -29,7 +29,7 @@ public class DateRange extends DateAbstract {
      *
      * @param fromDateValue The numeric {@code from} date value, e.q. {@code 12970301}.
      * @param toDateValue   The numeric {@code to} date value, e.q. {@code 12970331}.
-     * @param literalDate     The literal date value, e.g. {@code March 1297}.
+     * @param literalDate   The literal date value, e.g. {@code March 1297}.
      */
     public DateRange(@NotNull String fromDateValue, @NotNull String toDateValue, @NotNull String literalDate) {
 
@@ -56,7 +56,9 @@ public class DateRange extends DateAbstract {
         return fromDateValue;
     }
 
-    /**^
+    /**
+     * ^
+     *
      * @return The numeric {@code to} date value, e.g. {@code 12970331} (== {@code cei:dateRange/@from}).
      */
     @NotNull
@@ -70,6 +72,7 @@ public class DateRange extends DateAbstract {
     }
 
     @Override
+    @NotNull
     public String toString() {
 
         return "DateRange{" +

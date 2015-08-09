@@ -34,7 +34,7 @@ public class IdFond extends Id {
      * Instantiates a new fond id using another IdFond.
      *
      * @param fondId The atom:id, e.g.
-     *                   {@code tag:www.monasterium.net,2011:/fond/RS-IAGNS/Charters}.
+     *               {@code tag:www.monasterium.net,2011:/fond/RS-IAGNS/Charters}.
      */
     public IdFond(@NotNull String fondId) {
 
