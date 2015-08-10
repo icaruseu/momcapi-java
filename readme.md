@@ -49,6 +49,7 @@ _Fond manager_
 
 * List all fonds belonging to a specific archive
 * Get specific fond from the database
+* Add new fond
 
 _Charter Manager_
 
