@@ -21,25 +21,25 @@ public class Archive extends MomcaResource {
     @NotNull
     private final IdArchive id;
     @NotNull
-    private final String name;
+    private final String identifier;
     @NotNull
-    private final String shortName;
+    private final String name;
 
     public Archive(@NotNull MomcaResource momcaResource) {
         super(momcaResource);
         id = initId();
 
-        List<String> shortNameList = momcaResource.queryContentAsList(XpathQuery.QUERY_EAG_REPOSITORID);
+        List<String> identifierList = momcaResource.queryContentAsList(XpathQuery.QUERY_EAG_REPOSITORID);
         List<String> nameList = momcaResource.queryContentAsList(XpathQuery.QUERY_EAG_AUTFORM);
         List<String> countryCodeList = momcaResource.queryContentAsList(XpathQuery.QUERY_EAG_COUNTRYCODE);
         Nodes descNodes = momcaResource.queryContentAsNodes(XpathQuery.QUERY_EAG_DESC);
 
-        if (shortNameList.size() != 1 || nameList.size() != 1 || countryCodeList.size() != 1 || descNodes.size() != 1) {
+        if (identifierList.size() != 1 || nameList.size() != 1 || countryCodeList.size() != 1 || descNodes.size() != 1) {
             throw new IllegalArgumentException("The provided MomcaResource content is not valid for an archive: "
                     + momcaResource.getXmlAsDocument().toXML());
         }
 
-        shortName = shortNameList.get(0);
+        identifier = identifierList.get(0);
         name = nameList.get(0);
         countryCode = countryCodeList.get(0);
         desc = new Desc((Element) descNodes.get(0));
@@ -67,6 +67,11 @@ public class Archive extends MomcaResource {
     }
 
     @NotNull
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    @NotNull
     public String getLogoUrl() {
         return desc.getLogoUrl();
     }
@@ -74,11 +79,6 @@ public class Archive extends MomcaResource {
     @NotNull
     public String getName() {
         return name;
-    }
-
-    @NotNull
-    public String getShortName() {
-        return shortName;
     }
 
     @NotNull
@@ -95,7 +95,7 @@ public class Archive extends MomcaResource {
                 ", countryCode='" + countryCode + '\'' +
                 ", desc=" + desc +
                 ", name='" + name + '\'' +
-                ", shortName='" + shortName + '\'' +
+                ", identifier='" + identifier + '\'' +
                 "} " + super.toString();
     }
 

@@ -50,7 +50,7 @@ public class MomcaResource {
     public MomcaResource(@NotNull String resourceName, @NotNull String parentCollectionUri, @NotNull String xmlContent) {
 
         this.resourceName = Util.encode(resourceName);
-        this.xmlAsDocument = Util.parseXml(xmlContent).getDocument();
+        this.xmlAsDocument = Util.parseToDocument(xmlContent).getDocument();
         this.parentUri = Util.encode(parentCollectionUri);
 
     }

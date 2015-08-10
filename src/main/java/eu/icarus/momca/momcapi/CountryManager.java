@@ -211,7 +211,7 @@ public class CountryManager extends AbstractManager {
             throw new MomcaException(message);
         }
 
-        Element xml = Util.parseXml(queryResults.get(0));
+        Element xml = Util.parseToElement(queryResults.get(0));
         String nativeForm = getNativeform(xml);
         List<Subdivision> subdivisions = getSubdivisions(xml);
 

@@ -16,7 +16,7 @@ public class DescTest {
     @NotNull
     private static final String CORRECT_XML = "<eag:desc xmlns:eag=\"http://www.archivgut-online.de/eag\"><eag:country>Schweiz</eag:country><eag:firstdem>Schwyz</eag:firstdem><eag:street>0041 55 4186111</eag:street><eag:postalcode>CH-8840</eag:postalcode><eag:municipality>Einsiedeln</eag:municipality><eag:telephone>0041 55 4186111</eag:telephone><eag:fax>0041 55 4186112</eag:fax><eag:email>archivar@klosterarchiv.ch</eag:email><eag:webpage>http://www.klosterarchiv.ch</eag:webpage><eag:extptr href=\"http://example.com/img.png\" /></eag:desc>";
     @NotNull
-    private static final Desc EAG_DESC = new Desc(Util.parseXml(CORRECT_XML));
+    private static final Desc EAG_DESC = new Desc(Util.parseToElement(CORRECT_XML));
 
     @Test
     public void testConstructorWithDetails() throws Exception {
@@ -36,7 +36,7 @@ public class DescTest {
 
     @Test
     public void testConstructorWithXml() throws Exception {
-        Desc desc = new Desc(Util.parseXml(CORRECT_XML));
+        Desc desc = new Desc(Util.parseToElement(CORRECT_XML));
         assertEquals(desc.toXML(), CORRECT_XML);
     }
 

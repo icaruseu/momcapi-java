@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public enum ImageAccess {
 
-    FREE("free"), RESTRICTED("restricted"), UNDEFINED("undefined");
+    FREE("free"), RESTRICTED("restricted");
 
     @NotNull
     private final String text;

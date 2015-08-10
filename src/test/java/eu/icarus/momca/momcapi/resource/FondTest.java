@@ -33,6 +33,11 @@ public class FondTest {
     }
 
     @Test
+    public void testGetArchiveId() throws Exception {
+        assertEquals(correctFond.getArchiveId().getId(), "tag:www.monasterium.net,2011:/archive/CH-KASchwyz");
+    }
+
+    @Test
     public void testGetDummyImageUrl() throws Exception {
         assertEquals(correctFond.getDummyImageUrl().get().toExternalForm(), "http://example.com/dummy.png");
     }
@@ -43,8 +48,13 @@ public class FondTest {
     }
 
     @Test
+    public void testGetIdentifier() throws Exception {
+        assertEquals(correctFond.getIdentifier(), "Urkunden");
+    }
+
+    @Test
     public void testGetImageAccess() throws Exception {
-        assertEquals(correctFond.getImageAccess(), ImageAccess.RESTRICTED);
+        assertEquals(correctFond.getImageAccess().get(), ImageAccess.RESTRICTED);
     }
 
     @Test

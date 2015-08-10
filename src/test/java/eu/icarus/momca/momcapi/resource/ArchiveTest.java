@@ -72,7 +72,7 @@ public class ArchiveTest {
 
     @Test
     public void testGetShortName() throws Exception {
-        assertEquals(correctArchive.getShortName(), "CH-KAE");
+        assertEquals(correctArchive.getIdentifier(), "CH-KAE");
     }
 
 }

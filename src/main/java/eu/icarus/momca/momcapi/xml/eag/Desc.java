@@ -81,7 +81,7 @@ public class Desc extends Element {
                 logoUrl
         );
 
-        return Util.parseXml(xml);
+        return Util.parseToElement(xml);
 
     }
 

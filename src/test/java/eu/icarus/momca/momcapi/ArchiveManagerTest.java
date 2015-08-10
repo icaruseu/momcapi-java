@@ -46,7 +46,7 @@ public class ArchiveManagerTest {
 
         assertEquals(newArchive.getId().getArchiveIdentifier(), shortName);
 
-        assertEquals(newArchive.getShortName(), shortName);
+        assertEquals(newArchive.getIdentifier(), shortName);
         assertEquals(newArchive.getName(), name);
 
         assertEquals(newArchive.getCountryCode(), country.getCode());

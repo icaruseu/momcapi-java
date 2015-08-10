@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  */
 public class CharterManager extends AbstractManager {
 
-    CharterManager(MomcaConnection momcaConnection) {
+    CharterManager(@NotNull MomcaConnection momcaConnection) {
         super(momcaConnection);
     }
 

@@ -1,6 +1,7 @@
 package eu.icarus.momca.momcapi.resource;
 
 import eu.icarus.momca.momcapi.query.XpathQuery;
+import eu.icarus.momca.momcapi.xml.atom.IdArchive;
 import eu.icarus.momca.momcapi.xml.atom.IdFond;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,7 +21,7 @@ public class Fond extends MomcaResource {
     @NotNull
     private final IdFond id;
     @NotNull
-    private final ImageAccess imageAccess;
+    private final Optional<ImageAccess> imageAccess;
     @NotNull
     private final Optional<URL> imagesUrl;
     @NotNull
@@ -40,6 +41,11 @@ public class Fond extends MomcaResource {
     }
 
     @NotNull
+    public IdArchive getArchiveId() {
+        return new IdArchive(id.getArchiveIdentifier());
+    }
+
+    @NotNull
     public Optional<URL> getDummyImageUrl() {
         return dummyImageUrl;
     }
@@ -50,7 +56,12 @@ public class Fond extends MomcaResource {
     }
 
     @NotNull
-    public ImageAccess getImageAccess() {
+    public String getIdentifier() {
+        return id.getFondIdentifier();
+    }
+
+    @NotNull
+    public Optional<ImageAccess> getImageAccess() {
         return imageAccess;
     }
 
@@ -62,6 +73,19 @@ public class Fond extends MomcaResource {
     @NotNull
     public String getName() {
         return name;
+    }
+
+    @NotNull
+    @Override
+    public String toString() {
+        return "Fond{" +
+                "id=" + id +
+                ", dummyImageUrl=" + dummyImageUrl +
+                ", fondPreferences=" + fondPreferences +
+                ", imageAccess=" + imageAccess +
+                ", imagesUrl=" + imagesUrl +
+                ", name='" + name + '\'' +
+                "} " + super.toString();
     }
 
     @NotNull
@@ -112,14 +136,14 @@ public class Fond extends MomcaResource {
     }
 
     @NotNull
-    private ImageAccess initImageAccess() {
+    private Optional<ImageAccess> initImageAccess() {
 
-        ImageAccess access = ImageAccess.UNDEFINED;
+        Optional<ImageAccess> access = Optional.empty();
 
         if (fondPreferences.isPresent()) {
 
             String imageAccessString = fondPreferences.get().queryUniqueElement(XpathQuery.QUERY_XRX_IMAGE_ACCESS);
-            access = ImageAccess.fromText(imageAccessString);
+            access = Optional.of(ImageAccess.fromText(imageAccessString));
 
         }
 

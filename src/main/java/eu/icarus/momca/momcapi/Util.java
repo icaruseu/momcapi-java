@@ -1,6 +1,7 @@
 package eu.icarus.momca.momcapi;
 
 import nu.xom.Builder;
+import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.ParsingException;
 import org.jetbrains.annotations.NotNull;
@@ -84,12 +85,12 @@ public class Util {
     }
 
     @NotNull
-    public static Element parseXml(@NotNull String xml) {
+    public static Document parseToDocument(@NotNull String xml) {
 
         Builder builder = new Builder();
         try {
 
-            return builder.build(xml, null).getRootElement();
+            return builder.build(xml, null);
 
         } catch (ParsingException e) {
             throw new IllegalArgumentException("Failed to parse xml.", e);
@@ -97,6 +98,12 @@ public class Util {
             throw new RuntimeException(e);
         }
 
+    }
+
+    @NotNull
+    public static Element parseToElement(@NotNull String xml) {
+        Document doc = parseToDocument(xml);
+        return (Element) doc.getRootElement().copy();
     }
 
     private static void testIfUri(@NotNull String possibleUri) {

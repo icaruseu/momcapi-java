@@ -68,7 +68,7 @@ public class ArchiveManager extends AbstractManager {
 
         if (!momcaConnection.getFondManager().listFondsForArchive(archive).isEmpty()) {
             String message = String.format("The archive '%s',  that is to be deleted still has associated fonds.",
-                    archive.getShortName());
+                    archive.getIdentifier());
             throw new IllegalArgumentException(message);
         }
 
