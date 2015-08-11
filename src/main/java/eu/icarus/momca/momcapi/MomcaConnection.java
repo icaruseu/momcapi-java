@@ -35,6 +35,8 @@ public class MomcaConnection {
     @NotNull
     private final CharterManager charterManager;
     @NotNull
+    private final CollectionManager collectionManager;
+    @NotNull
     private final CountryManager countryManager;
     @NotNull
     private final String dbRootUri;
@@ -66,6 +68,7 @@ public class MomcaConnection {
         countryManager = new CountryManager(this);
         archiveManager = new ArchiveManager(this);
         fondManager = new FondManager(this);
+        collectionManager = new CollectionManager(this);
         charterManager = new CharterManager(this);
 
     }

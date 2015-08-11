@@ -85,21 +85,21 @@ public class ArchiveManager extends AbstractManager {
 
     @NotNull
     public List<IdArchive> listArchives() {
-        List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listIdArchives());
+        List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listArchives());
         return queryResults.stream().map(IdArchive::new).collect(Collectors.toList());
     }
 
     @NotNull
     public List<IdArchive> listArchives(@NotNull Country country) {
         List<String> queryResults = momcaConnection.queryDatabase(
-                ExistQueryFactory.listIdArchivesForCountry(country.getCode()));
+                ExistQueryFactory.listArchivesForCountry(country.getCode()));
         return queryResults.stream().map(IdArchive::new).collect(Collectors.toList());
     }
 
     @NotNull
     public List<IdArchive> listArchives(@NotNull Subdivision subdivision) {
         List<String> queryResults = momcaConnection.queryDatabase(
-                ExistQueryFactory.listIdArchivesForSubdivision(subdivision.getNativeform()));
+                ExistQueryFactory.listArchivesForSubdivision(subdivision.getNativeform()));
         return queryResults.stream().map(IdArchive::new).collect(Collectors.toList());
     }
 
