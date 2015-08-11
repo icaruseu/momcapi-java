@@ -50,9 +50,11 @@ _Fond manager_
 * List all fonds belonging to a specific archive
 * Get specific fond from the database
 * Add new fond
+* Delete fond
 
 _Charter Manager_
 
+* List all charter instances for a fond (`imported` or `public`)
 * Get all instances (`imported`, `private`, `public` and `saved`) of a charter from the database
 * Get specific charter instance, e.g. `saved` from the database
 * Get charter medadata like the list of all figures
