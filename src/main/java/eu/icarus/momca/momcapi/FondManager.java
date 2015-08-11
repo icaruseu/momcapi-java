@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 public class FondManager extends AbstractManager {
 
     public static final String FOND_DATA_COLLECTION = "/db/mom-data/metadata.fond.public";
+    public static final String CHARTER_DATA_COLLECTION = "/db/mom-data/metadata.charter.public";
     private static final String EAD_TEMPLATE = "<ead:ead xmlns:ead=\"urn:isbn:1-931666-22-9\"><ead:eadheader><ead:eadid /><ead:filedesc><ead:titlestmt><ead:titleproper /><ead:author /></ead:titlestmt></ead:filedesc></ead:eadheader><ead:archdesc level=\"otherlevel\"><ead:did><ead:abstract /></ead:did><ead:dsc><ead:c level=\"fonds\"><ead:did><ead:unitid identifier=\"%s\">%s</ead:unitid><ead:unittitle>%s</ead:unittitle></ead:did><ead:bioghist><ead:head /><ead:p /></ead:bioghist><ead:custodhist><ead:head /><ead:p /></ead:custodhist><ead:bibliography><ead:bibref /></ead:bibliography><ead:odd><ead:head /><ead:p /></ead:odd></ead:c></ead:dsc></ead:archdesc></ead:ead>";
     private static final String PREFERENCES_TEMPLATE = "<xrx:preferences xmlns:xrx=\"http://www.monasterium.net/NS/xrx\"><xrx:param name=\"image-access\">%s</xrx:param><xrx:param name=\"dummy-image-url\">%s</xrx:param><xrx:param name=\"image-server-base-url\" >%s</xrx:param></xrx:preferences>";
 
@@ -83,7 +84,13 @@ public class FondManager extends AbstractManager {
 
     public void deleteFond(@NotNull Fond fond) {
 
-        // TODO implement
+        if (!momcaConnection.getCharterManager().listPublishedCharters(fond.getId()).isEmpty()
+                || !momcaConnection.getCharterManager().listImportedCharters(fond.getId()).isEmpty()) {
+            throw new IllegalArgumentException("There are still existing charters for fond '" + fond.getIdentifier() + "'");
+        }
+
+        momcaConnection.deleteCollection(String.format("%s/%s/%s", CHARTER_DATA_COLLECTION, fond.getArchiveId().getArchiveIdentifier(), fond.getIdentifier()));
+        momcaConnection.deleteCollection(String.format("%s/%s/%s", FOND_DATA_COLLECTION, fond.getArchiveId().getArchiveIdentifier(), fond.getIdentifier()));
 
     }
 
@@ -115,7 +122,8 @@ public class FondManager extends AbstractManager {
     }
 
     @NotNull
-    private Entry createEadContent(@NotNull String authorEmail, @NotNull Id id, @NotNull String identifier, @NotNull String name) {
+    private Entry createEadContent(@NotNull String authorEmail, @NotNull Id id, @NotNull String
+            identifier, @NotNull String name) {
 
         String eadString = String.format(EAD_TEMPLATE, identifier, identifier, name);
         Element eadElement = Util.parseToElement(eadString);
@@ -127,7 +135,8 @@ public class FondManager extends AbstractManager {
     }
 
     @NotNull
-    private Optional<Element> createPreferencesContent(@Nullable ImageAccess imageAccess, @Nullable URL imagesUrl, @Nullable URL dummyImageUrl) {
+    private Optional<Element> createPreferencesContent(@Nullable ImageAccess imageAccess, @Nullable URL
+            imagesUrl, @Nullable URL dummyImageUrl) {
 
         Optional<Element> preferencesXml = Optional.empty();
 

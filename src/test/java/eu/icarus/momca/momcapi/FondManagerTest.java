@@ -22,6 +22,29 @@ public class FondManagerTest {
     private FondManager fm;
     private MomcaConnection mc;
 
+    @Test
+    public void testDeleteFond() throws Exception {
+
+        Archive archive = mc.getArchiveManager().getArchive(new IdArchive("DE-SAMuenchen")).get();
+
+        Fond fond = fm.addFond("admin", archive, "MUrkunden", "Mehrere Urkunden", null,
+                new URL("http://ex.com/img"), null);
+        fm.deleteFond(fond);
+
+        assertFalse(fm.getFond(fond.getId()).isPresent());
+        assertFalse(mc.getCollection("/db/mom-data/metadata.charter.public/DE-SAMuenchen/MUrkunden").isPresent());
+        assertFalse(mc.getCollection("/db/mom-data/metadata.fond.public/DE-SAMuenchen/MUrkunden").isPresent());
+
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testDeleteFondWithExistingCharters() throws Exception {
+
+        Fond fond = fm.getFond(new IdFond("CH-KAE", "Urkunden")).get();
+        fm.deleteFond(fond);
+
+    }
+
     @BeforeClass
     public void setUp() throws Exception {
         mc = TestUtils.initMomcaConnection();
