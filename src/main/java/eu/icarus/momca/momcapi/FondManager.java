@@ -5,10 +5,7 @@ import eu.icarus.momca.momcapi.resource.Archive;
 import eu.icarus.momca.momcapi.resource.Fond;
 import eu.icarus.momca.momcapi.resource.ImageAccess;
 import eu.icarus.momca.momcapi.resource.MomcaResource;
-import eu.icarus.momca.momcapi.xml.atom.Author;
-import eu.icarus.momca.momcapi.xml.atom.Entry;
-import eu.icarus.momca.momcapi.xml.atom.Id;
-import eu.icarus.momca.momcapi.xml.atom.IdFond;
+import eu.icarus.momca.momcapi.xml.atom.*;
 import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -82,15 +79,15 @@ public class FondManager extends AbstractManager {
 
     }
 
-    public void deleteFond(@NotNull Fond fond) {
+    public void deleteFond(@NotNull IdFond idFond) {
 
-        if (!momcaConnection.getCharterManager().listPublishedCharters(fond.getId()).isEmpty()
-                || !momcaConnection.getCharterManager().listImportedCharters(fond.getId()).isEmpty()) {
-            throw new IllegalArgumentException("There are still existing charters for fond '" + fond.getIdentifier() + "'");
+        if (!momcaConnection.getCharterManager().listPublishedCharters(idFond).isEmpty()
+                || !momcaConnection.getCharterManager().listImportedCharters(idFond).isEmpty()) {
+            throw new IllegalArgumentException("There are still existing charters for fond '" + idFond.getFondIdentifier() + "'");
         }
 
-        momcaConnection.deleteCollection(String.format("%s/%s/%s", CHARTER_DATA_COLLECTION, fond.getArchiveId().getArchiveIdentifier(), fond.getIdentifier()));
-        momcaConnection.deleteCollection(String.format("%s/%s/%s", FOND_DATA_COLLECTION, fond.getArchiveId().getArchiveIdentifier(), fond.getIdentifier()));
+        momcaConnection.deleteCollection(String.format("%s/%s/%s", CHARTER_DATA_COLLECTION, idFond.getArchiveIdentifier(), idFond.getFondIdentifier()));
+        momcaConnection.deleteCollection(String.format("%s/%s/%s", FOND_DATA_COLLECTION, idFond.getArchiveIdentifier(), idFond.getFondIdentifier()));
 
     }
 
@@ -115,9 +112,9 @@ public class FondManager extends AbstractManager {
     }
 
     @NotNull
-    public List<IdFond> listFonds(@NotNull Archive archive) {
+    public List<IdFond> listFonds(@NotNull IdArchive idArchive) {
         List<String> queryResults = momcaConnection.queryDatabase(
-                ExistQueryFactory.listFonds(archive.getId().getArchiveIdentifier()));
+                ExistQueryFactory.listFonds(idArchive));
         return queryResults.stream().map(IdFond::new).collect(Collectors.toList());
     }
 

@@ -29,7 +29,7 @@ public class FondManagerTest {
 
         Fond fond = fm.addFond("admin", archive, "MUrkunden", "Mehrere Urkunden", null,
                 new URL("http://ex.com/img"), null);
-        fm.deleteFond(fond);
+        fm.deleteFond(fond.getId());
 
         assertFalse(fm.getFond(fond.getId()).isPresent());
         assertFalse(mc.getCollection("/db/mom-data/metadata.charter.public/DE-SAMuenchen/MUrkunden").isPresent());
@@ -39,10 +39,7 @@ public class FondManagerTest {
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testDeleteFondWithExistingCharters() throws Exception {
-
-        Fond fond = fm.getFond(new IdFond("CH-KAE", "Urkunden")).get();
-        fm.deleteFond(fond);
-
+        fm.deleteFond(new IdFond("CH-KAE", "Urkunden"));
     }
 
     @BeforeClass
@@ -60,7 +57,7 @@ public class FondManagerTest {
         Fond fond1 = fm.addFond("admin", archive, "Urkunden", "Alle Urkunden", null,
                 new URL("http://ex.com/img"), null);
         assertTrue(mc.getExistResource("Urkunden.preferences.xml", "/db/mom-data/metadata.fond.public/DE-SAMuenchen/Urkunden").isPresent());
-        fm.deleteFond(fond1);
+        fm.deleteFond(fond1.getId());
 
         assertEquals(fond1.getId().getId(), "tag:www.monasterium.net,2011:/fond/DE-SAMuenchen/Urkunden");
         assertEquals(fond1.getIdentifier(), "Urkunden");
@@ -72,7 +69,7 @@ public class FondManagerTest {
 
         Fond fond2 = fm.addFond("admin", archive, "Urkunden1", "Andere Urkunden", ImageAccess.RESTRICTED,
                 null, new URL("http://ex.com/dummy.png"));
-        fm.deleteFond(fond2);
+        fm.deleteFond(fond2.getId());
 
         assertEquals(fond2.getImageAccess().get(), ImageAccess.RESTRICTED);
         assertFalse(fond2.getImagesUrl().isPresent());
@@ -81,7 +78,7 @@ public class FondManagerTest {
         Fond fond3 = fm.addFond("admin", archive, "Urkunden2", "Noch andere Urkunden", null,
                 null, null);
         assertFalse(mc.getExistResource("Urkunden2.preferences.xml", "/db/mom-data/metadata.fond.public/DE-SAMuenchen/Urkunden2").isPresent());
-        fm.deleteFond(fond3);
+        fm.deleteFond(fond3.getId());
 
         assertFalse(fond3.getImageAccess().isPresent());
         assertFalse(fond3.getImagesUrl().isPresent());
@@ -161,13 +158,13 @@ public class FondManagerTest {
 
         IdArchive id1 = new IdArchive("CH-KAE");
         Archive archive1 = mc.getArchiveManager().getArchive(id1).get();
-        List<IdFond> resultList1 = fm.listFonds(archive1);
+        List<IdFond> resultList1 = fm.listFonds(archive1.getId());
         assertEquals(resultList1.size(), 2);
         assertEquals(resultList1.get(0).getFondIdentifier(), "Urkunden");
 
         IdArchive id2 = new IdArchive("DE-SAMuenchen");
         Archive archive2 = mc.getArchiveManager().getArchive(id2).get();
-        List<IdFond> resultList2 = fm.listFonds(archive2);
+        List<IdFond> resultList2 = fm.listFonds(archive2.getId());
         assertTrue(resultList2.isEmpty());
 
     }

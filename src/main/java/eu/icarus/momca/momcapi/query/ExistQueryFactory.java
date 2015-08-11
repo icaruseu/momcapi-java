@@ -3,6 +3,7 @@ package eu.icarus.momca.momcapi.query;
 import eu.icarus.momca.momcapi.resource.ResourceRoot;
 import eu.icarus.momca.momcapi.xml.Namespace;
 import eu.icarus.momca.momcapi.xml.atom.Id;
+import eu.icarus.momca.momcapi.xml.atom.IdArchive;
 import eu.icarus.momca.momcapi.xml.atom.IdFond;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -151,16 +152,16 @@ public class ExistQueryFactory {
     }
 
     /**
-     * @param archiveIdentifier The archive the fonds to list need to belong to, e.g. {@code CH-KAE}
+     * @param idArchive The id of the archive the fonds to list need to belong to, e.g. {@code CH-KAE}
      * @return A query to list the ids of all fonds that belong to a specific archive.
      */
     @NotNull
-    public static ExistQuery listFonds(@NotNull String archiveIdentifier) {
+    public static ExistQuery listFonds(@NotNull IdArchive idArchive) {
 
         String query = String.format(
                 "%s collection('/db/mom-data/metadata.fond.public')//atom:id[contains(., '%s')]/text()",
                 getNamespaceDeclaration(Namespace.ATOM),
-                archiveIdentifier);
+                idArchive.getArchiveIdentifier());
 
         return new ExistQuery(query);
 
