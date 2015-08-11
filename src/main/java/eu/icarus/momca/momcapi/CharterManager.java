@@ -7,6 +7,7 @@ import eu.icarus.momca.momcapi.resource.CharterStatus;
 import eu.icarus.momca.momcapi.resource.ResourceRoot;
 import eu.icarus.momca.momcapi.resource.User;
 import eu.icarus.momca.momcapi.xml.atom.IdCharter;
+import eu.icarus.momca.momcapi.xml.atom.IdFond;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -53,6 +54,18 @@ public class CharterManager extends AbstractManager {
         return user.listSavedCharterIds().stream()
                 .filter(idCharter -> !isCharterExisting(idCharter, ResourceRoot.METADATA_CHARTER_SAVED))
                 .collect(Collectors.toList());
+    }
+
+    @NotNull
+    public List<IdCharter> listImportedCharters(@NotNull IdFond idFond) {
+        List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listImportedCharters(idFond));
+        return queryResults.stream().map(IdCharter::new).collect(Collectors.toList());
+    }
+
+    @NotNull
+    public List<IdCharter> listPublishedCharters(@NotNull IdFond idFond) {
+        List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listPublishedCharters(idFond));
+        return queryResults.stream().map(IdCharter::new).collect(Collectors.toList());
     }
 
     @NotNull

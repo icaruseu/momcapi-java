@@ -108,9 +108,9 @@ public class FondManager extends AbstractManager {
     }
 
     @NotNull
-    public List<IdFond> listFondsForArchive(@NotNull Archive archive) {
+    public List<IdFond> listFonds(@NotNull Archive archive) {
         List<String> queryResults = momcaConnection.queryDatabase(
-                ExistQueryFactory.listFondsForArchive(archive.getId().getArchiveIdentifier()));
+                ExistQueryFactory.listFonds(archive.getId().getArchiveIdentifier()));
         return queryResults.stream().map(IdFond::new).collect(Collectors.toList());
     }
 

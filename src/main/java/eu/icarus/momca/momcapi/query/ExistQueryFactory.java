@@ -3,6 +3,7 @@ package eu.icarus.momca.momcapi.query;
 import eu.icarus.momca.momcapi.resource.ResourceRoot;
 import eu.icarus.momca.momcapi.xml.Namespace;
 import eu.icarus.momca.momcapi.xml.atom.Id;
+import eu.icarus.momca.momcapi.xml.atom.IdFond;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -154,7 +155,7 @@ public class ExistQueryFactory {
      * @return A query to list the ids of all fonds that belong to a specific archive.
      */
     @NotNull
-    public static ExistQuery listFondsForArchive(@NotNull String archiveIdentifier) {
+    public static ExistQuery listFonds(@NotNull String archiveIdentifier) {
 
         String query = String.format(
                 "%s collection('/db/mom-data/metadata.fond.public')//atom:id[contains(., '%s')]/text()",
@@ -206,6 +207,34 @@ public class ExistQueryFactory {
                 "%s collection('/db/mom-data/metadata.archive.public')//atom:entry[.//eag:firstdem/text()='%s']/atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM, Namespace.EAG),
                 subdivisionNativeform);
+
+        return new ExistQuery(query);
+
+    }
+
+    @NotNull
+    public static ExistQuery listImportedCharters(@NotNull IdFond idFond) {
+
+        String query = String.format(
+                "%s collection('/db/mom-data/metadata.charter.import/%s/%s')//atom:id/text()",
+                getNamespaceDeclaration(Namespace.ATOM),
+                idFond.getArchiveIdentifier(),
+                idFond.getFondIdentifier()
+        );
+
+        return new ExistQuery(query);
+
+    }
+
+    @NotNull
+    public static ExistQuery listPublishedCharters(@NotNull IdFond idFond) {
+
+        String query = String.format(
+                "%s collection('/db/mom-data/metadata.charter.public/%s/%s')//atom:id/text()",
+                getNamespaceDeclaration(Namespace.ATOM),
+                idFond.getArchiveIdentifier(),
+                idFond.getFondIdentifier()
+        );
 
         return new ExistQuery(query);
 

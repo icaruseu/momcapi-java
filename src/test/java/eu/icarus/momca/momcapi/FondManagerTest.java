@@ -134,17 +134,17 @@ public class FondManagerTest {
     }
 
     @Test
-    public void testListFondsForArchive() throws Exception {
+    public void testListFonds() throws Exception {
 
         IdArchive id1 = new IdArchive("CH-KAE");
         Archive archive1 = mc.getArchiveManager().getArchive(id1).get();
-        List<IdFond> resultList1 = fm.listFondsForArchive(archive1);
+        List<IdFond> resultList1 = fm.listFonds(archive1);
         assertEquals(resultList1.size(), 2);
         assertEquals(resultList1.get(0).getFondIdentifier(), "Urkunden");
 
         IdArchive id2 = new IdArchive("DE-SAMuenchen");
         Archive archive2 = mc.getArchiveManager().getArchive(id2).get();
-        List<IdFond> resultList2 = fm.listFondsForArchive(archive2);
+        List<IdFond> resultList2 = fm.listFonds(archive2);
         assertTrue(resultList2.isEmpty());
 
     }

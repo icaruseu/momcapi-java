@@ -105,6 +105,7 @@ public class ArchiveManagerTest {
         am.deleteArchive(newArchive);
 
         assertFalse(am.getArchive(newArchive.getId()).isPresent());
+        assertFalse(mc.getCollection("/db/mom-data/metadata.fond.public/" + newArchive.getIdentifier()).isPresent());
 
     }
 
@@ -133,14 +134,14 @@ public class ArchiveManagerTest {
 
     @Test
     public void testListArchivesForCountry() throws Exception {
-        assertTrue(am.listArchivesForCountry(new Country("AT", "Österreich", new ArrayList<>(0))).isEmpty());
-        assertEquals(am.listArchivesForCountry(new Country("CH", "Schweiz", new ArrayList<>(0))).size(), 2);
+        assertTrue(am.listArchives(new Country("AT", "Österreich", new ArrayList<>(0))).isEmpty());
+        assertEquals(am.listArchives(new Country("CH", "Schweiz", new ArrayList<>(0))).size(), 2);
     }
 
     @Test
     public void testListArchivesForSubdivision() throws Exception {
-        assertTrue(am.listArchivesForSubdivision(new Subdivision("DE-BW", "Baden-Württemberg")).isEmpty());
-        assertEquals(am.listArchivesForSubdivision(new Subdivision("DE-BY", "Bayern")).size(), 1);
+        assertTrue(am.listArchives(new Subdivision("DE-BW", "Baden-Württemberg")).isEmpty());
+        assertEquals(am.listArchives(new Subdivision("DE-BY", "Bayern")).size(), 1);
     }
 
 }

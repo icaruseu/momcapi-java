@@ -66,13 +66,14 @@ public class ArchiveManager extends AbstractManager {
 
     public void deleteArchive(@NotNull Archive archive) {
 
-        if (!momcaConnection.getFondManager().listFondsForArchive(archive).isEmpty()) {
+        if (!momcaConnection.getFondManager().listFonds(archive).isEmpty()) {
             String message = String.format("The archive '%s',  that is to be deleted still has associated fonds.",
                     archive.getIdentifier());
             throw new IllegalArgumentException(message);
         }
 
         momcaConnection.deleteCollection("/db/mom-data/metadata.archive.public/" + archive.getId().getArchiveIdentifier());
+        momcaConnection.deleteCollection("/db/mom-data/metadata.fond.public/" + archive.getId().getArchiveIdentifier());
 
     }
 
@@ -89,14 +90,14 @@ public class ArchiveManager extends AbstractManager {
     }
 
     @NotNull
-    public List<IdArchive> listArchivesForCountry(@NotNull Country country) {
+    public List<IdArchive> listArchives(@NotNull Country country) {
         List<String> queryResults = momcaConnection.queryDatabase(
                 ExistQueryFactory.listIdArchivesForCountry(country.getCode()));
         return queryResults.stream().map(IdArchive::new).collect(Collectors.toList());
     }
 
     @NotNull
-    public List<IdArchive> listArchivesForSubdivision(@NotNull Subdivision subdivision) {
+    public List<IdArchive> listArchives(@NotNull Subdivision subdivision) {
         List<String> queryResults = momcaConnection.queryDatabase(
                 ExistQueryFactory.listIdArchivesForSubdivision(subdivision.getNativeform()));
         return queryResults.stream().map(IdArchive::new).collect(Collectors.toList());

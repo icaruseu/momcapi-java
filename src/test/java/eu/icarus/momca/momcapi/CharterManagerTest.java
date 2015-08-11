@@ -4,6 +4,7 @@ import eu.icarus.momca.momcapi.resource.Charter;
 import eu.icarus.momca.momcapi.resource.CharterStatus;
 import eu.icarus.momca.momcapi.resource.User;
 import eu.icarus.momca.momcapi.xml.atom.IdCharter;
+import eu.icarus.momca.momcapi.xml.atom.IdFond;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -16,26 +17,25 @@ import static org.testng.Assert.*;
  */
 public class CharterManagerTest {
 
-    private CharterManager charterManager;
-    private MomcaConnection momcaConnection;
+    private CharterManager cm;
+    private MomcaConnection mc;
 
     @BeforeClass
     public void setUp() throws Exception {
-        momcaConnection = TestUtils.initMomcaConnection();
-        charterManager = momcaConnection.getCharterManager();
-        assertNotNull(charterManager, "MOM-CA connection not initialized.");
+        mc = TestUtils.initMomcaConnection();
+        cm = mc.getCharterManager();
+        assertNotNull(cm, "MOM-CA connection not initialized.");
     }
-
 
     @Test
     public void testGetCharterInstances() throws Exception {
 
         IdCharter id = new IdCharter("CH-KAE", "Urkunden", "KAE_Urkunde_Nr_2");
-        List<Charter> charters = charterManager.getCharterInstances(id);
+        List<Charter> charters = cm.getCharterInstances(id);
         assertEquals(charters.size(), 2);
 
         IdCharter encodedId = new IdCharter("RS-IAGNS", "Charters", "IAGNS_F-.150_6605|193232"); // The | will be encoded
-        List<Charter> encodedIdCharters = charterManager.getCharterInstances(encodedId);
+        List<Charter> encodedIdCharters = cm.getCharterInstances(encodedId);
         assertEquals(encodedIdCharters.size(), 1);
 
     }
@@ -44,7 +44,7 @@ public class CharterManagerTest {
     public void testGetCharterInstancesForImportedCharter() throws Exception {
 
         IdCharter id = new IdCharter("RS-IAGNS", "Charters", "F1_fasc.16_sub_N_1513");
-        List<Charter> charters = charterManager.getCharterInstances(id, CharterStatus.IMPORTED);
+        List<Charter> charters = cm.getCharterInstances(id, CharterStatus.IMPORTED);
         assertEquals(charters.size(), 1);
         assertEquals(charters.get(0).getId().toXML(), id.toXML());
 
@@ -54,7 +54,7 @@ public class CharterManagerTest {
     public void testGetCharterInstancesForPrivateCharter() throws Exception {
 
         IdCharter id = new IdCharter("ea13e5f1-03b2-4bfa-9dd5-8fb770f98d7b", "46bc10f3-bc35-4fa8-ab82-25827dc243f6");
-        List<Charter> charters = charterManager.getCharterInstances(id, CharterStatus.PRIVATE);
+        List<Charter> charters = cm.getCharterInstances(id, CharterStatus.PRIVATE);
         assertEquals(charters.size(), 1);
         assertEquals(charters.get(0).getId().toXML(), id.toXML());
 
@@ -64,7 +64,7 @@ public class CharterManagerTest {
     public void testGetCharterInstancesForSavedCharter() throws Exception {
 
         IdCharter id = new IdCharter("CH-KAE", "Urkunden", "KAE_Urkunde_Nr_2");
-        List<Charter> charters = charterManager.getCharterInstances(id, CharterStatus.SAVED);
+        List<Charter> charters = cm.getCharterInstances(id, CharterStatus.SAVED);
         assertEquals(charters.size(), 1);
         assertEquals(charters.get(0).getId().toXML(), id.toXML());
 
@@ -73,7 +73,7 @@ public class CharterManagerTest {
     @Test
     public void testGetGetCharterInstancesCharterNotExisting() throws Exception {
         IdCharter id = new IdCharter("RS-IAGNS", "Charters", "NotExisting");
-        List<Charter> charters = charterManager.getCharterInstances(id);
+        List<Charter> charters = cm.getCharterInstances(id);
         assertTrue(charters.isEmpty());
     }
 
@@ -81,21 +81,47 @@ public class CharterManagerTest {
     public void testGetGetCharterInstancesForPublishedCharter() throws Exception {
 
         IdCharter id = new IdCharter("CH-KAE", "Urkunden", "KAE_Urkunde_Nr_1");
-        List<Charter> charters = charterManager.getCharterInstances(id, CharterStatus.PUBLIC);
+        List<Charter> charters = cm.getCharterInstances(id, CharterStatus.PUBLIC);
         assertEquals(charters.size(), 1);
         assertEquals(charters.get(0).getId().toXML(), id.toXML());
 
     }
 
     @Test
+    public void testListImportedCharters() throws Exception {
+
+        IdFond id1 = new IdFond("RS-IAGNS", "Charters");
+        List<IdCharter> charters1 = cm.listImportedCharters(id1);
+        assertEquals(charters1.size(), 8);
+
+        IdFond id2 = new IdFond("CH-KASchwyz", "Urkunden");
+        List<IdCharter> charters2 = cm.listImportedCharters(id2);
+        assertEquals(charters2.size(), 0);
+
+    }
+
+    @Test
+    public void testListPublishedCharters() throws Exception {
+
+        IdFond id1 = new IdFond("CH-KAE", "Urkunden");
+        List<IdCharter> charters1 = cm.listPublishedCharters(id1);
+        assertEquals(charters1.size(), 10);
+
+        IdFond id2 = new IdFond("CH-KASchwyz", "Urkunden");
+        List<IdCharter> charters2 = cm.listPublishedCharters(id2);
+        assertEquals(charters2.size(), 0);
+
+    }
+
+    @Test
     public void testlistErroneouslySavedCharters() throws Exception {
 
-        UserManager um = momcaConnection.getUserManager();
+        UserManager um = mc.getUserManager();
         User user = um.getUser("admin").get();
 
         IdCharter erroneouslySavedCharter = new IdCharter("tag:www.monasterium.net,2011:/charter/CH-KAE/Urkunden/KAE_Urkunde_Nr_1");
 
-        List<IdCharter> erroneouslySavedCharterIds = charterManager.listErroneouslySavedCharters(user);
+        List<IdCharter> erroneouslySavedCharterIds = cm.listErroneouslySavedCharters(user);
         assertEquals(erroneouslySavedCharterIds.size(), 1);
         assertEquals(erroneouslySavedCharterIds.get(0).toXML(), erroneouslySavedCharter.toXML());
 
