@@ -52,6 +52,13 @@ _Fond manager_
 * Add new fond
 * Delete fond
 
+_Collection manager_
+
+* List all collections
+* List all collections belonging to a specific country
+* List all collections belonging to a specific region
+* Get a specific collection from the database
+
 _Charter Manager_
 
 * List all charter instances for a fond (`imported` or `public`)
