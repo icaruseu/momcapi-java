@@ -3,11 +3,13 @@ package eu.icarus.momca.momcapi;
 import eu.icarus.momca.momcapi.exception.MomcaException;
 import eu.icarus.momca.momcapi.query.ExistQuery;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
+import eu.icarus.momca.momcapi.resource.Country;
+import eu.icarus.momca.momcapi.resource.CountryCode;
+import eu.icarus.momca.momcapi.resource.Region;
 import eu.icarus.momca.momcapi.resource.ResourceRoot;
 import eu.icarus.momca.momcapi.xml.Namespace;
-import eu.icarus.momca.momcapi.xml.eap.Country;
-import eu.icarus.momca.momcapi.xml.eap.EapAbstract;
-import eu.icarus.momca.momcapi.xml.eap.Subdivision;
+import eu.icarus.momca.momcapi.xml.eap.EapCountry;
+import eu.icarus.momca.momcapi.xml.eap.EapSubdivision;
 import nu.xom.Element;
 import nu.xom.Elements;
 import org.jetbrains.annotations.NotNull;
@@ -37,19 +39,19 @@ public class CountryManager extends AbstractManager {
      * Adds a new country to the database.
      *
      * @param code       The code of the new country to add. Throws an IllegalArgumentException if the code already exists.
-     * @param nativeform The name of the country in its own language, e.g. {@code Sverige}.
+     * @param nativeName The name of the country in its own language, e.g. {@code Sverige}.
      * @return The new country.
      */
     @NotNull
-    public Country addCountry(@NotNull String code, @NotNull String nativeform) {
+    public Country addNewCountryToHierarchy(@NotNull CountryCode code, @NotNull String nativeName) {
 
-        if (isCodeAlreadyExisting(code)) {
-            throw new IllegalArgumentException(String.format("Country code '%s' is already existing.", code));
+        if (isCodeInUseInHierarchy(code.getCode())) {
+            throw new IllegalArgumentException(String.format("EapCountry code '%s' is already existing.", code));
         }
 
-        Country newCountry = new Country(code, nativeform, new ArrayList<>(0));
+        EapCountry newEapCountry = new EapCountry(code.getCode(), nativeName, new ArrayList<>(0));
         ExistQuery query = ExistQueryFactory
-                .insertEapElement(MOM_PORTAL_XML_URI, "eap:countries", null, newCountry.toXML());
+                .insertEapElement(MOM_PORTAL_XML_URI, "eap:countries", null, newEapCountry.toXML());
         momcaConnection.queryDatabase(query);
 
         return getCountry(code).orElseThrow(RuntimeException::new);
@@ -57,137 +59,83 @@ public class CountryManager extends AbstractManager {
     }
 
     /**
-     * Adds a subdivision to the selected country.
+     * Adds a subdivision to the selected eapCountry.
      *
-     * @param country    The country to add the subdivision to.
-     * @param code       The code of the subdivision, e.g. {@code AT-NÖ}.
-     * @param nativeform The nativeform of the subdivision in its native language, e.g. {@code Niederösterreich}.
-     * @return The updated country.
-     * @see Subdivision
+     * @param country    The country to add the region to.
+     * @param regionCode The code of the region, e.g. {@code AT-NÖ}. Does not have a specific format.
+     * @param nativeName The native name of the subdivision in its native language, e.g. {@code Niederösterreich}.
+     * @return The updated eapCountry.
+     * @see EapSubdivision
      */
     @NotNull
-    public Country addSubdivision(@NotNull Country country, @NotNull String code, @NotNull String nativeform) {
+    public Country addRegionToHierarchy(@NotNull Country country, @NotNull String regionCode, @NotNull String nativeName) {
 
-        if (isCodeAlreadyExisting(code)) {
-            throw new IllegalArgumentException(String.format("Subdivision code '%s' is already existing.", code));
+        Country updated = country;
+
+        List<String> eapCountryXml = momcaConnection.queryDatabase(ExistQueryFactory.getEapCountryXml(country.getCountryCode().getCode()));
+
+        if (!eapCountryXml.isEmpty()) {
+
+            if (eapCountryXml.get(0).contains(regionCode)) {
+                throw new IllegalArgumentException(String.format("Re gion '%s' is already existing.", nativeName));
+            }
+
+            EapSubdivision eapSubdivision = new EapSubdivision(regionCode, nativeName);
+            ExistQuery query = ExistQueryFactory.insertEapElement(
+                    MOM_PORTAL_XML_URI, "eap:subdivisions", country.getCountryCode().getCode(), eapSubdivision.toXML());
+            momcaConnection.queryDatabase(query);
+
+            updated = getCountry(country.getCountryCode()).orElseThrow(RuntimeException::new);
+
         }
 
-        Subdivision subdivision = new Subdivision(code, nativeform);
-        ExistQuery query = ExistQueryFactory.insertEapElement(
-                MOM_PORTAL_XML_URI, "eap:subdivisions", country.getCode(), subdivision.toXML());
-        momcaConnection.queryDatabase(query);
-
-        return getCountry(country.getCode()).orElseThrow(RuntimeException::new);
+        return updated;
 
     }
 
     /**
-     * Updates the code of a country.
-     *
-     * @param country The country.
-     * @param newCode The new code.
-     * @return The updated country.
-     */
-    @NotNull
-    public Country changeCountryCode(@NotNull Country country, @NotNull String newCode) {
-        momcaConnection.queryDatabase(ExistQueryFactory
-                .updateElementText(MOM_PORTAL_XML_URI, "eap:code", country.getCode(), newCode));
-        return getCountry(newCode).orElseThrow(RuntimeException::new);
-    }
-
-    /**
-     * Updates the nativeform (== its name in its own language) of a country.
-     *
-     * @param country       The country.
-     * @param newNativeform The new nativeform.
-     * @return The updated country.
-     */
-    @NotNull
-    public Country changeCountryNativeform(@NotNull Country country, @NotNull String newNativeform) {
-        momcaConnection.queryDatabase(ExistQueryFactory
-                .updateElementText(MOM_PORTAL_XML_URI, "eap:nativeform", country.getNativeform(), newNativeform));
-        return getCountry(country.getCode()).orElseThrow(RuntimeException::new);
-    }
-
-    /**
-     * Updates the code of a subdivision of a country.
-     *
-     * @param country     The country.
-     * @param currentCode The current code of the subdivision.
-     * @param newCode     The new code.
-     * @return The updated country.
-     * @see Subdivision
-     */
-    @NotNull
-    public Country changeSubdivisionCode(@NotNull Country country, @NotNull String currentCode, @NotNull String newCode) {
-        momcaConnection.queryDatabase(ExistQueryFactory
-                .updateElementText(MOM_PORTAL_XML_URI, "eap:code", currentCode, newCode));
-        return getCountry(country.getCode()).orElseThrow(RuntimeException::new);
-    }
-
-    /**
-     * Updates the nativeform (== its name in its own language) of a country.
-     *
-     * @param country           The country.
-     * @param currentNativeform the current native form.
-     * @param newNativeform     The new nativeform.
-     * @return The updated country.
-     * @see Subdivision
-     */
-    @NotNull
-    public Country changeSubdivisionNativeform(@NotNull Country country, @NotNull String currentNativeform,
-                                               @NotNull String newNativeform) {
-        momcaConnection.queryDatabase(ExistQueryFactory
-                .updateElementText(MOM_PORTAL_XML_URI, "eap:nativeform", currentNativeform, newNativeform));
-        return getCountry(country.getCode()).orElseThrow(RuntimeException::new);
-    }
-
-    /**
-     * Deletes a country. If there are still archives using this country in the database, a
-     * {@code MomcaException} is thrown.
+     * Deletes a country.
      *
      * @param code The code of the country to delete, e.g. {@code DE}.
      */
-    public void deleteCountry(@NotNull String code) {
+    public void deleteCountryFromHierarchy(@NotNull CountryCode code) {
 
         List<String> archivesForCode = momcaConnection.queryDatabase(ExistQueryFactory.listArchivesForCountry(code));
         if (!archivesForCode.isEmpty()) {
             throw new MomcaException("There are existing archives for country '" + code + "'.");
         }
 
-        momcaConnection.queryDatabase(ExistQueryFactory.deleteEapElement(code));
+        momcaConnection.queryDatabase(ExistQueryFactory.deleteEapElement(code.getCode()));
 
     }
 
     /**
-     * Deletes a subdivison from a country. If there are still archives using this subdivision in the database, a
-     * {@code MomcaException} is thrown.
+     * Deletes a region from a countries hierarchy.
      *
-     * @param country The country to delete from.
-     * @param code    The code of the subdivision to delete.
+     * @param country    The country to delete from.
+     * @param regionCode The code of the subdivision to delete.
      * @return The updated country.
-     * @see Subdivision
      */
     @NotNull
-    public Country deleteSubdivision(@NotNull Country country, @NotNull String code) {
+    public Country deleteRegionFromHierarchy(@NotNull Country country, @NotNull String regionCode) {
 
-        List<Subdivision> matchingSubdivisions = country.getSubdivisions().stream()
-                .filter(s -> s.getCode().equals(code)).collect(Collectors.toList());
+        List<EapSubdivision> matchingEapSubdivisions = country.getHierarchyXml().getEapSubdivisions().stream()
+                .filter(s -> s.getCode().equals(regionCode)).collect(Collectors.toList());
 
-        if (!matchingSubdivisions.isEmpty()) {
+        if (!matchingEapSubdivisions.isEmpty()) {
 
-            String nativeForm = matchingSubdivisions.get(0).getNativeform();
-            ExistQuery query = ExistQueryFactory.listArchivesForSubdivision(nativeForm);
+            String nativeForm = matchingEapSubdivisions.get(0).getNativeform();
+            ExistQuery query = ExistQueryFactory.listArchivesForRegion(nativeForm);
 
             if (!momcaConnection.queryDatabase(query).isEmpty()) {
-                throw new MomcaException("There are existing archives for subdivision '" + code + "'.");
+                throw new MomcaException("There are existing archives for subdivision '" + regionCode + "'.");
             }
 
         }
 
-        ExistQuery query = ExistQueryFactory.deleteEapElement(code);
+        ExistQuery query = ExistQueryFactory.deleteEapElement(regionCode);
         momcaConnection.queryDatabase(query);
-        return getCountry(country.getCode()).orElseThrow(RuntimeException::new);
+        return getCountry(country.getCountryCode()).orElseThrow(RuntimeException::new);
 
     }
 
@@ -198,100 +146,56 @@ public class CountryManager extends AbstractManager {
      * @return The country.
      */
     @NotNull
-    public Optional<Country> getCountry(@NotNull String code) {
+    public Optional<Country> getCountry(@NotNull CountryCode code) {
 
-        List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.getCountryXml(code));
+        Optional<Country> country = Optional.empty();
 
-        if (queryResults.isEmpty()) {
-            return Optional.empty();
+        if (listCountries().stream().anyMatch(countryCode -> countryCode.equals(code))) {
+
+            List<String> nativeNames = momcaConnection.queryDatabase(ExistQueryFactory.getCountryNativeName(code));
+
+            if (nativeNames.size() > 1) {
+                throw new MomcaException("There are multiple names for country code '" + code.getCode() + "'");
+            }
+
+            String nativeName = nativeNames.isEmpty() ? "[No name]" : nativeNames.get(0);
+
+            List<String> regionsNames = momcaConnection.queryDatabase(ExistQueryFactory.listRegionsNativeNames(code));
+            List<Region> regions = new ArrayList<>(regionsNames.size());
+
+            for (String regionName : regionsNames) {
+
+                List<String> regionCodeResults = momcaConnection.queryDatabase(ExistQueryFactory.getRegionCode(regionName));
+
+                if (regionCodeResults.size() > 1) {
+                    throw new MomcaException("More than one region code for region '" + regionName + "' existing.");
+                }
+
+                String regionCode = regionCodeResults.isEmpty() ? "" : regionCodeResults.get(0);
+
+                regions.add(new Region(regionCode, regionName));
+
+            }
+
+            country = Optional.of(new Country(code, nativeName, regions));
+
         }
 
-        if (queryResults.size() > 1) {
-            String message = String.format("More than one countries for code '%s' existing. This is not allowed.", code);
-            throw new MomcaException(message);
-        }
-
-        Element xml = Util.parseToElement(queryResults.get(0));
-        String nativeForm = getNativeform(xml);
-        List<Subdivision> subdivisions = getSubdivisions(xml);
-
-        return Optional.of(new Country(code, nativeForm, subdivisions));
+        return country;
 
     }
 
     /**
-     * @return A list of the codes (e.g. {@code ["DE", "SE", "AT"]) of all countries in the database.
+     * @return A list of the country codes of all countries in the database (archives and collections).
      */
     @NotNull
-    public List<String> listCountries() {
-        return momcaConnection.queryDatabase(ExistQueryFactory.listCountryCodes());
+    public List<CountryCode> listCountries() {
+        return momcaConnection.queryDatabase(ExistQueryFactory.listCountryCodes())
+                .stream().map(CountryCode::new).collect(Collectors.toList());
     }
 
-    @NotNull
-    private String getCode(@NotNull Element eapRoot) {
-        return eapRoot.getChildElements("code", Namespace.EAP.getUri()).get(0).getValue();
-    }
-
-    @NotNull
-    private String getNativeform(@NotNull Element eapRoot) {
-        return eapRoot.getChildElements("nativeform", Namespace.EAP.getUri()).get(0).getValue();
-    }
-
-    @NotNull
-    private Elements getSubdivisionElements(@NotNull Element countryElement) {
-
-        Elements subdivisionsElements = countryElement.getChildElements("subdivisions", Namespace.EAP.getUri());
-
-        if (subdivisionsElements.size() != 1) {
-            throw new IllegalArgumentException("Element doesn't include a 'eap:subdivisions' element.");
-        }
-
-        return subdivisionsElements.get(0).getChildElements("subdivision", Namespace.EAP.getUri());
-
-    }
-
-    @NotNull
-    private List<Subdivision> getSubdivisions(@NotNull Element countryElement) {
-
-        Elements subdivisionElements = getSubdivisionElements(countryElement);
-
-        List<Subdivision> subdivisions = new ArrayList<>(0);
-
-        for (int i = 0; i < subdivisionElements.size(); i++) {
-
-            Element subdivisionElement = subdivisionElements.get(i);
-            String code = getCode(subdivisionElement);
-            String nativeform = getNativeform(subdivisionElement);
-
-            subdivisions.add(new Subdivision(code, nativeform));
-
-        }
-
-        return subdivisions;
-
-    }
-
-    private boolean isCodeAlreadyExisting(String code) {
-
-        List<String> allCountryCodes = momcaConnection.queryDatabase(ExistQueryFactory.listCountryCodes());
-
-        if (allCountryCodes.stream().anyMatch(countryCode -> countryCode.equals(code))) {
-
-            return true;
-
-        } else {
-
-            for (String countryCode : allCountryCodes) {
-                Country country = getCountry(countryCode).get();
-                if (country.getSubdivisions().stream().map(EapAbstract::getCode).anyMatch(s -> s.equals(code))) {
-                    return true;
-                }
-            }
-
-        }
-
-        return false;
-
+    private boolean isCodeInUseInHierarchy(@NotNull String code) {
+        return !momcaConnection.queryDatabase(ExistQueryFactory.getEapCountryXml(code)).isEmpty();
     }
 
 }

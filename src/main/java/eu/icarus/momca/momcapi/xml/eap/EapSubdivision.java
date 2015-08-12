@@ -6,9 +6,9 @@ import org.jetbrains.annotations.NotNull;
  * @author daniel
  *         Created on 17.07.2015.
  */
-public class Subdivision extends EapAbstract {
+public class EapSubdivision extends EapAbstract {
 
-    public Subdivision(@NotNull String code, @NotNull String nativeForm) {
+    public EapSubdivision(@NotNull String code, @NotNull String nativeForm) {
         super("subdivision", code, nativeForm);
     }
 

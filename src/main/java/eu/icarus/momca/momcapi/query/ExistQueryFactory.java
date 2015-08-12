@@ -1,5 +1,6 @@
 package eu.icarus.momca.momcapi.query;
 
+import eu.icarus.momca.momcapi.resource.CountryCode;
 import eu.icarus.momca.momcapi.resource.ResourceRoot;
 import eu.icarus.momca.momcapi.xml.Namespace;
 import eu.icarus.momca.momcapi.xml.atom.Id;
@@ -62,18 +63,15 @@ public class ExistQueryFactory {
         return new ExistQuery(query);
     }
 
-    /**
-     * @param code The code of the country, e.g. {@code DE}.
-     * @return A query to get the complete XML content of the {@code eap:country}-element specified by {@code code}.
-     */
     @NotNull
-    public static ExistQuery getCountryXml(@NotNull String code) {
+    public static ExistQuery getCountryNativeName(@NotNull CountryCode countryCode) {
 
-        String query = String.format(
-                "%s doc('/db/mom-data/%s/mom.portal.xml')//eap:country[eap:code='%s']",
-                getNamespaceDeclaration(Namespace.EAP),
-                ResourceRoot.METADATA_PORTAL_PUBLIC.getCollectionName(),
-                code);
+        String query = String.format("%s distinct-values(" +
+                        "(doc('/db/mom-data/metadata.portal.public/mom.portal.xml')//eap:country[./eap:code='%s']/eap:nativeform/text(),\n" +
+                        "    data(collection('/db/mom-data/metadata.collection.public')//cei:country[@id='%s']/text())))",
+                getNamespaceDeclaration(Namespace.CEI, Namespace.EAP),
+                countryCode.getCode(),
+                countryCode.getCode());
 
         return new ExistQuery(query);
 
@@ -85,6 +83,37 @@ public class ExistQueryFactory {
     @NotNull
     public static ExistQuery getCurrentDateTime() {
         return new ExistQuery("current-dateTime()");
+    }
+
+    /**
+     * @param code The code of the country, e.g. {@code DE}.
+     * @return A query to get the complete XML content of the {@code eap:country}-element specified by {@code code}.
+     */
+    @NotNull
+    public static ExistQuery getEapCountryXml(@NotNull String code) {
+
+        String query = String.format(
+                "%s doc('/db/mom-data/%s/mom.portal.xml')//eap:country[eap:code='%s']",
+                getNamespaceDeclaration(Namespace.EAP),
+                ResourceRoot.METADATA_PORTAL_PUBLIC.getCollectionName(),
+                code);
+
+        return new ExistQuery(query);
+
+    }
+
+    @NotNull
+    public static ExistQuery getRegionCode(@NotNull String regionNativeName) {
+
+        String query = String.format("%s distinct-values(" +
+                        "(doc('/db/mom-data/metadata.portal.public/mom.portal.xml')//eap:subdivision[eap:nativeform = '%s']/eap:code/text(),\n" +
+                        "    data(collection('/db/mom-data/metadata.collection.public')//cei:provenance[cei:region= '%s']/cei:region/@id)))",
+                getNamespaceDeclaration(Namespace.CEI, Namespace.EAP),
+                regionNativeName,
+                regionNativeName);
+
+        return new ExistQuery(query);
+
     }
 
     /**
@@ -154,28 +183,28 @@ public class ExistQueryFactory {
      * @return A query to list all archives that use the country code in their XML.
      */
     @NotNull
-    public static ExistQuery listArchivesForCountry(@NotNull String countryCode) {
+    public static ExistQuery listArchivesForCountry(@NotNull CountryCode countryCode) {
 
         String query = String.format(
                 "%s collection('/db/mom-data/metadata.archive.public')//atom:entry[.//eag:repositorid/@countrycode='%s']/atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM, Namespace.EAG),
-                countryCode);
+                countryCode.getCode());
 
         return new ExistQuery(query);
 
     }
 
     /**
-     * @param subdivisionNativeform The native name of a subdivision, e.g. {@code Bayern}.
-     * @return A query to list the ids of all archives that use the name of a subdivision in their XML.
+     * @param regionName The native name of a region, e.g. {@code Bayern}.
+     * @return A query to list the ids of all archives that use the name of a region in their XML.
      */
     @NotNull
-    public static ExistQuery listArchivesForSubdivision(@NotNull String subdivisionNativeform) {
+    public static ExistQuery listArchivesForRegion(@NotNull String regionName) {
 
         String query = String.format(
                 "%s collection('/db/mom-data/metadata.archive.public')//atom:entry[.//eag:firstdem/text()='%s']/atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM, Namespace.EAG),
-                subdivisionNativeform);
+                regionName);
 
         return new ExistQuery(query);
 
@@ -200,28 +229,28 @@ public class ExistQueryFactory {
      * @return A query to list all collections that use the country code in their XML.
      */
     @NotNull
-    public static ExistQuery listCollectionsForCountry(@NotNull String countryCode) {
+    public static ExistQuery listCollectionsForCountry(@NotNull CountryCode countryCode) {
 
         String query = String.format(
                 "%s collection('/db/mom-data/metadata.collection.public')//atom:entry[.//cei:country/@id='%s']/atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM, Namespace.CEI),
-                countryCode);
+                countryCode.getCode());
 
         return new ExistQuery(query);
 
     }
 
     /**
-     * @param subdivisionNativeform The native name of a subdivision, e.g. {@code Bayern}.
-     * @return A query to list the ids of all collections that use the name of a subdivision in their XML.
+     * @param regionName The native name of a region, e.g. {@code Bayern}.
+     * @return A query to list the ids of all collections that use the name of a region in their XML.
      */
     @NotNull
-    public static ExistQuery listCollectionsForSubdivision(@NotNull String subdivisionNativeform) {
+    public static ExistQuery listCollectionsForRegion(@NotNull String regionName) {
 
         String query = String.format(
-                "%s collection('/db/mom-data/metadata.collection.public')//atom:entry[.//cei:region/text()=\"Sofia\"]/atom:id/text()",
+                "%s collection('/db/mom-data/metadata.collection.public')//atom:entry[.//cei:region/text()='%s']/atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM, Namespace.CEI),
-                subdivisionNativeform);
+                regionName);
 
         return new ExistQuery(query);
 
@@ -235,9 +264,9 @@ public class ExistQueryFactory {
     public static ExistQuery listCountryCodes() {
 
         String query = String.format(
-                "%s doc('/db/mom-data/%s/mom.portal.xml')//eap:country/eap:code/text()",
-                getNamespaceDeclaration(Namespace.EAP),
-                ResourceRoot.METADATA_PORTAL_PUBLIC.getCollectionName());
+                "%s distinct-values((doc('/db/mom-data/metadata.portal.public/mom.portal.xml')//eap:country/eap:code[text() != '']/text(),\n" +
+                        "    data(collection('/db/mom-data/metadata.collection.public')//cei:country[@id != '']/@id)))",
+                getNamespaceDeclaration(Namespace.CEI, Namespace.EAP));
 
         return new ExistQuery(query);
 
@@ -282,6 +311,20 @@ public class ExistQueryFactory {
                 idFond.getArchiveIdentifier(),
                 idFond.getFondIdentifier()
         );
+
+        return new ExistQuery(query);
+
+    }
+
+    @NotNull
+    public static ExistQuery listRegionsNativeNames(@NotNull CountryCode countryCode) {
+
+        String query = String.format("%s distinct-values((" +
+                        "doc('/db/mom-data/metadata.portal.public/mom.portal.xml')//eap:country[eap:code = '%s']//eap:subdivision/eap:nativeform/text(),\n" +
+                        "    data(collection('/db/mom-data/metadata.collection.public')//cei:provenance[cei:country/@id = '%s']/cei:region/text())))",
+                getNamespaceDeclaration(Namespace.CEI, Namespace.EAP),
+                countryCode.getCode(),
+                countryCode.getCode());
 
         return new ExistQuery(query);
 

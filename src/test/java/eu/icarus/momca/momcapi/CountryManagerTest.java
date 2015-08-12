@@ -1,8 +1,9 @@
 package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.exception.MomcaException;
-import eu.icarus.momca.momcapi.xml.eap.Country;
-import eu.icarus.momca.momcapi.xml.eap.Subdivision;
+import eu.icarus.momca.momcapi.resource.Country;
+import eu.icarus.momca.momcapi.resource.CountryCode;
+import eu.icarus.momca.momcapi.resource.Region;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -18,7 +19,7 @@ import static org.testng.Assert.*;
  */
 public class CountryManagerTest {
 
-    private CountryManager countryManager;
+    private CountryManager cm;
     private MomcaConnection momcaConnection;
 
     @BeforeClass
@@ -26,195 +27,126 @@ public class CountryManagerTest {
 
 
         momcaConnection = TestUtils.initMomcaConnection();
-        countryManager = momcaConnection.getCountryManager();
-        assertNotNull(countryManager, "MOM-CA connection not initialized.");
+        cm = momcaConnection.getCountryManager();
+        assertNotNull(cm, "MOM-CA connection not initialized.");
 
-        countryManager.deleteCountry("AT");
-        countryManager.deleteCountry("SE");
-        countryManager.deleteSubdivision(new Country("CH", "Schweiz", new ArrayList<>(0)), "CH-SG");
-        countryManager.deleteSubdivision(new Country("RS", "Serbia", new ArrayList<>(0)), "RS-BG");
+        cm.deleteCountryFromHierarchy(new CountryCode("AT"));
+        cm.deleteCountryFromHierarchy(new CountryCode("SE"));
+        cm.deleteRegionFromHierarchy(new Country(new CountryCode("CH"), "Schweiz", new ArrayList<>(0)), "CH-SG");
+        cm.deleteRegionFromHierarchy(new Country(new CountryCode("RS"), "Serbia", new ArrayList<>(0)), "RS-BG");
 
     }
 
     @Test
-    public void testAddCountry() throws Exception {
+    public void testAddNewCountryToHierarchy() throws Exception {
 
-        String code = "AT";
-        String nativeform = "Österreich";
+        CountryCode code = new CountryCode("AT");
+        String nativeName = "Österreich";
 
-        Country newCountry = countryManager.addCountry(code, nativeform);
+        Country newCountry = cm.addNewCountryToHierarchy(code, nativeName);
 
-        assertEquals(newCountry.getCode(), code);
-        assertEquals(newCountry.getNativeform(), nativeform);
+        assertEquals(newCountry.getCountryCode(), code);
+        assertEquals(newCountry.getNativeName(), nativeName);
 
-        countryManager.deleteCountry(code);
+        cm.deleteCountryFromHierarchy(code);
 
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testAddCountryThatExists() throws Exception {
-        String existingCode = "DE";
+    public void testAddNewCountryToHierarchyThatExists() throws Exception {
+        CountryCode existingCode = new CountryCode("DE");
         String nativeform = "Österreich";
-        countryManager.addCountry(existingCode, nativeform);
+        cm.addNewCountryToHierarchy(existingCode, nativeform);
     }
 
     @Test
-    public void testAddSubdivision() throws Exception {
+    public void testAddRegionToHierarchy() throws Exception {
 
-        Country country = countryManager.getCountry("RS").get();
-        String subdivision = "RS-BG";
+        Country country = cm.getCountry(new CountryCode("RS")).get();
+        String regionCode = "RS-BG";
 
-        country = countryManager.addSubdivision(country, subdivision, "Beograd");
+        country = cm.addRegionToHierarchy(country, regionCode, "Beograd");
+        cm.deleteRegionFromHierarchy(country, regionCode);
 
-        assertFalse(country.getSubdivisions().isEmpty());
-
-        countryManager.deleteSubdivision(country, subdivision);
+        assertFalse(country.getRegions().isEmpty());
 
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testAddSubdivisionAlreadyExisting() throws Exception {
-        Country country = countryManager.getCountry("DE").get();
-        countryManager.addSubdivision(country, "DE-BW", "Baden-Württemberg");
+    public void testAddRegionToHierarchyAlreadyExisting() throws Exception {
+        Country country = cm.getCountry(new CountryCode("DE")).get();
+        cm.addRegionToHierarchy(country, "DE-BW", "Baden-Württemberg");
     }
 
     @Test
-    public void testChangeCountryCode() throws Exception {
+    public void testDeleteCountryFromHierarchy() throws Exception {
 
-        String originalCode = "CH";
-        Country originalCountry = countryManager.getCountry(originalCode).get();
-
-        String newCode = "Schw";
-
-        Country updatedCountry = countryManager.changeCountryCode(originalCountry, newCode);
-        countryManager.changeCountryCode(updatedCountry, originalCode);
-
-        assertEquals(updatedCountry.getCode(), newCode);
-
-    }
-
-    @Test
-    public void testChangeCountryNativeform() throws Exception {
-
-        String code = "CH";
-        Country originalCountry = countryManager.getCountry(code).get();
-
-        String originalNativeform = "Schweiz";
-        String newNativeform = "Svizzera";
-
-        Country updatedCountry = countryManager.changeCountryNativeform(originalCountry, newNativeform);
-        countryManager.changeCountryNativeform(updatedCountry, originalNativeform);
-
-        assertEquals(updatedCountry.getNativeform(), newNativeform);
-
-    }
-
-    @Test
-    public void testChangeSubdivisionCode() throws Exception {
-
-        String countryCode = "DE";
-        Country originalCountry = countryManager.getCountry(countryCode).get();
-
-        String originalSubdivisionCode = "DE-BY";
-        String newSubdivisionCode = "DE-BAY";
-
-        Country updatedCountry = countryManager
-                .changeSubdivisionCode(originalCountry, originalSubdivisionCode, newSubdivisionCode);
-        countryManager.changeSubdivisionCode(updatedCountry, newSubdivisionCode, originalSubdivisionCode);
-
-        assertEquals(updatedCountry.getSubdivisions().stream()
-                .filter(subdivision -> subdivision.getCode().equals(newSubdivisionCode)).count(), 1);
-
-    }
-
-    @Test
-    public void testChangeSubdivisionNativeform() throws Exception {
-
-        String code = "DE";
-        Country originalCountry = countryManager.getCountry(code).get();
-
-        String originalNativeform = "Bayern";
-        String newNativeform = "Bavaria";
-
-        Country updatedCountry = countryManager
-                .changeSubdivisionNativeform(originalCountry, originalNativeform, newNativeform);
-        countryManager.changeSubdivisionNativeform(updatedCountry, newNativeform, originalNativeform);
-
-        assertEquals(updatedCountry.getSubdivisions().stream()
-                .filter(subdivision -> subdivision.getNativeform().equals(newNativeform)).count(), 1);
-
-    }
-
-    @Test
-    public void testDeleteCountry() throws Exception {
-
-        String code = "SE";
-        countryManager.addCountry(code, "Sverige");
-        countryManager.deleteCountry(code);
-        assertFalse(countryManager.getCountry(code).isPresent());
+        CountryCode code = new CountryCode("SE");
+        cm.addNewCountryToHierarchy(code, "Sverige");
+        cm.deleteCountryFromHierarchy(code);
+        assertFalse(cm.getCountry(code).isPresent());
 
     }
 
     @Test(expectedExceptions = MomcaException.class)
-    public void testDeleteCountryWithExistingArchives() throws Exception {
-        countryManager.deleteCountry("CH");
+    public void testDeleteCountryFromHierarchyWithExistingArchives() throws Exception {
+        cm.deleteCountryFromHierarchy(new CountryCode("CH"));
     }
 
     @Test
-    public void testDeleteSubdivision() throws Exception {
+    public void testDeleteRegionFromHierarchy() throws Exception {
 
-        Country country = countryManager.getCountry("CH").get();
-        String subdivision = "CH-SG";
-        country = countryManager.addSubdivision(country, subdivision, "Sankt Gallen");
-        country = countryManager.deleteSubdivision(country, subdivision);
+        Country country = cm.getCountry(new CountryCode("CH")).get();
+        String regionCode = "CH-SG";
+        country = cm.addRegionToHierarchy(country, regionCode, "Sankt Gallen");
+        country = cm.deleteRegionFromHierarchy(country, regionCode);
 
-        assertTrue(country.getSubdivisions().isEmpty());
+        assertTrue(country.getRegions().isEmpty());
 
     }
 
     @Test(expectedExceptions = MomcaException.class)
-    public void testDeleteSubdivisionWithExistingArchives() throws Exception {
-        Country country = countryManager.getCountry("DE").get();
-        String subdivision = "DE-BY";
-        countryManager.deleteSubdivision(country, subdivision);
+    public void testDeleteRegionFromHierarchyWithExistingArchives() throws Exception {
+        Country country = cm.getCountry(new CountryCode("DE")).get();
+        String regionCode = "DE-BY";
+        cm.deleteRegionFromHierarchy(country, regionCode);
     }
 
     @Test
     public void testGetCountry() throws Exception {
 
-        Optional<Country> countryOptional = countryManager.getCountry("DE");
+        Optional<Country> countryOptional = cm.getCountry(new CountryCode("DE"));
         assertTrue(countryOptional.isPresent());
 
         Country country = countryOptional.get();
-        assertEquals(country.getCode(), "DE");
-        assertEquals(country.getNativeform(), "Deutschland");
-        assertEquals(country.toXML(), "<eap:country xmlns:eap=\"http://www.monasterium.net/NS/eap\">" +
+        assertEquals(country.getCountryCode().getCode(), "DE");
+        assertEquals(country.getNativeName(), "Deutschland");
+        assertEquals(country.getHierarchyXml().toXML(), "<eap:country xmlns:eap=\"http://www.monasterium.net/NS/eap\">" +
                 "<eap:code>DE</eap:code><eap:nativeform>Deutschland</eap:nativeform>" +
                 "<eap:subdivisions><eap:subdivision><eap:code>DE-BW</eap:code><eap:nativeform>" +
                 "Baden-Württemberg</eap:nativeform></eap:subdivision><eap:subdivision><eap:code>DE-BY</eap:code>" +
                 "<eap:nativeform>Bayern</eap:nativeform></eap:subdivision></eap:subdivisions></eap:country>");
 
-        List<Subdivision> subdivisions = country.getSubdivisions();
-        assertEquals(subdivisions.size(), 2);
+        List<Region> regions = country.getRegions();
+        assertEquals(regions.size(), 2);
 
-        assertEquals(subdivisions.get(0).getCode(), "DE-BW");
-        assertEquals(subdivisions.get(0).getNativeform(), "Baden-Württemberg");
+        assertEquals(regions.get(0).getCode().get(), "DE-BW");
+        assertEquals(regions.get(0).getNativeName(), "Baden-Württemberg");
 
 
-        assertEquals(subdivisions.get(1).getCode(), "DE-BY");
-        assertEquals(subdivisions.get(1).getNativeform(), "Bayern");
+        assertEquals(regions.get(1).getCode().get(), "DE-BY");
+        assertEquals(regions.get(1).getNativeName(), "Bayern");
 
     }
 
     @Test
     public void testGetCountryNotExisting() throws Exception {
-        assertFalse(countryManager.getCountry("notExisting").isPresent());
+        assertFalse(cm.getCountry(new CountryCode("RU")).isPresent());
     }
 
     @Test
     public void testListCountries() throws Exception {
-        assertEquals(countryManager.listCountries().toString(), "[CH, DE, RS]");
+        assertEquals(cm.listCountries().size(), 4);
     }
-
 
 }

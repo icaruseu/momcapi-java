@@ -28,20 +28,20 @@ _User manager_
 
 _Country manager_
 
-* List all countries
+* List all countries (used in archival fonds and collections)
 * Get specific country from the database
-* Get archive metadata (e.g. country, address, logo Url)
-* Add new country
-* Add new subdivision to country
-* Delete country that has no attached archives
-* Delete subdivision that has no attached archives
+* Add new country to static hierarchy (used for archival fonds)
+* Add new region to hierarchical countries
+* Delete countries from the hierarchy
+* Delete regions from hierarchical countries
 
 _Archive manager_
 
 * List all archives
 * List all archives belonging to a specific country
-* List all archvies belonging to a specific subdivision
+* List all archvies belonging to a specific region
 * Get specific archive from the database
+* Get archive metadata (e.g. country, address, logo Url)
 * Add new archive
 * Delete archive
 

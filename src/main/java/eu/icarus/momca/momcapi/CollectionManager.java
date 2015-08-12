@@ -1,9 +1,9 @@
 package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
+import eu.icarus.momca.momcapi.resource.Country;
+import eu.icarus.momca.momcapi.resource.Region;
 import eu.icarus.momca.momcapi.xml.atom.IdCollection;
-import eu.icarus.momca.momcapi.xml.eap.Country;
-import eu.icarus.momca.momcapi.xml.eap.Subdivision;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -27,14 +27,14 @@ public class CollectionManager extends AbstractManager {
     @NotNull
     public List<IdCollection> listCollections(@NotNull Country country) {
         List<String> queryResults = momcaConnection.queryDatabase(
-                ExistQueryFactory.listCollectionsForCountry(country.getCode()));
+                ExistQueryFactory.listCollectionsForCountry(country.getCountryCode()));
         return queryResults.stream().map(IdCollection::new).collect(Collectors.toList());
     }
 
     @NotNull
-    public List<IdCollection> listCollections(@NotNull Subdivision subdivision) {
+    public List<IdCollection> listCollections(@NotNull Region region) {
         List<String> queryResults = momcaConnection.queryDatabase(
-                ExistQueryFactory.listCollectionsForSubdivision(subdivision.getNativeform()));
+                ExistQueryFactory.listCollectionsForRegion(region.getNativeName()));
         return queryResults.stream().map(IdCollection::new).collect(Collectors.toList());
     }
 

@@ -10,26 +10,26 @@ import java.util.List;
  * @author daniel
  *         Created on 17.07.2015.
  */
-public class Country extends EapAbstract {
+public class EapCountry extends EapAbstract {
 
     @NotNull
-    private final List<Subdivision> subdivisions;
+    private final List<EapSubdivision> eapSubdivisions;
 
-    public Country(@NotNull String code, @NotNull String nativeForm, @NotNull List<Subdivision> subdivisions) {
+    public EapCountry(@NotNull String code, @NotNull String nativeForm, @NotNull List<EapSubdivision> eapSubdivisions) {
 
         super("country", code, nativeForm);
 
         Element subdivisionsElement = new Element("eap:subdivisions", Namespace.EAP.getUri());
-        subdivisions.forEach(subdivisionsElement::appendChild);
+        eapSubdivisions.forEach(subdivisionsElement::appendChild);
         appendChild(subdivisionsElement);
 
-        this.subdivisions = subdivisions;
+        this.eapSubdivisions = eapSubdivisions;
 
     }
 
     @NotNull
-    public List<Subdivision> getSubdivisions() {
-        return subdivisions;
+    public List<EapSubdivision> getEapSubdivisions() {
+        return eapSubdivisions;
     }
 
 }

@@ -15,7 +15,7 @@ import java.util.List;
 public class Archive extends MomcaResource {
 
     @NotNull
-    private final String countryCode;
+    private final CountryCode countryCode;
     @NotNull
     private final Desc desc;
     @NotNull
@@ -41,7 +41,7 @@ public class Archive extends MomcaResource {
 
         identifier = identifierList.get(0);
         name = nameList.get(0);
-        countryCode = countryCodeList.get(0);
+        countryCode = new CountryCode(countryCodeList.get(0));
         desc = new Desc((Element) descNodes.get(0));
 
     }
@@ -57,7 +57,7 @@ public class Archive extends MomcaResource {
     }
 
     @NotNull
-    public String getCountryCode() {
+    public CountryCode getCountryCode() {
         return countryCode;
     }
 

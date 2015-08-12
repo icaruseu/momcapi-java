@@ -1,17 +1,12 @@
 package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
-import eu.icarus.momca.momcapi.resource.Address;
-import eu.icarus.momca.momcapi.resource.Archive;
-import eu.icarus.momca.momcapi.resource.ContactInformation;
-import eu.icarus.momca.momcapi.resource.MomcaResource;
+import eu.icarus.momca.momcapi.resource.*;
 import eu.icarus.momca.momcapi.xml.Namespace;
 import eu.icarus.momca.momcapi.xml.atom.Author;
 import eu.icarus.momca.momcapi.xml.atom.Entry;
 import eu.icarus.momca.momcapi.xml.atom.IdArchive;
 import eu.icarus.momca.momcapi.xml.eag.Desc;
-import eu.icarus.momca.momcapi.xml.eap.Country;
-import eu.icarus.momca.momcapi.xml.eap.Subdivision;
 import nu.xom.Attribute;
 import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +27,7 @@ public class ArchiveManager extends AbstractManager {
 
     @NotNull
     public Archive addArchive(@NotNull String authorEmail, @NotNull String shortName, @NotNull String name,
-                              @NotNull Country country, @Nullable Subdivision subdivision, @NotNull Address address,
+                              @NotNull Country country, @Nullable Region region, @NotNull Address address,
                               @NotNull ContactInformation contactInformation, @NotNull String logoUrl) {
 
         IdArchive id = new IdArchive(shortName);
@@ -53,7 +48,7 @@ public class ArchiveManager extends AbstractManager {
         String resourceName = shortName + ".eag.xml";
         String parentCollectionUri = archivesCollection + "/" + shortName;
         Element resourceContent = createNewArchiveResourceContent(authorEmail,
-                shortName, name, country, subdivision, address, contactInformation, logoUrl);
+                shortName, name, country, region, address, contactInformation, logoUrl);
 
         MomcaResource resource = new MomcaResource(resourceName,
                 parentCollectionUri, resourceContent.toXML());
@@ -92,14 +87,14 @@ public class ArchiveManager extends AbstractManager {
     @NotNull
     public List<IdArchive> listArchives(@NotNull Country country) {
         List<String> queryResults = momcaConnection.queryDatabase(
-                ExistQueryFactory.listArchivesForCountry(country.getCode()));
+                ExistQueryFactory.listArchivesForCountry(country.getCountryCode()));
         return queryResults.stream().map(IdArchive::new).collect(Collectors.toList());
     }
 
     @NotNull
-    public List<IdArchive> listArchives(@NotNull Subdivision subdivision) {
+    public List<IdArchive> listArchives(@NotNull Region region) {
         List<String> queryResults = momcaConnection.queryDatabase(
-                ExistQueryFactory.listArchivesForSubdivision(subdivision.getNativeform()));
+                ExistQueryFactory.listArchivesForRegion(region.getNativeName()));
         return queryResults.stream().map(IdArchive::new).collect(Collectors.toList());
     }
 
@@ -136,7 +131,7 @@ public class ArchiveManager extends AbstractManager {
     @NotNull
     private Element createNewArchiveResourceContent(@NotNull String authorEmail, @NotNull String shortName,
                                                     @NotNull String name, @NotNull Country country,
-                                                    @Nullable Subdivision subdivision, @NotNull Address address,
+                                                    @Nullable Region region, @NotNull Address address,
                                                     @NotNull ContactInformation contactInformation,
                                                     @NotNull String logoUrl) {
 
@@ -144,9 +139,9 @@ public class ArchiveManager extends AbstractManager {
         Author author = new Author(authorEmail);
         String now = momcaConnection.queryDatabase(ExistQueryFactory.getCurrentDateTime()).get(0);
 
-        String subdivisionNativeform = subdivision == null ? "" : subdivision.getNativeform();
-        Desc desc = new Desc(country.getNativeform(), subdivisionNativeform, address, contactInformation, logoUrl);
-        Element eag = createEagElement(shortName, name, country.getCode(), desc);
+        String regionNativeName = region == null ? "" : region.getNativeName();
+        Desc desc = new Desc(country.getNativeName(), regionNativeName, address, contactInformation, logoUrl);
+        Element eag = createEagElement(shortName, name, country.getCountryCode().getCode(), desc);
 
         return new Entry(id, author, now, eag);
 

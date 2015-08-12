@@ -46,7 +46,7 @@ public class ArchiveTest {
 
     @Test
     public void testGetCountryCode() throws Exception {
-        assertEquals(correctArchive.getCountryCode(), "CH");
+        assertEquals(correctArchive.getCountryCode(), new CountryCode("CH"));
     }
 
     @Test

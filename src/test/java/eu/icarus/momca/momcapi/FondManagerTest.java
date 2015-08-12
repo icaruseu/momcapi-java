@@ -22,26 +22,6 @@ public class FondManagerTest {
     private FondManager fm;
     private MomcaConnection mc;
 
-    @Test
-    public void testDeleteFond() throws Exception {
-
-        Archive archive = mc.getArchiveManager().getArchive(new IdArchive("DE-SAMuenchen")).get();
-
-        Fond fond = fm.addFond("admin", archive, "MUrkunden", "Mehrere Urkunden", null,
-                new URL("http://ex.com/img"), null);
-        fm.deleteFond(fond.getId());
-
-        assertFalse(fm.getFond(fond.getId()).isPresent());
-        assertFalse(mc.getCollection("/db/mom-data/metadata.charter.public/DE-SAMuenchen/MUrkunden").isPresent());
-        assertFalse(mc.getCollection("/db/mom-data/metadata.fond.public/DE-SAMuenchen/MUrkunden").isPresent());
-
-    }
-
-    @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testDeleteFondWithExistingCharters() throws Exception {
-        fm.deleteFond(new IdFond("CH-KAE", "Urkunden"));
-    }
-
     @BeforeClass
     public void setUp() throws Exception {
         mc = TestUtils.initMomcaConnection();
@@ -112,6 +92,26 @@ public class FondManagerTest {
         Archive archive = mc.getArchiveManager().getArchive(new IdArchive("CH-KAE")).get();
         fm.addFond("someAuthor", archive, "Urkunden2", "Weitere Urkunden", ImageAccess.FREE,
                 new URL("http://www.klosterarchiv.ch/urkunden/urkunden-3000"), null);
+    }
+
+    @Test
+    public void testDeleteFond() throws Exception {
+
+        Archive archive = mc.getArchiveManager().getArchive(new IdArchive("DE-SAMuenchen")).get();
+
+        Fond fond = fm.addFond("admin", archive, "MUrkunden", "Mehrere Urkunden", null,
+                new URL("http://ex.com/img"), null);
+        fm.deleteFond(fond.getId());
+
+        assertFalse(fm.getFond(fond.getId()).isPresent());
+        assertFalse(mc.getCollection("/db/mom-data/metadata.charter.public/DE-SAMuenchen/MUrkunden").isPresent());
+        assertFalse(mc.getCollection("/db/mom-data/metadata.fond.public/DE-SAMuenchen/MUrkunden").isPresent());
+
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testDeleteFondWithExistingCharters() throws Exception {
+        fm.deleteFond(new IdFond("CH-KAE", "Urkunden"));
     }
 
     @Test
