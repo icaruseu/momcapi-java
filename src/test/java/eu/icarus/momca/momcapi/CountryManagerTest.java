@@ -20,13 +20,12 @@ import static org.testng.Assert.*;
 public class CountryManagerTest {
 
     private CountryManager cm;
-    private MomcaConnection momcaConnection;
 
     @BeforeClass
     public void setUp() throws Exception {
 
 
-        momcaConnection = TestUtils.initMomcaConnection();
+        MomcaConnection momcaConnection = TestUtils.initMomcaConnection();
         cm = momcaConnection.getCountryManager();
         assertNotNull(cm, "MOM-CA connection not initialized.");
 

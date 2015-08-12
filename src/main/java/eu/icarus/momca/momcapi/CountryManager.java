@@ -7,11 +7,8 @@ import eu.icarus.momca.momcapi.resource.Country;
 import eu.icarus.momca.momcapi.resource.CountryCode;
 import eu.icarus.momca.momcapi.resource.Region;
 import eu.icarus.momca.momcapi.resource.ResourceRoot;
-import eu.icarus.momca.momcapi.xml.Namespace;
 import eu.icarus.momca.momcapi.xml.eap.EapCountry;
 import eu.icarus.momca.momcapi.xml.eap.EapSubdivision;
-import nu.xom.Element;
-import nu.xom.Elements;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;

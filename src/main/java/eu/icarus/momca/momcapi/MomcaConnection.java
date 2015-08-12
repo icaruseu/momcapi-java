@@ -102,6 +102,11 @@ public class MomcaConnection {
         return charterManager;
     }
 
+    @NotNull
+    public CollectionManager getCollectionManager() {
+        return collectionManager;
+    }
+
     /**
      * @return The country manager instance.
      */
