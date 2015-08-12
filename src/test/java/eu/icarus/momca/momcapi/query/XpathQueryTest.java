@@ -204,6 +204,48 @@ public class XpathQueryTest {
         assertEquals(result.get(0), "xrxsaved");
     }
 
+    @Test
+    public void testQUERY_CEI_PROVENANCE_TEXT() throws Exception {
+        List<String> result = queryContentAsList(resource, XpathQuery.QUERY_CEI_PROVENANCE_TEXT);
+        assertEquals(result.size(), 1);
+        assertEquals(result.get(0), "ceiProvenanceText");
+    }
+
+    @Test
+    public void testQUERY_CEI_COUNTRY_TEXT() throws Exception {
+        List<String> result = queryContentAsList(resource, XpathQuery.QUERY_CEI_COUNTRY_TEXT);
+        assertEquals(result.size(), 1);
+        assertEquals(result.get(0), "ceiCountryText");
+    }
+
+    @Test
+    public void testQUERY_CEI_COUNTRY_ID() throws Exception {
+        List<String> result = queryContentAsList(resource, XpathQuery.QUERY_CEI_COUNTRY_ID);
+        assertEquals(result.size(), 1);
+        assertEquals(result.get(0), "ceiCountryId");
+    }
+
+    @Test
+    public void testQUERY_CEI_REGION_TEXT() throws Exception {
+        List<String> result = queryContentAsList(resource, XpathQuery.QUERY_CEI_REGION_TEXT);
+        assertEquals(result.size(), 1);
+        assertEquals(result.get(0), "ceiRegionText");
+    }
+
+    @Test
+    public void testQUERY_CEI_REGION_ID() throws Exception {
+        List<String> result = queryContentAsList(resource, XpathQuery.QUERY_CEI_REGION_ID);
+        assertEquals(result.size(), 1);
+        assertEquals(result.get(0), "ceiRegionId");
+    }
+
+    @Test
+    public void testQUERY_CEI_PROVENANCE_ABBR() throws Exception {
+        List<String> result = queryContentAsList(resource, XpathQuery.QUERY_CEI_PROVENANCE_ABBR);
+        assertEquals(result.size(), 1);
+        assertEquals(result.get(0), "ceiProvenanceAbbr");
+    }
+
     private List<String> queryContentAsList(@NotNull MomcaResource resource, @NotNull XpathQuery query)
             throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
 

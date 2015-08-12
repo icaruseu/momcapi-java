@@ -1,14 +1,17 @@
 package eu.icarus.momca.momcapi;
 
+import eu.icarus.momca.momcapi.resource.Collection;
 import eu.icarus.momca.momcapi.resource.Country;
 import eu.icarus.momca.momcapi.resource.CountryCode;
 import eu.icarus.momca.momcapi.resource.Region;
+import eu.icarus.momca.momcapi.xml.atom.IdCollection;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.util.stream.Collectors;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 
 /**
@@ -18,6 +21,25 @@ public class CollectionManagerTest {
 
     private CollectionManager cm;
     private MomcaConnection mc;
+
+    @Test
+    public void testGetCollection() throws Exception {
+
+        Collection collection1 = cm.getCollection(new IdCollection("AbteiEberbach")).get();
+        assertEquals(collection1.getCountryCode().get().getCode(), "DE");
+        assertEquals(collection1.getRegionName().get(), "Bayern");
+        assertEquals(collection1.getId().getId(), "tag:www.monasterium.net,2011:/collection/AbteiEberbach");
+        assertEquals(collection1.getIdentifier(), "AbteiEberbach");
+        assertEquals(collection1.getName(), "Urkundenbuch der Abtei Eberbach (Google data)");
+
+        Collection collection2 = cm.getCollection(new IdCollection("MedDocBulgEmp")).get();
+        assertEquals(collection2.getCountryCode().get().getCode(), "BG");
+        assertFalse(collection2.getRegionName().isPresent());
+        assertEquals(collection2.getId().getId(), "tag:www.monasterium.net,2011:/collection/MedDocBulgEmp");
+        assertEquals(collection2.getIdentifier(), "MedDocBulgEmp");
+        assertEquals(collection2.getName(), "Bulgarian Medieval Documents: The Second Bulgarian Empire");
+
+    }
 
     @BeforeClass
     public void setUp() throws Exception {

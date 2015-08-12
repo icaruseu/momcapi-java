@@ -50,8 +50,8 @@ public class ArchiveTest {
     }
 
     @Test
-    public void testGetCountrySubdivision() throws Exception {
-        assertEquals(correctArchive.getSubdivisionNativeForm(), "Schwyz");
+    public void testGetCountryRegion() throws Exception {
+        assertEquals(correctArchive.getRegionName().get(), "Schwyz");
     }
 
     @Test

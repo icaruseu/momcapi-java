@@ -17,6 +17,9 @@
                 <cei:graphic url="urlvalue1"/>
             </cei:figure>
         </cei:witnessOrig>
+        <cei:provenance abbr="ceiProvenanceAbbr">ceiProvenanceText</cei:provenance>
+        <cei:country id="ceiCountryId">ceiCountryText</cei:country>
+        <cei:region id="ceiRegionId">ceiRegionText</cei:region>
     </cei:text>
     <ead:ead xmlns:ead="urn:isbn:1-931666-22-9">
         <ead:unittitle>eadunittitle</ead:unittitle>

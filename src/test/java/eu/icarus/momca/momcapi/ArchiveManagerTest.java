@@ -46,7 +46,7 @@ public class ArchiveManagerTest {
         assertEquals(newArchive.getName(), name);
 
         assertEquals(newArchive.getCountryCode(), country.getCountryCode());
-        assertEquals(newArchive.getSubdivisionNativeForm(), region.getNativeName());
+        assertEquals(newArchive.getRegionName().get(), region.getNativeName());
 
         assertEquals(newArchive.getAddress(), address);
         assertEquals(newArchive.getContactInformation(), contactInformation);
@@ -119,6 +119,12 @@ public class ArchiveManagerTest {
         IdArchive nonExistingArchiveIdentifier = new IdArchive("CH-ABC");
 
         assertTrue(am.getArchive(existingArchiveIdentifier).isPresent());
+
+        Archive archive = am.getArchive(existingArchiveIdentifier).get();
+        assertEquals(archive.getName(), "Klosterarchiv Einsiedeln");
+        assertEquals(archive.getCountryCode().getCode(), "CH");
+        assertFalse(archive.getRegionName().isPresent());
+
         assertFalse(am.getArchive(nonExistingArchiveIdentifier).isPresent());
 
     }

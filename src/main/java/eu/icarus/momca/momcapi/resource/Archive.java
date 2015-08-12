@@ -8,6 +8,7 @@ import nu.xom.Nodes;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by daniel on 17.07.2015.
@@ -82,8 +83,8 @@ public class Archive extends MomcaResource {
     }
 
     @NotNull
-    public String getSubdivisionNativeForm() {
-        return desc.getSubdivisionName();
+    public Optional<String> getRegionName() {
+        return desc.getSubdivisionName().isEmpty() ? Optional.empty() : Optional.of(desc.getSubdivisionName());
     }
 
     @NotNull
