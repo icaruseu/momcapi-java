@@ -61,7 +61,7 @@ _Collection manager_
 
 _Charter Manager_
 
-* List all charter instances for fonds
+* List all charter instances (`imported`, `private`, `public` and `saved`) for fonds, collections, mycollections and users
 * Get all instances (`imported`, `private`, `public` and `saved`) of a charter from the database
 * Get specific charter instance, e.g. `saved` from the database
 * Get charter medadata like the list of all figures
