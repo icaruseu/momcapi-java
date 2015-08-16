@@ -210,6 +210,34 @@ public class ExistQueryFactory {
 
     }
 
+    @NotNull
+    public static ExistQuery listChartersImport(@NotNull IdFond idFond) {
+
+        String query = String.format(
+                "%s collection('/db/mom-data/metadata.charter.import/%s/%s')//atom:id/text()",
+                getNamespaceDeclaration(Namespace.ATOM),
+                idFond.getArchiveIdentifier(),
+                idFond.getFondIdentifier()
+        );
+
+        return new ExistQuery(query);
+
+    }
+
+    @NotNull
+    public static ExistQuery listChartersPublic(@NotNull IdFond idFond) {
+
+        String query = String.format(
+                "%s collection('/db/mom-data/metadata.charter.public/%s/%s')//atom:id/text()",
+                getNamespaceDeclaration(Namespace.ATOM),
+                idFond.getArchiveIdentifier(),
+                idFond.getFondIdentifier()
+        );
+
+        return new ExistQuery(query);
+
+    }
+
     /**
      * @return A query that lists the ids of all charter collections in the database as strings.
      */
@@ -283,34 +311,6 @@ public class ExistQueryFactory {
                 "%s collection('/db/mom-data/metadata.fond.public')//atom:id[contains(., '%s')]/text()",
                 getNamespaceDeclaration(Namespace.ATOM),
                 idArchive.getArchiveIdentifier());
-
-        return new ExistQuery(query);
-
-    }
-
-    @NotNull
-    public static ExistQuery listImportedCharters(@NotNull IdFond idFond) {
-
-        String query = String.format(
-                "%s collection('/db/mom-data/metadata.charter.import/%s/%s')//atom:id/text()",
-                getNamespaceDeclaration(Namespace.ATOM),
-                idFond.getArchiveIdentifier(),
-                idFond.getFondIdentifier()
-        );
-
-        return new ExistQuery(query);
-
-    }
-
-    @NotNull
-    public static ExistQuery listPublishedCharters(@NotNull IdFond idFond) {
-
-        String query = String.format(
-                "%s collection('/db/mom-data/metadata.charter.public/%s/%s')//atom:id/text()",
-                getNamespaceDeclaration(Namespace.ATOM),
-                idFond.getArchiveIdentifier(),
-                idFond.getFondIdentifier()
-        );
 
         return new ExistQuery(query);
 

@@ -51,13 +51,13 @@ public class CharterManager extends AbstractManager {
 
     @NotNull
     public List<IdCharter> listChartersImport(@NotNull IdFond idFond) {
-        List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listImportedCharters(idFond));
+        List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listChartersImport(idFond));
         return queryResults.stream().map(IdCharter::new).collect(Collectors.toList());
     }
 
     @NotNull
     public List<IdCharter> listChartersPublic(@NotNull IdFond idFond) {
-        List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listPublishedCharters(idFond));
+        List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listChartersPublic(idFond));
         return queryResults.stream().map(IdCharter::new).collect(Collectors.toList());
     }
 
