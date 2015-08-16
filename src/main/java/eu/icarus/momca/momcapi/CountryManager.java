@@ -26,7 +26,7 @@ public class CountryManager extends AbstractManager {
 
     @NotNull
     private static final String MOM_PORTAL_XML_URI = String
-            .format("/db/mom-data/%s/mom.portal.xml", ResourceRoot.METADATA_PORTAL_PUBLIC.getCollectionName());
+            .format("%s/mom.portal.xml", ResourceRoot.METADATA_PORTAL_PUBLIC.getUri());
 
     CountryManager(@NotNull MomcaConnection momcaConnection) {
         super(momcaConnection);

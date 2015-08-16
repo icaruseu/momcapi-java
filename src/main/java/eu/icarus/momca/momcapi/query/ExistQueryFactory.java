@@ -36,7 +36,7 @@ public class ExistQueryFactory {
     public static ExistQuery checkResourceExistence(@NotNull Id resourceId, @Nullable ResourceRoot resourceRoot) {
 
         String query = String.format(
-                "%s collection('/db/mom-data%s')//atom:entry[.//atom:id/text()='%s'][1]",
+                "%s collection('%s')//atom:entry[.//atom:id/text()='%s'][1]",
                 getNamespaceDeclaration(Namespace.ATOM),
                 getRootCollectionString(resourceRoot),
                 resourceId.getId());
@@ -56,9 +56,9 @@ public class ExistQueryFactory {
     public static ExistQuery deleteEapElement(@NotNull String code) {
 
         String query = String.format(
-                "%s update delete doc('/db/mom-data/%s/mom.portal.xml')//eap:*[eap:code='%s']",
+                "%s update delete doc('%s/mom.portal.xml')//eap:*[eap:code='%s']",
                 getNamespaceDeclaration(Namespace.EAP),
-                ResourceRoot.METADATA_PORTAL_PUBLIC.getCollectionName(),
+                ResourceRoot.METADATA_PORTAL_PUBLIC.getUri(),
                 code);
 
         return new ExistQuery(query);
@@ -94,9 +94,9 @@ public class ExistQueryFactory {
     public static ExistQuery getEapCountryXml(@NotNull String code) {
 
         String query = String.format(
-                "%s doc('/db/mom-data/%s/mom.portal.xml')//eap:country[eap:code='%s']",
+                "%s doc('%s/mom.portal.xml')//eap:country[eap:code='%s']",
                 getNamespaceDeclaration(Namespace.EAP),
-                ResourceRoot.METADATA_PORTAL_PUBLIC.getCollectionName(),
+                ResourceRoot.METADATA_PORTAL_PUBLIC.getUri(),
                 code);
 
         return new ExistQuery(query);
@@ -128,7 +128,7 @@ public class ExistQueryFactory {
     public static ExistQuery getResourceUri(@NotNull Id resourceId, @Nullable ResourceRoot resourceRoot) {
 
         String query = String.format(
-                "%s let $nodes := collection('/db/mom-data%s')//atom:entry[.//atom:id/text()='%s']" +
+                "%s let $nodes := collection('%s')//atom:entry[.//atom:id/text()='%s']" +
                         " for $node in $nodes" +
                         " return concat(util:collection-name($node), '/', util:document-name($node))",
                 getNamespaceDeclaration(Namespace.ATOM),
@@ -426,7 +426,7 @@ public class ExistQueryFactory {
 
     @NotNull
     private static String getRootCollectionString(@Nullable ResourceRoot resourceRoot) {
-        return (resourceRoot == null) ? "" : ("/" + resourceRoot.getCollectionName());
+        return (resourceRoot == null) ? "/db/mom-data" : (resourceRoot.getUri());
     }
 
 }

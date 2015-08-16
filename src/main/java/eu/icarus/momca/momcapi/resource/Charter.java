@@ -288,11 +288,11 @@ public class Charter extends MomcaResource {
 
         CharterStatus status;
 
-        if (getParentUri().contains(ResourceRoot.METADATA_CHARTER_IMPORT.getCollectionName())) {
+        if (getParentUri().contains(ResourceRoot.METADATA_CHARTER_IMPORT.getUri())) {
             status = CharterStatus.IMPORTED;
-        } else if (getParentUri().contains(ResourceRoot.XRX_USER.getCollectionName())) {
+        } else if (getParentUri().contains(ResourceRoot.XRX_USER.getUri())) {
             status = CharterStatus.PRIVATE;
-        } else if (getParentUri().contains(ResourceRoot.METADATA_CHARTER_SAVED.getCollectionName())) {
+        } else if (getParentUri().contains(ResourceRoot.METADATA_CHARTER_SAVED.getUri())) {
             status = CharterStatus.SAVED;
         } else {
             status = CharterStatus.PUBLIC;

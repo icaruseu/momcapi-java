@@ -8,32 +8,32 @@ package eu.icarus.momca.momcapi.resource;
  */
 public enum ResourceRoot {
 
-    METADATA_ANNOTATION("metadata.annotation"),
-    METADATA_ARCHIVE_PUBLIC("metadata.archive.public"),
-    METADATA_CHARTER_IMPORT("metadata.charter.import"),
-    METADATA_CHARTER_IMPORT_UTIL("metadata.charter.import.util"),
-    METADATA_CHARTER_PUBLIC("metadata.charter.public"),
-    METADATA_CHARTER_SAVED("metadata.charter.saved"),
-    METADATA_COLLECTION_PUBLIC("metadata.collection.public"),
-    METADATA_FOND_PUBLIC("metadata.fond.public"),
-    METADATA_IMAGE_COLLECTIONS("metadata.imagecollections"),
-    METADATA_MY_COLLECTION_PUBLIC("metadata.mycollection.public"),
-    METADATA_PORTAL_PUBLIC("metadata.portal.public"),
-    XRX_HTDOC("xrx.htdoc"),
-    XRX_I18N(" xrx.i18n"),
-    XRX_USER("xrx.user");
+    METADATA_ANNOTATION("/db/mom-data/metadata.annotation"),
+    METADATA_ARCHIVE_PUBLIC("/db/mom-data/metadata.archive.public"),
+    METADATA_CHARTER_IMPORT("/db/mom-data/metadata.charter.import"),
+    METADATA_CHARTER_IMPORT_UTIL("/db/mom-data/metadata.charter.import.util"),
+    METADATA_CHARTER_PUBLIC("/db/mom-data/metadata.charter.public"),
+    METADATA_CHARTER_SAVED("/db/mom-data/metadata.charter.saved"),
+    METADATA_COLLECTION_PUBLIC("/db/mom-data/metadata.collection.public"),
+    METADATA_FOND_PUBLIC("/db/mom-data/metadata.fond.public"),
+    METADATA_IMAGE_COLLECTIONS("/db/mom-data/metadata.imagecollections"),
+    METADATA_MY_COLLECTION_PUBLIC("/db/mom-data/metadata.mycollection.public"),
+    METADATA_PORTAL_PUBLIC("/db/mom-data/metadata.portal.public"),
+    XRX_HTDOC("/db/mom-data/xrx.htdoc"),
+    XRX_I18N("/db/mom-data/xrx.i18n"),
+    XRX_USER("/db/mom-data/xrx.user");
 
-    private final String collectionName;
+    private final String uri;
 
-    ResourceRoot(String collectionName) {
-        this.collectionName = collectionName;
+    ResourceRoot(String uri) {
+        this.uri = uri;
     }
 
     /**
      * @return The name of the root collection in the database, e.g. {@code metadata.charter.public}.
      */
-    public String getCollectionName() {
-        return collectionName;
+    public String getUri() {
+        return uri;
     }
 
 }
