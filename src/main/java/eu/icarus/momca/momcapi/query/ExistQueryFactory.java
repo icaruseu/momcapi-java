@@ -266,6 +266,18 @@ public class ExistQueryFactory {
 
     }
 
+    @NotNull
+    public static ExistQuery listChartersSaved() {
+
+        String query = String.format(
+                "%s collection('%s')//atom:id/text()",
+                getNamespaceDeclaration(Namespace.ATOM),
+                ResourceRoot.METADATA_CHARTER_SAVED.getUri());
+
+        return new ExistQuery(query);
+
+    }
+
     /**
      * @return A query that lists the ids of all charter collections in the database as strings.
      */

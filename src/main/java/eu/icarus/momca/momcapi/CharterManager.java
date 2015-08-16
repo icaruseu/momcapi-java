@@ -75,6 +75,12 @@ public class CharterManager extends AbstractManager {
     }
 
     @NotNull
+    public List<IdCharter> listChartersSaved() {
+        List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listChartersSaved());
+        return queryResults.stream().map(IdCharter::new).collect(Collectors.toList());
+    }
+
+    @NotNull
     public List<IdCharter> listErroneouslySavedCharters(@NotNull User user) {
         return user.listSavedCharterIds().stream()
                 .filter(idCharter -> !isCharterExisting(idCharter, ResourceRoot.METADATA_CHARTER_SAVED))

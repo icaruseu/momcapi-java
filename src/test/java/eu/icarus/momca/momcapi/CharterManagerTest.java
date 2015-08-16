@@ -141,6 +141,11 @@ public class CharterManagerTest {
     }
 
     @Test
+    public void testListChartersSaved() throws Exception {
+        assertEquals(cm.listChartersSaved().size(), 2);
+    }
+
+    @Test
     public void testlistErroneouslySavedCharters() throws Exception {
 
         UserManager um = mc.getUserManager();
