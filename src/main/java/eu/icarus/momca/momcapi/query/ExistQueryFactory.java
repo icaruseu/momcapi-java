@@ -5,6 +5,7 @@ import eu.icarus.momca.momcapi.resource.ResourceRoot;
 import eu.icarus.momca.momcapi.xml.Namespace;
 import eu.icarus.momca.momcapi.xml.atom.Id;
 import eu.icarus.momca.momcapi.xml.atom.IdArchive;
+import eu.icarus.momca.momcapi.xml.atom.IdCollection;
 import eu.icarus.momca.momcapi.xml.atom.IdFond;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -218,6 +219,19 @@ public class ExistQueryFactory {
                 getNamespaceDeclaration(Namespace.ATOM),
                 idFond.getArchiveIdentifier(),
                 idFond.getFondIdentifier()
+        );
+
+        return new ExistQuery(query);
+
+    }
+
+    @NotNull
+    public static ExistQuery listChartersImport(@NotNull IdCollection idCollection) {
+
+        String query = String.format(
+                "%s collection('/db/mom-data/metadata.charter.import/%s')//atom:id/text()",
+                getNamespaceDeclaration(Namespace.ATOM),
+                idCollection.getCollectionIdentifier()
         );
 
         return new ExistQuery(query);

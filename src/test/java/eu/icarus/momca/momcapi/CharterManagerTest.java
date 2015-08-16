@@ -4,6 +4,7 @@ import eu.icarus.momca.momcapi.resource.Charter;
 import eu.icarus.momca.momcapi.resource.CharterStatus;
 import eu.icarus.momca.momcapi.resource.User;
 import eu.icarus.momca.momcapi.xml.atom.IdCharter;
+import eu.icarus.momca.momcapi.xml.atom.IdCollection;
 import eu.icarus.momca.momcapi.xml.atom.IdFond;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -84,6 +85,19 @@ public class CharterManagerTest {
         List<Charter> charters = cm.getCharterInstances(id, CharterStatus.PUBLIC);
         assertEquals(charters.size(), 1);
         assertEquals(charters.get(0).getId().toXML(), id.toXML());
+
+    }
+
+    @Test
+    public void testListChartersImportForCollections() throws Exception {
+
+        IdCollection id1 = new IdCollection("MedDocBulgEmp");
+        List<IdCharter> charters1 = cm.listChartersImport(id1);
+        assertEquals(charters1.size(), 37);
+
+        IdCollection id2 = new IdCollection("AbteiEiberbach");
+        List<IdCharter> charters2 = cm.listChartersImport(id2);
+        assertEquals(charters2.size(), 0);
 
     }
 

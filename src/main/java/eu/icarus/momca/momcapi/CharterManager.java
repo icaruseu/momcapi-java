@@ -7,6 +7,7 @@ import eu.icarus.momca.momcapi.resource.CharterStatus;
 import eu.icarus.momca.momcapi.resource.ResourceRoot;
 import eu.icarus.momca.momcapi.resource.User;
 import eu.icarus.momca.momcapi.xml.atom.IdCharter;
+import eu.icarus.momca.momcapi.xml.atom.IdCollection;
 import eu.icarus.momca.momcapi.xml.atom.IdFond;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -52,6 +53,12 @@ public class CharterManager extends AbstractManager {
     @NotNull
     public List<IdCharter> listChartersImport(@NotNull IdFond idFond) {
         List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listChartersImport(idFond));
+        return queryResults.stream().map(IdCharter::new).collect(Collectors.toList());
+    }
+
+    @NotNull
+    public List<IdCharter> listChartersImport(@NotNull IdCollection idCollection) {
+        List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listChartersImport(idCollection));
         return queryResults.stream().map(IdCharter::new).collect(Collectors.toList());
     }
 
