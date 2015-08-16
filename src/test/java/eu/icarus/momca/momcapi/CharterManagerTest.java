@@ -91,11 +91,11 @@ public class CharterManagerTest {
     public void testListImportedCharters() throws Exception {
 
         IdFond id1 = new IdFond("RS-IAGNS", "Charters");
-        List<IdCharter> charters1 = cm.listImportedCharters(id1);
+        List<IdCharter> charters1 = cm.listChartersImport(id1);
         assertEquals(charters1.size(), 8);
 
         IdFond id2 = new IdFond("CH-KASchwyz", "Urkunden");
-        List<IdCharter> charters2 = cm.listImportedCharters(id2);
+        List<IdCharter> charters2 = cm.listChartersImport(id2);
         assertEquals(charters2.size(), 0);
 
     }
@@ -104,11 +104,11 @@ public class CharterManagerTest {
     public void testListPublishedCharters() throws Exception {
 
         IdFond id1 = new IdFond("CH-KAE", "Urkunden");
-        List<IdCharter> charters1 = cm.listPublishedCharters(id1);
+        List<IdCharter> charters1 = cm.listChartersPublic(id1);
         assertEquals(charters1.size(), 10);
 
         IdFond id2 = new IdFond("CH-KASchwyz", "Urkunden");
-        List<IdCharter> charters2 = cm.listPublishedCharters(id2);
+        List<IdCharter> charters2 = cm.listChartersPublic(id2);
         assertEquals(charters2.size(), 0);
 
     }

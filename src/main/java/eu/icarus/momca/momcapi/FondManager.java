@@ -81,8 +81,8 @@ public class FondManager extends AbstractManager {
 
     public void deleteFond(@NotNull IdFond idFond) {
 
-        if (!momcaConnection.getCharterManager().listPublishedCharters(idFond).isEmpty()
-                || !momcaConnection.getCharterManager().listImportedCharters(idFond).isEmpty()) {
+        if (!momcaConnection.getCharterManager().listChartersPublic(idFond).isEmpty()
+                || !momcaConnection.getCharterManager().listChartersImport(idFond).isEmpty()) {
             throw new IllegalArgumentException("There are still existing charters for fond '" + idFond.getFondIdentifier() + "'");
         }
 

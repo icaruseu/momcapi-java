@@ -50,22 +50,22 @@ public class CharterManager extends AbstractManager {
     }
 
     @NotNull
-    public List<IdCharter> listErroneouslySavedCharters(@NotNull User user) {
-        return user.listSavedCharterIds().stream()
-                .filter(idCharter -> !isCharterExisting(idCharter, ResourceRoot.METADATA_CHARTER_SAVED))
-                .collect(Collectors.toList());
-    }
-
-    @NotNull
-    public List<IdCharter> listImportedCharters(@NotNull IdFond idFond) {
+    public List<IdCharter> listChartersImport(@NotNull IdFond idFond) {
         List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listImportedCharters(idFond));
         return queryResults.stream().map(IdCharter::new).collect(Collectors.toList());
     }
 
     @NotNull
-    public List<IdCharter> listPublishedCharters(@NotNull IdFond idFond) {
+    public List<IdCharter> listChartersPublic(@NotNull IdFond idFond) {
         List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listPublishedCharters(idFond));
         return queryResults.stream().map(IdCharter::new).collect(Collectors.toList());
+    }
+
+    @NotNull
+    public List<IdCharter> listErroneouslySavedCharters(@NotNull User user) {
+        return user.listSavedCharterIds().stream()
+                .filter(idCharter -> !isCharterExisting(idCharter, ResourceRoot.METADATA_CHARTER_SAVED))
+                .collect(Collectors.toList());
     }
 
     @NotNull
