@@ -88,7 +88,7 @@ public class CharterManagerTest {
     }
 
     @Test
-    public void testListImportedCharters() throws Exception {
+    public void testListChartersImport() throws Exception {
 
         IdFond id1 = new IdFond("RS-IAGNS", "Charters");
         List<IdCharter> charters1 = cm.listChartersImport(id1);
@@ -101,7 +101,7 @@ public class CharterManagerTest {
     }
 
     @Test
-    public void testListPublishedCharters() throws Exception {
+    public void testListChartersPublic() throws Exception {
 
         IdFond id1 = new IdFond("CH-KAE", "Urkunden");
         List<IdCharter> charters1 = cm.listChartersPublic(id1);
