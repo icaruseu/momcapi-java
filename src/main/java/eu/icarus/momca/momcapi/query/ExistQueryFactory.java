@@ -3,10 +3,7 @@ package eu.icarus.momca.momcapi.query;
 import eu.icarus.momca.momcapi.resource.CountryCode;
 import eu.icarus.momca.momcapi.resource.ResourceRoot;
 import eu.icarus.momca.momcapi.xml.Namespace;
-import eu.icarus.momca.momcapi.xml.atom.Id;
-import eu.icarus.momca.momcapi.xml.atom.IdArchive;
-import eu.icarus.momca.momcapi.xml.atom.IdCollection;
-import eu.icarus.momca.momcapi.xml.atom.IdFond;
+import eu.icarus.momca.momcapi.xml.atom.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -261,6 +258,19 @@ public class ExistQueryFactory {
                 getNamespaceDeclaration(Namespace.ATOM),
                 ResourceRoot.METADATA_CHARTER_PUBLIC.getUri(),
                 idCollection.getCollectionIdentifier());
+
+        return new ExistQuery(query);
+
+    }
+
+    @NotNull
+    public static ExistQuery listChartersPublic(@NotNull IdMyCollection idMyCollection) {
+
+        String query = String.format(
+                "%s collection('%s/%s')//atom:id/text()",
+                getNamespaceDeclaration(Namespace.ATOM),
+                ResourceRoot.METADATA_CHARTER_PUBLIC.getUri(),
+                idMyCollection.getMyCollectionIdentifier());
 
         return new ExistQuery(query);
 

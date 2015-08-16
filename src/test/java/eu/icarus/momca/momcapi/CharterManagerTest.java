@@ -6,6 +6,7 @@ import eu.icarus.momca.momcapi.resource.User;
 import eu.icarus.momca.momcapi.xml.atom.IdCharter;
 import eu.icarus.momca.momcapi.xml.atom.IdCollection;
 import eu.icarus.momca.momcapi.xml.atom.IdFond;
+import eu.icarus.momca.momcapi.xml.atom.IdMyCollection;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -122,6 +123,19 @@ public class CharterManagerTest {
         assertEquals(charters1.size(), 364);
 
         IdCollection id2 = new IdCollection("emptycollection");
+        List<IdCharter> charters2 = cm.listChartersPublic(id2);
+        assertEquals(charters2.size(), 0);
+
+    }
+
+    @Test
+    public void testListChartersPublicForMyCollections() throws Exception {
+
+        IdMyCollection id1 = new IdMyCollection("67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3");
+        List<IdCharter> charters1 = cm.listChartersPublic(id1);
+        assertEquals(charters1.size(), 1);
+
+        IdMyCollection id2 = new IdMyCollection("0d48f895-f296-485b-a6d9-e88b4523cc92");
         List<IdCharter> charters2 = cm.listChartersPublic(id2);
         assertEquals(charters2.size(), 0);
 
