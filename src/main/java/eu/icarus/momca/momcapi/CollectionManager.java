@@ -21,9 +21,8 @@ public class CollectionManager extends AbstractManager {
     }
 
     @NotNull
-    public List<IdCollection> listCollections() {
-        List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listCollections());
-        return queryResults.stream().map(IdCollection::new).collect(Collectors.toList());
+    public Optional<Collection> getCollection(@NotNull IdCollection idCollection) {
+        return getMomcaResource(idCollection).map(Collection::new);
     }
 
     @NotNull
@@ -41,8 +40,9 @@ public class CollectionManager extends AbstractManager {
     }
 
     @NotNull
-    public Optional<Collection> getCollection(@NotNull IdCollection idCollection) {
-        return getMomcaResource(idCollection).map(Collection::new);
+    public List<IdCollection> listCollections() {
+        List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listCollections());
+        return queryResults.stream().map(IdCollection::new).collect(Collectors.toList());
     }
 
 }

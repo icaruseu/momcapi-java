@@ -10,9 +10,7 @@ import org.testng.annotations.Test;
 
 import java.util.stream.Collectors;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.*;
 
 /**
  * Created by djell on 11/08/2015.
@@ -21,6 +19,13 @@ public class CollectionManagerTest {
 
     private CollectionManager cm;
     private MomcaConnection mc;
+
+    @BeforeClass
+    public void setUp() throws Exception {
+        mc = TestUtils.initMomcaConnection();
+        cm = mc.getCollectionManager();
+        assertNotNull(cm, "MOM-CA connection not initialized.");
+    }
 
     @Test
     public void testGetCollection() throws Exception {
@@ -41,16 +46,9 @@ public class CollectionManagerTest {
 
     }
 
-    @BeforeClass
-    public void setUp() throws Exception {
-        mc = TestUtils.initMomcaConnection();
-        cm = mc.getCollectionManager();
-        assertNotNull(cm, "MOM-CA connection not initialized.");
-    }
-
     @Test
     public void testListCollections() throws Exception {
-        assertEquals(cm.listCollections().size(), 2);
+        assertEquals(cm.listCollections().size(), 3);
     }
 
     @Test

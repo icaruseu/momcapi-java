@@ -220,8 +220,7 @@ public class ExistQueryFactory {
                 getNamespaceDeclaration(Namespace.ATOM),
                 ResourceRoot.METADATA_CHARTER_IMPORT.getUri(),
                 idFond.getArchiveIdentifier(),
-                idFond.getFondIdentifier()
-        );
+                idFond.getFondIdentifier());
 
         return new ExistQuery(query);
 
@@ -234,8 +233,7 @@ public class ExistQueryFactory {
                 "%s collection('%s/%s')//atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM),
                 ResourceRoot.METADATA_CHARTER_IMPORT.getUri(),
-                idCollection.getCollectionIdentifier()
-        );
+                idCollection.getCollectionIdentifier());
 
         return new ExistQuery(query);
 
@@ -249,8 +247,20 @@ public class ExistQueryFactory {
                 getNamespaceDeclaration(Namespace.ATOM),
                 ResourceRoot.METADATA_CHARTER_PUBLIC.getUri(),
                 idFond.getArchiveIdentifier(),
-                idFond.getFondIdentifier()
-        );
+                idFond.getFondIdentifier());
+
+        return new ExistQuery(query);
+
+    }
+
+    @NotNull
+    public static ExistQuery listChartersPublic(@NotNull IdCollection idCollection) {
+
+        String query = String.format(
+                "%s collection('%s/%s')//atom:id/text()",
+                getNamespaceDeclaration(Namespace.ATOM),
+                ResourceRoot.METADATA_CHARTER_PUBLIC.getUri(),
+                idCollection.getCollectionIdentifier());
 
         return new ExistQuery(query);
 

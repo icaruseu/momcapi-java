@@ -115,6 +115,19 @@ public class CharterManagerTest {
     }
 
     @Test
+    public void testListChartersPublicForCollections() throws Exception {
+
+        IdCollection id1 = new IdCollection("AbteiEberbach");
+        List<IdCharter> charters1 = cm.listChartersPublic(id1);
+        assertEquals(charters1.size(), 364);
+
+        IdCollection id2 = new IdCollection("emptycollection");
+        List<IdCharter> charters2 = cm.listChartersPublic(id2);
+        assertEquals(charters2.size(), 0);
+
+    }
+
+    @Test
     public void testListChartersPublicForFonds() throws Exception {
 
         IdFond id1 = new IdFond("CH-KAE", "Urkunden");

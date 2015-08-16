@@ -16,35 +16,11 @@ public class Collection extends MomcaResource {
     @NotNull
     private final Optional<CountryCode> countryCode;
     @NotNull
-    private final Optional<String> regionName;
-    @NotNull
     private final IdCollection id;
     @NotNull
     private final String name;
-
     @NotNull
-    public Optional<CountryCode> getCountryCode() {
-        return countryCode;
-    }
-
-    @NotNull
-    public IdCollection getId() {
-        return id;
-    }
-
-    @NotNull
-    public String getName() {
-        return name;
-    }
-
-    public String getIdentifier(){
-        return id.getCollectionIdentifier();
-    }
-
-    @NotNull
-    public Optional<String> getRegionName() {
-        return regionName;
-    }
+    private final Optional<String> regionName;
 
     public Collection(@NotNull MomcaResource momcaResource) {
 
@@ -57,15 +33,40 @@ public class Collection extends MomcaResource {
 
     }
 
-    private String initName() {
+    @NotNull
+    public Optional<CountryCode> getCountryCode() {
+        return countryCode;
+    }
 
-        List<String> queryResults = queryContentAsList(XpathQuery.QUERY_CEI_PROVENANCE_TEXT);
+    @NotNull
+    public IdCollection getId() {
+        return id;
+    }
 
-        if (queryResults.isEmpty()) {
-            throw new IllegalArgumentException("The content of the collection doesn't contain an name.");
+    public String getIdentifier() {
+        return id.getCollectionIdentifier();
+    }
+
+    @NotNull
+    public String getName() {
+        return name;
+    }
+
+    @NotNull
+    public Optional<String> getRegionName() {
+        return regionName;
+    }
+
+    private Optional<CountryCode> initCountryCode() {
+
+        Optional<CountryCode> code = Optional.empty();
+        List<String> queryResults = queryContentAsList(XpathQuery.QUERY_CEI_COUNTRY_ID);
+
+        if (queryResults.size() == 1) {
+            code = Optional.of(new CountryCode(queryResults.get(0)));
         }
 
-        return queryResults.get(0).replaceAll("\\s+", " "); // Normalize whitespace due to nested elements in the xml content
+        return code;
 
     }
 
@@ -81,6 +82,18 @@ public class Collection extends MomcaResource {
 
     }
 
+    private String initName() {
+
+        List<String> queryResults = queryContentAsList(XpathQuery.QUERY_CEI_PROVENANCE_TEXT);
+
+        if (queryResults.isEmpty()) {
+            throw new IllegalArgumentException("The content of the collection doesn't contain an name.");
+        }
+
+        return queryResults.get(0).replaceAll("\\s+", " "); // Normalize whitespace due to nested elements in the xml content
+
+    }
+
     private Optional<String> initRegionName() {
 
         Optional<String> name = Optional.empty();
@@ -92,19 +105,6 @@ public class Collection extends MomcaResource {
         }
 
         return name;
-
-    }
-
-    private Optional<CountryCode> initCountryCode() {
-
-        Optional<CountryCode> code = Optional.empty();
-        List<String> queryResults = queryContentAsList(XpathQuery.QUERY_CEI_COUNTRY_ID);
-
-        if (queryResults.size() == 1) {
-            code = Optional.of(new CountryCode(queryResults.get(0)));
-        }
-
-        return code;
 
     }
 
