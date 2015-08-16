@@ -237,6 +237,19 @@ public class ExistQueryFactory {
     }
 
     @NotNull
+    public static ExistQuery listChartersPrivate(@NotNull IdMyCollection idMyCollection) {
+
+        String query = String.format(
+                "%s collection('%s')//atom:entry/atom:id/text()[contains(., 'charter') and contains(., '%s')]",
+                getNamespaceDeclaration(Namespace.ATOM),
+                ResourceRoot.XRX_USER.getUri(),
+                idMyCollection.getMyCollectionIdentifier());
+
+        return new ExistQuery(query);
+
+    }
+
+    @NotNull
     public static ExistQuery listChartersPublic(@NotNull IdFond idFond) {
 
         String query = String.format(

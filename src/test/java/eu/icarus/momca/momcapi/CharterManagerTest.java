@@ -116,6 +116,19 @@ public class CharterManagerTest {
     }
 
     @Test
+    public void testListChartersPrivateForMyCollections() throws Exception {
+
+        IdMyCollection id1 = new IdMyCollection("67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3");
+        List<IdCharter> charters1 = cm.listChartersPrivate(id1);
+        assertEquals(charters1.size(), 2);
+
+        IdMyCollection id2 = new IdMyCollection("0d48f895-f296-485b-a6d9-e88b4523cc92");
+        List<IdCharter> charters2 = cm.listChartersPrivate(id2);
+        assertEquals(charters2.size(), 0);
+
+    }
+
+    @Test
     public void testListChartersPublicForCollections() throws Exception {
 
         IdCollection id1 = new IdCollection("AbteiEberbach");
@@ -129,19 +142,6 @@ public class CharterManagerTest {
     }
 
     @Test
-    public void testListChartersPublicForMyCollections() throws Exception {
-
-        IdMyCollection id1 = new IdMyCollection("67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3");
-        List<IdCharter> charters1 = cm.listChartersPublic(id1);
-        assertEquals(charters1.size(), 1);
-
-        IdMyCollection id2 = new IdMyCollection("0d48f895-f296-485b-a6d9-e88b4523cc92");
-        List<IdCharter> charters2 = cm.listChartersPublic(id2);
-        assertEquals(charters2.size(), 0);
-
-    }
-
-    @Test
     public void testListChartersPublicForFonds() throws Exception {
 
         IdFond id1 = new IdFond("CH-KAE", "Urkunden");
@@ -149,6 +149,19 @@ public class CharterManagerTest {
         assertEquals(charters1.size(), 10);
 
         IdFond id2 = new IdFond("CH-KASchwyz", "Urkunden");
+        List<IdCharter> charters2 = cm.listChartersPublic(id2);
+        assertEquals(charters2.size(), 0);
+
+    }
+
+    @Test
+    public void testListChartersPublicForMyCollections() throws Exception {
+
+        IdMyCollection id1 = new IdMyCollection("67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3");
+        List<IdCharter> charters1 = cm.listChartersPublic(id1);
+        assertEquals(charters1.size(), 1);
+
+        IdMyCollection id2 = new IdMyCollection("0d48f895-f296-485b-a6d9-e88b4523cc92");
         List<IdCharter> charters2 = cm.listChartersPublic(id2);
         assertEquals(charters2.size(), 0);
 
