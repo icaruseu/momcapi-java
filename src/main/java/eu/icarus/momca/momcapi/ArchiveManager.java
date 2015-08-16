@@ -42,7 +42,7 @@ public class ArchiveManager extends AbstractManager {
             throw new IllegalArgumentException(message);
         }
 
-        String archivesCollection = "/db/mom-data/metadata.archive.public";
+        String archivesCollection = ResourceRoot.METADATA_ARCHIVE_PUBLIC.getUri();
         momcaConnection.addCollection(shortName, archivesCollection);
 
         String resourceName = shortName + ".eag.xml";
@@ -67,8 +67,10 @@ public class ArchiveManager extends AbstractManager {
             throw new IllegalArgumentException(message);
         }
 
-        momcaConnection.deleteCollection("/db/mom-data/metadata.archive.public/" + archive.getId().getArchiveIdentifier());
-        momcaConnection.deleteCollection("/db/mom-data/metadata.fond.public/" + archive.getId().getArchiveIdentifier());
+        momcaConnection.deleteCollection(String.format("%s/%s",
+                ResourceRoot.METADATA_ARCHIVE_PUBLIC.getUri(), archive.getId().getArchiveIdentifier()));
+        momcaConnection.deleteCollection(String.format("%s/%s",
+                ResourceRoot.METADATA_FOND_PUBLIC.getUri(), archive.getId().getArchiveIdentifier()));
 
     }
 
