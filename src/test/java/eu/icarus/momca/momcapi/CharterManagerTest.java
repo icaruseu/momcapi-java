@@ -129,6 +129,19 @@ public class CharterManagerTest {
     }
 
     @Test
+    public void testListChartersPrivateForUser() throws Exception {
+
+        User user1 = mc.getUserManager().getUser("user1.testuser@dev.monasterium.net").get();
+        List<IdCharter> charters1 = cm.listChartersPrivate(user1);
+        assertEquals(charters1.size(), 2);
+
+        User user2 = mc.getUserManager().getUser("user2.testuser@dev.monasterium.net").get();
+        List<IdCharter> charters2 = cm.listChartersPrivate(user2);
+        assertEquals(charters2.size(), 0);
+
+    }
+
+    @Test
     public void testListChartersPublicForCollections() throws Exception {
 
         IdCollection id1 = new IdCollection("AbteiEberbach");

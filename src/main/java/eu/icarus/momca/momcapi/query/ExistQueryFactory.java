@@ -2,6 +2,7 @@ package eu.icarus.momca.momcapi.query;
 
 import eu.icarus.momca.momcapi.resource.CountryCode;
 import eu.icarus.momca.momcapi.resource.ResourceRoot;
+import eu.icarus.momca.momcapi.resource.User;
 import eu.icarus.momca.momcapi.xml.Namespace;
 import eu.icarus.momca.momcapi.xml.atom.*;
 import org.jetbrains.annotations.NotNull;
@@ -244,6 +245,19 @@ public class ExistQueryFactory {
                 getNamespaceDeclaration(Namespace.ATOM),
                 ResourceRoot.XRX_USER.getUri(),
                 idMyCollection.getMyCollectionIdentifier());
+
+        return new ExistQuery(query);
+
+    }
+
+    @NotNull
+    public static ExistQuery listChartersPrivate(@NotNull User user) {
+
+        String query = String.format(
+                "%s collection('%s')//atom:entry[contains(./atom:id/text(), 'charter')][./atom:author/atom:email/text()='%s']/atom:id/text()",
+                getNamespaceDeclaration(Namespace.ATOM),
+                ResourceRoot.XRX_USER.getUri(),
+                user.getUserName());
 
         return new ExistQuery(query);
 
