@@ -203,8 +203,9 @@ public class ExistQueryFactory {
     public static ExistQuery listArchivesForRegion(@NotNull String regionName) {
 
         String query = String.format(
-                "%s collection('/db/mom-data/metadata.archive.public')//atom:entry[.//eag:firstdem/text()='%s']/atom:id/text()",
+                "%s collection('%s')//atom:entry[.//eag:firstdem/text()='%s']/atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM, Namespace.EAG),
+                ResourceRoot.METADATA_ARCHIVE_PUBLIC.getUri(),
                 regionName);
 
         return new ExistQuery(query);
@@ -215,8 +216,9 @@ public class ExistQueryFactory {
     public static ExistQuery listChartersImport(@NotNull IdFond idFond) {
 
         String query = String.format(
-                "%s collection('/db/mom-data/metadata.charter.import/%s/%s')//atom:id/text()",
+                "%s collection('%s/%s/%s')//atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM),
+                ResourceRoot.METADATA_CHARTER_IMPORT.getUri(),
                 idFond.getArchiveIdentifier(),
                 idFond.getFondIdentifier()
         );
@@ -229,8 +231,9 @@ public class ExistQueryFactory {
     public static ExistQuery listChartersImport(@NotNull IdCollection idCollection) {
 
         String query = String.format(
-                "%s collection('/db/mom-data/metadata.charter.import/%s')//atom:id/text()",
+                "%s collection('%s/%s')//atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM),
+                ResourceRoot.METADATA_CHARTER_IMPORT.getUri(),
                 idCollection.getCollectionIdentifier()
         );
 
@@ -242,8 +245,9 @@ public class ExistQueryFactory {
     public static ExistQuery listChartersPublic(@NotNull IdFond idFond) {
 
         String query = String.format(
-                "%s collection('/db/mom-data/metadata.charter.public/%s/%s')//atom:id/text()",
+                "%s collection('%s/%s/%s')//atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM),
+                ResourceRoot.METADATA_CHARTER_PUBLIC.getUri(),
                 idFond.getArchiveIdentifier(),
                 idFond.getFondIdentifier()
         );
@@ -259,8 +263,9 @@ public class ExistQueryFactory {
     public static ExistQuery listCollections() {
 
         String query = String.format(
-                "%s collection('/db/mom-data/metadata.collection.public')//atom:id/text()",
-                getNamespaceDeclaration(Namespace.ATOM));
+                "%s collection('%s')//atom:id/text()",
+                getNamespaceDeclaration(Namespace.ATOM),
+                ResourceRoot.METADATA_COLLECTION_PUBLIC.getUri());
 
         return new ExistQuery(query);
 
@@ -274,8 +279,9 @@ public class ExistQueryFactory {
     public static ExistQuery listCollectionsForCountry(@NotNull CountryCode countryCode) {
 
         String query = String.format(
-                "%s collection('/db/mom-data/metadata.collection.public')//atom:entry[.//cei:country/@id='%s']/atom:id/text()",
+                "%s collection('%s')//atom:entry[.//cei:country/@id='%s']/atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM, Namespace.CEI),
+                ResourceRoot.METADATA_COLLECTION_PUBLIC.getUri(),
                 countryCode.getCode());
 
         return new ExistQuery(query);
@@ -290,8 +296,9 @@ public class ExistQueryFactory {
     public static ExistQuery listCollectionsForRegion(@NotNull String regionName) {
 
         String query = String.format(
-                "%s collection('/db/mom-data/metadata.collection.public')//atom:entry[.//cei:region/text()='%s']/atom:id/text()",
+                "%s collection('%s')//atom:entry[.//cei:region/text()='%s']/atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM, Namespace.CEI),
+                ResourceRoot.METADATA_COLLECTION_PUBLIC.getUri(),
                 regionName);
 
         return new ExistQuery(query);
@@ -306,9 +313,11 @@ public class ExistQueryFactory {
     public static ExistQuery listCountryCodes() {
 
         String query = String.format(
-                "%s distinct-values((doc('/db/mom-data/metadata.portal.public/mom.portal.xml')//eap:country/eap:code[text() != '']/text(),\n" +
-                        "    data(collection('/db/mom-data/metadata.collection.public')//cei:country[@id != '']/@id)))",
-                getNamespaceDeclaration(Namespace.CEI, Namespace.EAP));
+                "%s distinct-values((doc('%s/mom.portal.xml')//eap:country/eap:code[text() != '']/text(),\n" +
+                        "    data(collection('%s')//cei:country[@id != '']/@id)))",
+                getNamespaceDeclaration(Namespace.CEI, Namespace.EAP),
+                ResourceRoot.METADATA_PORTAL_PUBLIC.getUri(),
+                ResourceRoot.METADATA_COLLECTION_PUBLIC.getUri());
 
         return new ExistQuery(query);
 
@@ -322,8 +331,9 @@ public class ExistQueryFactory {
     public static ExistQuery listFonds(@NotNull IdArchive idArchive) {
 
         String query = String.format(
-                "%s collection('/db/mom-data/metadata.fond.public')//atom:id[contains(., '%s')]/text()",
+                "%s collection('%s')//atom:id[contains(., '%s')]/text()",
                 getNamespaceDeclaration(Namespace.ATOM),
+                ResourceRoot.METADATA_FOND_PUBLIC.getUri(),
                 idArchive.getArchiveIdentifier());
 
         return new ExistQuery(query);
@@ -334,10 +344,12 @@ public class ExistQueryFactory {
     public static ExistQuery listRegionsNativeNames(@NotNull CountryCode countryCode) {
 
         String query = String.format("%s distinct-values((" +
-                        "doc('/db/mom-data/metadata.portal.public/mom.portal.xml')//eap:country[eap:code = '%s']//eap:subdivision/eap:nativeform/text(),\n" +
-                        "    data(collection('/db/mom-data/metadata.collection.public')//cei:provenance[cei:country/@id = '%s']/cei:region/text())))",
+                        "doc('%s/mom.portal.xml')//eap:country[eap:code = '%s']//eap:subdivision/eap:nativeform/text(),\n" +
+                        "    data(collection('%s')//cei:provenance[cei:country/@id = '%s']/cei:region/text())))",
                 getNamespaceDeclaration(Namespace.CEI, Namespace.EAP),
+                ResourceRoot.METADATA_PORTAL_PUBLIC.getUri(),
                 countryCode.getCode(),
+                ResourceRoot.METADATA_COLLECTION_PUBLIC.getUri(),
                 countryCode.getCode());
 
         return new ExistQuery(query);
