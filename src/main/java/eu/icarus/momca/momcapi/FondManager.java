@@ -1,10 +1,7 @@
 package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
-import eu.icarus.momca.momcapi.resource.Archive;
-import eu.icarus.momca.momcapi.resource.Fond;
-import eu.icarus.momca.momcapi.resource.ImageAccess;
-import eu.icarus.momca.momcapi.resource.MomcaResource;
+import eu.icarus.momca.momcapi.resource.*;
 import eu.icarus.momca.momcapi.xml.atom.*;
 import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
@@ -20,8 +17,6 @@ import java.util.stream.Collectors;
  */
 public class FondManager extends AbstractManager {
 
-    public static final String CHARTER_DATA_COLLECTION = "/db/mom-data/metadata.charter.public";
-    public static final String FOND_DATA_COLLECTION = "/db/mom-data/metadata.fond.public";
     private static final String EAD_TEMPLATE = "<ead:ead xmlns:ead=\"urn:isbn:1-931666-22-9\"><ead:eadheader><ead:eadid /><ead:filedesc><ead:titlestmt><ead:titleproper /><ead:author /></ead:titlestmt></ead:filedesc></ead:eadheader><ead:archdesc level=\"otherlevel\"><ead:did><ead:abstract /></ead:did><ead:dsc><ead:c level=\"fonds\"><ead:did><ead:unitid identifier=\"%s\">%s</ead:unitid><ead:unittitle>%s</ead:unittitle></ead:did><ead:bioghist><ead:head /><ead:p /></ead:bioghist><ead:custodhist><ead:head /><ead:p /></ead:custodhist><ead:bibliography><ead:bibref /></ead:bibliography><ead:odd><ead:head /><ead:p /></ead:odd></ead:c></ead:dsc></ead:archdesc></ead:ead>";
     private static final String PREFERENCES_TEMPLATE = "<xrx:preferences xmlns:xrx=\"http://www.monasterium.net/NS/xrx\"><xrx:param name=\"image-access\">%s</xrx:param><xrx:param name=\"dummy-image-url\">%s</xrx:param><xrx:param name=\"image-server-base-url\" >%s</xrx:param></xrx:preferences>";
 
@@ -56,7 +51,7 @@ public class FondManager extends AbstractManager {
             throw new IllegalArgumentException("An fond for the id '" + id.getId() + "' is already existing.");
         }
 
-        String archiveCollectionUri = FOND_DATA_COLLECTION + "/" + archive.getIdentifier();
+        String archiveCollectionUri = ResourceRoot.METADATA_FOND_PUBLIC.getUri() + "/" + archive.getIdentifier();
         String fondCollectionUri = archiveCollectionUri + "/" + identifier;
 
         String eadName = identifier + ".ead.xml";
@@ -69,7 +64,7 @@ public class FondManager extends AbstractManager {
                 -> new MomcaResource(preferencesName, fondCollectionUri, element.toXML()));
 
 
-        momcaConnection.addCollection(archive.getIdentifier(), FOND_DATA_COLLECTION);
+        momcaConnection.addCollection(archive.getIdentifier(), ResourceRoot.METADATA_FOND_PUBLIC.getUri());
         momcaConnection.addCollection(identifier, archiveCollectionUri);
 
         momcaConnection.storeExistResource(eadResource);
@@ -86,8 +81,8 @@ public class FondManager extends AbstractManager {
             throw new IllegalArgumentException("There are still existing charters for fond '" + idFond.getFondIdentifier() + "'");
         }
 
-        momcaConnection.deleteCollection(String.format("%s/%s/%s", CHARTER_DATA_COLLECTION, idFond.getArchiveIdentifier(), idFond.getFondIdentifier()));
-        momcaConnection.deleteCollection(String.format("%s/%s/%s", FOND_DATA_COLLECTION, idFond.getArchiveIdentifier(), idFond.getFondIdentifier()));
+        momcaConnection.deleteCollection(String.format("%s/%s/%s", ResourceRoot.METADATA_CHARTER_PUBLIC.getUri(), idFond.getArchiveIdentifier(), idFond.getFondIdentifier()));
+        momcaConnection.deleteCollection(String.format("%s/%s/%s", ResourceRoot.METADATA_FOND_PUBLIC.getUri(), idFond.getArchiveIdentifier(), idFond.getFondIdentifier()));
 
     }
 

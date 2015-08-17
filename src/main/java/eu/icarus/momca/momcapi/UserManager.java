@@ -4,6 +4,7 @@ import eu.icarus.momca.momcapi.exception.MomcaException;
 import eu.icarus.momca.momcapi.query.ExistQuery;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
 import eu.icarus.momca.momcapi.resource.MomcaResource;
+import eu.icarus.momca.momcapi.resource.ResourceRoot;
 import eu.icarus.momca.momcapi.resource.User;
 import org.exist.security.Account;
 import org.exist.security.Group;
@@ -34,8 +35,6 @@ public class UserManager extends AbstractManager {
             "<xrx:email>%s</xrx:email> <xrx:moderator>%s</xrx:moderator> <xrx:street /> <xrx:zip /> <xrx:town />" +
             " <xrx:phone /> <xrx:institution /> <xrx:info /> <xrx:storage> <xrx:saved_list /> <xrx:bookmark_list />" +
             " </xrx:storage> </xrx:user>";
-    @NotNull
-    private static final String PATH_USER = "/db/mom-data/xrx.user";
 
     /**
      * Instantiates a new UserManager.
@@ -66,7 +65,7 @@ public class UserManager extends AbstractManager {
             }
 
             String xmlContent = createUserResourceContent(userName, moderatorName, firstName, lastName);
-            MomcaResource userResource = new MomcaResource(userName + ".xml", PATH_USER, xmlContent);
+            MomcaResource userResource = new MomcaResource(userName + ".xml", ResourceRoot.XRX_USER.getUri(), xmlContent);
             momcaConnection.storeExistResource(userResource);
             initializeUser(new User(userResource), password);
 
@@ -146,7 +145,7 @@ public class UserManager extends AbstractManager {
         deleteExistUserAccount(userName);
 
         momcaConnection.deleteExistResource(user);
-        momcaConnection.deleteCollection(PATH_USER + "/" + userName);
+        momcaConnection.deleteCollection(ResourceRoot.XRX_USER.getUri() + "/" + userName);
 
     }
 
@@ -159,12 +158,14 @@ public class UserManager extends AbstractManager {
     @NotNull
     public Optional<User> getUser(@NotNull String userName) {
         boolean isInitialized = isUserInitialized(userName);
-        return momcaConnection.getExistResource(userName + ".xml", PATH_USER)
+        return momcaConnection.getExistResource(userName + ".xml", ResourceRoot.XRX_USER.getUri())
                 .flatMap(existResource -> Optional.of(new User(existResource, isInitialized)));
     }
 
     /**
-     * Initializes a registered but uninitialized user. This happens if the User doesn't recieve the registration-email or doesn't click on the confirmation link. Before this, the user is added to {@code xrx.user} but not added as an eXist-account.
+     * Initializes a registered but uninitialized user. This happens if the User doesn't receive the registration-email
+     * or doesn't click on the confirmation link. Before this, the user is added to {@code xrx.user} but not added as
+     * an eXist-account.
      *
      * @param user     The uninitialized user.
      * @param password The password.
@@ -275,14 +276,15 @@ public class UserManager extends AbstractManager {
     private List<String> listUserResourceNames() {
 
         List<String> users = new ArrayList<>();
-        momcaConnection.getCollection(PATH_USER).ifPresent(collection -> {
+        momcaConnection.getCollection(ResourceRoot.XRX_USER.getUri()).ifPresent(collection -> {
 
             String[] encodedUserNames;
 
             try {
                 encodedUserNames = collection.listResources();
             } catch (XMLDBException e) {
-                throw new MomcaException(String.format("Failed to list resources in collection '%s'.", PATH_USER), e);
+                String message = String.format("Failed to list resources in collection '%s'.", ResourceRoot.XRX_USER.getUri());
+                throw new MomcaException(message, e);
             }
 
             for (String encodedUserName : encodedUserNames) {

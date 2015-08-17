@@ -66,10 +66,12 @@ public class ExistQueryFactory {
     public static ExistQuery getCountryNativeName(@NotNull CountryCode countryCode) {
 
         String query = String.format("%s distinct-values(" +
-                        "(doc('/db/mom-data/metadata.portal.public/mom.portal.xml')//eap:country[./eap:code='%s']/eap:nativeform/text(),\n" +
-                        "    data(collection('/db/mom-data/metadata.collection.public')//cei:country[@id='%s']/text())))",
+                        "(doc('%s/mom.portal.xml')//eap:country[./eap:code='%s']/eap:nativeform/text(),\n" +
+                        "    data(collection('%s')//cei:country[@id='%s']/text())))",
                 getNamespaceDeclaration(Namespace.CEI, Namespace.EAP),
+                ResourceRoot.METADATA_PORTAL_PUBLIC.getUri(),
                 countryCode.getCode(),
+                ResourceRoot.METADATA_COLLECTION_PUBLIC.getUri(),
                 countryCode.getCode());
 
         return new ExistQuery(query);
@@ -105,10 +107,12 @@ public class ExistQueryFactory {
     public static ExistQuery getRegionCode(@NotNull String regionNativeName) {
 
         String query = String.format("%s distinct-values(" +
-                        "(doc('/db/mom-data/metadata.portal.public/mom.portal.xml')//eap:subdivision[eap:nativeform = '%s']/eap:code/text(),\n" +
-                        "    data(collection('/db/mom-data/metadata.collection.public')//cei:provenance[cei:region= '%s']/cei:region/@id)))",
+                        "(doc('%s/mom.portal.xml')//eap:subdivision[eap:nativeform = '%s']/eap:code/text(),\n" +
+                        "    data(collection('%s')//cei:provenance[cei:region= '%s']/cei:region/@id)))",
                 getNamespaceDeclaration(Namespace.CEI, Namespace.EAP),
+                ResourceRoot.METADATA_PORTAL_PUBLIC.getUri(),
                 regionNativeName,
+                ResourceRoot.METADATA_COLLECTION_PUBLIC.getUri(),
                 regionNativeName);
 
         return new ExistQuery(query);
@@ -170,8 +174,9 @@ public class ExistQueryFactory {
     public static ExistQuery listArchives() {
 
         String query = String.format(
-                "%s collection('/db/mom-data/metadata.archive.public')//atom:id/text()",
-                getNamespaceDeclaration(Namespace.ATOM));
+                "%s collection('%s')//atom:id/text()",
+                getNamespaceDeclaration(Namespace.ATOM),
+                ResourceRoot.METADATA_ARCHIVE_PUBLIC.getUri());
 
         return new ExistQuery(query);
 
@@ -185,8 +190,9 @@ public class ExistQueryFactory {
     public static ExistQuery listArchivesForCountry(@NotNull CountryCode countryCode) {
 
         String query = String.format(
-                "%s collection('/db/mom-data/metadata.archive.public')//atom:entry[.//eag:repositorid/@countrycode='%s']/atom:id/text()",
+                "%s collection('%s')//atom:entry[.//eag:repositorid/@countrycode='%s']/atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM, Namespace.EAG),
+                ResourceRoot.METADATA_ARCHIVE_PUBLIC.getUri(),
                 countryCode.getCode());
 
         return new ExistQuery(query);
