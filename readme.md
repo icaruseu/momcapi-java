@@ -58,6 +58,8 @@ _Collection manager_
 * List all collections belonging to a specific country
 * List all collections belonging to a specific region
 * Get a specific collection from the database
+* Add new collection
+* Delete collection
 
 _Charter Manager_
 
