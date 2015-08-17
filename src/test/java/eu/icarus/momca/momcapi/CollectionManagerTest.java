@@ -1,9 +1,6 @@
 package eu.icarus.momca.momcapi;
 
-import eu.icarus.momca.momcapi.resource.Collection;
-import eu.icarus.momca.momcapi.resource.Country;
-import eu.icarus.momca.momcapi.resource.CountryCode;
-import eu.icarus.momca.momcapi.resource.Region;
+import eu.icarus.momca.momcapi.resource.*;
 import eu.icarus.momca.momcapi.xml.atom.IdCollection;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -160,6 +157,39 @@ public class CollectionManagerTest {
 
         cm.addCollection(identifier, name, authorEmail, country, region, imageServerAddress, identifier, keyword);
 
+    }
+
+    @Test
+    public void testDeleteCollection() throws Exception {
+
+        String identifier = "collectionToDelete";
+        String name = "Collection to delete";
+        String authorEmail = "admin";
+
+        Collection coll = cm.addCollection(identifier, name, authorEmail, null, null, null, null, null);
+        mc.addCollection(identifier, ResourceRoot.PUBLIC_CHARTERS.getUri()); // add charters collection to test removal
+        cm.deleteCollection(coll.getId());
+
+        assertFalse(cm.getCollection(new IdCollection(identifier)).isPresent());
+
+        // Test if collections are removed
+        String collectionUri = ResourceRoot.ARCHIVAL_COLLECTIONS.getUri() + "/" + identifier;
+        assertFalse(mc.getCollection(collectionUri).isPresent());
+        String chartersLocationUri = ResourceRoot.PUBLIC_CHARTERS.getUri() + "/" + identifier;
+        assertFalse(mc.getCollection(chartersLocationUri).isPresent());
+
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testDeleteCollectionWithExistingImportedCharters() throws Exception {
+        IdCollection id = new IdCollection("MedDocBulgEmp");
+        cm.deleteCollection(id);
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testDeleteCollectionWithExistingPublicCharters() throws Exception {
+        IdCollection id = new IdCollection("AbteiEberbach");
+        cm.deleteCollection(id);
     }
 
     @Test

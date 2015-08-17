@@ -45,19 +45,8 @@ public class CollectionManager extends AbstractManager {
             throw new IllegalArgumentException(message);
         }
 
-        String collectionUri = String.format("%s/%s", ResourceRoot.ARCHIVAL_COLLECTIONS.getUri(), identifier);
-        String resourceName = identifier + ".cei.xml";
-
-        Optional<Element> keywords = createKeywordsElement(keyWord);
-        Element cei = createCeiElement(identifier, name, country, region, imageServerAddress, imageFolderName);
-
-        Author author = new Author(authorEmail);
-        String now = momcaConnection.queryDatabase(ExistQueryFactory.getCurrentDateTime()).get(0);
-        Element resourceContent = new Entry(id, author, now, cei);
-
-        keywords.ifPresent(element -> resourceContent.insertChild(element, 6));
-
-        MomcaResource resource = new MomcaResource(resourceName, collectionUri, resourceContent.toXML());
+        MomcaResource resource = createNewCollectionResource(identifier, name, authorEmail, country, region,
+                imageServerAddress, imageFolderName, keyWord, id);
 
         momcaConnection.addCollection(identifier, ResourceRoot.ARCHIVAL_COLLECTIONS.getUri());
         momcaConnection.storeExistResource(resource);
@@ -67,6 +56,18 @@ public class CollectionManager extends AbstractManager {
     }
 
     public void deleteCollection(@NotNull IdCollection idCollection) {
+
+        if (!momcaConnection.getCharterManager().listChartersPublic(idCollection).isEmpty()
+                || !momcaConnection.getCharterManager().listChartersImport(idCollection).isEmpty()) {
+            String message = String.format("There are still existing charters for collection '%s'",
+                    idCollection.getCollectionIdentifier());
+            throw new IllegalArgumentException(message);
+        }
+
+        momcaConnection.deleteCollection(String.format("%s/%s",
+                ResourceRoot.PUBLIC_CHARTERS.getUri(), idCollection.getCollectionIdentifier()));
+        momcaConnection.deleteCollection(String.format("%s/%s",
+                ResourceRoot.ARCHIVAL_COLLECTIONS.getUri(), idCollection.getCollectionIdentifier()));
 
     }
 
@@ -143,6 +144,29 @@ public class CollectionManager extends AbstractManager {
         }
 
         return keywordsOptional;
+
+    }
+
+    @NotNull
+    private MomcaResource createNewCollectionResource(@NotNull String identifier, @NotNull String name,
+                                                      @NotNull String authorEmail, @Nullable Country country,
+                                                      @Nullable Region region, @Nullable String imageServerAddress,
+                                                      @Nullable String imageFolderName, @Nullable String keyWord,
+                                                      @NotNull IdCollection id) {
+
+        String collectionUri = String.format("%s/%s", ResourceRoot.ARCHIVAL_COLLECTIONS.getUri(), identifier);
+        String resourceName = identifier + ".cei.xml";
+
+        Optional<Element> keywords = createKeywordsElement(keyWord);
+        Element cei = createCeiElement(identifier, name, country, region, imageServerAddress, imageFolderName);
+
+        Author author = new Author(authorEmail);
+        String now = momcaConnection.queryDatabase(ExistQueryFactory.getCurrentDateTime()).get(0);
+        Element resourceContent = new Entry(id, author, now, cei);
+
+        keywords.ifPresent(element -> resourceContent.insertChild(element, 6));
+
+        return new MomcaResource(resourceName, collectionUri, resourceContent.toXML());
 
     }
 
