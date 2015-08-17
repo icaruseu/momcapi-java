@@ -8,10 +8,10 @@ package eu.icarus.momca.momcapi.resource;
  */
 public enum CharterStatus {
 
-    IMPORTED(ResourceRoot.METADATA_CHARTER_IMPORT),
-    PRIVATE(ResourceRoot.XRX_USER),
-    PUBLIC(ResourceRoot.METADATA_CHARTER_PUBLIC),
-    SAVED(ResourceRoot.METADATA_CHARTER_SAVED);
+    IMPORTED(ResourceRoot.IMPORTED_ARCHIVAL_CHARTERS),
+    PRIVATE(ResourceRoot.USER_DATA),
+    PUBLIC(ResourceRoot.PUBLIC_CHARTERS),
+    SAVED(ResourceRoot.ARCHIVAL_CHARTERS_BEING_EDITED);
 
     private final ResourceRoot resourceRoot;
 
@@ -20,7 +20,7 @@ public enum CharterStatus {
     }
 
     /**
-     * @return The ResourceRoot associated with the charter status, e.g. {@code METADATA_CHARTER_SAVED}
+     * @return The ResourceRoot associated with the charter status, e.g. {@code ARCHIVAL_CHARTERS_BEING_EDITED}
      * for a {@code SAVED} charter.
      */
     public ResourceRoot getResourceRoot() {

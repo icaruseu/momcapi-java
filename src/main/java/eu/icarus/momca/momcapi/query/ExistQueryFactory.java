@@ -56,7 +56,7 @@ public class ExistQueryFactory {
         String query = String.format(
                 "%s update delete doc('%s/mom.portal.xml')//eap:*[eap:code='%s']",
                 getNamespaceDeclaration(Namespace.EAP),
-                ResourceRoot.METADATA_PORTAL_PUBLIC.getUri(),
+                ResourceRoot.PORTAL_HIERARCHY.getUri(),
                 code);
 
         return new ExistQuery(query);
@@ -69,9 +69,9 @@ public class ExistQueryFactory {
                         "(doc('%s/mom.portal.xml')//eap:country[./eap:code='%s']/eap:nativeform/text(),\n" +
                         "    data(collection('%s')//cei:country[@id='%s']/text())))",
                 getNamespaceDeclaration(Namespace.CEI, Namespace.EAP),
-                ResourceRoot.METADATA_PORTAL_PUBLIC.getUri(),
+                ResourceRoot.PORTAL_HIERARCHY.getUri(),
                 countryCode.getCode(),
-                ResourceRoot.METADATA_COLLECTION_PUBLIC.getUri(),
+                ResourceRoot.ARCHIVAL_COLLECTIONS.getUri(),
                 countryCode.getCode());
 
         return new ExistQuery(query);
@@ -96,7 +96,7 @@ public class ExistQueryFactory {
         String query = String.format(
                 "%s doc('%s/mom.portal.xml')//eap:country[eap:code='%s']",
                 getNamespaceDeclaration(Namespace.EAP),
-                ResourceRoot.METADATA_PORTAL_PUBLIC.getUri(),
+                ResourceRoot.PORTAL_HIERARCHY.getUri(),
                 code);
 
         return new ExistQuery(query);
@@ -110,9 +110,9 @@ public class ExistQueryFactory {
                         "(doc('%s/mom.portal.xml')//eap:subdivision[eap:nativeform = '%s']/eap:code/text(),\n" +
                         "    data(collection('%s')//cei:provenance[cei:region= '%s']/cei:region/@id)))",
                 getNamespaceDeclaration(Namespace.CEI, Namespace.EAP),
-                ResourceRoot.METADATA_PORTAL_PUBLIC.getUri(),
+                ResourceRoot.PORTAL_HIERARCHY.getUri(),
                 regionNativeName,
-                ResourceRoot.METADATA_COLLECTION_PUBLIC.getUri(),
+                ResourceRoot.ARCHIVAL_COLLECTIONS.getUri(),
                 regionNativeName);
 
         return new ExistQuery(query);
@@ -176,7 +176,7 @@ public class ExistQueryFactory {
         String query = String.format(
                 "%s collection('%s')//atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM),
-                ResourceRoot.METADATA_ARCHIVE_PUBLIC.getUri());
+                ResourceRoot.ARCHIVES.getUri());
 
         return new ExistQuery(query);
 
@@ -192,7 +192,7 @@ public class ExistQueryFactory {
         String query = String.format(
                 "%s collection('%s')//atom:entry[.//eag:repositorid/@countrycode='%s']/atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM, Namespace.EAG),
-                ResourceRoot.METADATA_ARCHIVE_PUBLIC.getUri(),
+                ResourceRoot.ARCHIVES.getUri(),
                 countryCode.getCode());
 
         return new ExistQuery(query);
@@ -209,7 +209,7 @@ public class ExistQueryFactory {
         String query = String.format(
                 "%s collection('%s')//atom:entry[.//eag:firstdem/text()='%s']/atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM, Namespace.EAG),
-                ResourceRoot.METADATA_ARCHIVE_PUBLIC.getUri(),
+                ResourceRoot.ARCHIVES.getUri(),
                 regionName);
 
         return new ExistQuery(query);
@@ -222,7 +222,7 @@ public class ExistQueryFactory {
         String query = String.format(
                 "%s collection('%s/%s/%s')//atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM),
-                ResourceRoot.METADATA_CHARTER_IMPORT.getUri(),
+                ResourceRoot.IMPORTED_ARCHIVAL_CHARTERS.getUri(),
                 idFond.getArchiveIdentifier(),
                 idFond.getFondIdentifier());
 
@@ -236,7 +236,7 @@ public class ExistQueryFactory {
         String query = String.format(
                 "%s collection('%s/%s')//atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM),
-                ResourceRoot.METADATA_CHARTER_IMPORT.getUri(),
+                ResourceRoot.IMPORTED_ARCHIVAL_CHARTERS.getUri(),
                 idCollection.getCollectionIdentifier());
 
         return new ExistQuery(query);
@@ -249,7 +249,7 @@ public class ExistQueryFactory {
         String query = String.format(
                 "%s collection('%s')//atom:entry/atom:id/text()[contains(., 'charter') and contains(., '%s')]",
                 getNamespaceDeclaration(Namespace.ATOM),
-                ResourceRoot.XRX_USER.getUri(),
+                ResourceRoot.USER_DATA.getUri(),
                 idMyCollection.getMyCollectionIdentifier());
 
         return new ExistQuery(query);
@@ -262,7 +262,7 @@ public class ExistQueryFactory {
         String query = String.format(
                 "%s collection('%s')//atom:entry[contains(./atom:id/text(), 'charter')][./atom:author/atom:email/text()='%s']/atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM),
-                ResourceRoot.XRX_USER.getUri(),
+                ResourceRoot.USER_DATA.getUri(),
                 user.getUserName());
 
         return new ExistQuery(query);
@@ -275,7 +275,7 @@ public class ExistQueryFactory {
         String query = String.format(
                 "%s collection('%s/%s/%s')//atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM),
-                ResourceRoot.METADATA_CHARTER_PUBLIC.getUri(),
+                ResourceRoot.PUBLIC_CHARTERS.getUri(),
                 idFond.getArchiveIdentifier(),
                 idFond.getFondIdentifier());
 
@@ -289,7 +289,7 @@ public class ExistQueryFactory {
         String query = String.format(
                 "%s collection('%s/%s')//atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM),
-                ResourceRoot.METADATA_CHARTER_PUBLIC.getUri(),
+                ResourceRoot.PUBLIC_CHARTERS.getUri(),
                 idCollection.getCollectionIdentifier());
 
         return new ExistQuery(query);
@@ -302,7 +302,7 @@ public class ExistQueryFactory {
         String query = String.format(
                 "%s collection('%s/%s')//atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM),
-                ResourceRoot.METADATA_CHARTER_PUBLIC.getUri(),
+                ResourceRoot.PUBLIC_CHARTERS.getUri(),
                 idMyCollection.getMyCollectionIdentifier());
 
         return new ExistQuery(query);
@@ -315,7 +315,7 @@ public class ExistQueryFactory {
         String query = String.format(
                 "%s collection('%s')//atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM),
-                ResourceRoot.METADATA_CHARTER_SAVED.getUri());
+                ResourceRoot.ARCHIVAL_CHARTERS_BEING_EDITED.getUri());
 
         return new ExistQuery(query);
 
@@ -330,7 +330,7 @@ public class ExistQueryFactory {
         String query = String.format(
                 "%s collection('%s')//atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM),
-                ResourceRoot.METADATA_COLLECTION_PUBLIC.getUri());
+                ResourceRoot.ARCHIVAL_COLLECTIONS.getUri());
 
         return new ExistQuery(query);
 
@@ -346,7 +346,7 @@ public class ExistQueryFactory {
         String query = String.format(
                 "%s collection('%s')//atom:entry[.//cei:country/@id='%s']/atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM, Namespace.CEI),
-                ResourceRoot.METADATA_COLLECTION_PUBLIC.getUri(),
+                ResourceRoot.ARCHIVAL_COLLECTIONS.getUri(),
                 countryCode.getCode());
 
         return new ExistQuery(query);
@@ -363,7 +363,7 @@ public class ExistQueryFactory {
         String query = String.format(
                 "%s collection('%s')//atom:entry[.//cei:region/text()='%s']/atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM, Namespace.CEI),
-                ResourceRoot.METADATA_COLLECTION_PUBLIC.getUri(),
+                ResourceRoot.ARCHIVAL_COLLECTIONS.getUri(),
                 regionName);
 
         return new ExistQuery(query);
@@ -381,8 +381,8 @@ public class ExistQueryFactory {
                 "%s distinct-values((doc('%s/mom.portal.xml')//eap:country/eap:code[text() != '']/text(),\n" +
                         "    data(collection('%s')//cei:country[@id != '']/@id)))",
                 getNamespaceDeclaration(Namespace.CEI, Namespace.EAP),
-                ResourceRoot.METADATA_PORTAL_PUBLIC.getUri(),
-                ResourceRoot.METADATA_COLLECTION_PUBLIC.getUri());
+                ResourceRoot.PORTAL_HIERARCHY.getUri(),
+                ResourceRoot.ARCHIVAL_COLLECTIONS.getUri());
 
         return new ExistQuery(query);
 
@@ -398,7 +398,7 @@ public class ExistQueryFactory {
         String query = String.format(
                 "%s collection('%s')//atom:id[contains(., '%s')]/text()",
                 getNamespaceDeclaration(Namespace.ATOM),
-                ResourceRoot.METADATA_FOND_PUBLIC.getUri(),
+                ResourceRoot.ARCHIVAL_FONDS.getUri(),
                 idArchive.getArchiveIdentifier());
 
         return new ExistQuery(query);
@@ -412,9 +412,9 @@ public class ExistQueryFactory {
                         "doc('%s/mom.portal.xml')//eap:country[eap:code = '%s']//eap:subdivision/eap:nativeform/text(),\n" +
                         "    data(collection('%s')//cei:provenance[cei:country/@id = '%s']/cei:region/text())))",
                 getNamespaceDeclaration(Namespace.CEI, Namespace.EAP),
-                ResourceRoot.METADATA_PORTAL_PUBLIC.getUri(),
+                ResourceRoot.PORTAL_HIERARCHY.getUri(),
                 countryCode.getCode(),
-                ResourceRoot.METADATA_COLLECTION_PUBLIC.getUri(),
+                ResourceRoot.ARCHIVAL_COLLECTIONS.getUri(),
                 countryCode.getCode());
 
         return new ExistQuery(query);

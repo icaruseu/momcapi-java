@@ -65,7 +65,7 @@ public class UserManager extends AbstractManager {
             }
 
             String xmlContent = createUserResourceContent(userName, moderatorName, firstName, lastName);
-            MomcaResource userResource = new MomcaResource(userName + ".xml", ResourceRoot.XRX_USER.getUri(), xmlContent);
+            MomcaResource userResource = new MomcaResource(userName + ".xml", ResourceRoot.USER_DATA.getUri(), xmlContent);
             momcaConnection.storeExistResource(userResource);
             initializeUser(new User(userResource), password);
 
@@ -145,7 +145,7 @@ public class UserManager extends AbstractManager {
         deleteExistUserAccount(userName);
 
         momcaConnection.deleteExistResource(user);
-        momcaConnection.deleteCollection(ResourceRoot.XRX_USER.getUri() + "/" + userName);
+        momcaConnection.deleteCollection(ResourceRoot.USER_DATA.getUri() + "/" + userName);
 
     }
 
@@ -158,7 +158,7 @@ public class UserManager extends AbstractManager {
     @NotNull
     public Optional<User> getUser(@NotNull String userName) {
         boolean isInitialized = isUserInitialized(userName);
-        return momcaConnection.getExistResource(userName + ".xml", ResourceRoot.XRX_USER.getUri())
+        return momcaConnection.getExistResource(userName + ".xml", ResourceRoot.USER_DATA.getUri())
                 .flatMap(existResource -> Optional.of(new User(existResource, isInitialized)));
     }
 
@@ -276,14 +276,14 @@ public class UserManager extends AbstractManager {
     private List<String> listUserResourceNames() {
 
         List<String> users = new ArrayList<>();
-        momcaConnection.getCollection(ResourceRoot.XRX_USER.getUri()).ifPresent(collection -> {
+        momcaConnection.getCollection(ResourceRoot.USER_DATA.getUri()).ifPresent(collection -> {
 
             String[] encodedUserNames;
 
             try {
                 encodedUserNames = collection.listResources();
             } catch (XMLDBException e) {
-                String message = String.format("Failed to list resources in collection '%s'.", ResourceRoot.XRX_USER.getUri());
+                String message = String.format("Failed to list resources in collection '%s'.", ResourceRoot.USER_DATA.getUri());
                 throw new MomcaException(message, e);
             }
 

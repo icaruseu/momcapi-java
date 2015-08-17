@@ -8,20 +8,20 @@ package eu.icarus.momca.momcapi.resource;
  */
 public enum ResourceRoot {
 
-    METADATA_ANNOTATION("/db/mom-data/metadata.annotation"),
-    METADATA_ARCHIVE_PUBLIC("/db/mom-data/metadata.archive.public"),
-    METADATA_CHARTER_IMPORT("/db/mom-data/metadata.charter.import"),
-    METADATA_CHARTER_IMPORT_UTIL("/db/mom-data/metadata.charter.import.util"),
-    METADATA_CHARTER_PUBLIC("/db/mom-data/metadata.charter.public"),
-    METADATA_CHARTER_SAVED("/db/mom-data/metadata.charter.saved"),
-    METADATA_COLLECTION_PUBLIC("/db/mom-data/metadata.collection.public"),
-    METADATA_FOND_PUBLIC("/db/mom-data/metadata.fond.public"),
-    METADATA_IMAGE_COLLECTIONS("/db/mom-data/metadata.imagecollections"),
-    METADATA_MY_COLLECTION_PUBLIC("/db/mom-data/metadata.mycollection.public"),
-    METADATA_PORTAL_PUBLIC("/db/mom-data/metadata.portal.public"),
-    XRX_HTDOC("/db/mom-data/xrx.htdoc"),
-    XRX_I18N("/db/mom-data/xrx.i18n"),
-    XRX_USER("/db/mom-data/xrx.user");
+    ANNOTATIONS("/db/mom-data/metadata.annotation"),
+    ARCHIVAL_CHARTERS_BEING_EDITED("/db/mom-data/metadata.charter.saved"),
+    ARCHIVAL_COLLECTIONS("/db/mom-data/metadata.collection.public"),
+    ARCHIVAL_FONDS("/db/mom-data/metadata.fond.public"),
+    ARCHIVES("/db/mom-data/metadata.archive.public"),
+    HTDOC("/db/mom-data/xrx.htdoc"),
+    I18N("/db/mom-data/xrx.i18n"),
+    IMAGE_COLLECTIONS("/db/mom-data/metadata.imagecollections"),
+    IMPORTED_ARCHIVAL_CHARTERS("/db/mom-data/metadata.charter.import"),
+    PORTAL_HIERARCHY("/db/mom-data/metadata.portal.public"),
+    PUBLIC_CHARTERS("/db/mom-data/metadata.charter.public"),
+    PUBLISHED_USER_COLLECTIONS("/db/mom-data/metadata.mycollection.public"),
+    SAVED_IMPORT_SOURCE_FILES("/db/mom-data/metadata.charter.import.util"),
+    USER_DATA("/db/mom-data/xrx.user");
 
     private final String uri;
 

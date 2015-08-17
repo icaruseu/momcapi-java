@@ -102,7 +102,7 @@ public class CharterManager extends AbstractManager {
     @NotNull
     public List<IdCharter> listErroneouslySavedCharters(@NotNull User user) {
         return user.listSavedCharterIds().stream()
-                .filter(idCharter -> !isCharterExisting(idCharter, ResourceRoot.METADATA_CHARTER_SAVED))
+                .filter(idCharter -> !isCharterExisting(idCharter, ResourceRoot.ARCHIVAL_CHARTERS_BEING_EDITED))
                 .collect(Collectors.toList());
     }
 
