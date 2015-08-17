@@ -67,6 +67,20 @@ public class XpathQueryTest {
     }
 
     @Test
+    public void testQUERY_CEI_IMAGE_SERVER_ADDRESS() throws Exception {
+        List<String> result = queryContentAsList(resource, XpathQuery.QUERY_CEI_IMAGE_SERVER_ADDRESS);
+        assertEquals(result.size(), 1);
+        assertEquals(result.get(0), "ceiImageServerAddress");
+    }
+
+    @Test
+    public void testQUERY_CEI_IMAGE_SERVER_FOLDER() throws Exception {
+        List<String> result = queryContentAsList(resource, XpathQuery.QUERY_CEI_IMAGE_SERVER_FOLDER);
+        assertEquals(result.size(), 1);
+        assertEquals(result.get(0), "ceiImageServerFolder");
+    }
+
+    @Test
     public void testQUERY_CEI_ISSUED() throws Exception {
         List<String> result = queryContentAsList(resource, XpathQuery.QUERY_CEI_ISSUED);
         assertEquals(result.size(), 1);
@@ -223,6 +237,13 @@ public class XpathQueryTest {
         List<String> result = queryContentAsList(resource, XpathQuery.QUERY_XRX_IMAGE_SERVER_BASE_URL);
         assertEquals(result.size(), 1);
         assertEquals(result.get(0), "http://example.com/images");
+    }
+
+    @Test
+    public void testQUERY_XRX_KEYWORD() throws Exception {
+        List<String> result = queryContentAsList(resource, XpathQuery.QUERY_XRX_KEYWORD);
+        assertEquals(result.size(), 1);
+        assertEquals(result.get(0), "xrxKeyword");
     }
 
     @Test

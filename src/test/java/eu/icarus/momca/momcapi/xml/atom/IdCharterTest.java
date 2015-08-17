@@ -35,9 +35,39 @@ public class IdCharterTest {
         assertEquals(id.getId(), COLLECTION_CHARTER_ID);
     }
 
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testConstructorForCollectionCharterWithEmptyCollection() throws Exception {
+        IdCharter id = new IdCharter("", COLLECTION_CHARTER_IDNO);
+        assertEquals(id.getId(), COLLECTION_CHARTER_ID);
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testConstructorForCollectionCharterWithEmptyIdentifier() throws Exception {
+        IdCharter id = new IdCharter(COLLECTION_ID, "");
+        assertEquals(id.getId(), COLLECTION_CHARTER_ID);
+    }
+
     @Test
     public void testConstructorForFondCharter() throws Exception {
         IdCharter id = new IdCharter(ARCHIVE_ID, FOND_ID, FOND_CHARTER_IDNO);
+        assertEquals(id.getId(), FOND_CHARTER_ID);
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testConstructorForFondCharterWithEmptyArchive() throws Exception {
+        IdCharter id = new IdCharter("", FOND_ID, FOND_CHARTER_IDNO);
+        assertEquals(id.getId(), FOND_CHARTER_ID);
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testConstructorForFondCharterWithEmptyFond() throws Exception {
+        IdCharter id = new IdCharter(ARCHIVE_ID, "", FOND_CHARTER_IDNO);
+        assertEquals(id.getId(), FOND_CHARTER_ID);
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testConstructorForFondCharterWithEmptyIdentifier() throws Exception {
+        IdCharter id = new IdCharter(ARCHIVE_ID, FOND_ID, "");
         assertEquals(id.getId(), FOND_CHARTER_ID);
     }
 
@@ -46,6 +76,12 @@ public class IdCharterTest {
         IdCharter id = new IdCharter(FOND_CHARTER_ID);
         assertEquals(id.getId(), FOND_CHARTER_ID);
         assertEquals(id.getCharterIdentifier(), FOND_CHARTER_IDNO);
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testConstructorWithEmptyId() throws Exception {
+        String emptyId = "";
+        new IdCharter(emptyId);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)

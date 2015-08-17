@@ -17,6 +17,8 @@
                 <cei:graphic url="urlvalue1"/>
             </cei:figure>
         </cei:witnessOrig>
+        <cei:image_server_address>ceiImageServerAddress</cei:image_server_address>
+        <cei:image_server_folder>ceiImageServerFolder</cei:image_server_folder>
         <cei:provenance abbr="ceiProvenanceAbbr">ceiProvenanceText</cei:provenance>
         <cei:country id="ceiCountryId">ceiCountryText</cei:country>
         <cei:region id="ceiRegionId">ceiRegionText</cei:region>
@@ -44,6 +46,9 @@
         <xrx:email>xrxemail</xrx:email>
         <xrx:moderator>xrxmoderator</xrx:moderator>
         <xrx:name>xrxname</xrx:name>
+        <xrx:keywords>
+            <xrx:keyword>xrxKeyword</xrx:keyword>
+        </xrx:keywords>
         <xrx:saved>
             <xrx:id>xrxsaved</xrx:id>
         </xrx:saved>

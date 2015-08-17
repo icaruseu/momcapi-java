@@ -70,20 +70,6 @@ public class ArchiveManagerTest {
 
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testAddArchiveWithNotexistingAuthor() throws Exception {
-
-        Country country = mc.getCountryManager().getCountry(new CountryCode("DE")).get();
-        Region region = country.getRegions().stream().filter(r -> r.getCode().get().equals("DE-BW")).findFirst().get();
-        Address address = new Address("Stuttgart", "01234", "Somewhere");
-        ContactInformation contactInformation =
-                new ContactInformation("http://example.com", "01234557", "0123458952", "alpha@example.com");
-
-        am.addArchive("notExisting", "DE-GLAK", "Landesarchiv Baden-Württemberg, Abt. Generallandesarchiv Karlsruhe",
-                country, region, address, contactInformation, "http://example.com/image.png");
-
-    }
-
     @Test
     public void testDeleteArchive() throws Exception {
 

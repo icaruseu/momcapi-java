@@ -25,9 +25,16 @@ public class IdFond extends Id {
      *                          .
      */
     public IdFond(@NotNull String archiveIdentifier, @NotNull String fondIdentifier) {
+
         super(String.format("%s/%s/%s", ResourceType.FOND.getNameInId(), archiveIdentifier, fondIdentifier));
+
+        if (archiveIdentifier.isEmpty() || fondIdentifier.isEmpty()) {
+            throw new IllegalArgumentException("A valid fond id needs to have non-empty archive- and fondidentifiers.");
+        }
+
         this.archiveIdentifier = archiveIdentifier;
         this.fondIdentifier = fondIdentifier;
+
     }
 
     /**

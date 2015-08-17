@@ -41,14 +41,15 @@ public class FondManager extends AbstractManager {
             throw new IllegalArgumentException(message);
         }
 
-        if (identifier.isEmpty() || name.isEmpty()) {
-            throw new IllegalArgumentException("The fond needs both an identifier and a name!");
-        }
-
         IdFond id = new IdFond(archive.getIdentifier(), identifier);
 
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException("The fond about to be added is not allowed to have an empty name!");
+        }
+
         if (getFond(id).isPresent()) {
-            throw new IllegalArgumentException("An fond for the id '" + id.getId() + "' is already existing.");
+            String message = String.format("An fond for the id '%s' is already existing.", id.getId());
+            throw new IllegalArgumentException(message);
         }
 
         String archiveCollectionUri = ResourceRoot.ARCHIVAL_FONDS.getUri() + "/" + archive.getIdentifier();

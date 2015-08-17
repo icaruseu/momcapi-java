@@ -102,8 +102,8 @@ public class Charter extends MomcaResource {
      * @return The Author.
      */
     @NotNull
-    public Optional<Author> getAuthor() {
-        return author;
+    public Optional<String> getAuthorName() {
+        return author.map(Author::getEmail);
     }
 
     /**

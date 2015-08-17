@@ -25,6 +25,8 @@ public enum XpathQuery {
     QUERY_CEI_COUNTRY_ID("//cei:country/@id", Namespace.CEI),
     QUERY_CEI_REGION_TEXT("//cei:region/text()", Namespace.CEI),
     QUERY_CEI_REGION_ID("//cei:region/@id", Namespace.CEI),
+    QUERY_CEI_IMAGE_SERVER_ADDRESS("//cei:image_server_address/text()", Namespace.CEI),
+    QUERY_CEI_IMAGE_SERVER_FOLDER("//cei:image_server_folder/text()", Namespace.CEI),
     QUERY_CEI_ISSUED("//cei:issued", Namespace.CEI),
     QUERY_CEI_PROVENANCE_TEXT("//cei:provenance/text()", Namespace.CEI),
     QUERY_CEI_PROVENANCE_ABBR("//cei:provenance/@abbr", Namespace.CEI),
@@ -42,6 +44,7 @@ public enum XpathQuery {
     QUERY_XRX_IMAGE_ACCESS("//xrx:param[@name='image-access']/text()", Namespace.XRX),
     QUERY_XRX_DUMMY_IMAGE_URL("//xrx:param[@name='dummy-image-url']/text()", Namespace.XRX),
     QUERY_XRX_IMAGE_SERVER_BASE_URL("//xrx:param[@name='image-server-base-url']/text()", Namespace.XRX),
+    QUERY_XRX_KEYWORD("//xrx:keyword/text()", Namespace.XRX),
     QUERY_XRX_MODERATOR("//xrx:moderator/text()", Namespace.XRX),
     QUERY_XRX_NAME("//xrx:name/text()", Namespace.XRX),
     QUERY_XRX_SAVED_ID("//xrx:saved/xrx:id/text()", Namespace.XRX);

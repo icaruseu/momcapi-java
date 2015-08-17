@@ -28,6 +28,22 @@ public class IdFondTest {
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testConstructorWithEmptyArchive() throws Exception {
+        new IdFond("", "Urkunden");
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testConstructorWithEmptyFond() throws Exception {
+        new IdFond("CH-KAE", "");
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testConstructorWithEmptyId() throws Exception {
+        String emptyId = "";
+        new IdFond(emptyId);
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConstructorWithFaultyId() throws Exception {
         String faultyId = "tag:www.monasterium.net,2011:/fond/CH-KAE";
         new IdFond(faultyId);

@@ -26,29 +26,24 @@ public class ArchiveManager extends AbstractManager {
     }
 
     @NotNull
-    public Archive addArchive(@NotNull String authorEmail, @NotNull String shortName, @NotNull String name,
+    public Archive addArchive(@NotNull String authorEmail, @NotNull String identifier, @NotNull String name,
                               @NotNull Country country, @Nullable Region region, @NotNull Address address,
                               @NotNull ContactInformation contactInformation, @NotNull String logoUrl) {
 
-        IdArchive id = new IdArchive(shortName);
+        IdArchive id = new IdArchive(identifier);
 
         if (getArchive(id).isPresent()) {
             String message = String.format("The archive '%s' that is to be added already exists.", id);
             throw new IllegalArgumentException(message);
         }
 
-        if (!momcaConnection.getUserManager().getUser(authorEmail).isPresent()) {
-            String message = String.format("The author '%s' is not existing in the database.", authorEmail);
-            throw new IllegalArgumentException(message);
-        }
-
         String archivesCollection = ResourceRoot.ARCHIVES.getUri();
-        momcaConnection.addCollection(shortName, archivesCollection);
+        momcaConnection.addCollection(identifier, archivesCollection);
 
-        String resourceName = shortName + ".eag.xml";
-        String parentCollectionUri = archivesCollection + "/" + shortName;
+        String resourceName = identifier + ".eag.xml";
+        String parentCollectionUri = archivesCollection + "/" + identifier;
         Element resourceContent = createNewArchiveResourceContent(authorEmail,
-                shortName, name, country, region, address, contactInformation, logoUrl);
+                identifier, name, country, region, address, contactInformation, logoUrl);
 
         MomcaResource resource = new MomcaResource(resourceName,
                 parentCollectionUri, resourceContent.toXML());

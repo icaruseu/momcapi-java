@@ -26,6 +26,12 @@ public class IdCollectionTest {
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testConstructorWithEmptyId() throws Exception {
+        String emptyId = "";
+        new IdCollection(emptyId);
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConstructorWithFaultyId() throws Exception {
         String faultyId = "tag:www.monasterium.net,2011:/collection/CH-KAE/Urkunden/Urkunde_1";
         new IdCollection(faultyId);

@@ -83,6 +83,10 @@ public class IdCharter extends Id {
 
         super(ResourceType.CHARTER.getNameInId(), archiveIdentifier, fondIdentifier, charterIdentifier);
 
+        if (archiveIdentifier.isEmpty() || fondIdentifier.isEmpty() || charterIdentifier.isEmpty()) {
+            throw new IllegalArgumentException("The id is not allowed to have any empty identifier strings.");
+        }
+
         this.archiveIdentifier = Optional.of(archiveIdentifier);
         this.fondIdentifier = Optional.of(fondIdentifier);
         this.charterIdentifier = charterIdentifier;
@@ -99,6 +103,10 @@ public class IdCharter extends Id {
     public IdCharter(@NotNull String collectionIdentifier, @NotNull String charterIdentifier) {
 
         super(ResourceType.CHARTER.getNameInId(), collectionIdentifier, charterIdentifier);
+
+        if (collectionIdentifier.isEmpty() || charterIdentifier.isEmpty()) {
+            throw new IllegalArgumentException("The id is not allowed to have any empty identifier strings.");
+        }
 
         this.collectionIdentifier = Optional.of(collectionIdentifier);
         this.charterIdentifier = charterIdentifier;

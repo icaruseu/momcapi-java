@@ -31,7 +31,6 @@ public class IdCollection extends Id {
                 ? collectionIdentifier
                 : String.format("%s/%s", ResourceType.COLLECTION.getNameInId(), collectionIdentifier));
 
-
         if (isId(collectionIdentifier) && !isCollectionId(collectionIdentifier)) {
             String message = String.format("'%s' is not a valid collection atom:id.", collectionIdentifier);
             throw new IllegalArgumentException(message);
