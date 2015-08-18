@@ -17,33 +17,32 @@ public class IdCollectionTest {
         String atomIdXml = "<atom:id xmlns:atom=\"http://www.w3.org/2005/Atom\">" +
                 "tag:www.monasterium.net,2011:/collection/MedDocBulgEmp</atom:id>";
 
-        IdCollection id = new IdCollection(identifier);
-        assertEquals(id.getAtomId().toXML(), atomIdXml);
-        assertEquals(id.getIdentifier(), identifier);
-        assertEquals(id.getAtomId().getText(), atomIdText);
+        IdCollection id1 = new IdCollection(identifier);
+        assertEquals(id1.getAtomId().toXML(), atomIdXml);
+        assertEquals(id1.getIdentifier(), identifier);
+        assertEquals(id1.getAtomId().getText(), atomIdText);
+
+        IdCollection id2 = new IdCollection(new AtomId(atomIdText));
+        assertEquals(id2.getAtomId().toXML(), atomIdXml);
+        assertEquals(id2.getIdentifier(), identifier);
+        assertEquals(id2.getAtomId().getText(), atomIdText);
 
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testConstructorWithWrongIdType() throws Exception {
+    public void testConstructorWithWrongAtomIdType() throws Exception {
         AtomId archiveAtomId = new AtomId("tag:www.monasterium.net,2011:/archive/CH-KAE");
         new IdCollection(archiveAtomId);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testConstructorWithEmptyId() throws Exception {
+    public void testConstructorWithEmptyIdentifier() throws Exception {
         String emptyId = "";
         new IdCollection(emptyId);
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testConstructorWithWrongIdentifier() throws Exception {
-        String archiveId = "tag:www.monasterium.net,2011:/archive/CH-KAE";
-        new IdCollection(archiveId);
-    }
-
     @Test
-    public void testGetCollectionIdentifier() throws Exception {
+    public void testGetIdentifier() throws Exception {
 
         String collectionIdentifier = "MedDocBulgEmp";
         IdCollection id1 = new IdCollection(collectionIdentifier);

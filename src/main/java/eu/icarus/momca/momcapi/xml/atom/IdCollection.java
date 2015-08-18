@@ -14,27 +14,24 @@ import org.jetbrains.annotations.NotNull;
  */
 public class IdCollection extends IdAbstract {
 
-    private static final int VALID_ID_PARTS = 3;
-
     public IdCollection(@NotNull String identifier) {
         super(initAtomId(identifier), identifier);
     }
 
     public IdCollection(@NotNull AtomId atomId) {
+
         super(atomId, initIdentifier(atomId));
+
+        if(getAtomId().getType() != ResourceType.COLLECTION) {
+            throw new IllegalArgumentException(getAtomId().getText() + " is not a collection atom:id text.");
+        }
+
     }
 
     @NotNull
     private static String initIdentifier(@NotNull AtomId atomId) {
-
         String[] idParts = atomId.getText().split("/");
-
-        if (atomId.getType() != ResourceType.COLLECTION || idParts.length != VALID_ID_PARTS) {
-            throw new IllegalArgumentException(atomId.getText() + " is not a valid collection id.");
-        }
-
         return idParts[idParts.length - 1];
-
     }
 
     private static AtomId initAtomId(@NotNull String identifier) {
