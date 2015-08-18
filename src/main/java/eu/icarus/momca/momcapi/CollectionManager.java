@@ -4,7 +4,7 @@ import eu.icarus.momca.momcapi.query.ExistQueryFactory;
 import eu.icarus.momca.momcapi.resource.*;
 import eu.icarus.momca.momcapi.xml.Namespace;
 import eu.icarus.momca.momcapi.xml.atom.AtomAuthor;
-import eu.icarus.momca.momcapi.xml.atom.Entry;
+import eu.icarus.momca.momcapi.xml.atom.AtomEntry;
 import eu.icarus.momca.momcapi.xml.atom.IdCollection;
 import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
@@ -162,7 +162,7 @@ public class CollectionManager extends AbstractManager {
 
         AtomAuthor atomAuthor = new AtomAuthor(authorEmail);
         String now = momcaConnection.queryDatabase(ExistQueryFactory.getCurrentDateTime()).get(0);
-        Element resourceContent = new Entry(id, atomAuthor, now, cei);
+        Element resourceContent = new AtomEntry(id, atomAuthor, now, cei);
 
         keywords.ifPresent(element -> resourceContent.insertChild(element, 6));
 

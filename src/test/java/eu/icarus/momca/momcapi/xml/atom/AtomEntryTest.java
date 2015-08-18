@@ -9,7 +9,7 @@ import static org.testng.Assert.assertEquals;
 /**
  * Created by djell on 08/08/2015.
  */
-public class EntryTest {
+public class AtomEntryTest {
 
     @Test
     public void testConstructor() throws Exception {
@@ -21,9 +21,9 @@ public class EntryTest {
         String currentDateTime = "2011-05-30T20:31:19.638+02:00";
         Element childContent = new Element("eag:eag", Namespace.EAG.getUri());
 
-        Entry entry = new Entry(id, atomAuthor, currentDateTime, childContent);
+        AtomEntry atomEntry = new AtomEntry(id, atomAuthor, currentDateTime, childContent);
 
-        assertEquals(entry.toXML(), correctXml);
+        assertEquals(atomEntry.toXML(), correctXml);
 
     }
 }

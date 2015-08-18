@@ -4,7 +4,7 @@ import eu.icarus.momca.momcapi.query.ExistQueryFactory;
 import eu.icarus.momca.momcapi.resource.*;
 import eu.icarus.momca.momcapi.xml.Namespace;
 import eu.icarus.momca.momcapi.xml.atom.AtomAuthor;
-import eu.icarus.momca.momcapi.xml.atom.Entry;
+import eu.icarus.momca.momcapi.xml.atom.AtomEntry;
 import eu.icarus.momca.momcapi.xml.atom.IdArchive;
 import eu.icarus.momca.momcapi.xml.eag.Desc;
 import nu.xom.Attribute;
@@ -140,7 +140,7 @@ public class ArchiveManager extends AbstractManager {
         Desc desc = new Desc(country.getNativeName(), regionNativeName, address, contactInformation, logoUrl);
         Element eag = createEagElement(shortName, name, country.getCountryCode().getCode(), desc);
 
-        return new Entry(id, atomAuthor, now, eag);
+        return new AtomEntry(id, atomAuthor, now, eag);
 
     }
 

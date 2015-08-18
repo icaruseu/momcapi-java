@@ -8,9 +8,9 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by djell on 08/08/2015.
  */
-public class Entry extends Element {
+public class AtomEntry extends Element {
 
-    public Entry(@NotNull Id id, @NotNull AtomAuthor atomAuthor, @NotNull String currentDateTime, @NotNull Element childContent) {
+    public AtomEntry(@NotNull Id id, @NotNull AtomAuthor atomAuthor, @NotNull String currentDateTime, @NotNull Element childContent) {
         super("atom:entry", Namespace.ATOM.getUri());
         initContent(atomAuthor, currentDateTime, id, childContent);
     }
