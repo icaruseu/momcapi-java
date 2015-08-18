@@ -37,7 +37,7 @@ public class FondManager extends AbstractManager {
         if (!momcaConnection.getArchiveManager().getArchive(archive.getId()).isPresent()) {
             String message = String.format(
                     "The archive you're trying to add a fond into doesn't exist in the database: %s",
-                    archive.getId().getText());
+                    archive.getId().getIdentifier());
             throw new IllegalArgumentException(message);
         }
 

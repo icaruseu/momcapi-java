@@ -44,13 +44,13 @@ public class IdCollectionTest {
     @Test
     public void testGetIdentifier() throws Exception {
 
-        String collectionIdentifier = "MedDocBulgEmp";
-        IdCollection id1 = new IdCollection(collectionIdentifier);
-        assertEquals(id1.getIdentifier(), collectionIdentifier);
+        String identifier = "MedDocBulgEmp";
+        IdCollection id1 = new IdCollection(identifier);
+        assertEquals(id1.getIdentifier(), identifier);
 
         AtomId atomId = new AtomId("tag:www.monasterium.net,2011:/collection/MedDocBulgEmp");
         IdCollection id2 = new IdCollection(atomId);
-        assertEquals(id2.getIdentifier(), collectionIdentifier);
+        assertEquals(id2.getIdentifier(), identifier);
 
     }
 

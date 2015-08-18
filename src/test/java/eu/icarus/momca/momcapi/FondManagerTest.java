@@ -41,7 +41,7 @@ public class FondManagerTest {
 
         assertEquals(fond1.getId().getText(), "tag:www.monasterium.net,2011:/fond/DE-SAMuenchen/Urkunden");
         assertEquals(fond1.getIdentifier(), "Urkunden");
-        assertEquals(fond1.getArchiveId().getText(), "tag:www.monasterium.net,2011:/archive/DE-SAMuenchen");
+        assertEquals(fond1.getArchiveId().getAtomId().getText(), "tag:www.monasterium.net,2011:/archive/DE-SAMuenchen");
         assertEquals(fond1.getName(), "Alle Urkunden");
         assertEquals(fond1.getImageAccess().get(), ImageAccess.FREE);
         assertEquals(fond1.getImagesUrl().get().toExternalForm(), "http://ex.com/img");

@@ -40,7 +40,7 @@ public class ArchiveManagerTest {
         Archive newArchive = am.addArchive(author, shortName, name, country, region, address, contactInformation, logoUrl);
         am.deleteArchive(newArchive);
 
-        assertEquals(newArchive.getId().getArchiveIdentifier(), shortName);
+        assertEquals(newArchive.getId().getIdentifier(), shortName);
 
         assertEquals(newArchive.getIdentifier(), shortName);
         assertEquals(newArchive.getName(), name);

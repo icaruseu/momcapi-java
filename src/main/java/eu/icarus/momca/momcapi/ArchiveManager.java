@@ -63,15 +63,15 @@ public class ArchiveManager extends AbstractManager {
         }
 
         momcaConnection.deleteCollection(String.format("%s/%s",
-                ResourceRoot.ARCHIVES.getUri(), archive.getId().getArchiveIdentifier()));
+                ResourceRoot.ARCHIVES.getUri(), archive.getId().getIdentifier()));
         momcaConnection.deleteCollection(String.format("%s/%s",
-                ResourceRoot.ARCHIVAL_FONDS.getUri(), archive.getId().getArchiveIdentifier()));
+                ResourceRoot.ARCHIVAL_FONDS.getUri(), archive.getId().getIdentifier()));
 
     }
 
     @NotNull
     public Optional<Archive> getArchive(@NotNull IdArchive idArchive) {
-        return getMomcaResource(idArchive).map(Archive::new);
+        return getMomcaResource(idArchive.getAtomId()).map(Archive::new);
     }
 
 
@@ -140,7 +140,7 @@ public class ArchiveManager extends AbstractManager {
         Desc desc = new Desc(country.getNativeName(), regionNativeName, address, contactInformation, logoUrl);
         Element eag = createEagElement(shortName, name, country.getCountryCode().getCode(), desc);
 
-        return new AtomEntry(id, atomAuthor, now, eag);
+        return new AtomEntry(id.getAtomId(), atomAuthor, now, eag);
 
     }
 

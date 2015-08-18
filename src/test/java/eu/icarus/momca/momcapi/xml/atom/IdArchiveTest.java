@@ -12,49 +12,45 @@ public class IdArchiveTest {
     @Test
     public void testConstructor() throws Exception {
 
-        String archiveIdentifier = "CH-KAE";
-        String idArchive = "tag:www.monasterium.net,2011:/archive/CH-KAE";
-        String correctXml = "<atom:id xmlns:atom=\"http://www.w3.org/2005/Atom\">" +
+        String identifier = "CH-KAE";
+        String atomIdText = "tag:www.monasterium.net,2011:/archive/CH-KAE";
+        String atomIdXml = "<atom:id xmlns:atom=\"http://www.w3.org/2005/Atom\">" +
                 "tag:www.monasterium.net,2011:/archive/CH-KAE</atom:id>";
 
-        IdArchive id1 = new IdArchive(archiveIdentifier);
-        assertEquals(id1.toXML(), correctXml);
+        IdArchive id1 = new IdArchive(identifier);
+        assertEquals(id1.getAtomId().toXML(), atomIdXml);
+        assertEquals(id1.getIdentifier(), identifier);
+        assertEquals(id1.getAtomId().getText(), atomIdText);
 
-        IdArchive id2 = new IdArchive(idArchive);
-        assertEquals(id2.toXML(), correctXml);
+        IdArchive id2 = new IdArchive(new AtomId(atomIdText));
+        assertEquals(id2.getAtomId().toXML(), atomIdXml);
+        assertEquals(id2.getIdentifier(), identifier);
+        assertEquals(id2.getAtomId().getText(), atomIdText);
 
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testConstructorWithEmptyId() throws Exception {
+    public void testConstructorWithWrongAtomIdType() throws Exception {
+        AtomId collectionAtomId = new AtomId("tag:www.monasterium.net,2011:/collection/MedDocBulgEmp");
+        new IdArchive(collectionAtomId);
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testConstructorWithEmptyIdentifier() throws Exception {
         String emptyId = "";
         new IdArchive(emptyId);
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testConstructorWithFaultyId() throws Exception {
-        String faultyId = "tag:www.monasterium.net,2011:/archive/CH-KAE/Urkunden/";
-        new IdArchive(faultyId);
-    }
-
-    @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testConstructorWithWrongId() throws Exception {
-        String idCharter = "tag:www.monasterium.net,2011:/charter/CH-KAE/Urkunden/Urkunde_1";
-        new IdArchive(idCharter);
-    }
-
     @Test
-    public void testGetArchiveIdentifier() throws Exception {
+    public void testGetIdentifier() throws Exception {
 
-        String archiveIdentifier = "CH-KAE";
-        String idArchive = "tag:www.monasterium.net,2011:/archive/CH-KAE";
+        String identifier = "CH-KAE";
+        IdArchive id1 = new IdArchive(identifier);
+        assertEquals(id1.getIdentifier(), identifier);
 
-        IdArchive id1 = new IdArchive(archiveIdentifier);
-        assertEquals(id1.getArchiveIdentifier(), archiveIdentifier);
-
-
-        IdArchive id2 = new IdArchive(idArchive);
-        assertEquals(id2.getArchiveIdentifier(), archiveIdentifier);
+        AtomId atomId = new AtomId("tag:www.monasterium.net,2011:/archive/CH-KAE");
+        IdArchive id2 = new IdArchive(atomId);
+        assertEquals(id2.getIdentifier(), identifier);
 
     }
 

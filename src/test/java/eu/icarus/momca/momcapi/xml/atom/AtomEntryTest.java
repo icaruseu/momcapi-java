@@ -21,7 +21,7 @@ public class AtomEntryTest {
         String currentDateTime = "2011-05-30T20:31:19.638+02:00";
         Element childContent = new Element("eag:eag", Namespace.EAG.getUri());
 
-        AtomEntry atomEntry = new AtomEntry(id, atomAuthor, currentDateTime, childContent);
+        AtomEntry atomEntry = new AtomEntry(id.getAtomId(), atomAuthor, currentDateTime, childContent);
 
         assertEquals(atomEntry.toXML(), correctXml);
 

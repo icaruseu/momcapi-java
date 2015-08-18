@@ -399,7 +399,7 @@ public class ExistQueryFactory {
                 "%s collection('%s')//atom:id[contains(., '%s')]/text()",
                 getNamespaceDeclaration(Namespace.ATOM),
                 ResourceRoot.ARCHIVAL_FONDS.getUri(),
-                idArchive.getArchiveIdentifier());
+                idArchive.getIdentifier());
 
         return new ExistQuery(query);
 
