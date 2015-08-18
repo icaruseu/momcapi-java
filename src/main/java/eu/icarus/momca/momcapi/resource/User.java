@@ -1,6 +1,7 @@
 package eu.icarus.momca.momcapi.resource;
 
 import eu.icarus.momca.momcapi.query.XpathQuery;
+import eu.icarus.momca.momcapi.xml.atom.AtomId;
 import eu.icarus.momca.momcapi.xml.atom.IdCharter;
 import org.jetbrains.annotations.NotNull;
 
@@ -75,7 +76,7 @@ public class User extends MomcaResource {
     @NotNull
     public List<IdCharter> listBookmarkedCharterIds() {
         return queryContentAsList(XpathQuery.QUERY_XRX_BOOKMARK).stream()
-                .map(IdCharter::new).collect(Collectors.toList());
+                .map(AtomId::new).map(IdCharter::new).collect(Collectors.toList());
     }
 
     /**
@@ -84,7 +85,7 @@ public class User extends MomcaResource {
     @NotNull
     public List<IdCharter> listSavedCharterIds() {
         return queryContentAsList(XpathQuery.QUERY_XRX_SAVED_ID).stream()
-                .map(IdCharter::new).collect(Collectors.toList());
+                .map(AtomId::new).map(IdCharter::new).collect(Collectors.toList());
     }
 
     @NotNull

@@ -1,5 +1,6 @@
 package eu.icarus.momca.momcapi;
 
+import eu.icarus.momca.momcapi.xml.atom.AtomId;
 import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.Element;
@@ -53,10 +54,15 @@ public class Util {
 
         List<String> encodedTokens = new ArrayList<>(0);
         for (String token : string.split("/")) {
-            try {
-                encodedTokens.add(URLEncoder.encode(URLDecoder.decode(token, "UTF-8"), "UTF-8"));
-            } catch (UnsupportedEncodingException e) {
-                throw new RuntimeException(e);
+
+            if (token.equals(AtomId.DEFAULT_PREFIX)) {
+                encodedTokens.add(token);
+            } else {
+                try {
+                    encodedTokens.add(URLEncoder.encode(URLDecoder.decode(token, "UTF-8"), "UTF-8"));
+                } catch (UnsupportedEncodingException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
         return String.join("/", encodedTokens);

@@ -32,110 +32,98 @@ public class IdCharterTest {
     @Test
     public void testConstructorForCollectionCharter() throws Exception {
         IdCharter id = new IdCharter(COLLECTION_ID, COLLECTION_CHARTER_IDNO);
-        assertEquals(id.getText(), COLLECTION_CHARTER_ID);
+        assertEquals(id.getAtomId().getText(), COLLECTION_CHARTER_ID);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConstructorForCollectionCharterWithEmptyCollection() throws Exception {
         IdCharter id = new IdCharter("", COLLECTION_CHARTER_IDNO);
-        assertEquals(id.getText(), COLLECTION_CHARTER_ID);
+        assertEquals(id.getAtomId().getText(), COLLECTION_CHARTER_ID);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConstructorForCollectionCharterWithEmptyIdentifier() throws Exception {
         IdCharter id = new IdCharter(COLLECTION_ID, "");
-        assertEquals(id.getText(), COLLECTION_CHARTER_ID);
+        assertEquals(id.getAtomId().getText(), COLLECTION_CHARTER_ID);
     }
 
     @Test
     public void testConstructorForFondCharter() throws Exception {
         IdCharter id = new IdCharter(ARCHIVE_ID, FOND_ID, FOND_CHARTER_IDNO);
-        assertEquals(id.getText(), FOND_CHARTER_ID);
+        assertEquals(id.getAtomId().getText(), FOND_CHARTER_ID);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConstructorForFondCharterWithEmptyArchive() throws Exception {
         IdCharter id = new IdCharter("", FOND_ID, FOND_CHARTER_IDNO);
-        assertEquals(id.getText(), FOND_CHARTER_ID);
+        assertEquals(id.getAtomId().getText(), FOND_CHARTER_ID);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConstructorForFondCharterWithEmptyFond() throws Exception {
         IdCharter id = new IdCharter(ARCHIVE_ID, "", FOND_CHARTER_IDNO);
-        assertEquals(id.getText(), FOND_CHARTER_ID);
+        assertEquals(id.getAtomId().getText(), FOND_CHARTER_ID);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConstructorForFondCharterWithEmptyIdentifier() throws Exception {
         IdCharter id = new IdCharter(ARCHIVE_ID, FOND_ID, "");
-        assertEquals(id.getText(), FOND_CHARTER_ID);
+        assertEquals(id.getAtomId().getText(), FOND_CHARTER_ID);
     }
 
     @Test
     public void testConstructorForId() throws Exception {
-        IdCharter id = new IdCharter(FOND_CHARTER_ID);
-        assertEquals(id.getText(), FOND_CHARTER_ID);
-        assertEquals(id.getCharterIdentifier(), FOND_CHARTER_IDNO);
+        IdCharter id = new IdCharter(new AtomId(FOND_CHARTER_ID));
+        assertEquals(id.getAtomId().getText(), FOND_CHARTER_ID);
+        assertEquals(id.getIdentifier(), FOND_CHARTER_IDNO);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConstructorWithEmptyId() throws Exception {
         String emptyId = "";
-        new IdCharter(emptyId);
+        new IdCharter(new AtomId(emptyId));
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConstructorWithFaultyId() throws Exception {
         String faultyId = "tag:www.monasterium.net,2011:/charter/RS-IAGNS";
-        new IdCharter(faultyId);
+        new IdCharter(new AtomId(faultyId));
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConstructorWithWrongId() throws Exception {
         String collectionId = "tag:www.monasterium.net,2011:/collection/MedDocBulgEmp";
-        new IdCharter(collectionId);
+        new IdCharter(new AtomId(collectionId));
     }
 
     @Test
     public void testGetArchiveId() throws Exception {
-        IdCharter id = new IdCharter(FOND_CHARTER_ID);
-        assertEquals(id.getArchiveIdentifier(), Optional.of(ARCHIVE_ID));
-    }
-
-    @Test
-    public void testGetBasePath() throws Exception {
-        IdCharter id = new IdCharter(FOND_CHARTER_ID);
-        assertEquals(id.getBasePath(), BASE_PATH);
+        IdCharter id = new IdCharter(new AtomId(FOND_CHARTER_ID));
+        assertEquals(id.getIdentifier(), Optional.of(ARCHIVE_ID));
     }
 
     @Test
     public void testGetCharterId() throws Exception {
-        IdCharter id = new IdCharter(COLLECTION_CHARTER_ID);
-        assertEquals(id.getCharterIdentifier(), COLLECTION_CHARTER_IDNO);
+        IdCharter id = new IdCharter(new AtomId(COLLECTION_CHARTER_ID));
+        assertEquals(id.getIdentifier(), COLLECTION_CHARTER_IDNO);
     }
 
     @Test
     public void testGetCollectionId() throws Exception {
-        IdCharter id = new IdCharter(COLLECTION_CHARTER_ID);
-        assertEquals(id.getCollectionIdentifier(), Optional.of(COLLECTION_ID));
+        IdCharter id = new IdCharter(new AtomId(COLLECTION_CHARTER_ID));
+        assertEquals(id.getIdentifier(), Optional.of(COLLECTION_ID));
     }
 
     @Test
     public void testGetFondId() throws Exception {
-        IdCharter id = new IdCharter(FOND_CHARTER_ID);
-        assertEquals(id.getFondIdentifier(), Optional.of(FOND_ID));
+        IdCharter id = new IdCharter(new AtomId(FOND_CHARTER_ID));
+        assertEquals(id.getIdentifier(), Optional.of(FOND_ID));
     }
 
     @Test
-    public void testIsPartOfArchiveFond() throws Exception {
-        IdCharter id = new IdCharter(FOND_CHARTER_ID);
-        assertTrue(id.isPartOfArchiveFond());
-    }
-
-    @Test
-    public void testIsPartOfArchiveFondWithCollectionCharter() throws Exception {
-        IdCharter id = new IdCharter(COLLECTION_CHARTER_ID);
-        assertFalse(id.isPartOfArchiveFond());
+    public void testIsInFond() throws Exception {
+        IdCharter id = new IdCharter(new AtomId(FOND_CHARTER_ID));
+        assertTrue(id.isInFond());
     }
 
 }

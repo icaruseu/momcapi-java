@@ -31,9 +31,11 @@ public class AtomId extends Element {
     @NotNull
     private final ResourceType type;
 
-   public AtomId(@NotNull String text) {
+   public  AtomId(@NotNull String text) {
 
         super("atom:id", Namespace.ATOM.getUri());
+
+       text = Util.encode(text);
 
         String[] idParts = text.split("/");
 

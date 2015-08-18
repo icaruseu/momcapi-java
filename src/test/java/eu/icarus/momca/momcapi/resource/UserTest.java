@@ -1,5 +1,6 @@
 package eu.icarus.momca.momcapi.resource;
 
+import eu.icarus.momca.momcapi.xml.atom.AtomId;
 import eu.icarus.momca.momcapi.xml.atom.IdCharter;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.BeforeClass;
@@ -36,9 +37,9 @@ public class UserTest {
     @BeforeClass
     public void setUp() throws Exception {
         resource = new MomcaResource(NAME, PARENT_URI, XML_CONTENT);
-        bookmarkedCharters.add(new IdCharter("tag:www.monasterium.net,2011:/charter/CH-KAE/Urkunden/KAE_Urkunde_Nr_1"));
-        savedCharters.add(new IdCharter("tag:www.monasterium.net,2011:/charter/CH-KAE/Urkunden/KAE_Urkunde_Nr_2"));
-        savedCharters.add(new IdCharter("tag:www.monasterium.net,2011:/charter/CH-KAE/Urkunden/KAE_Urkunde_Nr_1"));
+        bookmarkedCharters.add(new IdCharter(new AtomId("tag:www.monasterium.net,2011:/charter/CH-KAE/Urkunden/KAE_Urkunde_Nr_1")));
+        savedCharters.add(new IdCharter(new AtomId("tag:www.monasterium.net,2011:/charter/CH-KAE/Urkunden/KAE_Urkunde_Nr_2")));
+        savedCharters.add(new IdCharter(new AtomId("tag:www.monasterium.net,2011:/charter/CH-KAE/Urkunden/KAE_Urkunde_Nr_1")));
     }
 
     @Test

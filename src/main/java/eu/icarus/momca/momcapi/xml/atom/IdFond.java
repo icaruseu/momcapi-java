@@ -40,7 +40,7 @@ public class IdFond extends IdAbstract {
     private static AtomId initAtomId(@NotNull String archiveIdentifier, @NotNull String fondIdentifier) {
 
         if (archiveIdentifier.contains("/") || fondIdentifier.contains("/")) {
-            throw new IllegalArgumentException("The identifier '" + fondIdentifier + "' contains '/'" +
+            throw new IllegalArgumentException("One of the identifiers contains '/'" +
                     " which is forbidden. Maybe the string is an atom:id text and not just an identifier?");
         }
 

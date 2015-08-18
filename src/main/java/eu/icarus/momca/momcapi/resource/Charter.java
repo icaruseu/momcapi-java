@@ -6,6 +6,7 @@ import eu.icarus.momca.momcapi.query.XpathQuery;
 import eu.icarus.momca.momcapi.xml.Namespace;
 import eu.icarus.momca.momcapi.xml.XmlValidationProblem;
 import eu.icarus.momca.momcapi.xml.atom.AtomAuthor;
+import eu.icarus.momca.momcapi.xml.atom.AtomId;
 import eu.icarus.momca.momcapi.xml.atom.IdCharter;
 import eu.icarus.momca.momcapi.xml.cei.*;
 import nu.xom.*;
@@ -272,7 +273,7 @@ public class Charter extends MomcaResource {
             String errorMessage = String.format("No atom:id in xml content: '%s'", getXmlAsDocument().toXML());
             throw new IllegalArgumentException(errorMessage);
         } else {
-            return new IdCharter(idString);
+            return new IdCharter(new AtomId(idString));
         }
 
     }
