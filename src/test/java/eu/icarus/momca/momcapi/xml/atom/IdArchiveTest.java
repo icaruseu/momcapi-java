@@ -36,6 +36,11 @@ public class IdArchiveTest {
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testConstructorWithAtomId() throws Exception {
+        new IdArchive("tag:www.monasterium.net,2011:/archive/CH-KAE");
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConstructorWithEmptyIdentifier() throws Exception {
         String emptyId = "";
         new IdArchive(emptyId);

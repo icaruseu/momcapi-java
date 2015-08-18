@@ -44,7 +44,7 @@ public class FondTest {
 
     @Test
     public void testGetId() throws Exception {
-        assertEquals(correctFond.getId().getText(), "tag:www.monasterium.net,2011:/fond/CH-KASchwyz/Urkunden");
+        assertEquals(correctFond.getId().getAtomId().getText(), "tag:www.monasterium.net,2011:/fond/CH-KASchwyz/Urkunden");
     }
 
     @Test

@@ -31,7 +31,7 @@ public class AtomId extends Element {
     @NotNull
     private final ResourceType type;
 
-    AtomId(@NotNull String text) {
+   public AtomId(@NotNull String text) {
 
         super("atom:id", Namespace.ATOM.getUri());
 

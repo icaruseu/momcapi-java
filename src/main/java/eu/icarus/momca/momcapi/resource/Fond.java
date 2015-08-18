@@ -1,6 +1,7 @@
 package eu.icarus.momca.momcapi.resource;
 
 import eu.icarus.momca.momcapi.query.XpathQuery;
+import eu.icarus.momca.momcapi.xml.atom.AtomId;
 import eu.icarus.momca.momcapi.xml.atom.IdArchive;
 import eu.icarus.momca.momcapi.xml.atom.IdFond;
 import org.jetbrains.annotations.NotNull;
@@ -42,7 +43,7 @@ public class Fond extends MomcaResource {
 
     @NotNull
     public IdArchive getArchiveId() {
-        return new IdArchive(id.getArchiveIdentifier());
+        return id.getIdArchive();
     }
 
     @NotNull
@@ -57,7 +58,7 @@ public class Fond extends MomcaResource {
 
     @NotNull
     public String getIdentifier() {
-        return id.getFondIdentifier();
+        return id.getIdentifier();
     }
 
     @NotNull
@@ -130,7 +131,7 @@ public class Fond extends MomcaResource {
             String errorMessage = String.format("No atom:id in xml content: '%s'", getXmlAsDocument().toXML());
             throw new IllegalArgumentException(errorMessage);
         } else {
-            return new IdFond(idString);
+            return new IdFond(new AtomId(idString));
         }
 
     }

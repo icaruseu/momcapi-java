@@ -41,6 +41,11 @@ public class IdCollectionTest {
         new IdCollection(emptyId);
     }
 
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testConstructorWithAtomId() throws Exception {
+        new IdCollection("tag:www.monasterium.net,2011:/collection/MedDocBulgEmp");
+    }
+
     @Test
     public void testGetIdentifier() throws Exception {
 

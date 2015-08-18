@@ -9,75 +9,78 @@ import org.jetbrains.annotations.NotNull;
  * @author Daniel Jeller
  *         Created on 21.07.2015.
  */
-public class IdFond extends AtomId {
+public class IdFond extends IdAbstract {
 
-    private static final int VALID_FOND_ID_PART_COUNT = 4;
     @NotNull
-    private final String archiveIdentifier;
-    @NotNull
-    private final String fondIdentifier;
+    private final IdArchive idArchive;
 
-    /**
-     * Instantiates a new fond id using archiveIdentifier and fondIdentifier.
-     *
-     * @param archiveIdentifier The archiveIdentifier, e.g. {@code RS-IAGNS}
-     * @param fondIdentifier    The fondIdentifier, e.g. {@code Charters}
-     *                          .
-     */
+    public IdFond(@NotNull AtomId atomId) {
+
+        super(atomId, initIdentifier(atomId));
+
+        if (getAtomId().getType() != ResourceType.FOND) {
+            throw new IllegalArgumentException(getAtomId().getText() + " is not a fond atom:id text.");
+        }
+
+        idArchive = getArchiveFromAtomId(atomId);
+
+    }
+
     public IdFond(@NotNull String archiveIdentifier, @NotNull String fondIdentifier) {
+        super(initAtomId(archiveIdentifier, fondIdentifier), fondIdentifier);
+        idArchive = new IdArchive(archiveIdentifier);
+    }
 
-        super(String.join("/", AtomId.DEFAULT_PREFIX, ResourceType.FOND.getNameInId(), archiveIdentifier, fondIdentifier));
+    @NotNull
+    private static String initIdentifier(@NotNull AtomId atomId) {
+        String[] idParts = atomId.getText().split("/");
+        return idParts[idParts.length - 1];
+    }
 
-        if (archiveIdentifier.isEmpty() || fondIdentifier.isEmpty()) {
-            throw new IllegalArgumentException("A valid fond id needs to have non-empty archive- and fondidentifiers.");
+    private static AtomId initAtomId(@NotNull String archiveIdentifier, @NotNull String fondIdentifier) {
+
+        if (archiveIdentifier.contains("/") || fondIdentifier.contains("/")) {
+            throw new IllegalArgumentException("The identifier '" + fondIdentifier + "' contains '/'" +
+                    " which is forbidden. Maybe the string is an atom:id text and not just an identifier?");
         }
 
-        this.archiveIdentifier = archiveIdentifier;
-        this.fondIdentifier = fondIdentifier;
+        return new AtomId(String.join("/",
+                AtomId.DEFAULT_PREFIX,
+                ResourceType.FOND.getNameInId(),
+                archiveIdentifier,
+                fondIdentifier));
 
     }
 
-    /**
-     * Instantiates a new fond id using another IdFond.
-     *
-     * @param fondId The atom:id, e.g.
-     *               {@code tag:www.monasterium.net,2011:/fond/RS-IAGNS/Charters}.
-     */
-    public IdFond(@NotNull String fondId) {
-
-        super(fondId);
-
-        if (!isFondId(fondId)) {
-            String message = String.format("'%s' is not a valid fond atom:id.", fondId);
-            throw new IllegalArgumentException(message);
-        }
-
-        String[] idParts = fondId.split("/");
-
-        this.archiveIdentifier = idParts[2];
-        this.fondIdentifier = idParts[3];
-
-    }
-
-    /**
-     * @return The archive identifier, e.g. {@code RS-IAGNS}.
-     */
     @NotNull
-    public String getArchiveIdentifier() {
-        return archiveIdentifier;
+    private IdArchive getArchiveFromAtomId(@NotNull AtomId atomId) {
+        String[] parts = atomId.getText().split("/");
+        return new IdArchive(parts[parts.length - 2]);
     }
 
-    /**
-     * @return The fond identifier, e.g. {@code Charters}.
-     */
     @NotNull
-    public String getFondIdentifier() {
-        return fondIdentifier;
+    public IdArchive getIdArchive() {
+        return idArchive;
     }
 
-    private boolean isFondId(@NotNull String fondId) {
-        String[] idParts = fondId.split("/");
-        return getType() == ResourceType.FOND && idParts.length == VALID_FOND_ID_PART_COUNT;
+    @Override
+    public boolean equals(Object o) {
+
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        IdFond idFond = (IdFond) o;
+
+        return idArchive.equals(idFond.idArchive);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + idArchive.hashCode();
+        return result;
     }
 
 }

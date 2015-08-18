@@ -48,7 +48,7 @@ public class FondManager extends AbstractManager {
         }
 
         if (getFond(id).isPresent()) {
-            String message = String.format("An fond for the id '%s' is already existing.", id.getText());
+            String message = String.format("An fond for the id '%s' is already existing.", id.getIdentifier());
             throw new IllegalArgumentException(message);
         }
 
@@ -56,7 +56,7 @@ public class FondManager extends AbstractManager {
         String fondCollectionUri = archiveCollectionUri + "/" + identifier;
 
         String eadName = identifier + ".ead.xml";
-        Element eadContent = createEadContent(authorEmail, id, identifier, name);
+        Element eadContent = createEadContent(authorEmail, id.getAtomId(), identifier, name);
         MomcaResource eadResource = new MomcaResource(eadName, fondCollectionUri, eadContent.toXML());
 
         String preferencesName = identifier + ".preferences.xml";
@@ -79,11 +79,11 @@ public class FondManager extends AbstractManager {
 
         if (!momcaConnection.getCharterManager().listChartersPublic(idFond).isEmpty()
                 || !momcaConnection.getCharterManager().listChartersImport(idFond).isEmpty()) {
-            throw new IllegalArgumentException("There are still existing charters for fond '" + idFond.getFondIdentifier() + "'");
+            throw new IllegalArgumentException("There are still existing charters for fond '" + idFond.getIdentifier() + "'");
         }
 
-        momcaConnection.deleteCollection(String.format("%s/%s/%s", ResourceRoot.PUBLIC_CHARTERS.getUri(), idFond.getArchiveIdentifier(), idFond.getFondIdentifier()));
-        momcaConnection.deleteCollection(String.format("%s/%s/%s", ResourceRoot.ARCHIVAL_FONDS.getUri(), idFond.getArchiveIdentifier(), idFond.getFondIdentifier()));
+        momcaConnection.deleteCollection(String.format("%s/%s/%s", ResourceRoot.PUBLIC_CHARTERS.getUri(), idFond.getIdArchive().getIdentifier(), idFond.getIdentifier()));
+        momcaConnection.deleteCollection(String.format("%s/%s/%s", ResourceRoot.ARCHIVAL_FONDS.getUri(), idFond.getIdArchive().getIdentifier(), idFond.getIdentifier()));
 
     }
 
@@ -92,7 +92,7 @@ public class FondManager extends AbstractManager {
 
         Optional<Fond> fond = Optional.empty();
 
-        Optional<MomcaResource> fondResource = getMomcaResource(idFond);
+        Optional<MomcaResource> fondResource = getMomcaResource(idFond.getAtomId());
 
         if (fondResource.isPresent()) {
 
@@ -111,7 +111,7 @@ public class FondManager extends AbstractManager {
     public List<IdFond> listFonds(@NotNull IdArchive idArchive) {
         List<String> queryResults = momcaConnection.queryDatabase(
                 ExistQueryFactory.listFonds(idArchive));
-        return queryResults.stream().map(IdFond::new).collect(Collectors.toList());
+        return queryResults.stream().map(AtomId::new).map(IdFond::new).collect(Collectors.toList());
     }
 
     @NotNull

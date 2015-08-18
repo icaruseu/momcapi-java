@@ -39,7 +39,7 @@ public class FondManagerTest {
         assertTrue(mc.getExistResource("Urkunden.preferences.xml", "/db/mom-data/metadata.fond.public/DE-SAMuenchen/Urkunden").isPresent());
         fm.deleteFond(fond1.getId());
 
-        assertEquals(fond1.getId().getText(), "tag:www.monasterium.net,2011:/fond/DE-SAMuenchen/Urkunden");
+        assertEquals(fond1.getId().getAtomId().getText(), "tag:www.monasterium.net,2011:/fond/DE-SAMuenchen/Urkunden");
         assertEquals(fond1.getIdentifier(), "Urkunden");
         assertEquals(fond1.getArchiveId().getAtomId().getText(), "tag:www.monasterium.net,2011:/archive/DE-SAMuenchen");
         assertEquals(fond1.getName(), "Alle Urkunden");
@@ -124,7 +124,7 @@ public class FondManagerTest {
         Optional<Fond> fondOptional1 = fm.getFond(id1);
         assertTrue(fondOptional1.isPresent());
         Fond fond1 = fondOptional1.get();
-        assertEquals(fond1.getId().toXML(), id1.toXML());
+        assertEquals(fond1.getId().getAtomId().toXML(), id1.getAtomId().toXML());
         assertEquals(fond1.getName(), "Urkunden (0947-1483)");
         assertEquals(fond1.getImageAccess().get(), ImageAccess.FREE);
         assertFalse(fond1.getDummyImageUrl().isPresent());
@@ -134,7 +134,7 @@ public class FondManagerTest {
         Optional<Fond> fondOptional2 = fm.getFond(id2);
         assertTrue(fondOptional2.isPresent());
         Fond fond2 = fondOptional2.get();
-        assertEquals(fond2.getId().toXML(), id2.toXML());
+        assertEquals(fond2.getId().getAtomId().toXML(), id2.getAtomId().toXML());
         assertEquals(fond2.getName(), "Urkunden");
         assertEquals(fond2.getImageAccess().get(), ImageAccess.RESTRICTED);
         assertEquals(fond2.getDummyImageUrl().get().toExternalForm(), "http://example.com/dummy.png");
@@ -160,7 +160,7 @@ public class FondManagerTest {
         Archive archive1 = mc.getArchiveManager().getArchive(id1).get();
         List<IdFond> resultList1 = fm.listFonds(archive1.getId());
         assertEquals(resultList1.size(), 2);
-        assertEquals(resultList1.get(0).getFondIdentifier(), "Urkunden");
+        assertEquals(resultList1.get(0).getIdentifier(), "Urkunden");
 
         IdArchive id2 = new IdArchive("DE-SAMuenchen");
         Archive archive2 = mc.getArchiveManager().getArchive(id2).get();

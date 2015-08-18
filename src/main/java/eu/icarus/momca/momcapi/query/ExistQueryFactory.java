@@ -223,8 +223,8 @@ public class ExistQueryFactory {
                 "%s collection('%s/%s/%s')//atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM),
                 ResourceRoot.IMPORTED_ARCHIVAL_CHARTERS.getUri(),
-                idFond.getArchiveIdentifier(),
-                idFond.getFondIdentifier());
+                idFond.getIdArchive().getIdentifier(),
+                idFond.getIdentifier());
 
         return new ExistQuery(query);
 
@@ -276,8 +276,8 @@ public class ExistQueryFactory {
                 "%s collection('%s/%s/%s')//atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM),
                 ResourceRoot.PUBLIC_CHARTERS.getUri(),
-                idFond.getArchiveIdentifier(),
-                idFond.getFondIdentifier());
+                idFond.getIdArchive().getIdentifier(),
+                idFond.getIdentifier());
 
         return new ExistQuery(query);
 
