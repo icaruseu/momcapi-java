@@ -3,7 +3,7 @@ package eu.icarus.momca.momcapi;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
 import eu.icarus.momca.momcapi.resource.*;
 import eu.icarus.momca.momcapi.xml.Namespace;
-import eu.icarus.momca.momcapi.xml.atom.Author;
+import eu.icarus.momca.momcapi.xml.atom.AtomAuthor;
 import eu.icarus.momca.momcapi.xml.atom.Entry;
 import eu.icarus.momca.momcapi.xml.atom.IdCollection;
 import nu.xom.Element;
@@ -160,9 +160,9 @@ public class CollectionManager extends AbstractManager {
         Optional<Element> keywords = createKeywordsElement(keyWord);
         Element cei = createCeiElement(identifier, name, country, region, imageServerAddress, imageFolderName);
 
-        Author author = new Author(authorEmail);
+        AtomAuthor atomAuthor = new AtomAuthor(authorEmail);
         String now = momcaConnection.queryDatabase(ExistQueryFactory.getCurrentDateTime()).get(0);
-        Element resourceContent = new Entry(id, author, now, cei);
+        Element resourceContent = new Entry(id, atomAuthor, now, cei);
 
         keywords.ifPresent(element -> resourceContent.insertChild(element, 6));
 

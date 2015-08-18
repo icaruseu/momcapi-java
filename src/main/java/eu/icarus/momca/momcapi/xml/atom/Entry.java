@@ -10,12 +10,12 @@ import org.jetbrains.annotations.NotNull;
  */
 public class Entry extends Element {
 
-    public Entry(@NotNull Id id, @NotNull Author author, @NotNull String currentDateTime, @NotNull Element childContent) {
+    public Entry(@NotNull Id id, @NotNull AtomAuthor atomAuthor, @NotNull String currentDateTime, @NotNull Element childContent) {
         super("atom:entry", Namespace.ATOM.getUri());
-        initContent(author, currentDateTime, id, childContent);
+        initContent(atomAuthor, currentDateTime, id, childContent);
     }
 
-    private void initContent(@NotNull Author author, @NotNull String currentDateTime, @NotNull Id id, @NotNull Element childContent) {
+    private void initContent(@NotNull AtomAuthor atomAuthor, @NotNull String currentDateTime, @NotNull Id id, @NotNull Element childContent) {
 
         String atomUri = Namespace.ATOM.getUri();
         String appUri = Namespace.APP.getUri();
@@ -31,7 +31,7 @@ public class Entry extends Element {
         atomUpdated.appendChild(currentDateTime);
         appendChild(atomUpdated);
 
-        appendChild(author);
+        appendChild(atomAuthor);
 
         Element appControl = new Element("app:control", appUri);
         Element appDraft = new Element("app:draft", appUri);

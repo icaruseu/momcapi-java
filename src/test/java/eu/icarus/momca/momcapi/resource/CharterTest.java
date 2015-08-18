@@ -1,6 +1,6 @@
 package eu.icarus.momca.momcapi.resource;
 
-import eu.icarus.momca.momcapi.xml.atom.Author;
+import eu.icarus.momca.momcapi.xml.atom.AtomAuthor;
 import eu.icarus.momca.momcapi.xml.atom.IdCharter;
 import eu.icarus.momca.momcapi.xml.cei.Figure;
 import eu.icarus.momca.momcapi.xml.cei.Idno;
@@ -18,7 +18,7 @@ import static org.testng.Assert.*;
 public class CharterTest {
 
 
-    private static final Author AUTHOR = new Author("user1.testuser@dev.monasterium.net");
+    private static final AtomAuthor ATOM_AUTHOR = new AtomAuthor("user1.testuser@dev.monasterium.net");
     @NotNull
     private static final Idno IDNO = new Idno("KAE_Urkunde_Nr_1", "KAE, Urkunde Nr. 1");
     @NotNull
@@ -65,7 +65,7 @@ public class CharterTest {
     @Test
     public void testGetAuthor() throws Exception {
         Charter charter = new Charter(resource);
-        assertEquals(charter.getAuthorName().get(), AUTHOR.getEmail());
+        assertEquals(charter.getAuthorName().get(), ATOM_AUTHOR.getEmail());
     }
 
     @Test

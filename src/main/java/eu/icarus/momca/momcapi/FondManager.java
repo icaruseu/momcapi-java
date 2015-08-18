@@ -121,9 +121,9 @@ public class FondManager extends AbstractManager {
         String eadString = String.format(EAD_TEMPLATE, identifier, identifier, name);
         Element eadElement = Util.parseToElement(eadString);
 
-        Author author = new Author(authorEmail);
+        AtomAuthor atomAuthor = new AtomAuthor(authorEmail);
         String now = momcaConnection.queryDatabase(ExistQueryFactory.getCurrentDateTime()).get(0);
-        return new Entry(id, author, now, eadElement);
+        return new Entry(id, atomAuthor, now, eadElement);
 
     }
 

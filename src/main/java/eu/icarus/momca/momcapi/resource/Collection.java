@@ -1,7 +1,7 @@
 package eu.icarus.momca.momcapi.resource;
 
 import eu.icarus.momca.momcapi.query.XpathQuery;
-import eu.icarus.momca.momcapi.xml.atom.Author;
+import eu.icarus.momca.momcapi.xml.atom.AtomAuthor;
 import eu.icarus.momca.momcapi.xml.atom.IdCollection;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,7 +15,7 @@ import java.util.Optional;
 public class Collection extends MomcaResource {
 
     @NotNull
-    private final Optional<Author> author;
+    private final Optional<AtomAuthor> author;
     @NotNull
     private final Optional<CountryCode> countryCode;
     @NotNull
@@ -25,11 +25,11 @@ public class Collection extends MomcaResource {
     @NotNull
     private final Optional<String> imageServerAddress;
     @NotNull
+    private final Optional<String> keyword;
+    @NotNull
     private final String name;
     @NotNull
     private final Optional<String> regionName;
-    @NotNull
-    private Optional<String> keyword;
 
     public Collection(@NotNull MomcaResource momcaResource) {
 
@@ -48,7 +48,7 @@ public class Collection extends MomcaResource {
 
     @NotNull
     public Optional<String> getAuthorName() {
-        return author.map(Author::getEmail);
+        return author.map(AtomAuthor::getEmail);
     }
 
     @NotNull
@@ -90,12 +90,12 @@ public class Collection extends MomcaResource {
         return regionName;
     }
 
-    private Optional<Author> initAuthor() {
+    private Optional<AtomAuthor> initAuthor() {
 
-        Optional<Author> author = Optional.empty();
+        Optional<AtomAuthor> author = Optional.empty();
         String authorEmail = queryUniqueElement(XpathQuery.QUERY_ATOM_EMAIL);
         if (!authorEmail.isEmpty()) {
-            author = Optional.of(new Author(authorEmail));
+            author = Optional.of(new AtomAuthor(authorEmail));
         }
         return author;
 

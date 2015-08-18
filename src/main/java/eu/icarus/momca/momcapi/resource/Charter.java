@@ -5,7 +5,7 @@ import eu.icarus.momca.momcapi.exception.MomcaException;
 import eu.icarus.momca.momcapi.query.XpathQuery;
 import eu.icarus.momca.momcapi.xml.Namespace;
 import eu.icarus.momca.momcapi.xml.XmlValidationProblem;
-import eu.icarus.momca.momcapi.xml.atom.Author;
+import eu.icarus.momca.momcapi.xml.atom.AtomAuthor;
 import eu.icarus.momca.momcapi.xml.atom.IdCharter;
 import eu.icarus.momca.momcapi.xml.cei.*;
 import nu.xom.*;
@@ -38,7 +38,7 @@ public class Charter extends MomcaResource {
     private static final String CEI_SCHEMA_URL =
             "https://raw.githubusercontent.com/icaruseu/mom-ca/master/my/XRX/src/mom/app/cei/xsd/cei10.xsd";
     @NotNull
-    private final Optional<Author> author;
+    private final Optional<AtomAuthor> author;
     @NotNull
     private final Optional<DateAbstract> date;
     @NotNull
@@ -103,7 +103,7 @@ public class Charter extends MomcaResource {
      */
     @NotNull
     public Optional<String> getAuthorName() {
-        return author.map(Author::getEmail);
+        return author.map(AtomAuthor::getEmail);
     }
 
     /**
@@ -176,12 +176,12 @@ public class Charter extends MomcaResource {
 
     }
 
-    private Optional<Author> initAuthor() {
+    private Optional<AtomAuthor> initAuthor() {
 
-        Optional<Author> author = Optional.empty();
+        Optional<AtomAuthor> author = Optional.empty();
         String authorEmail = queryUniqueElement(XpathQuery.QUERY_ATOM_EMAIL);
         if (!authorEmail.isEmpty()) {
-            author = Optional.of(new Author(authorEmail));
+            author = Optional.of(new AtomAuthor(authorEmail));
         }
         return author;
 
