@@ -41,7 +41,7 @@ public class CollectionManager extends AbstractManager {
         }
 
         if (getCollection(id).isPresent()) {
-            String message = String.format("An collection for the id '%s' is already existing.", id.getId());
+            String message = String.format("An collection for the id '%s' is already existing.", id.toText());
             throw new IllegalArgumentException(message);
         }
 

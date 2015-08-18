@@ -54,11 +54,9 @@ public class AtomId extends Element {
             idParts = splitIntoParts(idParts[0]);
         }
 
-        if (
-                (
-                        ((idParts.length >= MIN_ID_PARTS_WITH_PREFIX) && idParts[0].equals(DEFAULT_PREFIX))
-                                || ((idParts.length >= MIN_ID_PARTS_WITHOUT_PREFIX) && !idParts[0].equals(DEFAULT_PREFIX)))
-                        && (idParts.length <= MAX_ID_PARTS)) {
+        if ((((idParts.length >= MIN_ID_PARTS_WITH_PREFIX) && idParts[0].equals(DEFAULT_PREFIX))
+                || ((idParts.length >= MIN_ID_PARTS_WITHOUT_PREFIX) && !idParts[0].equals(DEFAULT_PREFIX)))
+                && (idParts.length <= MAX_ID_PARTS)) {
 
             type = (idParts[0].equals(DEFAULT_PREFIX))
                     ? ResourceType.createFromValue(idParts[1]) : ResourceType.createFromValue(idParts[0]);
@@ -75,15 +73,6 @@ public class AtomId extends Element {
     }
 
     /**
-     * @return The AtomId text content, e.g.
-     * {@code tag:www.monasterium.net,2011:/charter/RS-IAGNS/Charters/IAGNS_F-.150_6605%7C193232}.
-     */
-    @NotNull
-    public String getId() {
-        return id;
-    }
-
-    /**
      * @return The type of the document referenced by the {@code atom:id}, e.g. for
      * {@code tag:www.monasterium.net,2011:/charter/RS-IAGNS/Charters/IAGNS_F-.150_6605%7C193232} the type
      * is {@code ResourceType.CHARTER}
@@ -91,6 +80,15 @@ public class AtomId extends Element {
     @NotNull
     public ResourceType getType() {
         return type;
+    }
+
+    /**
+     * @return The AtomId text content, e.g.
+     * {@code tag:www.monasterium.net,2011:/charter/RS-IAGNS/Charters/IAGNS_F-.150_6605%7C193232}.
+     */
+    @NotNull
+    public String toText() {
+        return id;
     }
 
     @NotNull

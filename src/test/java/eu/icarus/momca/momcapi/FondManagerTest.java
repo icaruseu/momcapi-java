@@ -39,9 +39,9 @@ public class FondManagerTest {
         assertTrue(mc.getExistResource("Urkunden.preferences.xml", "/db/mom-data/metadata.fond.public/DE-SAMuenchen/Urkunden").isPresent());
         fm.deleteFond(fond1.getId());
 
-        assertEquals(fond1.getId().getId(), "tag:www.monasterium.net,2011:/fond/DE-SAMuenchen/Urkunden");
+        assertEquals(fond1.getId().toText(), "tag:www.monasterium.net,2011:/fond/DE-SAMuenchen/Urkunden");
         assertEquals(fond1.getIdentifier(), "Urkunden");
-        assertEquals(fond1.getArchiveId().getId(), "tag:www.monasterium.net,2011:/archive/DE-SAMuenchen");
+        assertEquals(fond1.getArchiveId().toText(), "tag:www.monasterium.net,2011:/archive/DE-SAMuenchen");
         assertEquals(fond1.getName(), "Alle Urkunden");
         assertEquals(fond1.getImageAccess().get(), ImageAccess.FREE);
         assertEquals(fond1.getImagesUrl().get().toExternalForm(), "http://ex.com/img");

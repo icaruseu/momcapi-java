@@ -31,7 +31,7 @@ public class IdTest {
     @Test
     public void testConstructorWithId() throws Exception {
         AtomId atomId = new AtomId(ID);
-        assertEquals(atomId.getId(), ID);
+        assertEquals(atomId.toText(), ID);
         assertEquals(atomId.toXML(), "<atom:id xmlns:atom=\"http://www.w3.org/2005/Atom\">tag:www.monasterium.net,2011:/charter/RS-IAGNS/Charters/AGNS_F.1_the_fascia_9_Sub_3499%7C1817</atom:id>");
     }
 
@@ -43,8 +43,8 @@ public class IdTest {
         AtomId easyAtomId = new AtomId("charter", "RS-IAGNS", "Charters", "F1_fasc.16_sub_N_1513");
         AtomId difficultAtomId = new AtomId("charter", "RS-IAGNS", "Charters", "IAGNS_F-.150_6605|193232"); // | should be replaced with %7C etc.
 
-        assertEquals(easyAtomId.getId(), expectedEasyId);
-        assertEquals(difficultAtomId.getId(), expectedDifficultId);
+        assertEquals(easyAtomId.toText(), expectedEasyId);
+        assertEquals(difficultAtomId.toText(), expectedDifficultId);
 
     }
 
@@ -68,7 +68,7 @@ public class IdTest {
     @Test
     public void testGetId() throws Exception {
         AtomId atomId = new AtomId(ID);
-        assertEquals(atomId.getId(), ID);
+        assertEquals(atomId.toText(), ID);
     }
 
     @Test
