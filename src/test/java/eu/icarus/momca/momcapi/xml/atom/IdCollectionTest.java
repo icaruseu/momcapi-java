@@ -12,17 +12,22 @@ public class IdCollectionTest {
     @Test
     public void testConstructor() throws Exception {
 
-        String collectionIdentifier = "MedDocBulgEmp";
-        String collectionId = "tag:www.monasterium.net,2011:/collection/MedDocBulgEmp";
-        String correctXml = "<atom:id xmlns:atom=\"http://www.w3.org/2005/Atom\">" +
+        String identifier = "MedDocBulgEmp";
+        String atomIdText = "tag:www.monasterium.net,2011:/collection/MedDocBulgEmp";
+        String atomIdXml = "<atom:id xmlns:atom=\"http://www.w3.org/2005/Atom\">" +
                 "tag:www.monasterium.net,2011:/collection/MedDocBulgEmp</atom:id>";
 
-        IdCollection id1 = new IdCollection(collectionIdentifier);
-        assertEquals(id1.toXML(), correctXml);
+        IdCollection id = new IdCollection(identifier);
+        assertEquals(id.getAtomId().toXML(), atomIdXml);
+        assertEquals(id.getIdentifier(), identifier);
+        assertEquals(id.getAtomId().getText(), atomIdText);
 
-        IdCollection id2 = new IdCollection(collectionId);
-        assertEquals(id2.toXML(), correctXml);
+    }
 
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testConstructorWithWrongIdType() throws Exception {
+        AtomId archiveAtomId = new AtomId("tag:www.monasterium.net,2011:/archive/CH-KAE");
+        new IdCollection(archiveAtomId);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
@@ -32,13 +37,7 @@ public class IdCollectionTest {
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testConstructorWithFaultyId() throws Exception {
-        String faultyId = "tag:www.monasterium.net,2011:/collection/CH-KAE/Urkunden/Urkunde_1";
-        new IdCollection(faultyId);
-    }
-
-    @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testConstructorWithWrongId() throws Exception {
+    public void testConstructorWithWrongIdentifier() throws Exception {
         String archiveId = "tag:www.monasterium.net,2011:/archive/CH-KAE";
         new IdCollection(archiveId);
     }
@@ -47,13 +46,12 @@ public class IdCollectionTest {
     public void testGetCollectionIdentifier() throws Exception {
 
         String collectionIdentifier = "MedDocBulgEmp";
-        String collectionId = "tag:www.monasterium.net,2011:/collection/MedDocBulgEmp";
-
         IdCollection id1 = new IdCollection(collectionIdentifier);
-        assertEquals(id1.getCollectionIdentifier(), collectionIdentifier);
+        assertEquals(id1.getIdentifier(), collectionIdentifier);
 
-        IdCollection id2 = new IdCollection(collectionId);
-        assertEquals(id2.getCollectionIdentifier(), collectionIdentifier);
+        AtomId atomId = new AtomId("tag:www.monasterium.net,2011:/collection/MedDocBulgEmp");
+        IdCollection id2 = new IdCollection(atomId);
+        assertEquals(id2.getIdentifier(), collectionIdentifier);
 
     }
 

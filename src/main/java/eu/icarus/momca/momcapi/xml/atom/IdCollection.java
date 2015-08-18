@@ -12,58 +12,40 @@ import org.jetbrains.annotations.NotNull;
  *         Created on 21.07.2015.
  * @see IdMyCollection
  */
-public class IdCollection extends AtomId {
+public class IdCollection extends IdAbstract {
 
     private static final int VALID_ID_PARTS = 3;
+
+    public IdCollection(@NotNull String identifier) {
+        super(initAtomId(identifier), identifier);
+    }
+
+    public IdCollection(@NotNull AtomId atomId) {
+        super(atomId, initIdentifier(atomId));
+    }
+
     @NotNull
-    private final String collectionIdentifier;
+    private static String initIdentifier(@NotNull AtomId atomId) {
 
-    /**
-     * Instantiates a new collection id.
-     *
-     * @param collectionIdentifier The identifier to use. Can be either just the identifier of the collection,
-     *                             e.g. {@code MedDocBulgEmp} or a full collection atom:id, e.g.
-     *                             {@code tag:www.monasterium.net,2011:/collection/MedDocBulgEmp}
-     */
-    public IdCollection(@NotNull String collectionIdentifier) {
+        String[] idParts = atomId.getText().split("/");
 
-        super((collectionIdentifier.split("/").length == VALID_ID_PARTS)
-                ? collectionIdentifier
-                : String.format("%s/%s", ResourceType.COLLECTION.getNameInId(), collectionIdentifier));
-
-        if (isId(collectionIdentifier) && !isCollectionId(collectionIdentifier)) {
-            String message = String.format("'%s' is not a valid collection atom:id.", collectionIdentifier);
-            throw new IllegalArgumentException(message);
+        if (atomId.getType() != ResourceType.COLLECTION || idParts.length != VALID_ID_PARTS) {
+            throw new IllegalArgumentException(atomId.getText() + " is not a valid collection id.");
         }
 
-        String[] idParts = collectionIdentifier.split("/");
-        this.collectionIdentifier = idParts[idParts.length - 1];
+        return idParts[idParts.length - 1];
 
     }
 
-    /**
-     * @return The identifier of the collection, e.g. {@code MedDocBulgEmp}.
-     */
-    @NotNull
-    public String getCollectionIdentifier() {
-        return collectionIdentifier;
-    }
+    private static AtomId initAtomId(@NotNull String identifier) {
 
-    @Override
-    @NotNull
-    public String toString() {
-        return "IdCollection{" +
-                "collectionIdentifier='" + collectionIdentifier + '\'' +
-                "} " + super.toString();
-    }
+        if (identifier.contains("/")) {
+            throw new IllegalArgumentException("The collection identifier '" + identifier + "' contains '/'" +
+                    " which is forbidden. Maybe the string is an atom:id text and not just an identifier?");
+        }
 
-    private boolean isCollectionId(@NotNull String collectionId) {
-        String[] idParts = collectionId.split("/");
-        return getType() == ResourceType.COLLECTION && idParts.length == VALID_ID_PARTS;
-    }
+        return new AtomId(String.join("/", AtomId.DEFAULT_PREFIX, ResourceType.COLLECTION.getNameInId(), identifier));
 
-    private boolean isId(@NotNull String collectionIdentifier) {
-        return collectionIdentifier.contains("/");
     }
 
 }

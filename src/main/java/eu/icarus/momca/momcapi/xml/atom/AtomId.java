@@ -22,54 +22,48 @@ import org.jetbrains.annotations.NotNull;
 public class AtomId extends Element {
 
     @NotNull
-    private static final String DEFAULT_PREFIX = "tag:www.monasterium.net,2011:";
+    public static final String DEFAULT_PREFIX = "tag:www.monasterium.net,2011:";
     private static final int MAX_ID_PARTS = 5;
     private static final int MIN_ID_PARTS_WITHOUT_PREFIX = 2;
-    private static final int MIN_ID_PARTS_WITH_PREFIX = 3;
+    private static final int MIN_ID_PARTS = 3;
     @NotNull
-    private final String id;
+    private final String text;
     @NotNull
     private final ResourceType type;
 
-    /**
-     * Instantiates a new AtomId from an existing {@code atom:id} or by providing the individual parts to use for
-     * creation. Doesn't need to include the prefix {@code tag:www.monasterium.net,2011:}. The parts are encoded using
-     * {@link Util}.<br/>
-     * <br/>
-     * Example:<br/>
-     * <ul>
-     * <li>{@code new AtomId("tag:www.monasterium.net,2011:/charter/RS-IAGNS/Charters/IAGNS_F-.150_6605%7C193232")}</li>
-     * <li>{@code new AtomId("charter", "RS-IAGNS", "Charters", "IAGNS_F-.150_6605|193232"}</li>
-     * <li>{@code new AtomId("tag:www.monasterium.net,2011:", "charter", "RS-IAGNS", "Charters", "IAGNS_F-.150_6605|193232"}</li>
-     * </ul>
-     * Result: {@code <atom:id>tag:www.monasterium.net,2011:/charter/RS-IAGNS/Charters/IAGNS_F-.150_6605%7C193232<atom:id>}
-     *
-     * @param idParts The id parts to use for the id construction in their correct order.
-     */
-    AtomId(@NotNull String... idParts) {
+    AtomId(@NotNull String text) {
 
         super("atom:id", Namespace.ATOM.getUri());
 
-        if (idParts.length == 1) {
-            idParts = splitIntoParts(idParts[0]);
+        String[] idParts = text.split("/");
+
+        if (idParts.length < MIN_ID_PARTS || idParts.length > MAX_ID_PARTS) {
+            throw new IllegalArgumentException(String.format("'%s' is not a valid atom:id text.", text));
         }
 
-        if ((((idParts.length >= MIN_ID_PARTS_WITH_PREFIX) && idParts[0].equals(DEFAULT_PREFIX))
-                || ((idParts.length >= MIN_ID_PARTS_WITHOUT_PREFIX) && !idParts[0].equals(DEFAULT_PREFIX)))
-                && (idParts.length <= MAX_ID_PARTS)) {
+        if (isMissingPrefix(idParts)) {
+            throw new IllegalArgumentException(String.format("The prefix '%s' is missing from the provided ", DEFAULT_PREFIX));
+        }
 
-            type = (idParts[0].equals(DEFAULT_PREFIX))
-                    ? ResourceType.createFromValue(idParts[1]) : ResourceType.createFromValue(idParts[0]);
-            this.id = createIdFromParts(idParts);
-            appendChild(this.id);
+        type = ResourceType.createFromValue(idParts[1]);
 
-        } else {
-            String message = String.format(
-                    "'%s' has not the right amount of parts; probably not a valid atom:id",
-                    new Object[]{idParts});
+        if (hasWrongNumberOfPartsForType(idParts.length, type)) {
+            String message = String.format("'%s' doesn't have the correct number of parts, between '%d' and '%d'.",
+                    text, type.getMinIdParts(), type.getMaxIdParts());
             throw new IllegalArgumentException(message);
         }
 
+        this.text = text;
+        appendChild(text);
+
+    }
+
+    private boolean hasWrongNumberOfPartsForType(int numberOfParts, @NotNull ResourceType type) {
+        return numberOfParts < type.getMinIdParts() || numberOfParts > type.getMaxIdParts();
+    }
+
+    private boolean isMissingPrefix(@NotNull String... idParts) {
+        return !idParts[0].equals(DEFAULT_PREFIX);
     }
 
     /**
@@ -87,27 +81,8 @@ public class AtomId extends Element {
      * {@code tag:www.monasterium.net,2011:/charter/RS-IAGNS/Charters/IAGNS_F-.150_6605%7C193232}.
      */
     @NotNull
-    public String toText() {
-        return id;
-    }
-
-    @NotNull
-    private String createIdFromParts(@NotNull String[] idParts) {
-
-        StringBuilder idBuilder = new StringBuilder(DEFAULT_PREFIX);
-        for (String idPart : idParts) {
-            if (!idPart.equals(DEFAULT_PREFIX)) {
-                idBuilder.append("/");
-                idBuilder.append(Util.encode(idPart));
-            }
-        }
-        return idBuilder.toString();
-
-    }
-
-    @NotNull
-    private String[] splitIntoParts(@NotNull String id) {
-        return id.replace(DEFAULT_PREFIX + "/", "").split("/");
+    public String getText() {
+        return text;
     }
 
 }

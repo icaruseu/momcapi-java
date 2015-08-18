@@ -32,49 +32,49 @@ public class IdCharterTest {
     @Test
     public void testConstructorForCollectionCharter() throws Exception {
         IdCharter id = new IdCharter(COLLECTION_ID, COLLECTION_CHARTER_IDNO);
-        assertEquals(id.toText(), COLLECTION_CHARTER_ID);
+        assertEquals(id.getText(), COLLECTION_CHARTER_ID);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConstructorForCollectionCharterWithEmptyCollection() throws Exception {
         IdCharter id = new IdCharter("", COLLECTION_CHARTER_IDNO);
-        assertEquals(id.toText(), COLLECTION_CHARTER_ID);
+        assertEquals(id.getText(), COLLECTION_CHARTER_ID);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConstructorForCollectionCharterWithEmptyIdentifier() throws Exception {
         IdCharter id = new IdCharter(COLLECTION_ID, "");
-        assertEquals(id.toText(), COLLECTION_CHARTER_ID);
+        assertEquals(id.getText(), COLLECTION_CHARTER_ID);
     }
 
     @Test
     public void testConstructorForFondCharter() throws Exception {
         IdCharter id = new IdCharter(ARCHIVE_ID, FOND_ID, FOND_CHARTER_IDNO);
-        assertEquals(id.toText(), FOND_CHARTER_ID);
+        assertEquals(id.getText(), FOND_CHARTER_ID);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConstructorForFondCharterWithEmptyArchive() throws Exception {
         IdCharter id = new IdCharter("", FOND_ID, FOND_CHARTER_IDNO);
-        assertEquals(id.toText(), FOND_CHARTER_ID);
+        assertEquals(id.getText(), FOND_CHARTER_ID);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConstructorForFondCharterWithEmptyFond() throws Exception {
         IdCharter id = new IdCharter(ARCHIVE_ID, "", FOND_CHARTER_IDNO);
-        assertEquals(id.toText(), FOND_CHARTER_ID);
+        assertEquals(id.getText(), FOND_CHARTER_ID);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConstructorForFondCharterWithEmptyIdentifier() throws Exception {
         IdCharter id = new IdCharter(ARCHIVE_ID, FOND_ID, "");
-        assertEquals(id.toText(), FOND_CHARTER_ID);
+        assertEquals(id.getText(), FOND_CHARTER_ID);
     }
 
     @Test
     public void testConstructorForId() throws Exception {
         IdCharter id = new IdCharter(FOND_CHARTER_ID);
-        assertEquals(id.toText(), FOND_CHARTER_ID);
+        assertEquals(id.getText(), FOND_CHARTER_ID);
         assertEquals(id.getCharterIdentifier(), FOND_CHARTER_IDNO);
     }
 

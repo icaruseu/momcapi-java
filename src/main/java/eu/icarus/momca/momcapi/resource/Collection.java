@@ -62,7 +62,7 @@ public class Collection extends MomcaResource {
     }
 
     public String getIdentifier() {
-        return id.getCollectionIdentifier();
+        return id.getIdentifier();
     }
 
     @NotNull

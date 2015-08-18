@@ -19,7 +19,7 @@ public class IdMyCollectionTest {
 
         IdMyCollection id = new IdMyCollection(identifier);
         assertEquals(id.getIdentifier(), identifier);
-        assertEquals(id.getAtomId().toText(), idText);
+        assertEquals(id.getAtomId().getText(), idText);
         assertEquals(id.getAtomId().toXML(), atomIdXml);
 
     }

@@ -41,7 +41,7 @@ public class CollectionManager extends AbstractManager {
         }
 
         if (getCollection(id).isPresent()) {
-            String message = String.format("An collection for the id '%s' is already existing.", id.toText());
+            String message = String.format("An collection for the id '%s' is already existing.", id.getAtomId().getText());
             throw new IllegalArgumentException(message);
         }
 
@@ -60,20 +60,20 @@ public class CollectionManager extends AbstractManager {
         if (!momcaConnection.getCharterManager().listChartersPublic(idCollection).isEmpty()
                 || !momcaConnection.getCharterManager().listChartersImport(idCollection).isEmpty()) {
             String message = String.format("There are still existing charters for collection '%s'",
-                    idCollection.getCollectionIdentifier());
+                    idCollection.getIdentifier());
             throw new IllegalArgumentException(message);
         }
 
         momcaConnection.deleteCollection(String.format("%s/%s",
-                ResourceRoot.PUBLIC_CHARTERS.getUri(), idCollection.getCollectionIdentifier()));
+                ResourceRoot.PUBLIC_CHARTERS.getUri(), idCollection.getIdentifier()));
         momcaConnection.deleteCollection(String.format("%s/%s",
-                ResourceRoot.ARCHIVAL_COLLECTIONS.getUri(), idCollection.getCollectionIdentifier()));
+                ResourceRoot.ARCHIVAL_COLLECTIONS.getUri(), idCollection.getIdentifier()));
 
     }
 
     @NotNull
     public Optional<Collection> getCollection(@NotNull IdCollection idCollection) {
-        return getMomcaResource(idCollection).map(Collection::new);
+        return getMomcaResource(idCollection.getAtomId()).map(Collection::new);
     }
 
     @NotNull
@@ -162,7 +162,7 @@ public class CollectionManager extends AbstractManager {
 
         AtomAuthor atomAuthor = new AtomAuthor(authorEmail);
         String now = momcaConnection.queryDatabase(ExistQueryFactory.getCurrentDateTime()).get(0);
-        Element resourceContent = new AtomEntry(id, atomAuthor, now, cei);
+        Element resourceContent = new AtomEntry(id.getAtomId(), atomAuthor, now, cei);
 
         keywords.ifPresent(element -> resourceContent.insertChild(element, 6));
 

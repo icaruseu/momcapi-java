@@ -37,7 +37,7 @@ public class ExistQueryFactory {
                 "%s collection('%s')//atom:entry[.//atom:id/text()='%s'][1]",
                 getNamespaceDeclaration(Namespace.ATOM),
                 getRootCollectionString(resourceRoot),
-                resourceAtomId.toText());
+                resourceAtomId.getText());
 
         return new ExistQuery(query);
 
@@ -135,7 +135,7 @@ public class ExistQueryFactory {
                         " return concat(util:collection-name($node), '/', util:document-name($node))",
                 getNamespaceDeclaration(Namespace.ATOM),
                 getRootCollectionString(resourceRoot),
-                resourceAtomId.toText());
+                resourceAtomId.getText());
 
         return new ExistQuery(query);
 
@@ -237,7 +237,7 @@ public class ExistQueryFactory {
                 "%s collection('%s/%s')//atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM),
                 ResourceRoot.IMPORTED_ARCHIVAL_CHARTERS.getUri(),
-                idCollection.getCollectionIdentifier());
+                idCollection.getIdentifier());
 
         return new ExistQuery(query);
 
@@ -290,7 +290,7 @@ public class ExistQueryFactory {
                 "%s collection('%s/%s')//atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM),
                 ResourceRoot.PUBLIC_CHARTERS.getUri(),
-                idCollection.getCollectionIdentifier());
+                idCollection.getIdentifier());
 
         return new ExistQuery(query);
 

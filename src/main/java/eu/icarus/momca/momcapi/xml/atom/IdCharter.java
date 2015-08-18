@@ -81,7 +81,12 @@ public class IdCharter extends AtomId {
      */
     public IdCharter(@NotNull String archiveIdentifier, @NotNull String fondIdentifier, @NotNull String charterIdentifier) {
 
-        super(ResourceType.CHARTER.getNameInId(), archiveIdentifier, fondIdentifier, charterIdentifier);
+        super(String.join("/",
+                AtomId.DEFAULT_PREFIX,
+                ResourceType.CHARTER.getNameInId(),
+                archiveIdentifier,
+                fondIdentifier,
+                charterIdentifier));
 
         if (archiveIdentifier.isEmpty() || fondIdentifier.isEmpty() || charterIdentifier.isEmpty()) {
             throw new IllegalArgumentException("The id is not allowed to have any empty identifier strings.");
@@ -102,7 +107,11 @@ public class IdCharter extends AtomId {
      */
     public IdCharter(@NotNull String collectionIdentifier, @NotNull String charterIdentifier) {
 
-        super(ResourceType.CHARTER.getNameInId(), collectionIdentifier, charterIdentifier);
+        super(String.join("/",
+                AtomId.DEFAULT_PREFIX,
+                ResourceType.CHARTER.getNameInId(),
+                collectionIdentifier,
+                charterIdentifier));
 
         if (collectionIdentifier.isEmpty() || charterIdentifier.isEmpty()) {
             throw new IllegalArgumentException("The id is not allowed to have any empty identifier strings.");

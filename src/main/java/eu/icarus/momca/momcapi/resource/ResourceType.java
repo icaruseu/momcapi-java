@@ -12,18 +12,22 @@ import java.util.Optional;
  */
 public enum ResourceType {
 
-    ANNOTATION_IMAGE("annotation-image"),
-    ARCHIVE("archive"),
-    CHARTER("charter"),
-    COLLECTION("collection"),
-    FOND("fond"),
-    MY_COLLECTION("mycollection"),
-    SVG("svg");
+    ANNOTATION_IMAGE("annotation-image", 5, 5),
+    ARCHIVE("archive", 3, 3),
+    CHARTER("charter", 4, 5),
+    COLLECTION("collection", 3, 3),
+    FOND("fond", 4, 4),
+    MY_COLLECTION("mycollection", 3, 3),
+    SVG("svg", 5, 5);
 
+    private final int maxIdParts;
     private final String nameInId;
+    private final int minIdParts;
 
-    ResourceType(String nameInId) {
+    ResourceType(String nameInId, int minIdParts, int maxIdParts) {
         this.nameInId = nameInId;
+        this.minIdParts = minIdParts;
+        this.maxIdParts = maxIdParts;
     }
 
     /**
@@ -43,6 +47,14 @@ public enum ResourceType {
 
         return type.orElseThrow(IllegalArgumentException::new);
 
+    }
+
+    public int getMaxIdParts() {
+        return maxIdParts;
+    }
+
+    public int getMinIdParts() {
+        return minIdParts;
     }
 
     /**

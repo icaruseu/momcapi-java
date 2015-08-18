@@ -21,7 +21,7 @@ public class IdMyCollection extends IdAbstract {
     private static AtomId initAtomId(@NotNull String identifier) {
 
         if (identifier.contains("/")) {
-            throw new IllegalArgumentException("The collection identifier '" + identifier + "' contains '/'" +
+            throw new IllegalArgumentException("The myCollection identifier '" + identifier + "' contains '/'" +
                     " which is forbidden. Maybe the string is an atom:id text and not just an identifier?");
         }
 

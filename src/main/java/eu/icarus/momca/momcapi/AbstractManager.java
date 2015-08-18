@@ -31,7 +31,7 @@ abstract class AbstractManager {
         if (!resourceUris.isEmpty()) {
 
             if (resourceUris.size() > 1) {
-                String message = String.format("More than one result for atomId '%s'", atomId.toText());
+                String message = String.format("More than one result for atomId '%s'", atomId.getText());
                 throw new MomcaException(message);
             }
 
