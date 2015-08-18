@@ -3,7 +3,7 @@ package eu.icarus.momca.momcapi;
 import eu.icarus.momca.momcapi.exception.MomcaException;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
 import eu.icarus.momca.momcapi.resource.MomcaResource;
-import eu.icarus.momca.momcapi.xml.atom.Id;
+import eu.icarus.momca.momcapi.xml.atom.AtomId;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -22,16 +22,16 @@ abstract class AbstractManager {
     }
 
     @NotNull
-    Optional<MomcaResource> getMomcaResource(@NotNull Id id) {
+    Optional<MomcaResource> getMomcaResource(@NotNull AtomId atomId) {
 
-        List<String> resourceUris = momcaConnection.queryDatabase(ExistQueryFactory.getResourceUri(id, null));
+        List<String> resourceUris = momcaConnection.queryDatabase(ExistQueryFactory.getResourceUri(atomId, null));
 
         Optional<MomcaResource> resource = Optional.empty();
 
         if (!resourceUris.isEmpty()) {
 
             if (resourceUris.size() > 1) {
-                String message = String.format("More than one result for id '%s'", id.getId());
+                String message = String.format("More than one result for atomId '%s'", atomId.getId());
                 throw new MomcaException(message);
             }
 

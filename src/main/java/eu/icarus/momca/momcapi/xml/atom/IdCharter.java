@@ -13,7 +13,7 @@ import java.util.Optional;
  * @author Daniel Jeller
  *         Created on 25.06.2015.
  */
-public class IdCharter extends Id {
+public class IdCharter extends AtomId {
 
     private static final int MAX_ID_PARTS = 5;
     private static final int MIN_ID_PARTS = 4;

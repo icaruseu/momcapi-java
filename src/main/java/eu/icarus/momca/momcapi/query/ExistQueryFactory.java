@@ -24,20 +24,20 @@ public class ExistQueryFactory {
     }
 
     /**
-     * @param resourceId   The resource's {@code atom:id}.
+     * @param resourceAtomId   The resource's {@code atom:id}.
      * @param resourceRoot The resource root of the resource the search should be restricted to. If {@code null},
      *                     the whole database is searched.
-     * @return A query to check if a resource matching {@code resourceId} is existing in the database at the
+     * @return A query to check if a resource matching {@code resourceAtomId} is existing in the database at the
      * specified {@code resourceRoot}.
      */
     @NotNull
-    public static ExistQuery checkResourceExistence(@NotNull Id resourceId, @Nullable ResourceRoot resourceRoot) {
+    public static ExistQuery checkResourceExistence(@NotNull AtomId resourceAtomId, @Nullable ResourceRoot resourceRoot) {
 
         String query = String.format(
                 "%s collection('%s')//atom:entry[.//atom:id/text()='%s'][1]",
                 getNamespaceDeclaration(Namespace.ATOM),
                 getRootCollectionString(resourceRoot),
-                resourceId.getId());
+                resourceAtomId.getId());
 
         return new ExistQuery(query);
 
@@ -120,14 +120,14 @@ public class ExistQueryFactory {
     }
 
     /**
-     * @param resourceId   The {@code atom:id} of the resource to locate.
+     * @param resourceAtomId   The {@code atom:id} of the resource to locate.
      * @param resourceRoot The resource root of the resource the search should be restricted to. If {@code null},
      *                     the whole database is searched.
      * @return A query to get the absolute URIs, e.g. {@code /db/mom-data/xrx.user/admin.xml}, of all resources
-     * matching {@code resourceId} in {@code ResourceRoot} in the database.
+     * matching {@code resourceAtomId} in {@code ResourceRoot} in the database.
      */
     @NotNull
-    public static ExistQuery getResourceUri(@NotNull Id resourceId, @Nullable ResourceRoot resourceRoot) {
+    public static ExistQuery getResourceUri(@NotNull AtomId resourceAtomId, @Nullable ResourceRoot resourceRoot) {
 
         String query = String.format(
                 "%s let $nodes := collection('%s')//atom:entry[.//atom:id/text()='%s']" +
@@ -135,7 +135,7 @@ public class ExistQueryFactory {
                         " return concat(util:collection-name($node), '/', util:document-name($node))",
                 getNamespaceDeclaration(Namespace.ATOM),
                 getRootCollectionString(resourceRoot),
-                resourceId.getId());
+                resourceAtomId.getId());
 
         return new ExistQuery(query);
 

@@ -115,7 +115,7 @@ public class FondManager extends AbstractManager {
     }
 
     @NotNull
-    private AtomEntry createEadContent(@NotNull String authorEmail, @NotNull Id id, @NotNull String
+    private AtomEntry createEadContent(@NotNull String authorEmail, @NotNull AtomId atomId, @NotNull String
             identifier, @NotNull String name) {
 
         String eadString = String.format(EAD_TEMPLATE, identifier, identifier, name);
@@ -123,7 +123,7 @@ public class FondManager extends AbstractManager {
 
         AtomAuthor atomAuthor = new AtomAuthor(authorEmail);
         String now = momcaConnection.queryDatabase(ExistQueryFactory.getCurrentDateTime()).get(0);
-        return new AtomEntry(id, atomAuthor, now, eadElement);
+        return new AtomEntry(atomId, atomAuthor, now, eadElement);
 
     }
 

@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
  *         Created on 21.07.2015.
  * @see IdCollection
  */
-public class IdMyCollection extends Id {
+public class IdMyCollection extends AtomId {
 
     private static final int VALID_ID_PARTS = 3;
     @NotNull

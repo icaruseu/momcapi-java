@@ -10,17 +10,17 @@ import org.jetbrains.annotations.NotNull;
  */
 public class AtomEntry extends Element {
 
-    public AtomEntry(@NotNull Id id, @NotNull AtomAuthor atomAuthor, @NotNull String currentDateTime, @NotNull Element childContent) {
+    public AtomEntry(@NotNull AtomId atomId, @NotNull AtomAuthor atomAuthor, @NotNull String currentDateTime, @NotNull Element childContent) {
         super("atom:entry", Namespace.ATOM.getUri());
-        initContent(atomAuthor, currentDateTime, id, childContent);
+        initContent(atomAuthor, currentDateTime, atomId, childContent);
     }
 
-    private void initContent(@NotNull AtomAuthor atomAuthor, @NotNull String currentDateTime, @NotNull Id id, @NotNull Element childContent) {
+    private void initContent(@NotNull AtomAuthor atomAuthor, @NotNull String currentDateTime, @NotNull AtomId atomId, @NotNull Element childContent) {
 
         String atomUri = Namespace.ATOM.getUri();
         String appUri = Namespace.APP.getUri();
 
-        appendChild(id);
+        appendChild(atomId);
 
         appendChild(new Element("atom:title", atomUri));
 

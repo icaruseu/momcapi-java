@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Daniel Jeller
  *         Created on 20.07.2015.
  */
-public class IdArchive extends Id {
+public class IdArchive extends AtomId {
 
     private static final int VALID_ID_PARTS = 3;
     @NotNull
