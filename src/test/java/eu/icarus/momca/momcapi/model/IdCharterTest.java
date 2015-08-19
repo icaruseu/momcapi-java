@@ -162,5 +162,14 @@ public class IdCharterTest {
 
     }
 
+    @Test
+    public void testEquals() throws Exception {
+
+        IdCharter id1 = new IdCharter(IDENTIFIER_COLLECTION, IDENTIFIER_COLLECTION_CHARTER);
+        IdCharter id2 = new IdCharter(new AtomId(ATOM_ID_TEXT_COLLECTION_CHARTER));
+
+        assertTrue(id1.equals(id2));
+
+    }
 
 }

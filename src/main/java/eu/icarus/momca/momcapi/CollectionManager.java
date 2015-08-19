@@ -5,7 +5,6 @@ import eu.icarus.momca.momcapi.query.ExistQueryFactory;
 import eu.icarus.momca.momcapi.xml.Namespace;
 import eu.icarus.momca.momcapi.xml.atom.AtomAuthor;
 import eu.icarus.momca.momcapi.xml.atom.AtomEntry;
-import eu.icarus.momca.momcapi.model.IdCollection;
 import eu.icarus.momca.momcapi.xml.atom.AtomId;
 import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
@@ -27,7 +26,7 @@ public class CollectionManager extends AbstractManager {
     }
 
     @NotNull
-    public Collection addCollection(@NotNull String identifier, @NotNull String name, @NotNull String authorEmail,
+    public Collection addCollection(@NotNull String identifier, @NotNull String name, @NotNull IdUser authorId,
                                     @Nullable Country country, @Nullable Region region, @Nullable String imageServerAddress,
                                     @Nullable String imageFolderName, @Nullable String keyWord) {
 
@@ -37,7 +36,7 @@ public class CollectionManager extends AbstractManager {
             throw new IllegalArgumentException("The name of the new collection is not allowed to be an empty string.");
         }
 
-        if (authorEmail.isEmpty()) {
+        if (authorId.getIdentifier().isEmpty()) {
             throw new IllegalArgumentException("AuthorEmail is not allowed to be an empty string.");
         }
 
@@ -46,7 +45,7 @@ public class CollectionManager extends AbstractManager {
             throw new IllegalArgumentException(message);
         }
 
-        MomcaResource resource = createNewCollectionResource(identifier, name, authorEmail, country, region,
+        MomcaResource resource = createNewCollectionResource(identifier, name, authorId, country, region,
                 imageServerAddress, imageFolderName, keyWord, id);
 
         momcaConnection.addCollection(identifier, ResourceRoot.ARCHIVAL_COLLECTIONS.getUri());
@@ -54,47 +53,6 @@ public class CollectionManager extends AbstractManager {
 
         return getCollection(id).orElseThrow(RuntimeException::new);
 
-    }
-
-    public void deleteCollection(@NotNull IdCollection idCollection) {
-
-        if (!momcaConnection.getCharterManager().listChartersPublic(idCollection).isEmpty()
-                || !momcaConnection.getCharterManager().listChartersImport(idCollection).isEmpty()) {
-            String message = String.format("There are still existing charters for collection '%s'",
-                    idCollection.getIdentifier());
-            throw new IllegalArgumentException(message);
-        }
-
-        momcaConnection.deleteCollection(String.format("%s/%s",
-                ResourceRoot.PUBLIC_CHARTERS.getUri(), idCollection.getIdentifier()));
-        momcaConnection.deleteCollection(String.format("%s/%s",
-                ResourceRoot.ARCHIVAL_COLLECTIONS.getUri(), idCollection.getIdentifier()));
-
-    }
-
-    @NotNull
-    public Optional<Collection> getCollection(@NotNull IdCollection idCollection) {
-        return getMomcaResource(idCollection.getContentXml()).map(Collection::new);
-    }
-
-    @NotNull
-    public List<IdCollection> listCollections(@NotNull Country country) {
-        List<String> queryResults = momcaConnection.queryDatabase(
-                ExistQueryFactory.listCollectionsForCountry(country.getCountryCode()));
-        return queryResults.stream().map(AtomId::new).map(IdCollection::new).collect(Collectors.toList());
-    }
-
-    @NotNull
-    public List<IdCollection> listCollections(@NotNull Region region) {
-        List<String> queryResults = momcaConnection.queryDatabase(
-                ExistQueryFactory.listCollectionsForRegion(region.getNativeName()));
-        return queryResults.stream().map(AtomId::new).map(IdCollection::new).collect(Collectors.toList());
-    }
-
-    @NotNull
-    public List<IdCollection> listCollections() {
-        List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listCollections());
-        return queryResults.stream().map(AtomId::new).map(IdCollection::new).collect(Collectors.toList());
     }
 
     @NotNull
@@ -150,7 +108,7 @@ public class CollectionManager extends AbstractManager {
 
     @NotNull
     private MomcaResource createNewCollectionResource(@NotNull String identifier, @NotNull String name,
-                                                      @NotNull String authorEmail, @Nullable Country country,
+                                                      @NotNull IdUser idUser, @Nullable Country country,
                                                       @Nullable Region region, @Nullable String imageServerAddress,
                                                       @Nullable String imageFolderName, @Nullable String keyWord,
                                                       @NotNull IdCollection id) {
@@ -161,14 +119,54 @@ public class CollectionManager extends AbstractManager {
         Optional<Element> keywords = createKeywordsElement(keyWord);
         Element cei = createCeiElement(identifier, name, country, region, imageServerAddress, imageFolderName);
 
-        AtomAuthor atomAuthor = new AtomAuthor(authorEmail);
         String now = momcaConnection.queryDatabase(ExistQueryFactory.getCurrentDateTime()).get(0);
-        Element resourceContent = new AtomEntry(id.getContentXml(), atomAuthor, now, cei);
+        Element resourceContent = new AtomEntry(id.getContentXml(), idUser.getContentXml(), now, cei);
 
         keywords.ifPresent(element -> resourceContent.insertChild(element, 6));
 
         return new MomcaResource(resourceName, collectionUri, resourceContent.toXML());
 
+    }
+
+    public void deleteCollection(@NotNull IdCollection idCollection) {
+
+        if (!momcaConnection.getCharterManager().listChartersPublic(idCollection).isEmpty()
+                || !momcaConnection.getCharterManager().listChartersImport(idCollection).isEmpty()) {
+            String message = String.format("There are still existing charters for collection '%s'",
+                    idCollection.getIdentifier());
+            throw new IllegalArgumentException(message);
+        }
+
+        momcaConnection.deleteCollection(String.format("%s/%s",
+                ResourceRoot.PUBLIC_CHARTERS.getUri(), idCollection.getIdentifier()));
+        momcaConnection.deleteCollection(String.format("%s/%s",
+                ResourceRoot.ARCHIVAL_COLLECTIONS.getUri(), idCollection.getIdentifier()));
+
+    }
+
+    @NotNull
+    public Optional<Collection> getCollection(@NotNull IdCollection idCollection) {
+        return getMomcaResource(idCollection.getContentXml()).map(Collection::new);
+    }
+
+    @NotNull
+    public List<IdCollection> listCollections(@NotNull Country country) {
+        List<String> queryResults = momcaConnection.queryDatabase(
+                ExistQueryFactory.listCollectionsForCountry(country.getCountryCode()));
+        return queryResults.stream().map(AtomId::new).map(IdCollection::new).collect(Collectors.toList());
+    }
+
+    @NotNull
+    public List<IdCollection> listCollections(@NotNull Region region) {
+        List<String> queryResults = momcaConnection.queryDatabase(
+                ExistQueryFactory.listCollectionsForRegion(region.getNativeName()));
+        return queryResults.stream().map(AtomId::new).map(IdCollection::new).collect(Collectors.toList());
+    }
+
+    @NotNull
+    public List<IdCollection> listCollections() {
+        List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listCollections());
+        return queryResults.stream().map(AtomId::new).map(IdCollection::new).collect(Collectors.toList());
     }
 
 }

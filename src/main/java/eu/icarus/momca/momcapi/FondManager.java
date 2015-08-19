@@ -25,12 +25,12 @@ public class FondManager extends AbstractManager {
     }
 
     @NotNull
-    public Fond addFond(@NotNull String authorEmail, @NotNull Archive archive, @NotNull String identifier,
+    public Fond addFond(@NotNull IdUser userId, @NotNull Archive archive, @NotNull String identifier,
                         @NotNull String name, @Nullable ImageAccess imageAccess, @Nullable URL imagesUrl,
                         @Nullable URL dummyImageUrl) {
 
-        if (!momcaConnection.getUserManager().getUser(authorEmail).isPresent()) {
-            String message = String.format("The author '%s' is not existing in the database.", authorEmail);
+        if (!momcaConnection.getUserManager().getUser(userId).isPresent()) {
+            String message = String.format("The author '%s' is not existing in the database.", userId);
             throw new IllegalArgumentException(message);
         }
 
@@ -56,7 +56,7 @@ public class FondManager extends AbstractManager {
         String fondCollectionUri = archiveCollectionUri + "/" + identifier;
 
         String eadName = identifier + ".ead.xml";
-        Element eadContent = createEadContent(authorEmail, id.getContentXml(), identifier, name);
+        Element eadContent = createEadContent(userId.getIdentifier(), id.getContentXml(), identifier, name);
         MomcaResource eadResource = new MomcaResource(eadName, fondCollectionUri, eadContent.toXML());
 
         String preferencesName = identifier + ".preferences.xml";

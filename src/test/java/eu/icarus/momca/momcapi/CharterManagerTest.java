@@ -1,7 +1,7 @@
 package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.model.*;
-import eu.icarus.momca.momcapi.xml.atom.*;
+import eu.icarus.momca.momcapi.xml.atom.AtomId;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -126,11 +126,11 @@ public class CharterManagerTest {
     @Test
     public void testListChartersPrivateForUser() throws Exception {
 
-        User user1 = mc.getUserManager().getUser("user1.testuser@dev.monasterium.net").get();
+        IdUser user1 = new IdUser("user1.testuser@dev.monasterium.net");
         List<IdCharter> charters1 = cm.listChartersPrivate(user1);
         assertEquals(charters1.size(), 2);
 
-        User user2 = mc.getUserManager().getUser("user2.testuser@dev.monasterium.net").get();
+        IdUser user2 = new IdUser("user2.testuser@dev.monasterium.net");
         List<IdCharter> charters2 = cm.listChartersPrivate(user2);
         assertEquals(charters2.size(), 0);
 
@@ -183,12 +183,10 @@ public class CharterManagerTest {
     @Test
     public void testlistErroneouslySavedCharters() throws Exception {
 
-        UserManager um = mc.getUserManager();
-        User user = um.getUser("admin").get();
-
+        IdUser id = new IdUser("admin");
         IdCharter erroneouslySavedCharter = new IdCharter(new AtomId("tag:www.monasterium.net,2011:/charter/CH-KAE/Urkunden/KAE_Urkunde_Nr_1"));
 
-        List<IdCharter> erroneouslySavedCharterIds = cm.listErroneouslySavedCharters(user);
+        List<IdCharter> erroneouslySavedCharterIds = cm.listErroneouslySavedCharters(id);
         assertEquals(erroneouslySavedCharterIds.size(), 1);
         assertEquals(erroneouslySavedCharterIds.get(0).getContentXml().toXML(), erroneouslySavedCharter.getContentXml().toXML());
 

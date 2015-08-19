@@ -1,7 +1,6 @@
 package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.model.*;
-import eu.icarus.momca.momcapi.model.IdArchive;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -27,7 +26,7 @@ public class ArchiveManagerTest {
     @Test
     public void testAddArchive() throws Exception {
 
-        String author = "admin";
+        IdUser author = new IdUser("admin");
         Country country = mc.getCountryManager().getCountry(new CountryCode("DE")).get();
         Region region = country.getRegions().stream().filter(s -> s.getCode().get().equals("DE-BW")).findFirst().get();
         String shortName = "DE-GLAK";
@@ -57,7 +56,7 @@ public class ArchiveManagerTest {
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddArchiveAlreadyExisting() throws Exception {
 
-        String author = "admin";
+        IdUser author = new IdUser("admin");
         Country country = mc.getCountryManager().getCountry(new CountryCode("DE")).get();
         Region region = country.getRegions().stream().filter(r -> r.getCode().get().equals("DE-BY")).findFirst().get();
         String shortName = "DE-BayHStA";
@@ -73,7 +72,7 @@ public class ArchiveManagerTest {
     @Test
     public void testDeleteArchive() throws Exception {
 
-        String author = "admin";
+        IdUser author = new IdUser("admin");
         Country country = mc.getCountryManager().getCountry(new CountryCode("DE")).get();
         Region region = country.getRegions().stream().filter(r -> r.getCode().get().equals("DE-BW")).findFirst().get();
         String shortName = "DE-HStASt";

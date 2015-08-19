@@ -255,13 +255,13 @@ public class ExistQueryFactory {
     }
 
     @NotNull
-    public static ExistQuery listChartersPrivate(@NotNull User user) {
+    public static ExistQuery listChartersPrivate(@NotNull IdUser idUser) {
 
         String query = String.format(
                 "%s collection('%s')//atom:entry[contains(./atom:id/text(), 'charter')][./atom:author/atom:email/text()='%s']/atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM),
                 ResourceRoot.USER_DATA.getUri(),
-                user.getUserName());
+                idUser.getIdentifier());
 
         return new ExistQuery(query);
 

@@ -4,6 +4,7 @@ import eu.icarus.momca.momcapi.xml.atom.AtomAuthor;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Created by djell on 19/08/2015.
@@ -32,6 +33,19 @@ public class IdUserTest {
         IdUser id = new IdUser("");
         assertEquals(id.getIdentifier(), "");
         assertEquals(id.getContentXml().toXML(), "");
+    }
+
+    @Test
+    public void testEquals() throws Exception {
+
+        String userMail = "user1@example.com";
+        AtomAuthor atomAuthor = new AtomAuthor(userMail);
+
+        IdUser id1 = new IdUser(userMail);
+        IdUser id2 = new IdUser(atomAuthor);
+
+        assertTrue(id1.equals(id2));
+
     }
 
     @Test

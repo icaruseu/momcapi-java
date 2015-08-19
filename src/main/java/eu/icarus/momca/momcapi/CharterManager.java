@@ -3,10 +3,11 @@ package eu.icarus.momca.momcapi;
 import eu.icarus.momca.momcapi.model.*;
 import eu.icarus.momca.momcapi.query.ExistQuery;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
-import eu.icarus.momca.momcapi.xml.atom.*;
+import eu.icarus.momca.momcapi.xml.atom.AtomId;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -19,6 +20,13 @@ public class CharterManager extends AbstractManager {
 
     CharterManager(@NotNull MomcaConnection momcaConnection) {
         super(momcaConnection);
+    }
+
+    @NotNull
+    private Optional<Charter> getCharterFromUri(@NotNull String charterUri) {
+        String resourceName = Util.getLastUriPart(charterUri);
+        String parentUri = Util.getParentUri(charterUri);
+        return momcaConnection.getExistResource(resourceName, parentUri).map(Charter::new);
     }
 
     @NotNull
@@ -45,6 +53,11 @@ public class CharterManager extends AbstractManager {
 
     }
 
+    private boolean isCharterExisting(@NotNull IdCharter idCharter, @Nullable ResourceRoot resourceRoot) {
+        ExistQuery query = ExistQueryFactory.checkResourceExistence(idCharter.getContentXml(), resourceRoot);
+        return !momcaConnection.queryDatabase(query).isEmpty();
+    }
+
     @NotNull
     public List<IdCharter> listChartersImport(@NotNull IdFond idFond) {
         List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listChartersImport(idFond));
@@ -64,8 +77,8 @@ public class CharterManager extends AbstractManager {
     }
 
     @NotNull
-    public List<IdCharter> listChartersPrivate(@NotNull User user) {
-        List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listChartersPrivate(user));
+    public List<IdCharter> listChartersPrivate(@NotNull IdUser idUser) {
+        List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listChartersPrivate(idUser));
         return queryResults.stream().map(AtomId::new).map(IdCharter::new).collect(Collectors.toList());
     }
 
@@ -94,22 +107,20 @@ public class CharterManager extends AbstractManager {
     }
 
     @NotNull
-    public List<IdCharter> listErroneouslySavedCharters(@NotNull User user) {
-        return user.listSavedCharterIds().stream()
-                .filter(idCharter -> !isCharterExisting(idCharter, ResourceRoot.ARCHIVAL_CHARTERS_BEING_EDITED))
-                .collect(Collectors.toList());
-    }
+    public List<IdCharter> listErroneouslySavedCharters(@NotNull IdUser idUser) {
 
-    @NotNull
-    private Optional<Charter> getCharterFromUri(@NotNull String charterUri) {
-        String resourceName = Util.getLastUriPart(charterUri);
-        String parentUri = Util.getParentUri(charterUri);
-        return momcaConnection.getExistResource(resourceName, parentUri).map(Charter::new);
-    }
+        List<IdCharter> results = new ArrayList<>(0);
 
-    private boolean isCharterExisting(@NotNull IdCharter idCharter, @Nullable ResourceRoot resourceRoot) {
-        ExistQuery query = ExistQueryFactory.checkResourceExistence(idCharter.getContentXml(), resourceRoot);
-        return !momcaConnection.queryDatabase(query).isEmpty();
+        momcaConnection.getUserManager().getUser(idUser).ifPresent(user -> {
+
+            results.addAll(user.listSavedCharterIds().stream()
+                    .filter(idCharter -> !isCharterExisting(idCharter, ResourceRoot.ARCHIVAL_CHARTERS_BEING_EDITED))
+                    .collect(Collectors.toList()));
+
+        });
+
+        return results;
+
     }
 
 }

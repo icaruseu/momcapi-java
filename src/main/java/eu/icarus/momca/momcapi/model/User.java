@@ -46,6 +46,16 @@ public class User extends MomcaResource {
 
     }
 
+    @NotNull
+    public IdUser getId() {
+        return new IdUser(userName);
+    }
+
+    @NotNull
+    public IdUser getIdModerator() {
+        return new IdUser(moderator);
+    }
+
     /**
      * @return The name of the user's moderator.
      */

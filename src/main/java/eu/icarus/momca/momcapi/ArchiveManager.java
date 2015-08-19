@@ -3,9 +3,7 @@ package eu.icarus.momca.momcapi;
 import eu.icarus.momca.momcapi.model.*;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
 import eu.icarus.momca.momcapi.xml.Namespace;
-import eu.icarus.momca.momcapi.xml.atom.AtomAuthor;
 import eu.icarus.momca.momcapi.xml.atom.AtomEntry;
-import eu.icarus.momca.momcapi.model.IdArchive;
 import eu.icarus.momca.momcapi.xml.atom.AtomId;
 import eu.icarus.momca.momcapi.xml.eag.Desc;
 import nu.xom.Attribute;
@@ -27,7 +25,7 @@ public class ArchiveManager extends AbstractManager {
     }
 
     @NotNull
-    public Archive addArchive(@NotNull String authorEmail, @NotNull String identifier, @NotNull String name,
+    public Archive addArchive(@NotNull IdUser authorId, @NotNull String identifier, @NotNull String name,
                               @NotNull Country country, @Nullable Region region, @NotNull Address address,
                               @NotNull ContactInformation contactInformation, @NotNull String logoUrl) {
 
@@ -43,7 +41,7 @@ public class ArchiveManager extends AbstractManager {
 
         String resourceName = identifier + ".eag.xml";
         String parentCollectionUri = archivesCollection + "/" + identifier;
-        Element resourceContent = createNewArchiveResourceContent(authorEmail,
+        Element resourceContent = createNewArchiveResourceContent(authorId,
                 identifier, name, country, region, address, contactInformation, logoUrl);
 
         MomcaResource resource = new MomcaResource(resourceName,
@@ -54,48 +52,6 @@ public class ArchiveManager extends AbstractManager {
         return getArchive(id).orElseThrow(RuntimeException::new);
 
     }
-
-    public void deleteArchive(@NotNull Archive archive) {
-
-        if (!momcaConnection.getFondManager().listFonds(archive.getId()).isEmpty()) {
-            String message = String.format("The archive '%s',  that is to be deleted still has associated fonds.",
-                    archive.getIdentifier());
-            throw new IllegalArgumentException(message);
-        }
-
-        momcaConnection.deleteCollection(String.format("%s/%s",
-                ResourceRoot.ARCHIVES.getUri(), archive.getId().getIdentifier()));
-        momcaConnection.deleteCollection(String.format("%s/%s",
-                ResourceRoot.ARCHIVAL_FONDS.getUri(), archive.getId().getIdentifier()));
-
-    }
-
-    @NotNull
-    public Optional<Archive> getArchive(@NotNull IdArchive idArchive) {
-        return getMomcaResource(idArchive.getContentXml()).map(Archive::new);
-    }
-
-
-    @NotNull
-    public List<IdArchive> listArchives() {
-        List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listArchives());
-        return queryResults.stream().map(AtomId::new).map(IdArchive::new).collect(Collectors.toList());
-    }
-
-    @NotNull
-    public List<IdArchive> listArchives(@NotNull Country country) {
-        List<String> queryResults = momcaConnection.queryDatabase(
-                ExistQueryFactory.listArchivesForCountry(country.getCountryCode()));
-        return queryResults.stream().map(AtomId::new).map(IdArchive::new).collect(Collectors.toList());
-    }
-
-    @NotNull
-    public List<IdArchive> listArchives(@NotNull Region region) {
-        List<String> queryResults = momcaConnection.queryDatabase(
-                ExistQueryFactory.listArchivesForRegion(region.getNativeName()));
-        return queryResults.stream().map(AtomId::new).map(IdArchive::new).collect(Collectors.toList());
-    }
-
 
     @NotNull
     private Element createEagElement(@NotNull String shortName, @NotNull String archiveName,
@@ -127,23 +83,61 @@ public class ArchiveManager extends AbstractManager {
     }
 
     @NotNull
-    private Element createNewArchiveResourceContent(@NotNull String authorEmail, @NotNull String shortName,
+    private Element createNewArchiveResourceContent(@NotNull IdUser authorId, @NotNull String shortName,
                                                     @NotNull String name, @NotNull Country country,
                                                     @Nullable Region region, @NotNull Address address,
                                                     @NotNull ContactInformation contactInformation,
                                                     @NotNull String logoUrl) {
 
         IdArchive id = new IdArchive(shortName);
-        AtomAuthor atomAuthor = new AtomAuthor(authorEmail);
         String now = momcaConnection.queryDatabase(ExistQueryFactory.getCurrentDateTime()).get(0);
 
         String regionNativeName = region == null ? "" : region.getNativeName();
         Desc desc = new Desc(country.getNativeName(), regionNativeName, address, contactInformation, logoUrl);
         Element eag = createEagElement(shortName, name, country.getCountryCode().getCode(), desc);
 
-        return new AtomEntry(id.getContentXml(), atomAuthor, now, eag);
+        return new AtomEntry(id.getContentXml(), authorId.getContentXml(), now, eag);
 
     }
 
+    public void deleteArchive(@NotNull Archive archive) {
+
+        if (!momcaConnection.getFondManager().listFonds(archive.getId()).isEmpty()) {
+            String message = String.format("The archive '%s',  that is to be deleted still has associated fonds.",
+                    archive.getIdentifier());
+            throw new IllegalArgumentException(message);
+        }
+
+        momcaConnection.deleteCollection(String.format("%s/%s",
+                ResourceRoot.ARCHIVES.getUri(), archive.getId().getIdentifier()));
+        momcaConnection.deleteCollection(String.format("%s/%s",
+                ResourceRoot.ARCHIVAL_FONDS.getUri(), archive.getId().getIdentifier()));
+
+    }
+
+    @NotNull
+    public Optional<Archive> getArchive(@NotNull IdArchive idArchive) {
+        return getMomcaResource(idArchive.getContentXml()).map(Archive::new);
+    }
+
+    @NotNull
+    public List<IdArchive> listArchives(@NotNull Region region) {
+        List<String> queryResults = momcaConnection.queryDatabase(
+                ExistQueryFactory.listArchivesForRegion(region.getNativeName()));
+        return queryResults.stream().map(AtomId::new).map(IdArchive::new).collect(Collectors.toList());
+    }
+
+    @NotNull
+    public List<IdArchive> listArchives() {
+        List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listArchives());
+        return queryResults.stream().map(AtomId::new).map(IdArchive::new).collect(Collectors.toList());
+    }
+
+    @NotNull
+    public List<IdArchive> listArchives(@NotNull Country country) {
+        List<String> queryResults = momcaConnection.queryDatabase(
+                ExistQueryFactory.listArchivesForCountry(country.getCountryCode()));
+        return queryResults.stream().map(AtomId::new).map(IdArchive::new).collect(Collectors.toList());
+    }
 
 }

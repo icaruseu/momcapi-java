@@ -128,4 +128,24 @@ public class IdCharter extends IdAbstract {
         return parts.length == ResourceType.CHARTER.getMaxIdParts();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        IdCharter idCharter = (IdCharter) o;
+
+        if (!idCollection.equals(idCharter.idCollection)) return false;
+        return idFond.equals(idCharter.idFond);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + idCollection.hashCode();
+        result = 31 * result + idFond.hashCode();
+        return result;
+    }
 }

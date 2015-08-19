@@ -1,7 +1,6 @@
 package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.model.*;
-import eu.icarus.momca.momcapi.model.IdCollection;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -29,19 +28,19 @@ public class CollectionManagerTest {
 
         String identifier = "newcollection";
         String name = "A new collection";
-        String authorEmail = "user1.testuser@dev.monasterium.net";
+        IdUser author = new IdUser("user1.testuser@dev.monasterium.net");
         Country country = mc.getCountryManager().getCountry(new CountryCode("DE")).get();
         Region region = country.getRegions().get(0);
         String imageServerAddress = "http://images.icar-us.eu";
         String imageFolderName = "img/collections/newcollection";
         String keyword = "Random";
 
-        Collection coll = cm.addCollection(identifier, name, authorEmail, country, region, imageServerAddress, imageFolderName, keyword);
+        Collection coll = cm.addCollection(identifier, name, author, country, region, imageServerAddress, imageFolderName, keyword);
         cm.deleteCollection(coll.getId());
 
         assertEquals(coll.getId().getContentXml().getText(), new IdCollection(identifier).getContentXml().getText());
         assertEquals(coll.getName(), name);
-        assertEquals(coll.getAuthorName().get(), authorEmail);
+        assertEquals(coll.getAuthorName().get(), author.getIdentifier());
         assertEquals(coll.getCountryCode().get(), country.getCountryCode());
         assertEquals(coll.getRegionName().get(), region.getNativeName());
         assertEquals(coll.getImageServerAddress().get(), imageServerAddress);
@@ -55,17 +54,17 @@ public class CollectionManagerTest {
 
         String identifier = "anothercollection";
         String name = "Another collection";
-        String authorEmail = "admin";
+        IdUser author = new IdUser("admin");
         String imageServerAddress = "";
         String imageFolderName = "";
         String keyword = "";
 
-        Collection coll = cm.addCollection(identifier, name, authorEmail, null, null, imageServerAddress, imageFolderName, keyword);
+        Collection coll = cm.addCollection(identifier, name, author, null, null, imageServerAddress, imageFolderName, keyword);
         cm.deleteCollection(coll.getId());
 
         assertEquals(coll.getId().getContentXml().getText(), new IdCollection(identifier).getContentXml().getText());
         assertEquals(coll.getName(), name);
-        assertEquals(coll.getAuthorName().get(), authorEmail);
+        assertEquals(coll.getAuthorName().get(), author.getIdentifier());
         assertFalse(coll.getCountryCode().isPresent());
         assertFalse(coll.getRegionName().isPresent());
         assertFalse(coll.getImageServerAddress().isPresent());
@@ -79,14 +78,14 @@ public class CollectionManagerTest {
 
         String identifier = "yetanothercollection";
         String name = "Yet another collection";
-        String authorEmail = "admin";
+        IdUser author = new IdUser("admin");
 
-        Collection coll = cm.addCollection(identifier, name, authorEmail, null, null, null, null, null);
+        Collection coll = cm.addCollection(identifier, name, author, null, null, null, null, null);
         cm.deleteCollection(coll.getId());
 
         assertEquals(coll.getId().getContentXml().getText(), new IdCollection(identifier).getContentXml().getText());
         assertEquals(coll.getName(), name);
-        assertEquals(coll.getAuthorName().get(), authorEmail);
+        assertEquals(coll.getAuthorName().get(), author.getIdentifier());
         assertFalse(coll.getCountryCode().isPresent());
         assertFalse(coll.getRegionName().isPresent());
         assertFalse(coll.getImageServerAddress().isPresent());
@@ -100,14 +99,14 @@ public class CollectionManagerTest {
 
         String identifier = "MedDocBulgEmp";
         String name = "A new collection";
-        String authorEmail = "user1.testuser@dev.monasterium.net";
+        IdUser author = new IdUser("user1.testuser@dev.monasterium.net");
         Country country = mc.getCountryManager().getCountry(new CountryCode("DE")).get();
         Region region = country.getRegions().get(0);
         String imageServerAddress = "http://images.icar-us.eu";
         String imageFolderName = "img/collections/newcollection";
         String keyword = "Random";
 
-        cm.addCollection(identifier, name, authorEmail, country, region, imageServerAddress, identifier, keyword);
+        cm.addCollection(identifier, name, author, country, region, imageServerAddress, identifier, keyword);
 
     }
 
@@ -116,14 +115,14 @@ public class CollectionManagerTest {
 
         String identifier = "newcollection";
         String name = "New collection";
-        String authorEmail = "";
+        IdUser author = new IdUser("");;
         Country country = mc.getCountryManager().getCountry(new CountryCode("DE")).get();
         Region region = country.getRegions().get(0);
         String imageServerAddress = "http://images.icar-us.eu";
         String imageFolderName = "img/collections/newcollection";
         String keyword = "Random";
 
-        cm.addCollection(identifier, name, authorEmail, country, region, imageServerAddress, identifier, keyword);
+        cm.addCollection(identifier, name, author, country, region, imageServerAddress, identifier, keyword);
 
     }
 
@@ -132,14 +131,14 @@ public class CollectionManagerTest {
 
         String identifier = "";
         String name = "A new collection";
-        String authorEmail = "user1.testuser@dev.monasterium.net";
+        IdUser author = new IdUser("user1.testuser@dev.monasterium.net");
         Country country = mc.getCountryManager().getCountry(new CountryCode("DE")).get();
         Region region = country.getRegions().get(0);
         String imageServerAddress = "http://images.icar-us.eu";
         String imageFolderName = "img/collections/newcollection";
         String keyword = "Random";
 
-        cm.addCollection(identifier, name, authorEmail, country, region, imageServerAddress, identifier, keyword);
+        cm.addCollection(identifier, name, author, country, region, imageServerAddress, identifier, keyword);
 
     }
 
@@ -148,14 +147,14 @@ public class CollectionManagerTest {
 
         String identifier = "newcollection";
         String name = "";
-        String authorEmail = "user1.testuser@dev.monasterium.net";
+        IdUser author = new IdUser("user1.testuser@dev.monasterium.net");
         Country country = mc.getCountryManager().getCountry(new CountryCode("DE")).get();
         Region region = country.getRegions().get(0);
         String imageServerAddress = "http://images.icar-us.eu";
         String imageFolderName = "img/collections/newcollection";
         String keyword = "Random";
 
-        cm.addCollection(identifier, name, authorEmail, country, region, imageServerAddress, identifier, keyword);
+        cm.addCollection(identifier, name, author, country, region, imageServerAddress, identifier, keyword);
 
     }
 
@@ -164,9 +163,9 @@ public class CollectionManagerTest {
 
         String identifier = "collectionToDelete";
         String name = "Collection to delete";
-        String authorEmail = "admin";
+        IdUser author = new IdUser("admin");
 
-        Collection coll = cm.addCollection(identifier, name, authorEmail, null, null, null, null, null);
+        Collection coll = cm.addCollection(identifier, name, author, null, null, null, null, null);
         mc.addCollection(identifier, ResourceRoot.PUBLIC_CHARTERS.getUri()); // add charters collection to test removal
         cm.deleteCollection(coll.getId());
 

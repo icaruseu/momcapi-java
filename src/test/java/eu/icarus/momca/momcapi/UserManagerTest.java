@@ -1,8 +1,9 @@
 package eu.icarus.momca.momcapi;
 
-import eu.icarus.momca.momcapi.query.XpathQuery;
+import eu.icarus.momca.momcapi.model.IdUser;
 import eu.icarus.momca.momcapi.model.MomcaResource;
 import eu.icarus.momca.momcapi.model.User;
+import eu.icarus.momca.momcapi.query.XpathQuery;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -32,14 +33,15 @@ public class UserManagerTest {
     public void testAddUser() throws Exception {
 
         String userName = "newlyAddedUser@dev.monasterium.net";
+        IdUser id = new IdUser(userName);
         String password = "newPassword";
         String moderator = "admin";
         userManager.addUser(userName, password, moderator);
 
-        assertTrue(userManager.getUser(userName).isPresent());
-        assertTrue(userManager.isUserInitialized(userName));
+        assertTrue(userManager.getUser(id).isPresent());
+        assertTrue(userManager.isUserInitialized(id));
 
-        userManager.deleteUser(userManager.getUser(userName).get());
+        userManager.deleteUser(id);
 
     }
 
@@ -58,15 +60,15 @@ public class UserManagerTest {
 
         String userName = "modUpdateUser";
 
-        User oldModerator = userManager.getUser("admin").get();
-        User newModerator = userManager.getUser("user1.testuser@dev.monasterium.net").get();
+        User oldModerator = userManager.getUser(new IdUser("admin")).get();
+        User newModerator = userManager.getUser(new IdUser("user1.testuser@dev.monasterium.net")).get();
 
         User user = userManager.addUser(userName, "", oldModerator.getUserName());
         User updatedUser = userManager.changeModerator(user, newModerator);
 
         assertEquals(updatedUser.getModeratorName(), newModerator.getUserName());
 
-        userManager.deleteUser(updatedUser);
+        userManager.deleteUser(updatedUser.getId());
 
     }
 
@@ -79,9 +81,9 @@ public class UserManagerTest {
         User user = userManager.addUser(userName, password, moderator);
         userManager.deleteExistUserAccount(userName);
 
-        assertFalse(userManager.isUserInitialized(userName));
+        assertFalse(userManager.isUserInitialized(new IdUser(userName)));
 
-        userManager.deleteUser(user);
+        userManager.deleteUser(user.getId());
 
     }
 
@@ -89,14 +91,15 @@ public class UserManagerTest {
     public void testDeleteUser() throws Exception {
 
         String userName = "removeUserTest@dev.monasterium.net";
+        IdUser id = new IdUser(userName);
         String password = "testing123";
         String moderator = "admin";
 
         userManager.addUser(userName, password, moderator);
-        userManager.deleteUser(userManager.getUser(userName).get());
+        userManager.deleteUser(id);
 
-        assertFalse(userManager.getUser(userName).isPresent());
-        assertFalse(userManager.isUserInitialized(userName));
+        assertFalse(userManager.getUser(id).isPresent());
+        assertFalse(userManager.isUserInitialized(id));
         assertFalse(momcaConnection.getCollection("/db/mom-data/xrx.user/" + userName).isPresent());
 
     }
@@ -106,7 +109,7 @@ public class UserManagerTest {
 
         String userName = "user1.testuser@dev.monasterium.net";
         String moderator = "admin";
-        User user = userManager.getUser(userName).get();
+        User user = userManager.getUser(new IdUser(userName)).get();
         assertEquals(user.getUserName(), userName);
         assertEquals(user.getModeratorName(), moderator);
         assertTrue(user.isInitialized());
@@ -116,7 +119,7 @@ public class UserManagerTest {
     @Test
     public void testGetUserWithNotExistingUser() throws Exception {
         String userId = "randomstuff@crazyness.uk";
-        assertEquals(userManager.getUser(userId), Optional.empty());
+        assertEquals(userManager.getUser(new IdUser(userId)), Optional.empty());
     }
 
     @Test
@@ -137,7 +140,7 @@ public class UserManagerTest {
         User user = new User(userResource);
 
         // initialize user
-        User initializedUser = userManager.initializeUser(user, newUserPassword);
+        User initializedUser = userManager.initializeUser(user.getId(), newUserPassword);
         assertTrue(initializedUser.isInitialized());
 
         // test initialization success directly in the database
@@ -152,19 +155,20 @@ public class UserManagerTest {
         assertEquals(((List<String>) queryContentXml.invoke(res, XpathQuery.QUERY_CONFIG_GROUP_NAME)), expectedGroups);
 
         // clean up
-        userManager.deleteUser(initializedUser);
+        userManager.deleteUser(initializedUser.getId());
 
     }
 
     @Test
     public void testIsUserInitialized() throws Exception {
-        assertFalse(userManager.isUserInitialized("uninitialized.testuser@dev.monasterium.net"));
-        assertTrue(userManager.isUserInitialized("admin"));
+        assertFalse(userManager.isUserInitialized(new IdUser("uninitialized.testuser@dev.monasterium.net")));
+        assertTrue(userManager.isUserInitialized(new IdUser("admin")));
     }
 
     @Test
     public void testListUsers() throws Exception {
-        assertEquals(userManager.listUserNames().size(), 4);
+        assertEquals(userManager.listUsers().size(), 4);
+        assertTrue(userManager.listUsers().contains(new IdUser("admin")));
     }
 
 }

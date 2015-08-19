@@ -5,6 +5,7 @@ import eu.icarus.momca.momcapi.xml.atom.AtomId;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Created by daniel on 21.07.2015.
@@ -32,9 +33,8 @@ public class IdMyCollectionTest {
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testConstructorWithWrongAtomIdType() throws Exception {
-        AtomId archiveAtomId = new AtomId("tag:www.monasterium.net,2011:/archive/CH-KAE");
-        new IdMyCollection(archiveAtomId);
+    public void testConstructorWithAtomId() throws Exception {
+        new IdCollection("tag:www.monasterium.net,2011:/mycollection/67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3");
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
@@ -44,8 +44,22 @@ public class IdMyCollectionTest {
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testConstructorWithAtomId() throws Exception {
-        new IdCollection("tag:www.monasterium.net,2011:/mycollection/67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3");
+    public void testConstructorWithWrongAtomIdType() throws Exception {
+        AtomId archiveAtomId = new AtomId("tag:www.monasterium.net,2011:/archive/CH-KAE");
+        new IdMyCollection(archiveAtomId);
+    }
+
+    @Test
+    public void testEquals() throws Exception {
+
+        String identifier = "|67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3"; // has "|" at the beginning, this has to be encoded
+        String atomIdText = "tag:www.monasterium.net,2011:/mycollection/|67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3"; // includeds the "|" char
+
+        IdMyCollection id1 = new IdMyCollection(identifier);
+        IdMyCollection id2 = new IdMyCollection(new AtomId(atomIdText));
+
+        assertTrue(id1.equals(id2));
+
     }
 
     @Test
@@ -60,5 +74,4 @@ public class IdMyCollectionTest {
         assertEquals(id2.getIdentifier(), identifier);
 
     }
-
 }

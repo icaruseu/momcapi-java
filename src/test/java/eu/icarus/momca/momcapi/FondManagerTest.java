@@ -1,10 +1,6 @@
 package eu.icarus.momca.momcapi;
 
-import eu.icarus.momca.momcapi.model.Archive;
-import eu.icarus.momca.momcapi.model.Fond;
-import eu.icarus.momca.momcapi.model.ImageAccess;
-import eu.icarus.momca.momcapi.model.IdArchive;
-import eu.icarus.momca.momcapi.model.IdFond;
+import eu.icarus.momca.momcapi.model.*;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -34,7 +30,7 @@ public class FondManagerTest {
 
         Archive archive = mc.getArchiveManager().getArchive(new IdArchive("DE-SAMuenchen")).get();
 
-        Fond fond1 = fm.addFond("admin", archive, "Urkunden", "Alle Urkunden", null,
+        Fond fond1 = fm.addFond(new IdUser("admin"), archive, "Urkunden", "Alle Urkunden", null,
                 new URL("http://ex.com/img"), null);
         assertTrue(mc.getExistResource("Urkunden.preferences.xml", "/db/mom-data/metadata.fond.public/DE-SAMuenchen/Urkunden").isPresent());
         fm.deleteFond(fond1.getId());
@@ -47,7 +43,7 @@ public class FondManagerTest {
         assertEquals(fond1.getImagesUrl().get().toExternalForm(), "http://ex.com/img");
         assertFalse(fond1.getDummyImageUrl().isPresent());
 
-        Fond fond2 = fm.addFond("admin", archive, "Urkunden1", "Andere Urkunden", ImageAccess.RESTRICTED,
+        Fond fond2 = fm.addFond(new IdUser("admin"), archive, "Urkunden1", "Andere Urkunden", ImageAccess.RESTRICTED,
                 null, new URL("http://ex.com/dummy.png"));
         fm.deleteFond(fond2.getId());
 
@@ -55,7 +51,7 @@ public class FondManagerTest {
         assertFalse(fond2.getImagesUrl().isPresent());
         assertEquals(fond2.getDummyImageUrl().get().toExternalForm(), "http://ex.com/dummy.png");
 
-        Fond fond3 = fm.addFond("admin", archive, "Urkunden2", "Noch andere Urkunden", null,
+        Fond fond3 = fm.addFond(new IdUser("admin"), archive, "Urkunden2", "Noch andere Urkunden", null,
                 null, null);
         assertFalse(mc.getExistResource("Urkunden2.preferences.xml", "/db/mom-data/metadata.fond.public/DE-SAMuenchen/Urkunden2").isPresent());
         fm.deleteFond(fond3.getId());
@@ -69,28 +65,28 @@ public class FondManagerTest {
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddFondExisting() throws Exception {
         Archive archive = mc.getArchiveManager().getArchive(new IdArchive("CH-KAE")).get();
-        fm.addFond("admin", archive, "Urkunden", "Urkunden (0947-1483)", ImageAccess.FREE,
+        fm.addFond(new IdUser("admin"), archive, "Urkunden", "Urkunden (0947-1483)", ImageAccess.FREE,
                 new URL("http://www.klosterarchiv.ch/urkunden/urkunden-3000"), null);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddFondNoIdentifier() throws Exception {
         Archive archive = mc.getArchiveManager().getArchive(new IdArchive("CH-KAE")).get();
-        fm.addFond("admin", archive, "", "Weitere Urkunden", ImageAccess.FREE,
+        fm.addFond(new IdUser("admin"), archive, "", "Weitere Urkunden", ImageAccess.FREE,
                 new URL("http://www.klosterarchiv.ch/urkunden/urkunden-3000"), null);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddFondNoName() throws Exception {
         Archive archive = mc.getArchiveManager().getArchive(new IdArchive("CH-KAE")).get();
-        fm.addFond("admin", archive, "Urkunden2", "", ImageAccess.FREE,
+        fm.addFond(new IdUser("admin"), archive, "Urkunden2", "", ImageAccess.FREE,
                 new URL("http://www.klosterarchiv.ch/urkunden/urkunden-3000"), null);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddFondNonexistentAuthor() throws Exception {
         Archive archive = mc.getArchiveManager().getArchive(new IdArchive("CH-KAE")).get();
-        fm.addFond("someAuthor", archive, "Urkunden2", "Weitere Urkunden", ImageAccess.FREE,
+        fm.addFond(new IdUser("someAuthor"), archive, "Urkunden2", "Weitere Urkunden", ImageAccess.FREE,
                 new URL("http://www.klosterarchiv.ch/urkunden/urkunden-3000"), null);
     }
 
@@ -99,7 +95,7 @@ public class FondManagerTest {
 
         Archive archive = mc.getArchiveManager().getArchive(new IdArchive("DE-SAMuenchen")).get();
 
-        Fond fond = fm.addFond("admin", archive, "MUrkunden", "Mehrere Urkunden", null,
+        Fond fond = fm.addFond(new IdUser("admin"), archive, "MUrkunden", "Mehrere Urkunden", null,
                 new URL("http://ex.com/img"), null);
         fm.deleteFond(fond.getId());
 

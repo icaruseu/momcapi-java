@@ -5,6 +5,7 @@ import eu.icarus.momca.momcapi.xml.atom.AtomId;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Created by daniel on 21.07.2015.
@@ -71,6 +72,21 @@ public class IdFondTest {
     public void testConstructorWithWrongIdType() throws Exception {
         AtomId archiveAtomId = new AtomId("tag:www.monasterium.net,2011:/archive/CH-KAE");
         new IdFond(archiveAtomId);
+    }
+
+    @Test
+    public void testEquals() throws Exception {
+
+        String atomIdText = "tag:www.monasterium.net,2011:/fond/CH|KAE/Ur|kunden"; // includeds the "|" character
+        AtomId atomId = new AtomId(atomIdText);
+        String archiveIdentifier = "CH|KAE";
+        String fondIdentifier = "Ur|kunden";
+
+        IdFond id1 = new IdFond(atomId);
+        IdFond id2 = new IdFond(archiveIdentifier, fondIdentifier);
+
+        assertTrue(id1.equals(id2));
+
     }
 
     @Test

@@ -5,6 +5,7 @@ import eu.icarus.momca.momcapi.xml.atom.AtomId;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Created by daniel on 20.07.2015.
@@ -32,12 +33,6 @@ public class IdArchiveTest {
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testConstructorWithWrongAtomIdType() throws Exception {
-        AtomId collectionAtomId = new AtomId("tag:www.monasterium.net,2011:/collection/MedDocBulgEmp");
-        new IdArchive(collectionAtomId);
-    }
-
-    @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConstructorWithAtomId() throws Exception {
         new IdArchive("tag:www.monasterium.net,2011:/archive/CH-KAE");
     }
@@ -46,6 +41,25 @@ public class IdArchiveTest {
     public void testConstructorWithEmptyIdentifier() throws Exception {
         String emptyId = "";
         new IdArchive(emptyId);
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testConstructorWithWrongAtomIdType() throws Exception {
+        AtomId collectionAtomId = new AtomId("tag:www.monasterium.net,2011:/collection/MedDocBulgEmp");
+        new IdArchive(collectionAtomId);
+    }
+
+    @Test
+    public void testEquals() throws Exception {
+
+        String identifier = "CH|KAE";
+        String atomIdText = "tag:www.monasterium.net,2011:/archive/CH|KAE";
+
+        IdArchive id1 = new IdArchive(identifier);
+        IdArchive id2 = new IdArchive(new AtomId(atomIdText));
+
+        assertTrue(id1.equals(id2));
+
     }
 
     @Test

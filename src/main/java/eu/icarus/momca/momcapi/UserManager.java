@@ -1,11 +1,12 @@
 package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.exception.MomcaException;
-import eu.icarus.momca.momcapi.query.ExistQuery;
-import eu.icarus.momca.momcapi.query.ExistQueryFactory;
+import eu.icarus.momca.momcapi.model.IdUser;
 import eu.icarus.momca.momcapi.model.MomcaResource;
 import eu.icarus.momca.momcapi.model.ResourceRoot;
 import eu.icarus.momca.momcapi.model.User;
+import eu.icarus.momca.momcapi.query.ExistQuery;
+import eu.icarus.momca.momcapi.query.ExistQueryFactory;
 import org.exist.security.Account;
 import org.exist.security.Group;
 import org.exist.security.internal.aider.GroupAider;
@@ -58,20 +59,22 @@ public class UserManager extends AbstractManager {
     public User addUser(@NotNull String userName, @NotNull String password, @NotNull String moderatorName,
                         @NotNull String firstName, @NotNull String lastName) {
 
-        if (!getUser(userName).isPresent()) {
+        IdUser idUser = new IdUser(userName);
 
-            if (!getUser(moderatorName).isPresent()) {
+        if (!getUser(idUser).isPresent()) {
+
+            if (!getUser(new IdUser(moderatorName)).isPresent()) {
                 throw new IllegalArgumentException("Moderator '" + moderatorName + "' not existing in database.");
             }
 
             String xmlContent = createUserResourceContent(userName, moderatorName, firstName, lastName);
             MomcaResource userResource = new MomcaResource(userName + ".xml", ResourceRoot.USER_DATA.getUri(), xmlContent);
             momcaConnection.storeExistResource(userResource);
-            initializeUser(new User(userResource), password);
+            initializeUser(idUser, password);
 
         }
 
-        return getUser(userName).get();
+        return getUser(idUser).orElseThrow(RuntimeException::new);
 
     }
 
@@ -103,7 +106,7 @@ public class UserManager extends AbstractManager {
 
         momcaConnection.queryDatabase(query);
 
-        return getUser(user.getUserName()).get();
+        return getUser(user.getId()).orElseThrow(RuntimeException::new);
 
     }
 
@@ -133,80 +136,9 @@ public class UserManager extends AbstractManager {
 
     }
 
-    /**
-     * Deletes an existing user from MOM-CA.
-     *
-     * @param user The user to delete.
-     */
-    public void deleteUser(@NotNull User user) {
-
-        String userName = user.getUserName();
-
-        deleteExistUserAccount(userName);
-
-        momcaConnection.deleteExistResource(user);
-        momcaConnection.deleteCollection(ResourceRoot.USER_DATA.getUri() + "/" + userName);
-
-    }
-
-    /**
-     * Gets a user from the database.
-     *
-     * @param userName The name of the user.
-     * @return The user.
-     */
-    @NotNull
-    public Optional<User> getUser(@NotNull String userName) {
-        boolean isInitialized = isUserInitialized(userName);
-        return momcaConnection.getExistResource(userName + ".xml", ResourceRoot.USER_DATA.getUri())
-                .flatMap(existResource -> Optional.of(new User(existResource, isInitialized)));
-    }
-
-    /**
-     * Initializes a registered but uninitialized user. This happens if the User doesn't receive the registration-email
-     * or doesn't click on the confirmation link. Before this, the user is added to {@code xrx.user} but not added as
-     * an eXist-account.
-     *
-     * @param user     The uninitialized user.
-     * @param password The password.
-     * @return The initialized user.
-     */
-    public User initializeUser(@NotNull User user, @NotNull String password) {
-
-        String userName = user.getUserName();
-
-        if (!user.isInitialized()) {
-
-            try {
-
-                RemoteUserManagementService service = getUserService();
-
-                Group group = new GroupAider("atom");
-                service.addGroup(group);
-
-                Account newAccount = new UserAider(userName, group);
-                newAccount.setPassword(password);
-                service.addAccount(newAccount);
-                service.addAccountToGroup(userName, "guest");
-
-            } catch (XMLDBException e) {
-                if (!isExceptionBecauseAccountExists(userName, e)) {
-                    throw new MomcaException("Failed to create user '" + userName + "'", e);
-                }
-            }
-
-        }
-
-        return getUser(userName).get();
-
-    }
-
-    /**
-     * @return A list of all registered users in the database.
-     */
-    @NotNull
-    public List<String> listUserNames() {
-        return listUserResourceNames().stream().map(s -> s.replace(".xml", "")).collect(Collectors.toList());
+    private String createUserResourceContent(@NotNull String userName, @NotNull String moderatorName,
+                                             @NotNull String firstName, @NotNull String lastName) {
+        return String.format(NEW_USER_CONTENT, firstName, lastName, userName, moderatorName);
     }
 
     /**
@@ -232,25 +164,31 @@ public class UserManager extends AbstractManager {
     }
 
     /**
-     * Checks if a user is initialized (an eXist account with the same name is existing).
+     * Deletes an existing user from MOM-CA.
      *
-     * @param userName The user name to test.
-     * @return {@code True} if the user is initialized.
+     * @param idUser The id of the user to delete.
      */
-    boolean isUserInitialized(@NotNull String userName) {
+    public void deleteUser(@NotNull IdUser idUser) {
 
-        try {
-            RemoteUserManagementService service = getUserService();
-            return Optional.ofNullable(service.getAccount(userName)).isPresent();
-        } catch (XMLDBException e) {
-            throw new MomcaException("Failed to get resource for user '" + userName + "'", e);
-        }
+        getUser(idUser).ifPresent(u -> {
+            deleteExistUserAccount(u.getUserName());
+            momcaConnection.deleteExistResource(u);
+            momcaConnection.deleteCollection(ResourceRoot.USER_DATA.getUri() + "/" + u.getUserName());
+        });
 
     }
 
-    private String createUserResourceContent(@NotNull String userName, @NotNull String moderatorName,
-                                             @NotNull String firstName, @NotNull String lastName) {
-        return String.format(NEW_USER_CONTENT, firstName, lastName, userName, moderatorName);
+    /**
+     * Gets a user from the database.
+     *
+     * @param idUser The id of the user.
+     * @return The user.
+     */
+    @NotNull
+    public Optional<User> getUser(@NotNull IdUser idUser) {
+        boolean isInitialized = isUserInitialized(idUser);
+        return momcaConnection.getExistResource(idUser.getIdentifier() + ".xml", ResourceRoot.USER_DATA.getUri())
+                .flatMap(existResource -> Optional.of(new User(existResource, isInitialized)));
     }
 
     @NotNull
@@ -265,11 +203,69 @@ public class UserManager extends AbstractManager {
 
     }
 
+    /**
+     * Initializes a registered but uninitialized user. This happens if the User doesn't receive the registration-email
+     * or doesn't click on the confirmation link. Before this, the user is added to {@code xrx.user} but not added as
+     * an eXist-account.
+     *
+     * @param idUser   The id of an uninitialized user.
+     * @param password The password.
+     * @return The initialized user.
+     */
+    public User initializeUser(@NotNull IdUser idUser, @NotNull String password) {
+
+        String userName = idUser.getIdentifier();
+
+        if (!isUserInitialized(idUser)) {
+
+            try {
+
+                RemoteUserManagementService service = getUserService();
+
+                Group group = new GroupAider("atom");
+                service.addGroup(group);
+
+                Account newAccount = new UserAider(userName, group);
+                newAccount.setPassword(password);
+                service.addAccount(newAccount);
+                service.addAccountToGroup(userName, "guest");
+
+            } catch (XMLDBException e) {
+                if (!isExceptionBecauseAccountExists(userName, e)) {
+                    throw new MomcaException("Failed to create user '" + userName + "'", e);
+                }
+            }
+
+        }
+
+        return getUser(idUser).orElseThrow(RuntimeException::new);
+
+    }
+
     private boolean isExceptionBecauseAccountExists(@NotNull String userName, @NotNull XMLDBException e) {
         String existingAccountErrorMessage =
                 String.format("Failed to invoke method addAccount in class " +
                         "org.exist.xmlrpc.RpcConnection: Account '%s' exist", userName);
         return e.getMessage().equals(existingAccountErrorMessage);
+    }
+
+    /**
+     * Checks if a user is initialized (an eXist account with the same name is existing).
+     *
+     * @param idUser The id of the user to test.
+     * @return {@code True} if the user is initialized.
+     */
+    boolean isUserInitialized(@NotNull IdUser idUser) {
+
+        String userName = idUser.getIdentifier();
+
+        try {
+            RemoteUserManagementService service = getUserService();
+            return Optional.ofNullable(service.getAccount(userName)).isPresent();
+        } catch (XMLDBException e) {
+            throw new MomcaException("Failed to get resource for user '" + userName + "'", e);
+        }
+
     }
 
     @NotNull
@@ -296,6 +292,14 @@ public class UserManager extends AbstractManager {
         users.sort(Comparator.<String>naturalOrder());
         return users;
 
+    }
+
+    /**
+     * @return A list of all registered users in the database.
+     */
+    @NotNull
+    public List<IdUser> listUsers() {
+        return listUserResourceNames().stream().map(s -> new IdUser(s.replace(".xml", ""))).collect(Collectors.toList());
     }
 
 }
