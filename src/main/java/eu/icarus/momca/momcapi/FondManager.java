@@ -2,7 +2,8 @@ package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.model.*;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
-import eu.icarus.momca.momcapi.xml.atom.*;
+import eu.icarus.momca.momcapi.xml.atom.AtomEntry;
+import eu.icarus.momca.momcapi.xml.atom.AtomId;
 import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -56,7 +57,7 @@ public class FondManager extends AbstractManager {
         String fondCollectionUri = archiveCollectionUri + "/" + identifier;
 
         String eadName = identifier + ".ead.xml";
-        Element eadContent = createEadContent(userId.getIdentifier(), id.getContentXml(), identifier, name);
+        Element eadContent = createEadContent(userId, id.getContentXml(), identifier, name);
         MomcaResource eadResource = new MomcaResource(eadName, fondCollectionUri, eadContent.toXML());
 
         String preferencesName = identifier + ".preferences.xml";
@@ -72,6 +73,43 @@ public class FondManager extends AbstractManager {
         preferencesResource.ifPresent(momcaConnection::storeExistResource);
 
         return getFond(id).orElseThrow(RuntimeException::new);
+
+    }
+
+    @NotNull
+    private AtomEntry createEadContent(@NotNull IdUser author, @NotNull AtomId atomId, @NotNull String
+            identifier, @NotNull String name) {
+
+        String eadString = String.format(EAD_TEMPLATE, identifier, identifier, name);
+        Element eadElement = Util.parseToElement(eadString);
+
+        String now = momcaConnection.queryDatabase(ExistQueryFactory.getCurrentDateTime()).get(0);
+        return new AtomEntry(atomId, author.getContentXml(), now, eadElement);
+
+    }
+
+    @NotNull
+    private Optional<Element> createPreferencesContent(@Nullable ImageAccess imageAccess, @Nullable URL
+            imagesUrl, @Nullable URL dummyImageUrl) {
+
+        Optional<Element> preferencesXml = Optional.empty();
+
+        if (imageAccess != null || imagesUrl != null || dummyImageUrl != null) {
+
+            String imageAccessString = imageAccess == null ? ImageAccess.FREE.getText() : imageAccess.getText();
+            String imagesUrlString = imagesUrl == null ? "" : imagesUrl.toExternalForm();
+            String dummyImageUrlString = dummyImageUrl == null ? "" : dummyImageUrl.toExternalForm();
+
+            String preferencesXmlString = String.format(PREFERENCES_TEMPLATE,
+                    imageAccessString,
+                    dummyImageUrlString,
+                    imagesUrlString);
+
+            preferencesXml = Optional.of(Util.parseToElement(preferencesXmlString));
+
+        }
+
+        return preferencesXml;
 
     }
 
@@ -112,44 +150,6 @@ public class FondManager extends AbstractManager {
         List<String> queryResults = momcaConnection.queryDatabase(
                 ExistQueryFactory.listFonds(idArchive));
         return queryResults.stream().map(AtomId::new).map(IdFond::new).collect(Collectors.toList());
-    }
-
-    @NotNull
-    private AtomEntry createEadContent(@NotNull String authorEmail, @NotNull AtomId atomId, @NotNull String
-            identifier, @NotNull String name) {
-
-        String eadString = String.format(EAD_TEMPLATE, identifier, identifier, name);
-        Element eadElement = Util.parseToElement(eadString);
-
-        AtomAuthor atomAuthor = new AtomAuthor(authorEmail);
-        String now = momcaConnection.queryDatabase(ExistQueryFactory.getCurrentDateTime()).get(0);
-        return new AtomEntry(atomId, atomAuthor, now, eadElement);
-
-    }
-
-    @NotNull
-    private Optional<Element> createPreferencesContent(@Nullable ImageAccess imageAccess, @Nullable URL
-            imagesUrl, @Nullable URL dummyImageUrl) {
-
-        Optional<Element> preferencesXml = Optional.empty();
-
-        if (imageAccess != null || imagesUrl != null || dummyImageUrl != null) {
-
-            String imageAccessString = imageAccess == null ? ImageAccess.FREE.getText() : imageAccess.getText();
-            String imagesUrlString = imagesUrl == null ? "" : imagesUrl.toExternalForm();
-            String dummyImageUrlString = dummyImageUrl == null ? "" : dummyImageUrl.toExternalForm();
-
-            String preferencesXmlString = String.format(PREFERENCES_TEMPLATE,
-                    imageAccessString,
-                    dummyImageUrlString,
-                    imagesUrlString);
-
-            preferencesXml = Optional.of(Util.parseToElement(preferencesXmlString));
-
-        }
-
-        return preferencesXml;
-
     }
 
 }
