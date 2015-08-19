@@ -14,7 +14,7 @@ public abstract class IdAbstract {
     @NotNull
     private final String identifier;
 
-    public IdAbstract(@NotNull AtomId contentXml, @NotNull String identifier) {
+    public IdAbstract(@NotNull Element contentXml, @NotNull String identifier) {
 
         if (identifier.isEmpty()) {
             throw new IllegalArgumentException("The identifier is not allowed to be an empty string.");
