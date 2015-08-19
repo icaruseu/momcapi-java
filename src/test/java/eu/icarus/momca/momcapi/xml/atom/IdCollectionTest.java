@@ -1,5 +1,6 @@
 package eu.icarus.momca.momcapi.xml.atom;
 
+import eu.icarus.momca.momcapi.Util;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -12,20 +13,20 @@ public class IdCollectionTest {
     @Test
     public void testConstructor() throws Exception {
 
-        String identifier = "MedDocBulgEmp";
-        String atomIdText = "tag:www.monasterium.net,2011:/collection/MedDocBulgEmp";
+        String identifier = "MedDoc|BulgEmp"; // includeds a "|" character
+        String atomIdText = "tag:www.monasterium.net,2011:/collection/MedDoc|BulgEmp";
         String atomIdXml = "<atom:id xmlns:atom=\"http://www.w3.org/2005/Atom\">" +
-                "tag:www.monasterium.net,2011:/collection/MedDocBulgEmp</atom:id>";
+                "tag:www.monasterium.net,2011:/collection/MedDoc%7CBulgEmp</atom:id>";
 
         IdCollection id1 = new IdCollection(identifier);
         assertEquals(id1.getAtomId().toXML(), atomIdXml);
         assertEquals(id1.getIdentifier(), identifier);
-        assertEquals(id1.getAtomId().getText(), atomIdText);
+        assertEquals(id1.getAtomId().getText(), Util.encode(atomIdText));
 
         IdCollection id2 = new IdCollection(new AtomId(atomIdText));
         assertEquals(id2.getAtomId().toXML(), atomIdXml);
         assertEquals(id2.getIdentifier(), identifier);
-        assertEquals(id2.getAtomId().getText(), atomIdText);
+        assertEquals(id2.getAtomId().getText(), Util.encode(atomIdText));
 
     }
 

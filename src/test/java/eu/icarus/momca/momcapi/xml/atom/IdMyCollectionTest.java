@@ -1,5 +1,6 @@
 package eu.icarus.momca.momcapi.xml.atom;
 
+import eu.icarus.momca.momcapi.Util;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -12,20 +13,20 @@ public class IdMyCollectionTest {
     @Test
     public void testConstructor() throws Exception {
 
-        String identifier = "67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3";
-        String atomIdText = "tag:www.monasterium.net,2011:/mycollection/67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3";
+        String identifier = "|67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3"; // has "|" at the beginning, this has to be encoded
+        String atomIdText = "tag:www.monasterium.net,2011:/mycollection/|67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3"; // includeds the "|" char
         String atomIdXml = "<atom:id xmlns:atom=\"http://www.w3.org/2005/Atom\">" +
-                "tag:www.monasterium.net,2011:/mycollection/67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3</atom:id>";
+                "tag:www.monasterium.net,2011:/mycollection/%7C67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3</atom:id>";
 
         IdMyCollection id1 = new IdMyCollection(identifier);
         assertEquals(id1.getAtomId().toXML(), atomIdXml);
         assertEquals(id1.getIdentifier(), identifier);
-        assertEquals(id1.getAtomId().getText(), atomIdText);
+        assertEquals(id1.getAtomId().getText(), Util.encode(atomIdText));
 
         IdMyCollection id2 = new IdMyCollection(new AtomId(atomIdText));
         assertEquals(id2.getAtomId().toXML(), atomIdXml);
         assertEquals(id2.getIdentifier(), identifier);
-        assertEquals(id2.getAtomId().getText(), atomIdText);
+        assertEquals(id2.getAtomId().getText(), Util.encode(atomIdText));
 
     }
 

@@ -1,5 +1,6 @@
 package eu.icarus.momca.momcapi.xml.atom;
 
+import eu.icarus.momca.momcapi.Util;
 import eu.icarus.momca.momcapi.resource.ResourceType;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,7 +25,7 @@ public class IdCharter extends IdAbstract {
         super(atomId, initIdentifier(atomId));
 
         if (getAtomId().getType() != ResourceType.CHARTER) {
-            throw new IllegalArgumentException(getAtomId().getText() + " is not a fond atom:id text.");
+            throw new IllegalArgumentException(getAtomId().getText() + " is not a charter atom:id.");
         }
 
         if (isInFond()) {
@@ -38,7 +39,7 @@ public class IdCharter extends IdAbstract {
     }
 
     public IdCharter(@NotNull String archiveIdentifier, @NotNull String fondIdentifier, @NotNull String charterIdentifier) {
-        super(initAtomIdForFond(archiveIdentifier, fondIdentifier, charterIdentifier), fondIdentifier);
+        super(initAtomIdForFond(archiveIdentifier, fondIdentifier, charterIdentifier), charterIdentifier);
         idFond = Optional.of(new IdFond(archiveIdentifier, fondIdentifier));
         idCollection = Optional.empty();
     }
@@ -52,7 +53,7 @@ public class IdCharter extends IdAbstract {
     @NotNull
     private static String initIdentifier(@NotNull AtomId atomId) {
         String[] idParts = atomId.getText().split("/");
-        return idParts[idParts.length - 1];
+        return Util.decode(idParts[idParts.length - 1]);
     }
 
     private static AtomId initAtomIdForFond(@NotNull String archiveIdentifier, @NotNull String fondIdentifier, @NotNull String charterIdentifier) {
@@ -95,8 +96,8 @@ public class IdCharter extends IdAbstract {
     private IdFond getFondFromAtomId(@NotNull AtomId atomId) {
 
         String[] parts = atomId.getText().split("/");
-        String archiveIdentifier = parts[parts.length - 3];
-        String fondIdentifier = parts[parts.length - 2];
+        String archiveIdentifier = Util.decode(parts[parts.length - 3]);
+        String fondIdentifier = Util.decode(parts[parts.length - 2]);
 
         return new IdFond(archiveIdentifier, fondIdentifier);
 
@@ -106,7 +107,7 @@ public class IdCharter extends IdAbstract {
     private IdCollection getCollectionFromAtomId(@NotNull AtomId atomId) {
 
         String[] parts = atomId.getText().split("/");
-        String collectionIdentifier = parts[parts.length - 2];
+        String collectionIdentifier = Util.decode(parts[parts.length - 2]);
         return new IdCollection(collectionIdentifier);
 
     }
@@ -120,4 +121,5 @@ public class IdCharter extends IdAbstract {
     public Optional<IdCollection> getIdCollection() {
         return idCollection;
     }
+
 }

@@ -1,5 +1,6 @@
 package eu.icarus.momca.momcapi.xml.atom;
 
+import eu.icarus.momca.momcapi.Util;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -12,20 +13,20 @@ public class IdArchiveTest {
     @Test
     public void testConstructor() throws Exception {
 
-        String identifier = "CH-KAE";
-        String atomIdText = "tag:www.monasterium.net,2011:/archive/CH-KAE";
+        String identifier = "CH|KAE";
+        String atomIdText = "tag:www.monasterium.net,2011:/archive/CH|KAE";
         String atomIdXml = "<atom:id xmlns:atom=\"http://www.w3.org/2005/Atom\">" +
-                "tag:www.monasterium.net,2011:/archive/CH-KAE</atom:id>";
+                "tag:www.monasterium.net,2011:/archive/CH%7CKAE</atom:id>";
 
         IdArchive id1 = new IdArchive(identifier);
         assertEquals(id1.getAtomId().toXML(), atomIdXml);
         assertEquals(id1.getIdentifier(), identifier);
-        assertEquals(id1.getAtomId().getText(), atomIdText);
+        assertEquals(id1.getAtomId().getText(), Util.encode(atomIdText));
 
         IdArchive id2 = new IdArchive(new AtomId(atomIdText));
         assertEquals(id2.getAtomId().toXML(), atomIdXml);
         assertEquals(id2.getIdentifier(), identifier);
-        assertEquals(id2.getAtomId().getText(), atomIdText);
+        assertEquals(id2.getAtomId().getText(), Util.encode(atomIdText));
 
     }
 

@@ -1,5 +1,6 @@
 package eu.icarus.momca.momcapi.xml.atom;
 
+import eu.icarus.momca.momcapi.Util;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -12,22 +13,24 @@ public class IdFondTest {
     @Test
     public void testConstructor() throws Exception {
 
-        String atomIdText = "tag:www.monasterium.net,2011:/fond/CH-KAE/Urkunden";
+        String atomIdText = "tag:www.monasterium.net,2011:/fond/CH|KAE/Ur|kunden"; // includeds the "|" character
         AtomId atomId = new AtomId(atomIdText);
-        String archiveIdentifier = "CH-KAE";
-        String fondIdentifier = "Urkunden";
+        String archiveIdentifier = "CH|KAE";
+        String fondIdentifier = "Ur|kunden";
         String correctXml = "<atom:id xmlns:atom=\"http://www.w3.org/2005/Atom\">" +
-                "tag:www.monasterium.net,2011:/fond/CH-KAE/Urkunden</atom:id>";
+                "tag:www.monasterium.net,2011:/fond/CH%7CKAE/Ur%7Ckunden</atom:id>";
 
         IdFond id1 = new IdFond(atomId);
         assertEquals(id1.getIdentifier(), fondIdentifier);
         assertEquals(id1.getIdArchive().getIdentifier(), archiveIdentifier);
         assertEquals(id1.getAtomId().toXML(), correctXml);
+        assertEquals(id1.getAtomId().getText(), Util.encode(atomIdText));
 
         IdFond id2 = new IdFond(archiveIdentifier, fondIdentifier);
         assertEquals(id2.getIdentifier(), fondIdentifier);
         assertEquals(id2.getIdArchive().getIdentifier(), archiveIdentifier);
         assertEquals(id2.getAtomId().toXML(), correctXml);
+        assertEquals(id2.getAtomId().getText(), Util.encode(atomIdText));
 
     }
 

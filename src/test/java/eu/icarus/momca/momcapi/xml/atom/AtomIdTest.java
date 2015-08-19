@@ -15,7 +15,10 @@ import static org.testng.Assert.assertEquals;
 public class AtomIdTest {
 
     @NotNull
-    private static final String CHARTER_TEXT = "tag:www.monasterium.net,2011:/charter/RS-IAGNS/Charters/AGNS_F.1_the_fascia_9_Sub_3499%7C1817";
+    private static final String CHARTER_TEXT_ENCODED = "tag:www.monasterium.net,2011:/charter/RS-IAGNS/Charters/AGNS_F.1_the_fascia_9_Sub_3499%7C1817";
+    @NotNull
+    private static final String CHARTER_TEXT_DECODED = "tag:www.monasterium.net,2011:/charter/RS-IAGNS/Charters/AGNS_F.1_the_fascia_9_Sub_3499|1817";
+    @NotNull
     public static final String ARCHIVE_TEXT = "tag:www.monasterium.net,2011:/archive/RS-IAGNS";
     @NotNull
     private static final ResourceType TYPE = ResourceType.CHARTER;
@@ -30,14 +33,14 @@ public class AtomIdTest {
 
     @BeforeClass
     public void setUp() throws Exception {
-        XML.appendChild(CHARTER_TEXT);
+        XML.appendChild(CHARTER_TEXT_ENCODED);
     }
 
     @Test
     public void testConstructorWithId() throws Exception {
 
-        AtomId atomId1 = new AtomId(CHARTER_TEXT);
-        assertEquals(atomId1.getText(), CHARTER_TEXT);
+        AtomId atomId1 = new AtomId(CHARTER_TEXT_DECODED);
+        assertEquals(atomId1.getText(), CHARTER_TEXT_ENCODED);
         assertEquals(atomId1.toXML(), CHARTER_XML_STRING);
 
         AtomId atomId2 = new AtomId(ARCHIVE_TEXT);
@@ -79,19 +82,19 @@ public class AtomIdTest {
 
     @Test
     public void testGetText() throws Exception {
-        AtomId atomId = new AtomId(CHARTER_TEXT);
-        assertEquals(atomId.getText(), CHARTER_TEXT);
+        AtomId atomId = new AtomId(CHARTER_TEXT_ENCODED);
+        assertEquals(atomId.getText(), CHARTER_TEXT_ENCODED);
     }
 
     @Test
     public void testGetType() throws Exception {
-        AtomId atomId = new AtomId(CHARTER_TEXT);
+        AtomId atomId = new AtomId(CHARTER_TEXT_ENCODED);
         assertEquals(atomId.getType(), TYPE);
     }
 
     @Test
     public void testToXml() throws Exception {
-        AtomId atomId = new AtomId(CHARTER_TEXT);
+        AtomId atomId = new AtomId(CHARTER_TEXT_ENCODED);
         assertEquals(atomId.toXML(), XML.toXML());
     }
 

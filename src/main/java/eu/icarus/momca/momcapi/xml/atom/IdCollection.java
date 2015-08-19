@@ -1,5 +1,6 @@
 package eu.icarus.momca.momcapi.xml.atom;
 
+import eu.icarus.momca.momcapi.Util;
 import eu.icarus.momca.momcapi.resource.ResourceType;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,7 +32,7 @@ public class IdCollection extends IdAbstract {
     @NotNull
     private static String initIdentifier(@NotNull AtomId atomId) {
         String[] idParts = atomId.getText().split("/");
-        return idParts[idParts.length - 1];
+        return Util.decode(idParts[idParts.length - 1]);
     }
 
     private static AtomId initAtomId(@NotNull String identifier) {
