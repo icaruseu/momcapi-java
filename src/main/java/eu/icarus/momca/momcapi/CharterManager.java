@@ -24,7 +24,7 @@ public class CharterManager extends AbstractManager {
     @NotNull
     public List<Charter> getCharterInstances(@NotNull IdCharter idCharter) {
 
-        return momcaConnection.queryDatabase(ExistQueryFactory.getResourceUri(idCharter.getAtomId(), null
+        return momcaConnection.queryDatabase(ExistQueryFactory.getResourceUri(idCharter.getContentXml(), null
         )).stream()
                 .map(this::getCharterFromUri)
                 .filter(Optional::isPresent)
@@ -36,7 +36,7 @@ public class CharterManager extends AbstractManager {
     @NotNull
     public List<Charter> getCharterInstances(@NotNull IdCharter idCharter, @NotNull CharterStatus charterStatus) {
 
-        return momcaConnection.queryDatabase(ExistQueryFactory.getResourceUri(idCharter.getAtomId(), charterStatus.getResourceRoot()
+        return momcaConnection.queryDatabase(ExistQueryFactory.getResourceUri(idCharter.getContentXml(), charterStatus.getResourceRoot()
         )).stream()
                 .map(this::getCharterFromUri)
                 .filter(Optional::isPresent)
@@ -108,7 +108,7 @@ public class CharterManager extends AbstractManager {
     }
 
     private boolean isCharterExisting(@NotNull IdCharter idCharter, @Nullable ResourceRoot resourceRoot) {
-        ExistQuery query = ExistQueryFactory.checkResourceExistence(idCharter.getAtomId(), resourceRoot);
+        ExistQuery query = ExistQueryFactory.checkResourceExistence(idCharter.getContentXml(), resourceRoot);
         return !momcaConnection.queryDatabase(query).isEmpty();
     }
 

@@ -1,8 +1,5 @@
 package eu.icarus.momca.momcapi.model;
 
-import eu.icarus.momca.momcapi.model.Fond;
-import eu.icarus.momca.momcapi.model.ImageAccess;
-import eu.icarus.momca.momcapi.model.MomcaResource;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -37,7 +34,7 @@ public class FondTest {
 
     @Test
     public void testGetArchiveId() throws Exception {
-        assertEquals(correctFond.getArchiveId().getAtomId().getText(), "tag:www.monasterium.net,2011:/archive/CH-KASchwyz");
+        assertEquals(correctFond.getArchiveId().getContentXml().getText(), "tag:www.monasterium.net,2011:/archive/CH-KASchwyz");
     }
 
     @Test
@@ -47,7 +44,7 @@ public class FondTest {
 
     @Test
     public void testGetId() throws Exception {
-        assertEquals(correctFond.getId().getAtomId().getText(), "tag:www.monasterium.net,2011:/fond/CH-KASchwyz/Urkunden");
+        assertEquals(correctFond.getId().getContentXml().getText(), "tag:www.monasterium.net,2011:/fond/CH-KASchwyz/Urkunden");
     }
 
     @Test

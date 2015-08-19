@@ -72,7 +72,7 @@ public class ArchiveManager extends AbstractManager {
 
     @NotNull
     public Optional<Archive> getArchive(@NotNull IdArchive idArchive) {
-        return getMomcaResource(idArchive.getAtomId()).map(Archive::new);
+        return getMomcaResource(idArchive.getContentXml()).map(Archive::new);
     }
 
 
@@ -141,7 +141,7 @@ public class ArchiveManager extends AbstractManager {
         Desc desc = new Desc(country.getNativeName(), regionNativeName, address, contactInformation, logoUrl);
         Element eag = createEagElement(shortName, name, country.getCountryCode().getCode(), desc);
 
-        return new AtomEntry(id.getAtomId(), atomAuthor, now, eag);
+        return new AtomEntry(id.getContentXml(), atomAuthor, now, eag);
 
     }
 

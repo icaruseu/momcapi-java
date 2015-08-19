@@ -20,16 +20,10 @@ public class IdArchive extends IdAbstract {
 
         super(atomId, initIdentifier(atomId));
 
-        if(getAtomId().getType() != ResourceType.ARCHIVE) {
-            throw new IllegalArgumentException(getAtomId().getText() + " is not a archive atom:id text.");
+        if (getContentXml().getType() != ResourceType.ARCHIVE) {
+            throw new IllegalArgumentException(getContentXml().getText() + " is not a archive atom:id text.");
         }
 
-    }
-
-    @NotNull
-    private static String initIdentifier(@NotNull AtomId atomId) {
-        String[] idParts = atomId.getText().split("/");
-        return Util.decode(idParts[idParts.length - 1]);
     }
 
     private static AtomId initAtomId(@NotNull String identifier) {
@@ -43,6 +37,16 @@ public class IdArchive extends IdAbstract {
 
     }
 
+    @NotNull
+    private static String initIdentifier(@NotNull AtomId atomId) {
+        String[] idParts = atomId.getText().split("/");
+        return Util.decode(idParts[idParts.length - 1]);
+    }
 
+    @NotNull
+    @Override
+    public AtomId getContentXml() {
+        return (AtomId) contentXml;
+    }
 
 }

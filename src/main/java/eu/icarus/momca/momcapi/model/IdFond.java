@@ -19,8 +19,8 @@ public class IdFond extends IdAbstract {
 
         super(atomId, initIdentifier(atomId));
 
-        if (getAtomId().getType() != ResourceType.FOND) {
-            throw new IllegalArgumentException(getAtomId().getText() + " is not a fond atom:id text.");
+        if (getContentXml().getType() != ResourceType.FOND) {
+            throw new IllegalArgumentException(getContentXml().getText() + " is not a fond atom:id text.");
         }
 
         idArchive = getArchiveFromAtomId(atomId);
@@ -82,6 +82,12 @@ public class IdFond extends IdAbstract {
         int result = super.hashCode();
         result = 31 * result + idArchive.hashCode();
         return result;
+    }
+
+    @NotNull
+    @Override
+    public AtomId getContentXml() {
+        return (AtomId) contentXml;
     }
 
 }

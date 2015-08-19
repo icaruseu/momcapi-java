@@ -1,6 +1,7 @@
 package eu.icarus.momca.momcapi.model;
 
 import eu.icarus.momca.momcapi.xml.atom.AtomId;
+import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -9,19 +10,32 @@ import org.jetbrains.annotations.NotNull;
 public abstract class IdAbstract {
 
     @NotNull
-    private final AtomId atomId;
+    final Element contentXml;
     @NotNull
     private final String identifier;
 
-    public IdAbstract(@NotNull AtomId atomId, @NotNull String identifier) {
+    public IdAbstract(@NotNull AtomId contentXml, @NotNull String identifier) {
 
         if (identifier.isEmpty()) {
             throw new IllegalArgumentException("The identifier is not allowed to be an empty string.");
         }
 
-        this.atomId = atomId;
+        this.contentXml = contentXml;
         this.identifier = identifier;
 
+    }
+
+    @NotNull
+    public abstract Element getContentXml();
+
+    @NotNull
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    @Override
+    public int hashCode() {
+        return identifier.hashCode();
     }
 
     @Override
@@ -34,21 +48,6 @@ public abstract class IdAbstract {
 
         return identifier.equals(that.identifier);
 
-    }
-
-    @NotNull
-    public AtomId getAtomId() {
-        return atomId;
-    }
-
-    @NotNull
-    public String getIdentifier() {
-        return identifier;
-    }
-
-    @Override
-    public int hashCode() {
-        return identifier.hashCode();
     }
 
 }

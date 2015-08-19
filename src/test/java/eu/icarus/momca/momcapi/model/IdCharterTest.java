@@ -1,9 +1,6 @@
 package eu.icarus.momca.momcapi.model;
 
 import eu.icarus.momca.momcapi.Util;
-import eu.icarus.momca.momcapi.model.IdCharter;
-import eu.icarus.momca.momcapi.model.IdCollection;
-import eu.icarus.momca.momcapi.model.IdFond;
 import eu.icarus.momca.momcapi.xml.atom.AtomId;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
@@ -42,16 +39,16 @@ public class IdCharterTest {
         assertFalse(id1.isInFond());
         assertFalse(id1.getIdFond().isPresent());
         assertEquals(id1.getIdCollection().get().getIdentifier(), IDENTIFIER_COLLECTION);
-        assertEquals(id1.getAtomId().toXML(), ATOM_ID_COLLECTION_CHARTER);
-        assertEquals(id1.getAtomId().getText(), Util.encode(ATOM_ID_TEXT_COLLECTION_CHARTER));
+        assertEquals(id1.getContentXml().toXML(), ATOM_ID_COLLECTION_CHARTER);
+        assertEquals(id1.getContentXml().getText(), Util.encode(ATOM_ID_TEXT_COLLECTION_CHARTER));
 
         IdCharter id2 = new IdCharter(new AtomId(ATOM_ID_TEXT_COLLECTION_CHARTER));
         assertEquals(id2.getIdentifier(), IDENTIFIER_COLLECTION_CHARTER);
         assertFalse(id2.isInFond());
         assertFalse(id2.getIdFond().isPresent());
         assertEquals(id2.getIdCollection().get().getIdentifier(), IDENTIFIER_COLLECTION);
-        assertEquals(id2.getAtomId().toXML(), ATOM_ID_COLLECTION_CHARTER);
-        assertEquals(id2.getAtomId().getText(), Util.encode(ATOM_ID_TEXT_COLLECTION_CHARTER));
+        assertEquals(id2.getContentXml().toXML(), ATOM_ID_COLLECTION_CHARTER);
+        assertEquals(id2.getContentXml().getText(), Util.encode(ATOM_ID_TEXT_COLLECTION_CHARTER));
 
     }
 
@@ -64,16 +61,16 @@ public class IdCharterTest {
         assertFalse(id1.getIdCollection().isPresent());
         assertEquals(id1.getIdFond().get().getIdentifier(), IDENTIFIER_FOND);
         assertEquals(id1.getIdFond().get().getIdArchive().getIdentifier(), IDENTIFIER_ARCHIVE);
-        assertEquals(id1.getAtomId().toXML(), ATOM_ID_FOND_CHARTER);
-        assertEquals(id1.getAtomId().getText(), Util.encode(ATOM_ID_TEXT_FOND_CHARTER));
+        assertEquals(id1.getContentXml().toXML(), ATOM_ID_FOND_CHARTER);
+        assertEquals(id1.getContentXml().getText(), Util.encode(ATOM_ID_TEXT_FOND_CHARTER));
 
         IdCharter id2 = new IdCharter(new AtomId(ATOM_ID_TEXT_FOND_CHARTER));
         assertEquals(id2.getIdentifier(), IDENTIFIER_FOND_CHARTER);
         assertTrue(id2.isInFond());
         assertEquals(id2.getIdFond().get().getIdentifier(), IDENTIFIER_FOND);
         assertEquals(id2.getIdFond().get().getIdArchive().getIdentifier(), IDENTIFIER_ARCHIVE);
-        assertEquals(id2.getAtomId().toXML(), ATOM_ID_FOND_CHARTER);
-        assertEquals(id2.getAtomId().getText(), Util.encode(ATOM_ID_TEXT_FOND_CHARTER));
+        assertEquals(id2.getContentXml().toXML(), ATOM_ID_FOND_CHARTER);
+        assertEquals(id2.getContentXml().getText(), Util.encode(ATOM_ID_TEXT_FOND_CHARTER));
 
     }
 

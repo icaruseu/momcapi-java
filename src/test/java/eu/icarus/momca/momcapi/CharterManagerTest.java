@@ -43,7 +43,7 @@ public class CharterManagerTest {
         IdCharter id = new IdCharter("RS-IAGNS", "Charters", "F1_fasc.16_sub_N_1513");
         List<Charter> charters = cm.getCharterInstances(id, CharterStatus.IMPORTED);
         assertEquals(charters.size(), 1);
-        assertEquals(charters.get(0).getId().getAtomId().toXML(), id.getAtomId().toXML());
+        assertEquals(charters.get(0).getId().getContentXml().toXML(), id.getContentXml().toXML());
 
     }
 
@@ -53,7 +53,7 @@ public class CharterManagerTest {
         IdCharter id = new IdCharter("ea13e5f1-03b2-4bfa-9dd5-8fb770f98d7b", "46bc10f3-bc35-4fa8-ab82-25827dc243f6");
         List<Charter> charters = cm.getCharterInstances(id, CharterStatus.PRIVATE);
         assertEquals(charters.size(), 1);
-        assertEquals(charters.get(0).getId().getAtomId().toXML(), id.getAtomId().toXML());
+        assertEquals(charters.get(0).getId().getContentXml().toXML(), id.getContentXml().toXML());
 
     }
 
@@ -63,7 +63,7 @@ public class CharterManagerTest {
         IdCharter id = new IdCharter("CH-KAE", "Urkunden", "KAE_Urkunde_Nr_2");
         List<Charter> charters = cm.getCharterInstances(id, CharterStatus.SAVED);
         assertEquals(charters.size(), 1);
-        assertEquals(charters.get(0).getId().getAtomId().toXML(), id.getAtomId().toXML());
+        assertEquals(charters.get(0).getId().getContentXml().toXML(), id.getContentXml().toXML());
 
     }
 
@@ -80,7 +80,7 @@ public class CharterManagerTest {
         IdCharter id = new IdCharter("CH-KAE", "Urkunden", "KAE_Urkunde_Nr_1");
         List<Charter> charters = cm.getCharterInstances(id, CharterStatus.PUBLIC);
         assertEquals(charters.size(), 1);
-        assertEquals(charters.get(0).getId().getAtomId().toXML(), id.getAtomId().toXML());
+        assertEquals(charters.get(0).getId().getContentXml().toXML(), id.getContentXml().toXML());
 
     }
 
@@ -190,7 +190,7 @@ public class CharterManagerTest {
 
         List<IdCharter> erroneouslySavedCharterIds = cm.listErroneouslySavedCharters(user);
         assertEquals(erroneouslySavedCharterIds.size(), 1);
-        assertEquals(erroneouslySavedCharterIds.get(0).getAtomId().toXML(), erroneouslySavedCharter.getAtomId().toXML());
+        assertEquals(erroneouslySavedCharterIds.get(0).getContentXml().toXML(), erroneouslySavedCharter.getContentXml().toXML());
 
     }
 

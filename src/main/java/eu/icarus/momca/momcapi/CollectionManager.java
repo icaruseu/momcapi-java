@@ -42,7 +42,7 @@ public class CollectionManager extends AbstractManager {
         }
 
         if (getCollection(id).isPresent()) {
-            String message = String.format("An collection for the id '%s' is already existing.", id.getAtomId().getText());
+            String message = String.format("An collection for the id '%s' is already existing.", id.getContentXml().getText());
             throw new IllegalArgumentException(message);
         }
 
@@ -74,7 +74,7 @@ public class CollectionManager extends AbstractManager {
 
     @NotNull
     public Optional<Collection> getCollection(@NotNull IdCollection idCollection) {
-        return getMomcaResource(idCollection.getAtomId()).map(Collection::new);
+        return getMomcaResource(idCollection.getContentXml()).map(Collection::new);
     }
 
     @NotNull
@@ -163,7 +163,7 @@ public class CollectionManager extends AbstractManager {
 
         AtomAuthor atomAuthor = new AtomAuthor(authorEmail);
         String now = momcaConnection.queryDatabase(ExistQueryFactory.getCurrentDateTime()).get(0);
-        Element resourceContent = new AtomEntry(id.getAtomId(), atomAuthor, now, cei);
+        Element resourceContent = new AtomEntry(id.getContentXml(), atomAuthor, now, cei);
 
         keywords.ifPresent(element -> resourceContent.insertChild(element, 6));
 

@@ -39,7 +39,7 @@ public class CollectionManagerTest {
         Collection coll = cm.addCollection(identifier, name, authorEmail, country, region, imageServerAddress, imageFolderName, keyword);
         cm.deleteCollection(coll.getId());
 
-        assertEquals(coll.getId().getAtomId().getText(), new IdCollection(identifier).getAtomId().getText());
+        assertEquals(coll.getId().getContentXml().getText(), new IdCollection(identifier).getContentXml().getText());
         assertEquals(coll.getName(), name);
         assertEquals(coll.getAuthorName().get(), authorEmail);
         assertEquals(coll.getCountryCode().get(), country.getCountryCode());
@@ -63,7 +63,7 @@ public class CollectionManagerTest {
         Collection coll = cm.addCollection(identifier, name, authorEmail, null, null, imageServerAddress, imageFolderName, keyword);
         cm.deleteCollection(coll.getId());
 
-        assertEquals(coll.getId().getAtomId().getText(), new IdCollection(identifier).getAtomId().getText());
+        assertEquals(coll.getId().getContentXml().getText(), new IdCollection(identifier).getContentXml().getText());
         assertEquals(coll.getName(), name);
         assertEquals(coll.getAuthorName().get(), authorEmail);
         assertFalse(coll.getCountryCode().isPresent());
@@ -84,7 +84,7 @@ public class CollectionManagerTest {
         Collection coll = cm.addCollection(identifier, name, authorEmail, null, null, null, null, null);
         cm.deleteCollection(coll.getId());
 
-        assertEquals(coll.getId().getAtomId().getText(), new IdCollection(identifier).getAtomId().getText());
+        assertEquals(coll.getId().getContentXml().getText(), new IdCollection(identifier).getContentXml().getText());
         assertEquals(coll.getName(), name);
         assertEquals(coll.getAuthorName().get(), authorEmail);
         assertFalse(coll.getCountryCode().isPresent());
@@ -198,7 +198,7 @@ public class CollectionManagerTest {
         Collection collection1 = cm.getCollection(new IdCollection("AbteiEberbach")).get();
         assertEquals(collection1.getCountryCode().get().getCode(), "DE");
         assertEquals(collection1.getRegionName().get(), "Bayern");
-        assertEquals(collection1.getId().getAtomId().getText(), "tag:www.monasterium.net,2011:/collection/AbteiEberbach");
+        assertEquals(collection1.getId().getContentXml().getText(), "tag:www.monasterium.net,2011:/collection/AbteiEberbach");
         assertEquals(collection1.getIdentifier(), "AbteiEberbach");
         assertEquals(collection1.getName(), "Urkundenbuch der Abtei Eberbach (Google data)");
         assertFalse(collection1.getAuthorName().isPresent());
@@ -209,7 +209,7 @@ public class CollectionManagerTest {
         Collection collection2 = cm.getCollection(new IdCollection("emptycollection")).get();
         assertFalse(collection2.getCountryCode().isPresent());
         assertFalse(collection2.getRegionName().isPresent());
-        assertEquals(collection2.getId().getAtomId().getText(), "tag:www.monasterium.net,2011:/collection/emptycollection");
+        assertEquals(collection2.getId().getContentXml().getText(), "tag:www.monasterium.net,2011:/collection/emptycollection");
         assertEquals(collection2.getIdentifier(), "emptycollection");
         assertEquals(collection2.getName(), "Empty Collection");
         assertEquals(collection2.getAuthorName().get(), "admin");

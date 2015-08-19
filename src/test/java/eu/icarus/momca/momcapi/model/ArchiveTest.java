@@ -1,6 +1,5 @@
 package eu.icarus.momca.momcapi.model;
 
-import eu.icarus.momca.momcapi.model.*;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -58,7 +57,7 @@ public class ArchiveTest {
     @Test
     public void testGetId() throws Exception {
         String correctId = "tag:www.monasterium.net,2011:/archive/CH-KAE";
-        assertEquals(correctArchive.getId().getAtomId().getText(), correctId);
+        assertEquals(correctArchive.getId().getContentXml().getText(), correctId);
     }
 
     @Test

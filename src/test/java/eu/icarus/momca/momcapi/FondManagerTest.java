@@ -39,9 +39,9 @@ public class FondManagerTest {
         assertTrue(mc.getExistResource("Urkunden.preferences.xml", "/db/mom-data/metadata.fond.public/DE-SAMuenchen/Urkunden").isPresent());
         fm.deleteFond(fond1.getId());
 
-        assertEquals(fond1.getId().getAtomId().getText(), "tag:www.monasterium.net,2011:/fond/DE-SAMuenchen/Urkunden");
+        assertEquals(fond1.getId().getContentXml().getText(), "tag:www.monasterium.net,2011:/fond/DE-SAMuenchen/Urkunden");
         assertEquals(fond1.getIdentifier(), "Urkunden");
-        assertEquals(fond1.getArchiveId().getAtomId().getText(), "tag:www.monasterium.net,2011:/archive/DE-SAMuenchen");
+        assertEquals(fond1.getArchiveId().getContentXml().getText(), "tag:www.monasterium.net,2011:/archive/DE-SAMuenchen");
         assertEquals(fond1.getName(), "Alle Urkunden");
         assertEquals(fond1.getImageAccess().get(), ImageAccess.FREE);
         assertEquals(fond1.getImagesUrl().get().toExternalForm(), "http://ex.com/img");
@@ -124,7 +124,7 @@ public class FondManagerTest {
         Optional<Fond> fondOptional1 = fm.getFond(id1);
         assertTrue(fondOptional1.isPresent());
         Fond fond1 = fondOptional1.get();
-        assertEquals(fond1.getId().getAtomId().toXML(), id1.getAtomId().toXML());
+        assertEquals(fond1.getId().getContentXml().toXML(), id1.getContentXml().toXML());
         assertEquals(fond1.getName(), "Urkunden (0947-1483)");
         assertEquals(fond1.getImageAccess().get(), ImageAccess.FREE);
         assertFalse(fond1.getDummyImageUrl().isPresent());
@@ -134,7 +134,7 @@ public class FondManagerTest {
         Optional<Fond> fondOptional2 = fm.getFond(id2);
         assertTrue(fondOptional2.isPresent());
         Fond fond2 = fondOptional2.get();
-        assertEquals(fond2.getId().getAtomId().toXML(), id2.getAtomId().toXML());
+        assertEquals(fond2.getId().getContentXml().toXML(), id2.getContentXml().toXML());
         assertEquals(fond2.getName(), "Urkunden");
         assertEquals(fond2.getImageAccess().get(), ImageAccess.RESTRICTED);
         assertEquals(fond2.getDummyImageUrl().get().toExternalForm(), "http://example.com/dummy.png");

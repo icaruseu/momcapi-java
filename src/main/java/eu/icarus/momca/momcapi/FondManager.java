@@ -56,7 +56,7 @@ public class FondManager extends AbstractManager {
         String fondCollectionUri = archiveCollectionUri + "/" + identifier;
 
         String eadName = identifier + ".ead.xml";
-        Element eadContent = createEadContent(authorEmail, id.getAtomId(), identifier, name);
+        Element eadContent = createEadContent(authorEmail, id.getContentXml(), identifier, name);
         MomcaResource eadResource = new MomcaResource(eadName, fondCollectionUri, eadContent.toXML());
 
         String preferencesName = identifier + ".preferences.xml";
@@ -92,7 +92,7 @@ public class FondManager extends AbstractManager {
 
         Optional<Fond> fond = Optional.empty();
 
-        Optional<MomcaResource> fondResource = getMomcaResource(idFond.getAtomId());
+        Optional<MomcaResource> fondResource = getMomcaResource(idFond.getContentXml());
 
         if (fondResource.isPresent()) {
 

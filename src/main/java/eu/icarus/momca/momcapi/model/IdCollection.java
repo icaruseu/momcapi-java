@@ -23,16 +23,10 @@ public class IdCollection extends IdAbstract {
 
         super(atomId, initIdentifier(atomId));
 
-        if(getAtomId().getType() != ResourceType.COLLECTION) {
-            throw new IllegalArgumentException(getAtomId().getText() + " is not a collection atom:id text.");
+        if (getContentXml().getType() != ResourceType.COLLECTION) {
+            throw new IllegalArgumentException(getContentXml().getText() + " is not a collection atom:id text.");
         }
 
-    }
-
-    @NotNull
-    private static String initIdentifier(@NotNull AtomId atomId) {
-        String[] idParts = atomId.getText().split("/");
-        return Util.decode(idParts[idParts.length - 1]);
     }
 
     private static AtomId initAtomId(@NotNull String identifier) {
@@ -44,6 +38,18 @@ public class IdCollection extends IdAbstract {
 
         return new AtomId(String.join("/", AtomId.DEFAULT_PREFIX, ResourceType.COLLECTION.getNameInId(), identifier));
 
+    }
+
+    @NotNull
+    private static String initIdentifier(@NotNull AtomId atomId) {
+        String[] idParts = atomId.getText().split("/");
+        return Util.decode(idParts[idParts.length - 1]);
+    }
+
+    @NotNull
+    @Override
+    public AtomId getContentXml() {
+        return (AtomId) contentXml;
     }
 
 }

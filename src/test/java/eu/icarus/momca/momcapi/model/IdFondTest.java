@@ -1,8 +1,6 @@
 package eu.icarus.momca.momcapi.model;
 
 import eu.icarus.momca.momcapi.Util;
-import eu.icarus.momca.momcapi.model.IdArchive;
-import eu.icarus.momca.momcapi.model.IdFond;
 import eu.icarus.momca.momcapi.xml.atom.AtomId;
 import org.testng.annotations.Test;
 
@@ -26,14 +24,14 @@ public class IdFondTest {
         IdFond id1 = new IdFond(atomId);
         assertEquals(id1.getIdentifier(), fondIdentifier);
         assertEquals(id1.getIdArchive().getIdentifier(), archiveIdentifier);
-        assertEquals(id1.getAtomId().toXML(), correctXml);
-        assertEquals(id1.getAtomId().getText(), Util.encode(atomIdText));
+        assertEquals(id1.getContentXml().toXML(), correctXml);
+        assertEquals(id1.getContentXml().getText(), Util.encode(atomIdText));
 
         IdFond id2 = new IdFond(archiveIdentifier, fondIdentifier);
         assertEquals(id2.getIdentifier(), fondIdentifier);
         assertEquals(id2.getIdArchive().getIdentifier(), archiveIdentifier);
-        assertEquals(id2.getAtomId().toXML(), correctXml);
-        assertEquals(id2.getAtomId().getText(), Util.encode(atomIdText));
+        assertEquals(id2.getContentXml().toXML(), correctXml);
+        assertEquals(id2.getContentXml().getText(), Util.encode(atomIdText));
 
     }
 

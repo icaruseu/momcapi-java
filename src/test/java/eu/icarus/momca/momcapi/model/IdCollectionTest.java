@@ -1,7 +1,6 @@
 package eu.icarus.momca.momcapi.model;
 
 import eu.icarus.momca.momcapi.Util;
-import eu.icarus.momca.momcapi.model.IdCollection;
 import eu.icarus.momca.momcapi.xml.atom.AtomId;
 import org.testng.annotations.Test;
 
@@ -21,14 +20,14 @@ public class IdCollectionTest {
                 "tag:www.monasterium.net,2011:/collection/MedDoc%7CBulgEmp</atom:id>";
 
         IdCollection id1 = new IdCollection(identifier);
-        assertEquals(id1.getAtomId().toXML(), atomIdXml);
+        assertEquals(id1.getContentXml().toXML(), atomIdXml);
         assertEquals(id1.getIdentifier(), identifier);
-        assertEquals(id1.getAtomId().getText(), Util.encode(atomIdText));
+        assertEquals(id1.getContentXml().getText(), Util.encode(atomIdText));
 
         IdCollection id2 = new IdCollection(new AtomId(atomIdText));
-        assertEquals(id2.getAtomId().toXML(), atomIdXml);
+        assertEquals(id2.getContentXml().toXML(), atomIdXml);
         assertEquals(id2.getIdentifier(), identifier);
-        assertEquals(id2.getAtomId().getText(), Util.encode(atomIdText));
+        assertEquals(id2.getContentXml().getText(), Util.encode(atomIdText));
 
     }
 

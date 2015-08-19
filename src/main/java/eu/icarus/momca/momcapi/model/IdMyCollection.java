@@ -23,8 +23,8 @@ public class IdMyCollection extends IdAbstract {
 
         super(atomId, initIdentifier(atomId));
 
-        if (getAtomId().getType() != ResourceType.MY_COLLECTION) {
-            throw new IllegalArgumentException(getAtomId().getText() + " is not a myCollection atom:id text.");
+        if (getContentXml().getType() != ResourceType.MY_COLLECTION) {
+            throw new IllegalArgumentException(getContentXml().getText() + " is not a myCollection atom:id text.");
         }
 
     }
@@ -44,6 +44,12 @@ public class IdMyCollection extends IdAbstract {
 
         return new AtomId(String.join("/", AtomId.DEFAULT_PREFIX, ResourceType.MY_COLLECTION.getNameInId(), identifier));
 
+    }
+
+    @NotNull
+    @Override
+    public AtomId getContentXml() {
+        return (AtomId) contentXml;
     }
 
 }

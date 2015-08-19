@@ -16,16 +16,16 @@ import java.util.Optional;
 public class IdCharter extends IdAbstract {
 
     @NotNull
-    private final Optional<IdFond> idFond;
-    @NotNull
     private final Optional<IdCollection> idCollection;
+    @NotNull
+    private final Optional<IdFond> idFond;
 
     public IdCharter(@NotNull AtomId atomId) {
 
         super(atomId, initIdentifier(atomId));
 
-        if (getAtomId().getType() != ResourceType.CHARTER) {
-            throw new IllegalArgumentException(getAtomId().getText() + " is not a charter atom:id.");
+        if (getContentXml().getType() != ResourceType.CHARTER) {
+            throw new IllegalArgumentException(getContentXml().getText() + " is not a charter atom:id.");
         }
 
         if (isInFond()) {
@@ -50,10 +50,19 @@ public class IdCharter extends IdAbstract {
         idFond = Optional.empty();
     }
 
-    @NotNull
-    private static String initIdentifier(@NotNull AtomId atomId) {
-        String[] idParts = atomId.getText().split("/");
-        return Util.decode(idParts[idParts.length - 1]);
+    private static AtomId initAtomIdForCollection(@NotNull String collectionIdentifier, @NotNull String charterIdentifier) {
+
+        if (collectionIdentifier.contains("/") || charterIdentifier.contains("/")) {
+            throw new IllegalArgumentException("One of the identifiers contains '/'" +
+                    " which is forbidden. Maybe the string is an atom:id text and not just an identifier?");
+        }
+
+        return new AtomId(String.join("/",
+                AtomId.DEFAULT_PREFIX,
+                ResourceType.CHARTER.getNameInId(),
+                collectionIdentifier,
+                charterIdentifier));
+
     }
 
     private static AtomId initAtomIdForFond(@NotNull String archiveIdentifier, @NotNull String fondIdentifier, @NotNull String charterIdentifier) {
@@ -72,24 +81,25 @@ public class IdCharter extends IdAbstract {
 
     }
 
-    private static AtomId initAtomIdForCollection(@NotNull String collectionIdentifier, @NotNull String charterIdentifier) {
-
-        if (collectionIdentifier.contains("/") || charterIdentifier.contains("/")) {
-            throw new IllegalArgumentException("One of the identifiers contains '/'" +
-                    " which is forbidden. Maybe the string is an atom:id text and not just an identifier?");
-        }
-
-        return new AtomId(String.join("/",
-                AtomId.DEFAULT_PREFIX,
-                ResourceType.CHARTER.getNameInId(),
-                collectionIdentifier,
-                charterIdentifier));
-
+    @NotNull
+    private static String initIdentifier(@NotNull AtomId atomId) {
+        String[] idParts = atomId.getText().split("/");
+        return Util.decode(idParts[idParts.length - 1]);
     }
 
-    public boolean isInFond() {
-        String[] parts = getAtomId().getText().split("/");
-        return parts.length == ResourceType.CHARTER.getMaxIdParts();
+    @NotNull
+    @Override
+    public AtomId getContentXml() {
+        return (AtomId) contentXml;
+    }
+
+    @NotNull
+    private IdCollection getCollectionFromAtomId(@NotNull AtomId atomId) {
+
+        String[] parts = atomId.getText().split("/");
+        String collectionIdentifier = Util.decode(parts[parts.length - 2]);
+        return new IdCollection(collectionIdentifier);
+
     }
 
     @NotNull
@@ -104,12 +114,8 @@ public class IdCharter extends IdAbstract {
     }
 
     @NotNull
-    private IdCollection getCollectionFromAtomId(@NotNull AtomId atomId) {
-
-        String[] parts = atomId.getText().split("/");
-        String collectionIdentifier = Util.decode(parts[parts.length - 2]);
-        return new IdCollection(collectionIdentifier);
-
+    public Optional<IdCollection> getIdCollection() {
+        return idCollection;
     }
 
     @NotNull
@@ -117,9 +123,9 @@ public class IdCharter extends IdAbstract {
         return idFond;
     }
 
-    @NotNull
-    public Optional<IdCollection> getIdCollection() {
-        return idCollection;
+    public boolean isInFond() {
+        String[] parts = getContentXml().getText().split("/");
+        return parts.length == ResourceType.CHARTER.getMaxIdParts();
     }
 
 }

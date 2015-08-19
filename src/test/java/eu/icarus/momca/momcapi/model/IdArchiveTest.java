@@ -1,7 +1,6 @@
 package eu.icarus.momca.momcapi.model;
 
 import eu.icarus.momca.momcapi.Util;
-import eu.icarus.momca.momcapi.model.IdArchive;
 import eu.icarus.momca.momcapi.xml.atom.AtomId;
 import org.testng.annotations.Test;
 
@@ -21,14 +20,14 @@ public class IdArchiveTest {
                 "tag:www.monasterium.net,2011:/archive/CH%7CKAE</atom:id>";
 
         IdArchive id1 = new IdArchive(identifier);
-        assertEquals(id1.getAtomId().toXML(), atomIdXml);
+        assertEquals(id1.getContentXml().toXML(), atomIdXml);
         assertEquals(id1.getIdentifier(), identifier);
-        assertEquals(id1.getAtomId().getText(), Util.encode(atomIdText));
+        assertEquals(id1.getContentXml().getText(), Util.encode(atomIdText));
 
         IdArchive id2 = new IdArchive(new AtomId(atomIdText));
-        assertEquals(id2.getAtomId().toXML(), atomIdXml);
+        assertEquals(id2.getContentXml().toXML(), atomIdXml);
         assertEquals(id2.getIdentifier(), identifier);
-        assertEquals(id2.getAtomId().getText(), Util.encode(atomIdText));
+        assertEquals(id2.getContentXml().getText(), Util.encode(atomIdText));
 
     }
 

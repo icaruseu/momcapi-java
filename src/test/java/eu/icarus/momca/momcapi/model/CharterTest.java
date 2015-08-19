@@ -47,7 +47,7 @@ public class CharterTest {
     @Test
     public void testConstructor() throws Exception {
         Charter charter = new Charter(resource);
-        assertEquals(charter.getId().getAtomId().toXML(), ID_CHARTER.getAtomId().toXML());
+        assertEquals(charter.getId().getContentXml().toXML(), ID_CHARTER.getContentXml().toXML());
     }
 
     @Test
@@ -99,7 +99,7 @@ public class CharterTest {
     @Test
     public void testGetId() throws Exception {
         Charter charter = new Charter(resource);
-        assertEquals(charter.getId().getAtomId().toXML(), ID_CHARTER.getAtomId().toXML());
+        assertEquals(charter.getId().getContentXml().toXML(), ID_CHARTER.getContentXml().toXML());
     }
 
     @Test
