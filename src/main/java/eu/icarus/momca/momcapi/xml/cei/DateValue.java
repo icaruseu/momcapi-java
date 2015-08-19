@@ -38,17 +38,6 @@ public class DateValue {
         return numericDate.matches("-?[129]?[0-9][0-9][0-9][019][0-9][01239][0-9]");
     }
 
-    @Override
-    public boolean equals(@Nullable Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        DateValue dateValue = (DateValue) o;
-
-        return value.equals(dateValue.value);
-
-    }
-
     /**
      * @return The numeric date value, e.g. {@code 12970918}.
      */
@@ -62,11 +51,15 @@ public class DateValue {
         return value.hashCode();
     }
 
-    /**
-     * @return {@code True}, if the numeric date is a valid date as specified by the <a href="https://github.com/icaruseu/mom-ca/blob/master/my/XRX/src/mom/app/cei/xsd/cei.xsd#L5207">CEI-Schema</a>.
-     */
-    public boolean isValid() {
-        return isValid;
+    @Override
+    public boolean equals(@Nullable Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DateValue dateValue = (DateValue) o;
+
+        return value.equals(dateValue.value);
+
     }
 
     @Override
@@ -75,6 +68,13 @@ public class DateValue {
         return "DateValue{" +
                 "value='" + value + '\'' +
                 '}';
+    }
+
+    /**
+     * @return {@code True}, if the numeric date is a valid date as specified by the <a href="https://github.com/icaruseu/mom-ca/blob/master/my/XRX/src/mom/app/cei/xsd/cei.xsd#L5207">CEI-Schema</a>.
+     */
+    public boolean isValid() {
+        return isValid;
     }
 
 }

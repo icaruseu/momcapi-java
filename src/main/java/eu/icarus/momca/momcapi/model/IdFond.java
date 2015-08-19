@@ -32,12 +32,6 @@ public class IdFond extends IdAbstract {
         idArchive = new IdArchive(archiveIdentifier);
     }
 
-    @NotNull
-    private static String initIdentifier(@NotNull AtomId atomId) {
-        String[] idParts = atomId.getText().split("/");
-        return Util.decode(idParts[idParts.length - 1]);
-    }
-
     private static AtomId initAtomId(@NotNull String archiveIdentifier, @NotNull String fondIdentifier) {
 
         if (archiveIdentifier.contains("/") || fondIdentifier.contains("/")) {
@@ -54,14 +48,28 @@ public class IdFond extends IdAbstract {
     }
 
     @NotNull
+    private static String initIdentifier(@NotNull AtomId atomId) {
+        String[] idParts = atomId.getText().split("/");
+        return Util.decode(idParts[idParts.length - 1]);
+    }
+
+    @NotNull
     private IdArchive getArchiveFromAtomId(@NotNull AtomId atomId) {
         String[] parts = atomId.getText().split("/");
         return new IdArchive(Util.decode(parts[parts.length - 2]));
     }
 
     @NotNull
-    public IdArchive getIdArchive() {
-        return idArchive;
+    @Override
+    public AtomId getContentXml() {
+        return (AtomId) contentXml;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + idArchive.hashCode();
+        return result;
     }
 
     @Override
@@ -77,17 +85,9 @@ public class IdFond extends IdAbstract {
 
     }
 
-    @Override
-    public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + idArchive.hashCode();
-        return result;
-    }
-
     @NotNull
-    @Override
-    public AtomId getContentXml() {
-        return (AtomId) contentXml;
+    public IdArchive getIdArchive() {
+        return idArchive;
     }
 
 }

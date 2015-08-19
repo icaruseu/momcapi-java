@@ -49,14 +49,6 @@ public class Date extends DateAbstract {
 
     }
 
-    /**
-     * @return The numeric date value, e.g. {@code 12970311} (== {@code cei:date/@value}).
-     */
-    @NotNull
-    public DateValue getDateValue() {
-        return dateValue;
-    }
-
     @Override
     public boolean isValid() {
         return dateValue.isValid();
@@ -68,6 +60,14 @@ public class Date extends DateAbstract {
         return "Date{" +
                 "dateValue=" + dateValue +
                 "} " + super.toString();
+    }
+
+    /**
+     * @return The numeric date value, e.g. {@code 12970311} (== {@code cei:date/@value}).
+     */
+    @NotNull
+    public DateValue getDateValue() {
+        return dateValue;
     }
 
 }

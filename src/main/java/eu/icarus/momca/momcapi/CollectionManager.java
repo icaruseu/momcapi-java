@@ -3,7 +3,6 @@ package eu.icarus.momca.momcapi;
 import eu.icarus.momca.momcapi.model.*;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
 import eu.icarus.momca.momcapi.xml.Namespace;
-import eu.icarus.momca.momcapi.xml.atom.AtomAuthor;
 import eu.icarus.momca.momcapi.xml.atom.AtomEntry;
 import eu.icarus.momca.momcapi.xml.atom.AtomId;
 import nu.xom.Element;

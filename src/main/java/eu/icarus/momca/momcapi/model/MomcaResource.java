@@ -56,6 +56,45 @@ public class MomcaResource {
     }
 
     /**
+     * @return The URI of the collection, the resource is stored in in the database, e.g. {@code /db/mom-data/xrx.user}.
+     */
+    @NotNull
+    public String getParentUri() {
+        return parentUri;
+    }
+
+    /**
+     * @return The name of the resource in the database, e.g. {@code user.xml}
+     */
+    @NotNull
+    public String getResourceName() {
+        return resourceName;
+    }
+
+    /**
+     * @return The URI of the resource in the database, e.g. {@code /db/mom-data/xrx.user/user.xml}.
+     */
+    @NotNull
+    public String getUri() {
+        return parentUri + "/" + resourceName;
+    }
+
+    /**
+     * @return The XML as an XML document.
+     */
+    @NotNull
+    public Document getXmlAsDocument() {
+        return xmlAsDocument;
+    }
+
+    @NotNull
+    private XPathContext getxPathContext(@NotNull Element root, @NotNull XpathQuery query) {
+        XPathContext context = XPathContext.makeNamespaceContext(root);
+        query.getNamespaces().forEach(n -> context.addNamespace(n.getPrefix(), n.getUri()));
+        return context;
+    }
+
+    /**
      * The Xpath Query to execute on the content.
      *
      * @param query the query
@@ -92,48 +131,6 @@ public class MomcaResource {
 
     }
 
-    /**
-     * @return The URI of the collection, the resource is stored in in the database, e.g. {@code /db/mom-data/xrx.user}.
-     */
-    @NotNull
-    public String getParentUri() {
-        return parentUri;
-    }
-
-    /**
-     * @return The name of the resource in the database, e.g. {@code user.xml}
-     */
-    @NotNull
-    public String getResourceName() {
-        return resourceName;
-    }
-
-    /**
-     * @return The URI of the resource in the database, e.g. {@code /db/mom-data/xrx.user/user.xml}.
-     */
-    @NotNull
-    public String getUri() {
-        return parentUri + "/" + resourceName;
-    }
-
-    /**
-     * @return The XML as an XML document.
-     */
-    @NotNull
-    public Document getXmlAsDocument() {
-        return xmlAsDocument;
-    }
-
-    @NotNull
-    @Override
-    public String toString() {
-        return "MomcaResource{" +
-                "resourceName='" + resourceName + '\'' +
-                ", xmlAsDocument=" + xmlAsDocument +
-                ", parentUri='" + parentUri + '\'' +
-                '}';
-    }
-
     @NotNull
     String queryUniqueElement(@NotNull XpathQuery query) {
 
@@ -162,10 +159,13 @@ public class MomcaResource {
     }
 
     @NotNull
-    private XPathContext getxPathContext(@NotNull Element root, @NotNull XpathQuery query) {
-        XPathContext context = XPathContext.makeNamespaceContext(root);
-        query.getNamespaces().forEach(n -> context.addNamespace(n.getPrefix(), n.getUri()));
-        return context;
+    @Override
+    public String toString() {
+        return "MomcaResource{" +
+                "resourceName='" + resourceName + '\'' +
+                ", xmlAsDocument=" + xmlAsDocument +
+                ", parentUri='" + parentUri + '\'' +
+                '}';
     }
 
 }

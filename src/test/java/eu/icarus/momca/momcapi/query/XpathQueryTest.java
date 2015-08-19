@@ -25,6 +25,26 @@ public class XpathQueryTest {
     private static final String PARENT_URI = "/db/mom-data/";
     private MomcaResource resource;
 
+    private List<String> queryContentAsList(@NotNull MomcaResource resource, @NotNull XpathQuery query)
+            throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+
+        Method queryMethod = MomcaResource.class.
+                getDeclaredMethod("queryContentAsList", XpathQuery.class);
+        queryMethod.setAccessible(true);
+        return (List<String>) queryMethod.invoke(resource, query);
+
+    }
+
+    private Nodes queryContentAsNodes(@NotNull MomcaResource resource, @NotNull XpathQuery query)
+            throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+
+        Method queryMethod = MomcaResource.class.
+                getDeclaredMethod("queryContentAsNodes", XpathQuery.class);
+        queryMethod.setAccessible(true);
+        return (Nodes) queryMethod.invoke(resource, query);
+
+    }
+
     @BeforeClass
     public void setUp() throws Exception {
         String testXml = TestUtils.getXmlFromResource("XpathQueryTestXml.xml").toXML();
@@ -265,26 +285,6 @@ public class XpathQueryTest {
         List<String> result = queryContentAsList(resource, XpathQuery.QUERY_XRX_SAVED_ID);
         assertEquals(result.size(), 1);
         assertEquals(result.get(0), "xrxsaved");
-    }
-
-    private List<String> queryContentAsList(@NotNull MomcaResource resource, @NotNull XpathQuery query)
-            throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-
-        Method queryMethod = MomcaResource.class.
-                getDeclaredMethod("queryContentAsList", XpathQuery.class);
-        queryMethod.setAccessible(true);
-        return (List<String>) queryMethod.invoke(resource, query);
-
-    }
-
-    private Nodes queryContentAsNodes(@NotNull MomcaResource resource, @NotNull XpathQuery query)
-            throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-
-        Method queryMethod = MomcaResource.class.
-                getDeclaredMethod("queryContentAsNodes", XpathQuery.class);
-        queryMethod.setAccessible(true);
-        return (Nodes) queryMethod.invoke(resource, query);
-
     }
 
 }

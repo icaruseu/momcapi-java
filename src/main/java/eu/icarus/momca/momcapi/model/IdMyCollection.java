@@ -29,12 +29,6 @@ public class IdMyCollection extends IdAbstract {
 
     }
 
-    @NotNull
-    private static String initIdentifier(@NotNull AtomId atomId) {
-        String[] idParts = atomId.getText().split("/");
-        return Util.decode(idParts[idParts.length - 1]);
-    }
-
     private static AtomId initAtomId(@NotNull String identifier) {
 
         if (identifier.contains("/")) {
@@ -44,6 +38,12 @@ public class IdMyCollection extends IdAbstract {
 
         return new AtomId(String.join("/", AtomId.DEFAULT_PREFIX, ResourceType.MY_COLLECTION.getNameInId(), identifier));
 
+    }
+
+    @NotNull
+    private static String initIdentifier(@NotNull AtomId atomId) {
+        String[] idParts = atomId.getText().split("/");
+        return Util.decode(idParts[idParts.length - 1]);
     }
 
     @NotNull

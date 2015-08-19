@@ -1,6 +1,5 @@
 package eu.icarus.momca.momcapi.model;
 
-import eu.icarus.momca.momcapi.model.ResourceType;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
 

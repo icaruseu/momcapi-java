@@ -24,18 +24,18 @@ public class AtomId extends Element {
     @NotNull
     public static final String DEFAULT_PREFIX = "tag:www.monasterium.net,2011:";
     private static final int MAX_ID_PARTS = 5;
-    private static final int MIN_ID_PARTS_WITHOUT_PREFIX = 2;
     private static final int MIN_ID_PARTS = 3;
+    private static final int MIN_ID_PARTS_WITHOUT_PREFIX = 2;
     @NotNull
     private final String text;
     @NotNull
     private final ResourceType type;
 
-   public  AtomId(@NotNull String text) {
+    public AtomId(@NotNull String text) {
 
         super("atom:id", Namespace.ATOM.getUri());
 
-       text = Util.encode(text);
+        text = Util.encode(text);
 
         String[] idParts = text.split("/");
 
@@ -60,12 +60,13 @@ public class AtomId extends Element {
 
     }
 
-    private boolean hasWrongNumberOfPartsForType(int numberOfParts, @NotNull ResourceType type) {
-        return numberOfParts < type.getMinIdParts() || numberOfParts > type.getMaxIdParts();
-    }
-
-    private boolean isMissingPrefix(@NotNull String... idParts) {
-        return !idParts[0].equals(DEFAULT_PREFIX);
+    /**
+     * @return The AtomId text content, e.g.
+     * {@code tag:www.monasterium.net,2011:/charter/RS-IAGNS/Charters/IAGNS_F-.150_6605%7C193232}.
+     */
+    @NotNull
+    public String getText() {
+        return text;
     }
 
     /**
@@ -78,13 +79,12 @@ public class AtomId extends Element {
         return type;
     }
 
-    /**
-     * @return The AtomId text content, e.g.
-     * {@code tag:www.monasterium.net,2011:/charter/RS-IAGNS/Charters/IAGNS_F-.150_6605%7C193232}.
-     */
-    @NotNull
-    public String getText() {
-        return text;
+    private boolean hasWrongNumberOfPartsForType(int numberOfParts, @NotNull ResourceType type) {
+        return numberOfParts < type.getMinIdParts() || numberOfParts > type.getMaxIdParts();
+    }
+
+    private boolean isMissingPrefix(@NotNull String... idParts) {
+        return !idParts[0].equals(DEFAULT_PREFIX);
     }
 
 }

@@ -96,18 +96,6 @@ public class Figure extends Element {
         return url.startsWith("http://") || url.startsWith("https://");
     }
 
-    @NotNull
-    @Override
-    public String toString() {
-
-        return "Figure{" +
-                ", n='" + n + '\'' +
-                ", text='" + text + '\'' +
-                ", url='" + url + '\'' +
-                "} " + super.toString();
-
-    }
-
     private void initXml() {
 
         if (!n.isEmpty()) {
@@ -120,6 +108,18 @@ public class Figure extends Element {
             ceiGraphic.appendChild(text);
         }
         appendChild(ceiGraphic);
+
+    }
+
+    @NotNull
+    @Override
+    public String toString() {
+
+        return "Figure{" +
+                ", n='" + n + '\'' +
+                ", text='" + text + '\'' +
+                ", url='" + url + '\'' +
+                "} " + super.toString();
 
     }
 

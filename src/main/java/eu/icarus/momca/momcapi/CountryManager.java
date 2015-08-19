@@ -1,12 +1,12 @@
 package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.exception.MomcaException;
-import eu.icarus.momca.momcapi.query.ExistQuery;
-import eu.icarus.momca.momcapi.query.ExistQueryFactory;
 import eu.icarus.momca.momcapi.model.Country;
 import eu.icarus.momca.momcapi.model.CountryCode;
 import eu.icarus.momca.momcapi.model.Region;
 import eu.icarus.momca.momcapi.model.ResourceRoot;
+import eu.icarus.momca.momcapi.query.ExistQuery;
+import eu.icarus.momca.momcapi.query.ExistQueryFactory;
 import eu.icarus.momca.momcapi.xml.eap.EapCountry;
 import eu.icarus.momca.momcapi.xml.eap.EapSubdivision;
 import org.jetbrains.annotations.NotNull;
@@ -182,6 +182,10 @@ public class CountryManager extends AbstractManager {
 
     }
 
+    private boolean isCodeInUseInHierarchy(@NotNull String code) {
+        return !momcaConnection.queryDatabase(ExistQueryFactory.getEapCountryXml(code)).isEmpty();
+    }
+
     /**
      * @return A list of the country codes of all countries in the database (archives and collections).
      */
@@ -189,10 +193,6 @@ public class CountryManager extends AbstractManager {
     public List<CountryCode> listCountries() {
         return momcaConnection.queryDatabase(ExistQueryFactory.listCountryCodes())
                 .stream().map(CountryCode::new).collect(Collectors.toList());
-    }
-
-    private boolean isCodeInUseInHierarchy(@NotNull String code) {
-        return !momcaConnection.queryDatabase(ExistQueryFactory.getEapCountryXml(code)).isEmpty();
     }
 
 }

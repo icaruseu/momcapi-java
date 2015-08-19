@@ -18,15 +18,6 @@ public class XmlValidationProblem {
     private final SeverityLevel severityLevel;
 
     /**
-     * The enum SeverityLevel.
-     */
-    public enum SeverityLevel {
-        WARNING,
-        ERROR,
-        FATAL_ERROR
-    }
-
-    /**
      * Instantiates a new XmlValidationProblem.
      *
      * @param severityLevel The severity level.
@@ -69,5 +60,14 @@ public class XmlValidationProblem {
     @NotNull
     public SeverityLevel getSeverityLevel() {
         return severityLevel;
+    }
+
+    /**
+     * The enum SeverityLevel.
+     */
+    public enum SeverityLevel {
+        WARNING,
+        ERROR,
+        FATAL_ERROR
     }
 }

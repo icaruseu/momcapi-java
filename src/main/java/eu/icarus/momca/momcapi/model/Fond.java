@@ -40,6 +40,25 @@ public class Fond extends MomcaResource {
     }
 
     @NotNull
+    private Optional<URL> createUrl(@NotNull String urlString) {
+
+        Optional<URL> url = Optional.empty();
+
+        try {
+
+            if (!urlString.isEmpty()) {
+                url = Optional.of(new URL(urlString));
+            }
+
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException(urlString + " is not a valid URL.");
+        }
+
+        return url;
+
+    }
+
+    @NotNull
     public IdArchive getArchiveId() {
         return id.getIdArchive();
     }
@@ -72,38 +91,6 @@ public class Fond extends MomcaResource {
     @NotNull
     public String getName() {
         return name;
-    }
-
-    @NotNull
-    @Override
-    public String toString() {
-        return "Fond{" +
-                "id=" + id +
-                ", dummyImageUrl=" + dummyImageUrl +
-                ", fondPreferences=" + fondPreferences +
-                ", imageAccess=" + imageAccess +
-                ", imagesUrl=" + imagesUrl +
-                ", name='" + name + '\'' +
-                "} " + super.toString();
-    }
-
-    @NotNull
-    private Optional<URL> createUrl(@NotNull String urlString) {
-
-        Optional<URL> url = Optional.empty();
-
-        try {
-
-            if (!urlString.isEmpty()) {
-                url = Optional.of(new URL(urlString));
-            }
-
-        } catch (MalformedURLException e) {
-            throw new IllegalArgumentException(urlString + " is not a valid URL.");
-        }
-
-        return url;
-
     }
 
     @NotNull
@@ -161,6 +148,19 @@ public class Fond extends MomcaResource {
 
         return url;
 
+    }
+
+    @NotNull
+    @Override
+    public String toString() {
+        return "Fond{" +
+                "id=" + id +
+                ", dummyImageUrl=" + dummyImageUrl +
+                ", fondPreferences=" + fondPreferences +
+                ", imageAccess=" + imageAccess +
+                ", imagesUrl=" + imagesUrl +
+                ", name='" + name + '\'' +
+                "} " + super.toString();
     }
 
 }

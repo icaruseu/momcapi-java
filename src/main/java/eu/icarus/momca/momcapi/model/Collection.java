@@ -1,7 +1,6 @@
 package eu.icarus.momca.momcapi.model;
 
 import eu.icarus.momca.momcapi.query.XpathQuery;
-import eu.icarus.momca.momcapi.xml.atom.AtomAuthor;
 import eu.icarus.momca.momcapi.xml.atom.AtomId;
 import org.jetbrains.annotations.NotNull;
 

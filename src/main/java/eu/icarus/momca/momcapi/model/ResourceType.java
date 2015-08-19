@@ -21,8 +21,8 @@ public enum ResourceType {
     SVG("svg", 5, 5);
 
     private final int maxIdParts;
-    private final String nameInId;
     private final int minIdParts;
+    private final String nameInId;
 
     ResourceType(String nameInId, int minIdParts, int maxIdParts) {
         this.nameInId = nameInId;

@@ -1,6 +1,5 @@
 package eu.icarus.momca.momcapi.model;
 
-import eu.icarus.momca.momcapi.xml.atom.AtomId;
 import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
 

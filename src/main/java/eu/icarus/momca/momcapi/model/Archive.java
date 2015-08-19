@@ -88,19 +88,6 @@ public class Archive extends MomcaResource {
     }
 
     @NotNull
-    @Override
-    public String toString() {
-
-        return "Archive{" +
-                "id=" + id +
-                ", countryCode='" + countryCode + '\'' +
-                ", desc=" + desc +
-                ", name='" + name + '\'' +
-                ", identifier='" + identifier + '\'' +
-                "} " + super.toString();
-    }
-
-    @NotNull
     private IdArchive initId() {
 
         String idString = queryUniqueElement(XpathQuery.QUERY_ATOM_ID);
@@ -112,6 +99,19 @@ public class Archive extends MomcaResource {
             return new IdArchive(new AtomId(idString));
         }
 
+    }
+
+    @NotNull
+    @Override
+    public String toString() {
+
+        return "Archive{" +
+                "id=" + id +
+                ", countryCode='" + countryCode + '\'' +
+                ", desc=" + desc +
+                ", name='" + name + '\'' +
+                ", identifier='" + identifier + '\'' +
+                "} " + super.toString();
     }
 
 }

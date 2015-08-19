@@ -88,17 +88,38 @@ public class IdCharter extends IdAbstract {
     }
 
     @NotNull
-    @Override
-    public AtomId getContentXml() {
-        return (AtomId) contentXml;
-    }
-
-    @NotNull
     private IdCollection getCollectionFromAtomId(@NotNull AtomId atomId) {
 
         String[] parts = atomId.getText().split("/");
         String collectionIdentifier = Util.decode(parts[parts.length - 2]);
         return new IdCollection(collectionIdentifier);
+
+    }
+
+    @NotNull
+    @Override
+    public AtomId getContentXml() {
+        return (AtomId) contentXml;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + idCollection.hashCode();
+        result = 31 * result + idFond.hashCode();
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        IdCharter idCharter = (IdCharter) o;
+
+        if (!idCollection.equals(idCharter.idCollection)) return false;
+        return idFond.equals(idCharter.idFond);
 
     }
 
@@ -126,26 +147,5 @@ public class IdCharter extends IdAbstract {
     public boolean isInFond() {
         String[] parts = getContentXml().getText().split("/");
         return parts.length == ResourceType.CHARTER.getMaxIdParts();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-
-        IdCharter idCharter = (IdCharter) o;
-
-        if (!idCollection.equals(idCharter.idCollection)) return false;
-        return idFond.equals(idCharter.idFond);
-
-    }
-
-    @Override
-    public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + idCollection.hashCode();
-        result = 31 * result + idFond.hashCode();
-        return result;
     }
 }

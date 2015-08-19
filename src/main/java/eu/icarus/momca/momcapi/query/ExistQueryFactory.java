@@ -2,7 +2,7 @@ package eu.icarus.momca.momcapi.query;
 
 import eu.icarus.momca.momcapi.model.*;
 import eu.icarus.momca.momcapi.xml.Namespace;
-import eu.icarus.momca.momcapi.xml.atom.*;
+import eu.icarus.momca.momcapi.xml.atom.AtomId;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,9 +22,9 @@ public class ExistQueryFactory {
     }
 
     /**
-     * @param resourceAtomId   The resource's {@code atom:id}.
-     * @param resourceRoot The resource root of the resource the search should be restricted to. If {@code null},
-     *                     the whole database is searched.
+     * @param resourceAtomId The resource's {@code atom:id}.
+     * @param resourceRoot   The resource root of the resource the search should be restricted to. If {@code null},
+     *                       the whole database is searched.
      * @return A query to check if a resource matching {@code resourceAtomId} is existing in the database at the
      * specified {@code resourceRoot}.
      */
@@ -102,6 +102,36 @@ public class ExistQueryFactory {
     }
 
     @NotNull
+    private static String getNamespaceDeclaration(@NotNull Namespace... namespaces) {
+
+        StringBuilder declarationBuilder = new StringBuilder();
+
+        for (Namespace namespace : namespaces) {
+            declarationBuilder.append(String.format(
+                    "declare namespace %s='%s';",
+                    namespace.getPrefix(),
+                    namespace.getUri()));
+        }
+
+        return declarationBuilder.toString();
+
+    }
+
+    @NotNull
+    private static String getNamespaceDeclaration(@NotNull String... qualifiedElementNames) {
+
+        List<Namespace> namespaceList = new ArrayList<>(0);
+
+        for (String element : qualifiedElementNames) {
+            String namespaceString = element.substring(0, element.indexOf(':')).toUpperCase();
+            namespaceList.add(Namespace.valueOf(namespaceString));
+        }
+
+        return getNamespaceDeclaration(namespaceList.toArray(new Namespace[namespaceList.size()]));
+
+    }
+
+    @NotNull
     public static ExistQuery getRegionCode(@NotNull String regionNativeName) {
 
         String query = String.format("%s distinct-values(" +
@@ -118,9 +148,9 @@ public class ExistQueryFactory {
     }
 
     /**
-     * @param resourceAtomId   The {@code atom:id} of the resource to locate.
-     * @param resourceRoot The resource root of the resource the search should be restricted to. If {@code null},
-     *                     the whole database is searched.
+     * @param resourceAtomId The {@code atom:id} of the resource to locate.
+     * @param resourceRoot   The resource root of the resource the search should be restricted to. If {@code null},
+     *                       the whole database is searched.
      * @return A query to get the absolute URIs, e.g. {@code /db/mom-data/xrx.user/admin.xml}, of all resources
      * matching {@code resourceAtomId} in {@code ResourceRoot} in the database.
      */
@@ -137,6 +167,11 @@ public class ExistQueryFactory {
 
         return new ExistQuery(query);
 
+    }
+
+    @NotNull
+    private static String getRootCollectionString(@Nullable ResourceRoot resourceRoot) {
+        return (resourceRoot == null) ? "/db/mom-data" : (resourceRoot.getUri());
     }
 
     /**
@@ -467,41 +502,6 @@ public class ExistQueryFactory {
 
         return new ExistQuery(query);
 
-    }
-
-    @NotNull
-    private static String getNamespaceDeclaration(@NotNull Namespace... namespaces) {
-
-        StringBuilder declarationBuilder = new StringBuilder();
-
-        for (Namespace namespace : namespaces) {
-            declarationBuilder.append(String.format(
-                    "declare namespace %s='%s';",
-                    namespace.getPrefix(),
-                    namespace.getUri()));
-        }
-
-        return declarationBuilder.toString();
-
-    }
-
-    @NotNull
-    private static String getNamespaceDeclaration(@NotNull String... qualifiedElementNames) {
-
-        List<Namespace> namespaceList = new ArrayList<>(0);
-
-        for (String element : qualifiedElementNames) {
-            String namespaceString = element.substring(0, element.indexOf(':')).toUpperCase();
-            namespaceList.add(Namespace.valueOf(namespaceString));
-        }
-
-        return getNamespaceDeclaration(namespaceList.toArray(new Namespace[namespaceList.size()]));
-
-    }
-
-    @NotNull
-    private static String getRootCollectionString(@Nullable ResourceRoot resourceRoot) {
-        return (resourceRoot == null) ? "/db/mom-data" : (resourceRoot.getUri());
     }
 
 }
