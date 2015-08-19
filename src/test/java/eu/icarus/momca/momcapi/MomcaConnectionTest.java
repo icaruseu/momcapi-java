@@ -1,6 +1,6 @@
 package eu.icarus.momca.momcapi;
 
-import eu.icarus.momca.momcapi.resource.MomcaResource;
+import eu.icarus.momca.momcapi.model.MomcaResource;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;

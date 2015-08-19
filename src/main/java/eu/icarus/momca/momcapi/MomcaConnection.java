@@ -2,7 +2,7 @@ package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.exception.MomcaException;
 import eu.icarus.momca.momcapi.query.ExistQuery;
-import eu.icarus.momca.momcapi.resource.MomcaResource;
+import eu.icarus.momca.momcapi.model.MomcaResource;
 import org.exist.xmldb.RemoteCollection;
 import org.exist.xmldb.RemoteCollectionManagementService;
 import org.exist.xmldb.RemoteUserManagementService;

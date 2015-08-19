@@ -1,9 +1,9 @@
 package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.exception.MomcaException;
-import eu.icarus.momca.momcapi.resource.Country;
-import eu.icarus.momca.momcapi.resource.CountryCode;
-import eu.icarus.momca.momcapi.resource.Region;
+import eu.icarus.momca.momcapi.model.Country;
+import eu.icarus.momca.momcapi.model.CountryCode;
+import eu.icarus.momca.momcapi.model.Region;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 

@@ -1,8 +1,6 @@
 package eu.icarus.momca.momcapi.query;
 
-import eu.icarus.momca.momcapi.resource.CountryCode;
-import eu.icarus.momca.momcapi.resource.ResourceRoot;
-import eu.icarus.momca.momcapi.resource.User;
+import eu.icarus.momca.momcapi.model.*;
 import eu.icarus.momca.momcapi.xml.Namespace;
 import eu.icarus.momca.momcapi.xml.atom.*;
 import org.jetbrains.annotations.NotNull;

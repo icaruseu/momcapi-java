@@ -1,7 +1,7 @@
 package eu.icarus.momca.momcapi;
 
+import eu.icarus.momca.momcapi.model.*;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
-import eu.icarus.momca.momcapi.resource.*;
 import eu.icarus.momca.momcapi.xml.atom.*;
 import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;

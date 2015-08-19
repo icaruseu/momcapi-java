@@ -1,11 +1,8 @@
 package eu.icarus.momca.momcapi;
 
+import eu.icarus.momca.momcapi.model.*;
 import eu.icarus.momca.momcapi.query.ExistQuery;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
-import eu.icarus.momca.momcapi.resource.Charter;
-import eu.icarus.momca.momcapi.resource.CharterStatus;
-import eu.icarus.momca.momcapi.resource.ResourceRoot;
-import eu.icarus.momca.momcapi.resource.User;
 import eu.icarus.momca.momcapi.xml.atom.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

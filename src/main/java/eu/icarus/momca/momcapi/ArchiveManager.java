@@ -1,11 +1,12 @@
 package eu.icarus.momca.momcapi;
 
+import eu.icarus.momca.momcapi.model.*;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
-import eu.icarus.momca.momcapi.resource.*;
 import eu.icarus.momca.momcapi.xml.Namespace;
 import eu.icarus.momca.momcapi.xml.atom.AtomAuthor;
 import eu.icarus.momca.momcapi.xml.atom.AtomEntry;
-import eu.icarus.momca.momcapi.xml.atom.IdArchive;
+import eu.icarus.momca.momcapi.model.IdArchive;
+import eu.icarus.momca.momcapi.xml.atom.AtomId;
 import eu.icarus.momca.momcapi.xml.eag.Desc;
 import nu.xom.Attribute;
 import nu.xom.Element;
@@ -78,21 +79,21 @@ public class ArchiveManager extends AbstractManager {
     @NotNull
     public List<IdArchive> listArchives() {
         List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listArchives());
-        return queryResults.stream().map(IdArchive::new).collect(Collectors.toList());
+        return queryResults.stream().map(AtomId::new).map(IdArchive::new).collect(Collectors.toList());
     }
 
     @NotNull
     public List<IdArchive> listArchives(@NotNull Country country) {
         List<String> queryResults = momcaConnection.queryDatabase(
                 ExistQueryFactory.listArchivesForCountry(country.getCountryCode()));
-        return queryResults.stream().map(IdArchive::new).collect(Collectors.toList());
+        return queryResults.stream().map(AtomId::new).map(IdArchive::new).collect(Collectors.toList());
     }
 
     @NotNull
     public List<IdArchive> listArchives(@NotNull Region region) {
         List<String> queryResults = momcaConnection.queryDatabase(
                 ExistQueryFactory.listArchivesForRegion(region.getNativeName()));
-        return queryResults.stream().map(IdArchive::new).collect(Collectors.toList());
+        return queryResults.stream().map(AtomId::new).map(IdArchive::new).collect(Collectors.toList());
     }
 
 

@@ -1,10 +1,10 @@
 package eu.icarus.momca.momcapi;
 
-import eu.icarus.momca.momcapi.resource.Archive;
-import eu.icarus.momca.momcapi.resource.Fond;
-import eu.icarus.momca.momcapi.resource.ImageAccess;
-import eu.icarus.momca.momcapi.xml.atom.IdArchive;
-import eu.icarus.momca.momcapi.xml.atom.IdFond;
+import eu.icarus.momca.momcapi.model.Archive;
+import eu.icarus.momca.momcapi.model.Fond;
+import eu.icarus.momca.momcapi.model.ImageAccess;
+import eu.icarus.momca.momcapi.model.IdArchive;
+import eu.icarus.momca.momcapi.model.IdFond;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 

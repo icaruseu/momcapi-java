@@ -1,5 +1,6 @@
 package eu.icarus.momca.momcapi.xml.atom;
 
+import eu.icarus.momca.momcapi.model.IdArchive;
 import eu.icarus.momca.momcapi.xml.Namespace;
 import nu.xom.Element;
 import org.testng.annotations.Test;

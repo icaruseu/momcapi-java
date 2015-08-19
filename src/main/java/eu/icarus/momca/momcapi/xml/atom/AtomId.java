@@ -1,7 +1,7 @@
 package eu.icarus.momca.momcapi.xml.atom;
 
 import eu.icarus.momca.momcapi.Util;
-import eu.icarus.momca.momcapi.resource.ResourceType;
+import eu.icarus.momca.momcapi.model.ResourceType;
 import eu.icarus.momca.momcapi.xml.Namespace;
 import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
