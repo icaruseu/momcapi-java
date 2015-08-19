@@ -20,6 +20,7 @@ import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.SchemaFactory;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,9 +34,6 @@ import java.util.Optional;
  */
 public class Charter extends MomcaResource {
 
-    @NotNull
-    private static final String CEI_SCHEMA_URL =
-            "https://raw.githubusercontent.com/icaruseu/mom-ca/master/my/XRX/src/mom/app/cei/xsd/cei10.xsd";
     @NotNull
     private final Optional<IdUser> author;
     @NotNull
@@ -289,7 +287,8 @@ public class Charter extends MomcaResource {
         factory.setNamespaceAware(true);
 
         SchemaFactory schemaFactory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
-        factory.setSchema(schemaFactory.newSchema(new Source[]{new StreamSource(CEI_SCHEMA_URL)}));
+        factory.setSchema(schemaFactory.newSchema(new Source[]{
+                new StreamSource(this.getClass().getResourceAsStream("/cei10.xsd"))}));
 
         SAXParser parser = factory.newSAXParser();
         XMLReader reader = parser.getXMLReader();
