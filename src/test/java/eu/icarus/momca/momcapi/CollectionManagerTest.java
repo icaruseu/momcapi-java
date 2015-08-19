@@ -40,7 +40,7 @@ public class CollectionManagerTest {
 
         assertEquals(coll.getId().getContentXml().getText(), new IdCollection(identifier).getContentXml().getText());
         assertEquals(coll.getName(), name);
-        assertEquals(coll.getAuthorName().get(), author.getIdentifier());
+        assertEquals(coll.getAuthorId().get(), author);
         assertEquals(coll.getCountryCode().get(), country.getCountryCode());
         assertEquals(coll.getRegionName().get(), region.getNativeName());
         assertEquals(coll.getImageServerAddress().get(), imageServerAddress);
@@ -64,7 +64,7 @@ public class CollectionManagerTest {
 
         assertEquals(coll.getId().getContentXml().getText(), new IdCollection(identifier).getContentXml().getText());
         assertEquals(coll.getName(), name);
-        assertEquals(coll.getAuthorName().get(), author.getIdentifier());
+        assertEquals(coll.getAuthorId().get(), author);
         assertFalse(coll.getCountryCode().isPresent());
         assertFalse(coll.getRegionName().isPresent());
         assertFalse(coll.getImageServerAddress().isPresent());
@@ -85,7 +85,7 @@ public class CollectionManagerTest {
 
         assertEquals(coll.getId().getContentXml().getText(), new IdCollection(identifier).getContentXml().getText());
         assertEquals(coll.getName(), name);
-        assertEquals(coll.getAuthorName().get(), author.getIdentifier());
+        assertEquals(coll.getAuthorId().get(), author);
         assertFalse(coll.getCountryCode().isPresent());
         assertFalse(coll.getRegionName().isPresent());
         assertFalse(coll.getImageServerAddress().isPresent());
@@ -115,7 +115,8 @@ public class CollectionManagerTest {
 
         String identifier = "newcollection";
         String name = "New collection";
-        IdUser author = new IdUser("");;
+        IdUser author = new IdUser("");
+        ;
         Country country = mc.getCountryManager().getCountry(new CountryCode("DE")).get();
         Region region = country.getRegions().get(0);
         String imageServerAddress = "http://images.icar-us.eu";
@@ -200,7 +201,7 @@ public class CollectionManagerTest {
         assertEquals(collection1.getId().getContentXml().getText(), "tag:www.monasterium.net,2011:/collection/AbteiEberbach");
         assertEquals(collection1.getIdentifier(), "AbteiEberbach");
         assertEquals(collection1.getName(), "Urkundenbuch der Abtei Eberbach (Google data)");
-        assertFalse(collection1.getAuthorName().isPresent());
+        assertFalse(collection1.getAuthorId().isPresent());
         assertEquals(collection1.getImageServerAddress().get(), "www.mom-image.uni-koeln.de");
         assertEquals(collection1.getImageFolderName().get(), "google/Teil1/AbteiEberbach");
         assertEquals(collection1.getKeyword().get(), "Retrodigitalisierte Urkundeneditionen");
@@ -211,7 +212,7 @@ public class CollectionManagerTest {
         assertEquals(collection2.getId().getContentXml().getText(), "tag:www.monasterium.net,2011:/collection/emptycollection");
         assertEquals(collection2.getIdentifier(), "emptycollection");
         assertEquals(collection2.getName(), "Empty Collection");
-        assertEquals(collection2.getAuthorName().get(), "admin");
+        assertEquals(collection2.getAuthorId().get().getIdentifier(), "admin");
         assertFalse(collection2.getImageServerAddress().isPresent());
         assertFalse(collection2.getImageFolderName().isPresent());
         assertFalse(collection2.getKeyword().isPresent());

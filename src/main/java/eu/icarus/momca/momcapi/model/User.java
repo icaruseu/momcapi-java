@@ -15,11 +15,11 @@ import java.util.stream.Collectors;
  */
 public class User extends MomcaResource {
 
+    @NotNull
+    private final IdUser id;
+    @NotNull
+    private final IdUser idModerator;
     private final boolean isInitialized;
-    @NotNull
-    private final String moderator;
-    @NotNull
-    private final String userName;
 
     /**
      * Instantiates a new User.
@@ -40,36 +40,28 @@ public class User extends MomcaResource {
 
         super(momcaResource);
 
-        this.userName = queryUniqueFieldValue(XpathQuery.QUERY_XRX_EMAIL);
-        this.moderator = queryUniqueFieldValue(XpathQuery.QUERY_XRX_MODERATOR);
+        this.id = new IdUser(queryUniqueFieldValue(XpathQuery.QUERY_XRX_EMAIL));
+        this.idModerator = new IdUser(queryUniqueFieldValue(XpathQuery.QUERY_XRX_MODERATOR));
         this.isInitialized = isInitialized;
 
     }
 
     @NotNull
     public IdUser getId() {
-        return new IdUser(userName);
+        return id;
     }
 
     @NotNull
     public IdUser getIdModerator() {
-        return new IdUser(moderator);
-    }
-
-    /**
-     * @return The name of the user's moderator.
-     */
-    @NotNull
-    public String getModeratorName() {
-        return moderator;
+        return idModerator;
     }
 
     /**
      * @return The name of the user.
      */
     @NotNull
-    public String getUserName() {
-        return userName;
+    public String getIdentifier() {
+        return id.getIdentifier();
     }
 
     /**

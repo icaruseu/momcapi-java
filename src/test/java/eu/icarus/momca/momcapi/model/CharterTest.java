@@ -65,7 +65,7 @@ public class CharterTest {
     @Test
     public void testGetAuthor() throws Exception {
         Charter charter = new Charter(resource);
-        assertEquals(charter.getAuthorName().get(), ATOM_AUTHOR.getEmail());
+        assertEquals(charter.getAuthor().get(), ATOM_AUTHOR.getEmail());
     }
 
     @Test

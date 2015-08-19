@@ -15,7 +15,7 @@ import java.util.Optional;
 public class Collection extends MomcaResource {
 
     @NotNull
-    private final Optional<AtomAuthor> author;
+    private final Optional<IdUser> authorId;
     @NotNull
     private final Optional<CountryCode> countryCode;
     @NotNull
@@ -39,7 +39,7 @@ public class Collection extends MomcaResource {
         regionName = initRegionName();
         id = initId();
         name = initName();
-        author = initAuthor();
+        authorId = initAuthor();
         imageFolderName = initImageFolderName();
         imageServerAddress = initImageServerAddress();
         keyword = initKeyword();
@@ -47,8 +47,8 @@ public class Collection extends MomcaResource {
     }
 
     @NotNull
-    public Optional<String> getAuthorName() {
-        return author.map(AtomAuthor::getEmail);
+    public Optional<IdUser> getAuthorId() {
+        return authorId;
     }
 
     @NotNull
@@ -90,12 +90,12 @@ public class Collection extends MomcaResource {
         return regionName;
     }
 
-    private Optional<AtomAuthor> initAuthor() {
+    private Optional<IdUser> initAuthor() {
 
-        Optional<AtomAuthor> author = Optional.empty();
+        Optional<IdUser> author = Optional.empty();
         String authorEmail = queryUniqueElement(XpathQuery.QUERY_ATOM_EMAIL);
         if (!authorEmail.isEmpty()) {
-            author = Optional.of(new AtomAuthor(authorEmail));
+            author = Optional.of(new IdUser(authorEmail));
         }
         return author;
 

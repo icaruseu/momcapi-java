@@ -63,10 +63,10 @@ public class UserManagerTest {
         User oldModerator = userManager.getUser(new IdUser("admin")).get();
         User newModerator = userManager.getUser(new IdUser("user1.testuser@dev.monasterium.net")).get();
 
-        User user = userManager.addUser(userName, "", oldModerator.getUserName());
+        User user = userManager.addUser(userName, "", oldModerator.getIdentifier());
         User updatedUser = userManager.changeModerator(user, newModerator);
 
-        assertEquals(updatedUser.getModeratorName(), newModerator.getUserName());
+        assertEquals(updatedUser.getIdModerator().getIdentifier(), newModerator.getIdentifier());
 
         userManager.deleteUser(updatedUser.getId());
 
@@ -110,8 +110,8 @@ public class UserManagerTest {
         String userName = "user1.testuser@dev.monasterium.net";
         String moderator = "admin";
         User user = userManager.getUser(new IdUser(userName)).get();
-        assertEquals(user.getUserName(), userName);
-        assertEquals(user.getModeratorName(), moderator);
+        assertEquals(user.getIdentifier(), userName);
+        assertEquals(user.getIdModerator().getIdentifier(), moderator);
         assertTrue(user.isInitialized());
 
     }

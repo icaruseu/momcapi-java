@@ -100,7 +100,7 @@ public class UserManager extends AbstractManager {
     @NotNull
     public User changeModerator(@NotNull User user, @NotNull User newModerator) {
 
-        String newModeratorElement = String.format("<xrx:moderator>%s</xrx:moderator>", newModerator.getUserName());
+        String newModeratorElement = String.format("<xrx:moderator>%s</xrx:moderator>", newModerator.getIdentifier());
         String userUri = user.getUri();
         ExistQuery query = ExistQueryFactory.replaceFirstInResource(userUri, "xrx:moderator", newModeratorElement);
 
@@ -118,7 +118,7 @@ public class UserManager extends AbstractManager {
      */
     public void changeUserPassword(@NotNull User user, @NotNull String newPassword) {
 
-        String userName = user.getUserName();
+        String userName = user.getIdentifier();
 
         try {
 
@@ -171,9 +171,9 @@ public class UserManager extends AbstractManager {
     public void deleteUser(@NotNull IdUser idUser) {
 
         getUser(idUser).ifPresent(u -> {
-            deleteExistUserAccount(u.getUserName());
+            deleteExistUserAccount(u.getIdentifier());
             momcaConnection.deleteExistResource(u);
-            momcaConnection.deleteCollection(ResourceRoot.USER_DATA.getUri() + "/" + u.getUserName());
+            momcaConnection.deleteCollection(ResourceRoot.USER_DATA.getUri() + "/" + u.getIdentifier());
         });
 
     }

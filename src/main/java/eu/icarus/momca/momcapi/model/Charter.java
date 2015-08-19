@@ -5,7 +5,6 @@ import eu.icarus.momca.momcapi.exception.MomcaException;
 import eu.icarus.momca.momcapi.query.XpathQuery;
 import eu.icarus.momca.momcapi.xml.Namespace;
 import eu.icarus.momca.momcapi.xml.XmlValidationProblem;
-import eu.icarus.momca.momcapi.xml.atom.AtomAuthor;
 import eu.icarus.momca.momcapi.xml.atom.AtomId;
 import eu.icarus.momca.momcapi.xml.cei.*;
 import nu.xom.*;
@@ -38,7 +37,7 @@ public class Charter extends MomcaResource {
     private static final String CEI_SCHEMA_URL =
             "https://raw.githubusercontent.com/icaruseu/mom-ca/master/my/XRX/src/mom/app/cei/xsd/cei10.xsd";
     @NotNull
-    private final Optional<AtomAuthor> author;
+    private final Optional<IdUser> author;
     @NotNull
     private final Optional<DateAbstract> date;
     @NotNull
@@ -52,26 +51,6 @@ public class Charter extends MomcaResource {
     @NotNull
     private final List<XmlValidationProblem> validationProblems = new ArrayList<>(0);
 
-
-    private class SimpleErrorHandler implements ErrorHandler {
-
-        public void error(@NotNull SAXParseException e) throws SAXException {
-            addToXmlValidationProblem(XmlValidationProblem.SeverityLevel.ERROR, e);
-        }
-
-        public void fatalError(@NotNull SAXParseException e) throws SAXException {
-            addToXmlValidationProblem(XmlValidationProblem.SeverityLevel.FATAL_ERROR, e);
-        }
-
-        public void warning(@NotNull SAXParseException e) throws SAXException {
-            addToXmlValidationProblem(XmlValidationProblem.SeverityLevel.WARNING, e);
-        }
-
-        private void addToXmlValidationProblem(@NotNull XmlValidationProblem.SeverityLevel severityLevel, @NotNull SAXParseException e) {
-            validationProblems.add(new XmlValidationProblem(severityLevel, e.getLineNumber(), e.getColumnNumber(), e.getMessage()));
-        }
-
-    }
 
     /**
      * Instantiates a new Charter.
@@ -102,8 +81,8 @@ public class Charter extends MomcaResource {
      * @return The Author.
      */
     @NotNull
-    public Optional<String> getAuthorName() {
-        return author.map(AtomAuthor::getEmail);
+    public Optional<IdUser> getAuthor() {
+        return author;
     }
 
     /**
@@ -154,34 +133,12 @@ public class Charter extends MomcaResource {
         return validationProblems;
     }
 
-    /**
-     * @return {@code True} if there are any validation problems.
-     * @see #getValidationProblems
-     */
-    public boolean isValidCei() {
-        return validationProblems.isEmpty();
-    }
+    private Optional<IdUser> initAuthor() {
 
-    @NotNull
-    @Override
-    public String toString() {
-
-        return "Charter{" +
-                "author=" + author +
-                ", id=" + id +
-                ", idno=" + idno +
-                ", figures=" + figures +
-                ", status=" + status +
-                "} " + super.toString();
-
-    }
-
-    private Optional<AtomAuthor> initAuthor() {
-
-        Optional<AtomAuthor> author = Optional.empty();
+        Optional<IdUser> author = Optional.empty();
         String authorEmail = queryUniqueElement(XpathQuery.QUERY_ATOM_EMAIL);
         if (!authorEmail.isEmpty()) {
-            author = Optional.of(new AtomAuthor(authorEmail));
+            author = Optional.of(new IdUser(authorEmail));
         }
         return author;
 
@@ -302,6 +259,28 @@ public class Charter extends MomcaResource {
 
     }
 
+    /**
+     * @return {@code True} if there are any validation problems.
+     * @see #getValidationProblems
+     */
+    public boolean isValidCei() {
+        return validationProblems.isEmpty();
+    }
+
+    @NotNull
+    @Override
+    public String toString() {
+
+        return "Charter{" +
+                "author=" + author +
+                ", id=" + id +
+                ", idno=" + idno +
+                ", figures=" + figures +
+                ", status=" + status +
+                "} " + super.toString();
+
+    }
+
     private void validateCei(@NotNull MomcaResource resource)
             throws SAXException, ParserConfigurationException, ParsingException, IOException {
 
@@ -327,6 +306,26 @@ public class Charter extends MomcaResource {
 
         Builder builder = new Builder(reader);
         builder.build(ceiTextElement.toXML(), Namespace.CEI.getUri());
+
+    }
+
+    private class SimpleErrorHandler implements ErrorHandler {
+
+        private void addToXmlValidationProblem(@NotNull XmlValidationProblem.SeverityLevel severityLevel, @NotNull SAXParseException e) {
+            validationProblems.add(new XmlValidationProblem(severityLevel, e.getLineNumber(), e.getColumnNumber(), e.getMessage()));
+        }
+
+        public void warning(@NotNull SAXParseException e) throws SAXException {
+            addToXmlValidationProblem(XmlValidationProblem.SeverityLevel.WARNING, e);
+        }
+
+        public void error(@NotNull SAXParseException e) throws SAXException {
+            addToXmlValidationProblem(XmlValidationProblem.SeverityLevel.ERROR, e);
+        }
+
+        public void fatalError(@NotNull SAXParseException e) throws SAXException {
+            addToXmlValidationProblem(XmlValidationProblem.SeverityLevel.FATAL_ERROR, e);
+        }
 
     }
 
