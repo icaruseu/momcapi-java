@@ -47,9 +47,9 @@ public class ArchiveManagerTest {
         assertEquals(newArchive.getCountry().getCountryCode(), country.getCountryCode());
         assertEquals(newArchive.getRegionName().get(), region.getNativeName());
 
-        assertEquals(newArchive.getAddress(), address);
-        assertEquals(newArchive.getContactInformation(), contactInformation);
-        assertEquals(newArchive.getLogoUrl(), logoUrl);
+        assertEquals(newArchive.getAddress().get(), address);
+        assertEquals(newArchive.getContactInformation().get(), contactInformation);
+        assertEquals(newArchive.getLogoUrl().get(), logoUrl);
 
     }
 
