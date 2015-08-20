@@ -25,8 +25,7 @@ public class MomcaResource {
     @NotNull
     private final String resourceName;
     @NotNull
-    private final Document xmlAsDocument;
-
+    private final Document xmlDocument;
 
     /**
      * Instantiates a new MomcaResource with an existing resource.
@@ -35,22 +34,26 @@ public class MomcaResource {
      */
     MomcaResource(@NotNull MomcaResource momcaResource) {
         this.resourceName = momcaResource.getResourceName();
-        this.xmlAsDocument = momcaResource.getXmlAsDocument();
+        this.xmlDocument = momcaResource.toDocument();
         this.parentUri = momcaResource.getParentUri();
     }
 
     /**
      * Instantiates a new MomcaResource.
      *
-     * @param resourceName        The name of the resource, e.g. {@code user.xml}.
+     * @param resourceName        The name of the resource, e.g. {@code user.xmlDocument}.
      * @param parentCollectionUri The URI of the collection, the resource is stored in in the database,
      *                            e.g. {@code /db/mom-data/xrx.user}.
-     * @param xmlContent          The xml content of the resource as {@code String}.
+     * @param xmlDocument          The xmlDocument content of the resource as {@code String}.
      */
-    public MomcaResource(@NotNull String resourceName, @NotNull String parentCollectionUri, @NotNull String xmlContent) {
+    public MomcaResource(@NotNull String resourceName, @NotNull String parentCollectionUri, @NotNull String xmlDocument) {
+
+        if (resourceName.isEmpty() || parentCollectionUri.isEmpty() || xmlDocument.isEmpty()) {
+            throw new IllegalArgumentException("Constructor strings are not allowed to be empty.");
+        }
 
         this.resourceName = Util.encode(resourceName);
-        this.xmlAsDocument = Util.parseToDocument(xmlContent).getDocument();
+        this.xmlDocument = Util.parseToDocument(xmlDocument).getDocument();
         this.parentUri = Util.encode(parentCollectionUri);
 
     }
@@ -64,7 +67,7 @@ public class MomcaResource {
     }
 
     /**
-     * @return The name of the resource in the database, e.g. {@code user.xml}
+     * @return The name of the resource in the database, e.g. {@code user.xmlDocument}
      */
     @NotNull
     public String getResourceName() {
@@ -72,19 +75,11 @@ public class MomcaResource {
     }
 
     /**
-     * @return The URI of the resource in the database, e.g. {@code /db/mom-data/xrx.user/user.xml}.
+     * @return The URI of the resource in the database, e.g. {@code /db/mom-data/xrx.user/user.xmlDocument}.
      */
     @NotNull
     public String getUri() {
         return parentUri + "/" + resourceName;
-    }
-
-    /**
-     * @return The XML as an XML document.
-     */
-    @NotNull
-    public Document getXmlAsDocument() {
-        return xmlAsDocument;
     }
 
     @NotNull
@@ -123,7 +118,7 @@ public class MomcaResource {
     @NotNull
     final Nodes queryContentAsNodes(@NotNull XpathQuery query) {
 
-        Element rootElement = getXmlAsDocument().getRootElement();
+        Element rootElement = xmlDocument.getRootElement();
         String queryString = query.asString();
         XPathContext context = getxPathContext(rootElement, query);
 
@@ -158,12 +153,20 @@ public class MomcaResource {
 
     }
 
+    /**
+     * @return The XML as an XML document.
+     */
+    @NotNull
+    public Document toDocument() {
+        return xmlDocument;
+    }
+
     @NotNull
     @Override
     public String toString() {
         return "MomcaResource{" +
                 "resourceName='" + resourceName + '\'' +
-                ", xmlAsDocument=" + xmlAsDocument +
+                ", xmlDocument=" + xmlDocument +
                 ", parentUri='" + parentUri + '\'' +
                 '}';
     }

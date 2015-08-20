@@ -362,7 +362,7 @@ public class MomcaConnection {
         try {
 
             XMLResource newResource = (XMLResource) collection.createResource(resource.getResourceName(), "XMLResource");
-            newResource.setContent(resource.getXmlAsDocument().toXML());
+            newResource.setContent(resource.toDocument().toXML());
             collection.storeResource(newResource);
 
             UserManagementService userService = (RemoteUserManagementService) collection.getService("UserManagementService", "1.0");

@@ -12,20 +12,22 @@ import java.util.Optional;
  */
 public enum ResourceType {
 
-    ANNOTATION_IMAGE("annotation-image", 5, 5),
-    ARCHIVE("archive", 3, 3),
-    CHARTER("charter", 4, 5),
-    COLLECTION("collection", 3, 3),
-    FOND("fond", 4, 4),
-    MY_COLLECTION("mycollection", 3, 3),
-    SVG("svg", 5, 5);
+    ANNOTATION_IMAGE("annotation-image", ".xml", 5, 5),
+    ARCHIVE("archive", ".eag.xml", 3, 3),
+    CHARTER("charter", ".charter.xml", 4, 5),
+    COLLECTION("collection", ".cei.xml", 3, 3),
+    FOND("fond", ".ead.xml", 4, 4),
+    MY_COLLECTION("mycollection", ".mycollection.xml", 3, 3),
+    SVG("svg", ".xml", 5, 5);
 
     private final int maxIdParts;
     private final int minIdParts;
     private final String nameInId;
+    private final String nameSuffix;
 
-    ResourceType(String nameInId, int minIdParts, int maxIdParts) {
+    ResourceType(String nameInId, String resourceNameSuffix, int minIdParts, int maxIdParts) {
         this.nameInId = nameInId;
+        this.nameSuffix = resourceNameSuffix;
         this.minIdParts = minIdParts;
         this.maxIdParts = maxIdParts;
     }
@@ -65,4 +67,7 @@ public enum ResourceType {
         return nameInId;
     }
 
+    public String getNameSuffix() {
+        return nameSuffix;
+    }
 }

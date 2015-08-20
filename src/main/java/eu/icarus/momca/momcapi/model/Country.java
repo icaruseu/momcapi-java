@@ -4,6 +4,7 @@ import eu.icarus.momca.momcapi.xml.eap.EapCountry;
 import eu.icarus.momca.momcapi.xml.eap.EapSubdivision;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,6 +24,12 @@ public class Country {
         this.countryCode = countryCode;
         this.nativeName = nativeName;
         this.regions = regions;
+    }
+
+    public Country(@NotNull CountryCode countryCode, @NotNull String nativeName) {
+        this.countryCode = countryCode;
+        this.nativeName = nativeName;
+        this.regions = new ArrayList<Region>(0);
     }
 
     @NotNull

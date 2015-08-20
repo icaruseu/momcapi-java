@@ -113,7 +113,7 @@ public class Fond extends MomcaResource {
         String idString = queryUniqueElement(XpathQuery.QUERY_ATOM_ID);
 
         if (idString.isEmpty()) {
-            String errorMessage = String.format("No atom:id in xml content: '%s'", getXmlAsDocument().toXML());
+            String errorMessage = String.format("No atom:id in xml content: '%s'", toDocument().toXML());
             throw new IllegalArgumentException(errorMessage);
         } else {
             return new IdFond(new AtomId(idString));

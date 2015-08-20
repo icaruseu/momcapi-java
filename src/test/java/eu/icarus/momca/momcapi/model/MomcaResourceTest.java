@@ -60,7 +60,7 @@ public class MomcaResourceTest {
     public void testGetXmlAsDocument() throws Exception {
         String origXml = Util.parseToDocument(XML_CONTENT_WITH_NAMESPACE).getDocument().toXML();
         MomcaResource res = new MomcaResource(NAME, PARENT_URI, XML_CONTENT_WITH_NAMESPACE);
-        assertEquals(res.getXmlAsDocument().toXML(), origXml);
+        assertEquals(res.toDocument().toXML(), origXml);
     }
 
     @Test
