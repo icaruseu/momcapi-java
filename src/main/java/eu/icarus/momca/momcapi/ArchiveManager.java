@@ -2,14 +2,8 @@ package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.model.*;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
-import eu.icarus.momca.momcapi.xml.Namespace;
-import eu.icarus.momca.momcapi.xml.atom.AtomEntry;
 import eu.icarus.momca.momcapi.xml.atom.AtomId;
-import eu.icarus.momca.momcapi.xml.eag.EagDesc;
-import nu.xom.Attribute;
-import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,94 +18,30 @@ public class ArchiveManager extends AbstractManager {
         super(momcaConnection);
     }
 
-    @NotNull
-    public Archive addArchive(@NotNull IdUser authorId, @NotNull String identifier, @NotNull String name,
-                              @NotNull Country country, @Nullable Region region, @NotNull Address address,
-                              @NotNull ContactInformation contactInformation, @NotNull String logoUrl) {
+    public void addArchive(@NotNull Archive newArchive) {
 
-        IdArchive id = new IdArchive(identifier);
-
-        if (getArchive(id).isPresent()) {
-            String message = String.format("The archive '%s' that is to be added already exists.", id);
+        if (getArchive(newArchive.getId()).isPresent()) {
+            String message = String.format("The archive '%s' that is to be added already exists.", newArchive.getId());
             throw new IllegalArgumentException(message);
         }
 
-        String archivesCollection = ResourceRoot.ARCHIVES.getUri();
-        momcaConnection.addCollection(identifier, archivesCollection);
-
-        String resourceName = identifier + ".eag.xml";
-        String parentCollectionUri = archivesCollection + "/" + identifier;
-        Element resourceContent = createNewArchiveResourceContent(authorId,
-                identifier, name, country, region, address, contactInformation, logoUrl);
-
-        MomcaResource resource = new MomcaResource(resourceName,
-                parentCollectionUri, resourceContent.toXML());
-
-        momcaConnection.storeExistResource(resource);
-
-        return getArchive(id).orElseThrow(RuntimeException::new);
+        momcaConnection.addCollection(newArchive.getIdentifier(), ResourceRoot.ARCHIVES.getUri());
+        momcaConnection.storeExistResource(newArchive);
 
     }
 
-    @NotNull
-    private Element createEagElement(@NotNull String shortName, @NotNull String archiveName,
-                                     @NotNull String countrycode, @NotNull EagDesc eagDesc) {
+    public void deleteArchive(@NotNull IdArchive idArchive) {
 
-        String eagUri = Namespace.EAG.getUri();
-
-        Element eagEag = new Element("eag:eag", eagUri);
-
-        Element eagArchguide = new Element("eag:archguide", eagUri);
-        eagEag.appendChild(eagArchguide);
-
-        Element eagIdentity = new Element("eag:identity", eagUri);
-        eagArchguide.appendChild(eagIdentity);
-
-        Element eagRepositorid = new Element("eag:repositorid", eagUri);
-        eagRepositorid.addAttribute(new Attribute("countrycode", countrycode));
-        eagRepositorid.appendChild(shortName);
-        eagIdentity.appendChild(eagRepositorid);
-
-        Element eagAutform = new Element("eag:autform", eagUri);
-        eagIdentity.appendChild(eagAutform);
-        eagAutform.appendChild(archiveName);
-
-        eagArchguide.appendChild(eagDesc);
-
-        return eagEag;
-
-    }
-
-    @NotNull
-    private Element createNewArchiveResourceContent(@NotNull IdUser authorId, @NotNull String shortName,
-                                                    @NotNull String name, @NotNull Country country,
-                                                    @Nullable Region region, @NotNull Address address,
-                                                    @NotNull ContactInformation contactInformation,
-                                                    @NotNull String logoUrl) {
-
-        IdArchive id = new IdArchive(shortName);
-        String now = momcaConnection.queryDatabase(ExistQueryFactory.getCurrentDateTime()).get(0);
-
-        String regionNativeName = region == null ? "" : region.getNativeName();
-        EagDesc eagDesc = new EagDesc(country.getNativeName(), regionNativeName, address, contactInformation, logoUrl);
-        Element eag = createEagElement(shortName, name, country.getCountryCode().getCode(), eagDesc);
-
-        return new AtomEntry(id.getContentXml(), authorId.getContentXml(), now, eag);
-
-    }
-
-    public void deleteArchive(@NotNull Archive archive) {
-
-        if (!momcaConnection.getFondManager().listFonds(archive.getId()).isEmpty()) {
+        if (!momcaConnection.getFondManager().listFonds(idArchive).isEmpty()) {
             String message = String.format("The archive '%s',  that is to be deleted still has associated fonds.",
-                    archive.getIdentifier());
+                    idArchive.getIdentifier());
             throw new IllegalArgumentException(message);
         }
 
         momcaConnection.deleteCollection(String.format("%s/%s",
-                ResourceRoot.ARCHIVES.getUri(), archive.getId().getIdentifier()));
+                ResourceRoot.ARCHIVES.getUri(), idArchive.getIdentifier()));
         momcaConnection.deleteCollection(String.format("%s/%s",
-                ResourceRoot.ARCHIVAL_FONDS.getUri(), archive.getId().getIdentifier()));
+                ResourceRoot.ARCHIVAL_FONDS.getUri(), idArchive.getIdentifier()));
 
     }
 

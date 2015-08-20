@@ -5,6 +5,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 import static org.testng.Assert.*;
 
@@ -36,54 +37,58 @@ public class ArchiveManagerTest {
                 new ContactInformation("http://example.com", "01234557", "0123458952", "alpha@example.com");
         String logoUrl = "http://example.com/image.png";
 
-        Archive newArchive = am.addArchive(author, shortName, name, country, region, address, contactInformation, logoUrl);
-        am.deleteArchive(newArchive);
+        Archive newArchive = new Archive(shortName, name, country);
+        newArchive.setCreator(author.getIdentifier());
+        newArchive.setRegionName(region.getNativeName());
+        newArchive.setAddress(address);
+        newArchive.setContactInformation(contactInformation);
+        newArchive.setLogoUrl(logoUrl);
 
-        assertEquals(newArchive.getId().getIdentifier(), shortName);
+        am.addArchive(newArchive);
+        Optional<Archive> addedArchiveOptional = am.getArchive(newArchive.getId());
+        am.deleteArchive(newArchive.getId());
 
-        assertEquals(newArchive.getIdentifier(), shortName);
-        assertEquals(newArchive.getName(), name);
+        assertTrue(addedArchiveOptional.isPresent());
 
-        assertEquals(newArchive.getCountry().getCountryCode(), country.getCountryCode());
-        assertEquals(newArchive.getRegionName().get(), region.getNativeName());
+        Archive addedArchive = addedArchiveOptional.get();
 
-        assertEquals(newArchive.getAddress().get(), address);
-        assertEquals(newArchive.getContactInformation().get(), contactInformation);
-        assertEquals(newArchive.getLogoUrl().get(), logoUrl);
+        assertEquals(addedArchive.getId().getIdentifier(), shortName);
+
+        assertEquals(addedArchive.getIdentifier(), shortName);
+        assertEquals(addedArchive.getName(), name);
+
+        assertEquals(addedArchive.getCountry().getCountryCode(), country.getCountryCode());
+        assertEquals(addedArchive.getRegionName().get(), region.getNativeName());
+
+        assertEquals(addedArchive.getAddress().get(), address);
+        assertEquals(addedArchive.getContactInformation().get(), contactInformation);
+        assertEquals(addedArchive.getLogoUrl().get(), logoUrl);
 
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddArchiveAlreadyExisting() throws Exception {
 
-        IdUser author = new IdUser("admin");
         Country country = mc.getCountryManager().getCountry(new CountryCode("DE")).get();
-        Region region = country.getRegions().stream().filter(r -> r.getCode().get().equals("DE-BY")).findFirst().get();
         String shortName = "DE-BayHStA";
         String name = "München, Bayerisches Hauptstaatsarchiv";
-        Address address = new Address("", "", "");
-        ContactInformation contactInformation = new ContactInformation("", "", "", "");
-        String logoUrl = "http://example.com/image.png";
 
-        am.addArchive(author, shortName, name, country, region, address, contactInformation, logoUrl);
+        Archive newArchive = new Archive(shortName, name, country);
+
+        am.addArchive(newArchive);
 
     }
 
     @Test
     public void testDeleteArchive() throws Exception {
 
-        IdUser author = new IdUser("admin");
         Country country = mc.getCountryManager().getCountry(new CountryCode("DE")).get();
-        Region region = country.getRegions().stream().filter(r -> r.getCode().get().equals("DE-BW")).findFirst().get();
         String shortName = "DE-HStASt";
         String name = "Landesarchiv Baden-Württemberg, Abt. Hauptstaatsarchiv Stuttgart";
-        Address address = new Address("Stuttgart", "0123334", "Somewhere else");
-        ContactInformation contactInformation =
-                new ContactInformation("http://example.com", "01234557", "0123458952", "alpha@example.com");
-        String logoUrl = "http://example.com/image.png";
 
-        Archive newArchive = am.addArchive(author, shortName, name, country, region, address, contactInformation, logoUrl);
-        am.deleteArchive(newArchive);
+        Archive newArchive = new Archive(shortName, name, country);
+        am.addArchive(newArchive);
+        am.deleteArchive(newArchive.getId());
 
         assertFalse(am.getArchive(newArchive.getId()).isPresent());
         assertFalse(mc.getCollection("/db/mom-data/metadata.fond.public/" + newArchive.getIdentifier()).isPresent());
@@ -93,8 +98,7 @@ public class ArchiveManagerTest {
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testDeleteArchiveWithExistingFonds() throws Exception {
         IdArchive id = new IdArchive("CH-KAE");
-        Archive archive = am.getArchive(id).get();
-        am.deleteArchive(archive);
+        am.deleteArchive(id);
     }
 
     @Test
