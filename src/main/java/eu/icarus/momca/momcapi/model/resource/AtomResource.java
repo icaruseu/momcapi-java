@@ -2,11 +2,9 @@ package eu.icarus.momca.momcapi.model.resource;
 
 import eu.icarus.momca.momcapi.model.id.IdAtomId;
 import eu.icarus.momca.momcapi.model.id.IdUser;
-import eu.icarus.momca.momcapi.query.XpathQuery;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -37,17 +35,15 @@ public abstract class AtomResource extends ExistResource {
 
         super(existResource);
 
-        List<String> identifierList = existResource.queryContentAsList(XpathQuery.QUERY_EAG_REPOSITORID);
-        List<String> nameList = existResource.queryContentAsList(XpathQuery.QUERY_EAG_AUTFORM);
-
-        if (identifierList.size() != 1 || nameList.size() != 1) {
+        Optional<String> nameOptional = getNameFromXml(existResource);
+        Optional<String> identifierOptional = getIdentifierFromXml(existResource);
+        if (!identifierOptional.isPresent() || !nameOptional.isPresent()) {
             throw new IllegalArgumentException("The provided resource content is not a valid ExistResource: "
                     + existResource.toDocument().toXML());
         }
 
-        setIdentifier(identifierList.get(0));
-        setName(nameList.get(0));
-
+        setIdentifier(identifierOptional.get());
+        setName(nameOptional.get());
 
     }
 
@@ -77,6 +73,9 @@ public abstract class AtomResource extends ExistResource {
     public abstract void setIdentifier(@NotNull String identifier);
 
     @NotNull
+    abstract Optional<String> getIdentifierFromXml(ExistResource existResource);
+
+    @NotNull
     public final String getName() {
         return name;
     }
@@ -90,5 +89,8 @@ public abstract class AtomResource extends ExistResource {
         this.name = name;
 
     }
+
+    @NotNull
+    abstract Optional<String> getNameFromXml(ExistResource existResource);
 
 }

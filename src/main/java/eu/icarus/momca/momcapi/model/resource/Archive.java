@@ -49,7 +49,6 @@ public class Archive extends AtomResource {
 
         super(existResource);
 
-
         List<String> authorEmailList = existResource.queryContentAsList(XpathQuery.QUERY_ATOM_EMAIL);
         List<String> countryCodeList = existResource.queryContentAsList(XpathQuery.QUERY_EAG_COUNTRYCODE);
         Nodes descNodes = existResource.queryContentAsNodes(XpathQuery.QUERY_EAG_DESC);
@@ -162,6 +161,20 @@ public class Archive extends AtomResource {
 
         this.id = new IdArchive(identifier);
 
+    }
+
+    @Override
+    @NotNull
+    Optional<String> getIdentifierFromXml(ExistResource existResource) {
+        List<String> identifierList = existResource.queryContentAsList(XpathQuery.QUERY_EAG_REPOSITORID);
+        return identifierList.isEmpty() ? Optional.empty() : Optional.of(identifierList.get(0));
+    }
+
+    @NotNull
+    @Override
+    Optional<String> getNameFromXml(ExistResource existResource) {
+        List<String> nameList = existResource.queryContentAsList(XpathQuery.QUERY_EAG_AUTFORM);
+        return nameList.isEmpty() ? Optional.empty() : Optional.of(nameList.get(0));
     }
 
     @NotNull

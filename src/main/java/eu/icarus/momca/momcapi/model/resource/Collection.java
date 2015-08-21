@@ -4,10 +4,8 @@ import eu.icarus.momca.momcapi.model.Country;
 import eu.icarus.momca.momcapi.model.CountryCode;
 import eu.icarus.momca.momcapi.model.id.IdCollection;
 import eu.icarus.momca.momcapi.model.id.IdUser;
-import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
 import eu.icarus.momca.momcapi.query.XpathQuery;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,22 +14,16 @@ import java.util.Optional;
  * @author daniel
  *         Created on 17.07.2015.
  */
-public class Collection extends ExistResource {
+public class Collection extends AtomResource {
 
     @NotNull
     private Optional<Country> country;
-    @NotNull
-    private Optional<IdUser> creator;
-    @NotNull
-    private IdCollection id;
     @NotNull
     private Optional<String> imageFolderName;
     @NotNull
     private Optional<String> imageServerAddress;
     @NotNull
     private Optional<String> keyword;
-    @NotNull
-    private String name;
     @NotNull
     private Optional<String> regionName;
 
@@ -41,12 +33,17 @@ public class Collection extends ExistResource {
 
         country = initCountry();
         regionName = initRegionName();
-        id = initId();
-        name = initName();
         creator = initAuthor();
         imageFolderName = initImageFolderName();
         imageServerAddress = initImageServerAddress();
         keyword = initKeyword();
+
+        Optional<String> identifierOptional = getIdentifierFromXml(existResource);
+        if (!identifierOptional.isPresent()) {
+            throw new IllegalArgumentException("The content of the provided eXist resource is not valid for an eXist resource.");
+        }
+
+        setIdentifier(identifierOptional.get());
 
     }
 
@@ -60,31 +57,42 @@ public class Collection extends ExistResource {
     }
 
     @NotNull
-    public Optional<IdUser> getCreator() {
-        return creator;
-    }
-
-    public void setCreator(@Nullable String creator) {
-
-        if (creator == null || creator.isEmpty()) {
-            this.creator = Optional.empty();
-        } else {
-            this.creator = Optional.of(new IdUser(creator));
-        }
-
-    }
-
-    @NotNull
     public IdCollection getId() {
-        return id;
+        return (IdCollection) id;
     }
 
     public void setId(@NotNull IdCollection id) {
         this.id = id;
     }
 
-    public String getIdentifier() {
-        return id.getIdentifier();
+    @Override
+    public void setIdentifier(@NotNull String identifier) {
+
+        if (identifier.isEmpty()) {
+            throw new IllegalArgumentException("The identifier is not allowed to be an empty string.");
+        }
+
+        this.id = new IdCollection(identifier);
+
+    }
+
+    @Override
+    @NotNull
+    Optional<String> getIdentifierFromXml(ExistResource existResource) {
+        List<String> identifierList = existResource.queryContentAsList(XpathQuery.QUERY_CEI_PROVENANCE_ABBR);
+        return identifierList.isEmpty() ? Optional.<String>empty() : Optional.of(identifierList.get(0));
+    }
+
+    @NotNull
+    @Override
+    Optional<String> getNameFromXml(ExistResource existResource) {
+
+        List<String> queryResults = queryContentAsList(XpathQuery.QUERY_CEI_PROVENANCE_TEXT);
+
+        return queryResults.isEmpty() ?
+                Optional.empty() :
+                Optional.of(queryResults.get(0).replaceAll("\\s+", " ")); // Normalize whitespace due to nested elements in the xml content
+
     }
 
     @NotNull
@@ -112,15 +120,6 @@ public class Collection extends ExistResource {
 
     public void setKeyword(@NotNull Optional<String> keyword) {
         this.keyword = keyword;
-    }
-
-    @NotNull
-    public String getName() {
-        return name;
-    }
-
-    public void setName(@NotNull String name) {
-        this.name = name;
     }
 
     @NotNull
@@ -168,18 +167,6 @@ public class Collection extends ExistResource {
 
     }
 
-    private IdCollection initId() {
-
-        List<String> queryResults = queryContentAsList(XpathQuery.QUERY_ATOM_ID);
-
-        if (queryResults.isEmpty()) {
-            throw new IllegalArgumentException("The content of the resource doesn't contain an atom:id element");
-        }
-
-        return new IdCollection(new AtomId(queryResults.get(0)));
-
-    }
-
     private Optional<String> initImageFolderName() {
 
         Optional<String> folder = Optional.empty();
@@ -210,18 +197,6 @@ public class Collection extends ExistResource {
             keyword = Optional.of(keywordText);
         }
         return keyword;
-
-    }
-
-    private String initName() {
-
-        List<String> queryResults = queryContentAsList(XpathQuery.QUERY_CEI_PROVENANCE_TEXT);
-
-        if (queryResults.isEmpty()) {
-            throw new IllegalArgumentException("The content of the collection doesn't contain an name.");
-        }
-
-        return queryResults.get(0).replaceAll("\\s+", " "); // Normalize whitespace due to nested elements in the xml content
 
     }
 
