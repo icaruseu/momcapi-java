@@ -14,21 +14,21 @@ import java.util.Optional;
 public class Collection extends MomcaResource {
 
     @NotNull
-    private final Optional<IdUser> authorId;
+    private Optional<IdUser> authorId;
     @NotNull
-    private final Optional<Country> country;
+    private Optional<Country> country;
     @NotNull
-    private final IdCollection id;
+    private IdCollection id;
     @NotNull
-    private final Optional<String> imageFolderName;
+    private Optional<String> imageFolderName;
     @NotNull
-    private final Optional<String> imageServerAddress;
+    private Optional<String> imageServerAddress;
     @NotNull
-    private final Optional<String> keyword;
+    private Optional<String> keyword;
     @NotNull
-    private final String name;
+    private String name;
     @NotNull
-    private final Optional<String> regionName;
+    private Optional<String> regionName;
 
     public Collection(@NotNull MomcaResource momcaResource) {
 
