@@ -15,8 +15,18 @@ public class Region {
     private final String nativeName;
 
     public Region(@NotNull String code, @NotNull String nativeName) {
+
+        if (nativeName.isEmpty()) {
+            throw new IllegalArgumentException("The regions native name is not allowed to be an empty string.");
+        }
+
         this.code = code.isEmpty() ? Optional.empty() : Optional.of(code);
         this.nativeName = nativeName;
+
+    }
+
+    public Region(@NotNull String nativeName) {
+        this("", nativeName);
     }
 
     @NotNull

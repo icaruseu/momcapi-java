@@ -4,7 +4,6 @@ import eu.icarus.momca.momcapi.model.*;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.testng.Assert.*;
@@ -28,8 +27,8 @@ public class ArchiveManagerTest {
     public void testAddArchive() throws Exception {
 
         IdUser author = new IdUser("admin");
-        Country country = mc.getCountryManager().getCountry(new CountryCode("DE")).get();
-        Region region = mc.getCountryManager().getRegions(country).stream().filter(s -> s.getCode().get().equals("DE-BW")).findFirst().get();
+        Country country = new Country(new CountryCode("DE"), "Deutschland");
+        Region region = new Region("DE-BW", "Baden-Württemberg");
         String shortName = "DE-GLAK";
         String name = "Landesarchiv Baden-Württemberg, Abt. Generallandesarchiv Karlsruhe";
         Address address = new Address("Karlsruhe", "01234", "Somewhere");
@@ -69,7 +68,7 @@ public class ArchiveManagerTest {
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddArchiveAlreadyExisting() throws Exception {
 
-        Country country = mc.getCountryManager().getCountry(new CountryCode("DE")).get();
+        Country country = new Country(new CountryCode("DE"), "Deutschland");
         String shortName = "DE-BayHStA";
         String name = "München, Bayerisches Hauptstaatsarchiv";
 
@@ -82,7 +81,7 @@ public class ArchiveManagerTest {
     @Test
     public void testDeleteArchive() throws Exception {
 
-        Country country = mc.getCountryManager().getCountry(new CountryCode("DE")).get();
+        Country country = new Country(new CountryCode("DE"), "Deutschland");
         String shortName = "DE-HStASt";
         String name = "Landesarchiv Baden-Württemberg, Abt. Hauptstaatsarchiv Stuttgart";
 
@@ -125,8 +124,8 @@ public class ArchiveManagerTest {
 
     @Test
     public void testListArchivesForCountry() throws Exception {
-        assertTrue(am.listArchives(new Country(new CountryCode("AT"), "Österreich", new ArrayList<>(0))).isEmpty());
-        assertEquals(am.listArchives(new Country(new CountryCode("CH"), "Schweiz", new ArrayList<>(0))).size(), 2);
+        assertTrue(am.listArchives(new Country(new CountryCode("AT"), "Österreich")).isEmpty());
+        assertEquals(am.listArchives(new Country(new CountryCode("CH"), "Schweiz")).size(), 2);
     }
 
     @Test

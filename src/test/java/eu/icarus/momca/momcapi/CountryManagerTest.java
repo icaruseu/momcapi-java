@@ -7,7 +7,6 @@ import eu.icarus.momca.momcapi.model.Region;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,8 +30,8 @@ public class CountryManagerTest {
 
         cm.deleteCountryFromHierarchy(new CountryCode("AT"));
         cm.deleteCountryFromHierarchy(new CountryCode("SE"));
-        cm.deleteRegionFromHierarchy(new Country(new CountryCode("CH"), "Schweiz", new ArrayList<>(0)), "CH-SG");
-        cm.deleteRegionFromHierarchy(new Country(new CountryCode("RS"), "Serbia", new ArrayList<>(0)), "RS-BG");
+        cm.deleteRegionFromHierarchy(new Country(new CountryCode("CH"), "Schweiz"), "Sankt Gallen");
+        cm.deleteRegionFromHierarchy(new Country(new CountryCode("RS"), "Serbia"), "Beograd");
 
     }
 
@@ -41,47 +40,47 @@ public class CountryManagerTest {
 
         CountryCode code = new CountryCode("AT");
         String nativeName = "Österreich";
+        Country country = new Country(code, nativeName);
 
-        Country newCountry = cm.addNewCountryToHierarchy(code, nativeName);
-
-        assertEquals(newCountry.getCountryCode(), code);
-        assertEquals(newCountry.getNativeName(), nativeName);
-
+        cm.addNewCountryToHierarchy(country);
+        Optional<Country> countryOptional = cm.getCountry(code);
         cm.deleteCountryFromHierarchy(code);
+
+        assertTrue(countryOptional.isPresent());
+        assertEquals(countryOptional.get(), country);
 
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddNewCountryToHierarchyThatExists() throws Exception {
-        CountryCode existingCode = new CountryCode("DE");
-        String nativeform = "Österreich";
-        cm.addNewCountryToHierarchy(existingCode, nativeform);
+        cm.addNewCountryToHierarchy(new Country(new CountryCode("DE"), "Deutschland"));
     }
 
     @Test
     public void testAddRegionToHierarchy() throws Exception {
 
-        Country country = cm.getCountry(new CountryCode("RS")).get();
-        String regionCode = "RS-BG";
+        Country country = new Country(new CountryCode("RS"), "Serbia");
+        Region region = new Region("RS-BG", "Beograd");
 
-        country = cm.addRegionToHierarchy(country, regionCode, "Beograd");
-        cm.deleteRegionFromHierarchy(country, regionCode);
+        cm.addRegionToHierarchy(country, region);
+        List<Region> regions = cm.getRegions(country);
+        cm.deleteRegionFromHierarchy(country, region.getNativeName());
 
-        assertFalse(country.getRegions().isEmpty());
+        assertTrue(regions.contains(region));
 
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddRegionToHierarchyAlreadyExisting() throws Exception {
-        Country country = cm.getCountry(new CountryCode("DE")).get();
-        cm.addRegionToHierarchy(country, "DE-BW", "Baden-Württemberg");
+        Country country = new Country(new CountryCode("DE"), "Deutschland");
+        cm.addRegionToHierarchy(country, new Region("DE-BW", "Baden-Württemberg"));
     }
 
     @Test
     public void testDeleteCountryFromHierarchy() throws Exception {
 
         CountryCode code = new CountryCode("SE");
-        cm.addNewCountryToHierarchy(code, "Sverige");
+        cm.addNewCountryToHierarchy(new Country(code, "Sverige"));
         cm.deleteCountryFromHierarchy(code);
         assertFalse(cm.getCountry(code).isPresent());
 
@@ -96,40 +95,31 @@ public class CountryManagerTest {
     public void testDeleteRegionFromHierarchy() throws Exception {
 
         Country country = cm.getCountry(new CountryCode("CH")).get();
-        String regionCode = "CH-SG";
-        country = cm.addRegionToHierarchy(country, regionCode, "Sankt Gallen");
-        country = cm.deleteRegionFromHierarchy(country, regionCode);
+        Region region = new Region("CH-SG", "Sankt Gallen");
+        cm.addRegionToHierarchy(country, region);
 
-        assertTrue(country.getRegions().isEmpty());
+        cm.deleteRegionFromHierarchy(country, region.getNativeName());
+
+        assertTrue(cm.getRegions(country).isEmpty());
 
     }
 
     @Test(expectedExceptions = MomcaException.class)
     public void testDeleteRegionFromHierarchyWithExistingArchives() throws Exception {
         Country country = cm.getCountry(new CountryCode("DE")).get();
-        String regionCode = "DE-BY";
-        cm.deleteRegionFromHierarchy(country, regionCode);
+        cm.deleteRegionFromHierarchy(country, "Bayern");
     }
 
     @Test
     public void testGetCountry() throws Exception {
 
-        Optional<Country> countryOptional = cm.getCountry(new CountryCode("DE"));
+        CountryCode countryCode = new CountryCode("DE");
+        Country country = new Country(countryCode, "Deutschland");
+
+        Optional<Country> countryOptional = cm.getCountry(countryCode);
+
         assertTrue(countryOptional.isPresent());
-
-        Country country = countryOptional.get();
-        assertEquals(country.getCountryCode().getCode(), "DE");
-        assertEquals(country.getNativeName(), "Deutschland");
-        assertEquals(country.getHierarchyXml().toXML(), "<eap:country xmlns:eap=\"http://www.monasterium.net/NS/eap\"><eap:code>DE</eap:code><eap:nativeform>Deutschland</eap:nativeform><eap:subdivisions><eap:subdivision><eap:code>DE-BY</eap:code><eap:nativeform>Bayern</eap:nativeform></eap:subdivision><eap:subdivision><eap:code>DE-BW</eap:code><eap:nativeform>Baden-Württemberg</eap:nativeform></eap:subdivision><eap:subdivision><eap:code>DE-NRW</eap:code><eap:nativeform>Nordrhein-Westfalen</eap:nativeform></eap:subdivision></eap:subdivisions></eap:country>");
-
-        List<Region> regions = country.getRegions();
-        assertEquals(regions.size(), 3);
-
-        assertEquals(regions.get(0).getCode().get(), "DE-BY");
-        assertEquals(regions.get(0).getNativeName(), "Bayern");
-
-        assertEquals(regions.get(1).getCode().get(), "DE-BW");
-        assertEquals(regions.get(1).getNativeName(), "Baden-Württemberg");
+        assertEquals(countryOptional.get(), country);
 
     }
 

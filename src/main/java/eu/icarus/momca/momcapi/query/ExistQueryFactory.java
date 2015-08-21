@@ -42,22 +42,25 @@ public class ExistQueryFactory {
     }
 
     /**
-     * @param code The content of the {@code eap:code} child-element of the eap-element tree to delete, e.g. {@code DE}.
+     * @param eapText The text value that signifies which element to delete. Can be either a {@code eap:code} or
+     *                {@code eap:nativeform}
      * @return A query to delete a eap-element tree, e.g.
      * {@code <eap:country><eap:code>DE</eap:code><eap:nativeform/></eap:country>} or
      * {@code <eap:subdivision><eap:code>DE-BW</eap:code><eap:nativeform/></eap:subdivision>}. It deletes the whole tree
      * including its sub-elements.
      */
     @NotNull
-    public static ExistQuery deleteEapElement(@NotNull String code) {
+    public static ExistQuery deleteEapElement(@NotNull String eapText) {
 
         String query = String.format(
-                "%s update delete doc('%s/mom.portal.xml')//eap:*[eap:code='%s']",
+                "%s update delete doc('%s/mom.portal.xml')//eap:*[eap:code='%s' or eap:nativeform='%s']",
                 getNamespaceDeclaration(Namespace.EAP),
                 ResourceRoot.PORTAL_HIERARCHY.getUri(),
-                code);
+                eapText,
+                eapText);
 
         return new ExistQuery(query);
+
     }
 
     @NotNull

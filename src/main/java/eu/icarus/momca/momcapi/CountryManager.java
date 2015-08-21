@@ -33,60 +33,48 @@ public class CountryManager extends AbstractManager {
     }
 
     /**
-     * Adds a new country to the database.
+     * Adds a new country to country hierarchy used for archives and fonds.
      *
-     * @param code       The code of the new country to add. Throws an IllegalArgumentException if the code already exists.
-     * @param nativeName The name of the country in its own language, e.g. {@code Sverige}.
-     * @return The new country.
+     * @param country The country to add.
      */
     @NotNull
-    public Country addNewCountryToHierarchy(@NotNull CountryCode code, @NotNull String nativeName) {
+    public void addNewCountryToHierarchy(@NotNull Country country) {
 
-        if (isCodeInUseInHierarchy(code.getCode())) {
+        String code = country.getCountryCode().getCode();
+        String name = country.getNativeName();
+
+        if (isCodeInUseInHierarchy(code)) {
             throw new IllegalArgumentException(String.format("EapCountry code '%s' is already existing.", code));
         }
 
-        EapCountry newEapCountry = new EapCountry(code.getCode(), nativeName, new ArrayList<>(0));
+        EapCountry newEapCountry = new EapCountry(code, name, new ArrayList<>(0));
         ExistQuery query = ExistQueryFactory
                 .insertEapElement(MOM_PORTAL_XML_URI, "eap:countries", null, newEapCountry.toXML());
         momcaConnection.queryDatabase(query);
 
-        return getCountry(code).orElseThrow(RuntimeException::new);
-
     }
 
     /**
-     * Adds a subdivision to the selected eapCountry.
+     * Adds a region to the country hierarchy used for fonds and archives.
      *
-     * @param country    The country to add the region to.
-     * @param regionCode The code of the region, e.g. {@code AT-NÖ}. Does not have a specific format.
-     * @param nativeName The native name of the subdivision in its native language, e.g. {@code Niederösterreich}.
-     * @return The updated eapCountry.
-     * @see EapSubdivision
+     * @param country The country to add the region to.
+     * @param region  The region to add to the hierarchy
      */
-    @NotNull
-    public Country addRegionToHierarchy(@NotNull Country country, @NotNull String regionCode, @NotNull String nativeName) {
 
-        Country updated = country;
+    public void addRegionToHierarchy(@NotNull Country country, @NotNull Region region) {
 
-        List<String> eapCountryXml = momcaConnection.queryDatabase(ExistQueryFactory.getEapCountryXml(country.getCountryCode().getCode()));
-
-        if (!eapCountryXml.isEmpty()) {
-
-            if (eapCountryXml.get(0).contains(regionCode)) {
-                throw new IllegalArgumentException(String.format("Re gion '%s' is already existing.", nativeName));
-            }
-
-            EapSubdivision eapSubdivision = new EapSubdivision(regionCode, nativeName);
-            ExistQuery query = ExistQueryFactory.insertEapElement(
-                    MOM_PORTAL_XML_URI, "eap:subdivisions", country.getCountryCode().getCode(), eapSubdivision.toXML());
-            momcaConnection.queryDatabase(query);
-
-            updated = getCountry(country.getCountryCode()).orElseThrow(RuntimeException::new);
-
+        if (getRegions(country).contains(region)) {
+            throw new IllegalArgumentException(String.format("Region '%s' is already existing.", region.getNativeName()));
         }
 
-        return updated;
+        if (!region.getCode().isPresent()) {
+            throw new IllegalArgumentException("A hierarchical region needs to contain a region code.");
+        }
+
+        EapSubdivision eapSubdivision = new EapSubdivision(region.getCode().get(), region.getNativeName());
+        ExistQuery query = ExistQueryFactory.insertEapElement(
+                MOM_PORTAL_XML_URI, "eap:subdivisions", country.getCountryCode().getCode(), eapSubdivision.toXML());
+        momcaConnection.queryDatabase(query);
 
     }
 
@@ -110,29 +98,22 @@ public class CountryManager extends AbstractManager {
      * Deletes a region from a countries hierarchy.
      *
      * @param country    The country to delete from.
-     * @param regionCode The code of the subdivision to delete.
-     * @return The updated country.
+     * @param regionName The native name of the region to delete
      */
     @NotNull
-    public Country deleteRegionFromHierarchy(@NotNull Country country, @NotNull String regionCode) {
+    public void deleteRegionFromHierarchy(@NotNull Country country, @NotNull String regionName) {
 
-        List<EapSubdivision> matchingEapSubdivisions = country.getHierarchyXml().getEapSubdivisions().stream()
-                .filter(s -> s.getCode().equals(regionCode)).collect(Collectors.toList());
+        if (getRegions(country).stream().anyMatch(region -> regionName.equals(region.getNativeName()))) {
 
-        if (!matchingEapSubdivisions.isEmpty()) {
-
-            String nativeForm = matchingEapSubdivisions.get(0).getNativeform();
-            ExistQuery query = ExistQueryFactory.listArchivesForRegion(nativeForm);
-
-            if (!momcaConnection.queryDatabase(query).isEmpty()) {
-                throw new MomcaException("There are existing archives for subdivision '" + regionCode + "'.");
+            if (!momcaConnection.queryDatabase(
+                    ExistQueryFactory.listArchivesForRegion(regionName)).isEmpty()) {
+                String message = String.format("There are existing archives for region '%s'.", regionName);
+                throw new MomcaException(message);
             }
 
-        }
+            momcaConnection.queryDatabase(ExistQueryFactory.deleteEapElement(regionName));
 
-        ExistQuery query = ExistQueryFactory.deleteEapElement(regionCode);
-        momcaConnection.queryDatabase(query);
-        return getCountry(country.getCountryCode()).orElseThrow(RuntimeException::new);
+        }
 
     }
 
@@ -156,25 +137,7 @@ public class CountryManager extends AbstractManager {
             }
 
             String nativeName = nativeNames.isEmpty() ? "[No name]" : nativeNames.get(0);
-
-            List<String> regionsNames = momcaConnection.queryDatabase(ExistQueryFactory.listRegionsNativeNames(code));
-            List<Region> regions = new ArrayList<>(regionsNames.size());
-
-            for (String regionName : regionsNames) {
-
-                List<String> regionCodeResults = momcaConnection.queryDatabase(ExistQueryFactory.getRegionCode(regionName));
-
-                if (regionCodeResults.size() > 1) {
-                    throw new MomcaException("More than one region code for region '" + regionName + "' existing.");
-                }
-
-                String regionCode = regionCodeResults.isEmpty() ? "" : regionCodeResults.get(0);
-
-                regions.add(new Region(regionCode, regionName));
-
-            }
-
-            country = Optional.of(new Country(code, nativeName, regions));
+            country = Optional.of(new Country(code, nativeName));
 
         }
 

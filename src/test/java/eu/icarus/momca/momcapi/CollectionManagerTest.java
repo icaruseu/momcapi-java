@@ -29,8 +29,8 @@ public class CollectionManagerTest {
         String identifier = "newcollection";
         String name = "A new collection";
         IdUser author = new IdUser("user1.testuser@dev.monasterium.net");
-        Country country = mc.getCountryManager().getCountry(new CountryCode("DE")).get();
-        Region region = country.getRegions().get(0);
+        Country country = new Country(new CountryCode("DE"), "Deutschland");
+        Region region = new Region("DE-BW", "Baden-Württemberg");
         String imageServerAddress = "http://images.icar-us.eu";
         String imageFolderName = "img/collections/newcollection";
         String keyword = "Random";
@@ -100,8 +100,8 @@ public class CollectionManagerTest {
         String identifier = "MedDocBulgEmp";
         String name = "A new collection";
         IdUser author = new IdUser("user1.testuser@dev.monasterium.net");
-        Country country = mc.getCountryManager().getCountry(new CountryCode("DE")).get();
-        Region region = country.getRegions().get(0);
+        Country country = new Country(new CountryCode("DE"), "Deutschland");
+        Region region = new Region("DE-BW", "Baden-Württemberg");
         String imageServerAddress = "http://images.icar-us.eu";
         String imageFolderName = "img/collections/newcollection";
         String keyword = "Random";
@@ -116,8 +116,8 @@ public class CollectionManagerTest {
         String identifier = "newcollection";
         String name = "New collection";
         IdUser author = new IdUser("");
-        Country country = mc.getCountryManager().getCountry(new CountryCode("DE")).get();
-        Region region = country.getRegions().get(0);
+        Country country = new Country(new CountryCode("DE"), "Deutschland");
+        Region region = new Region("DE-BW", "Baden-Württemberg");
         String imageServerAddress = "http://images.icar-us.eu";
         String imageFolderName = "img/collections/newcollection";
         String keyword = "Random";
@@ -132,8 +132,8 @@ public class CollectionManagerTest {
         String identifier = "";
         String name = "A new collection";
         IdUser author = new IdUser("user1.testuser@dev.monasterium.net");
-        Country country = mc.getCountryManager().getCountry(new CountryCode("DE")).get();
-        Region region = country.getRegions().get(0);
+        Country country = new Country(new CountryCode("DE"), "Deutschland");
+        Region region = new Region("DE-BW", "Baden-Württemberg");
         String imageServerAddress = "http://images.icar-us.eu";
         String imageFolderName = "img/collections/newcollection";
         String keyword = "Random";
@@ -148,8 +148,8 @@ public class CollectionManagerTest {
         String identifier = "newcollection";
         String name = "";
         IdUser author = new IdUser("user1.testuser@dev.monasterium.net");
-        Country country = mc.getCountryManager().getCountry(new CountryCode("DE")).get();
-        Region region = country.getRegions().get(0);
+        Country country = new Country(new CountryCode("DE"), "Deutschland");
+        Region region = new Region("DE-BW", "Baden-Württemberg");
         String imageServerAddress = "http://images.icar-us.eu";
         String imageFolderName = "img/collections/newcollection";
         String keyword = "Random";
@@ -225,14 +225,14 @@ public class CollectionManagerTest {
 
     @Test
     public void testListCollectionsForCountry() throws Exception {
-        Country country = mc.getCountryManager().getCountry(new CountryCode("BG")).get();
+        Country country = new Country(new CountryCode("BG"), "Bǎlgarija");
         assertEquals(cm.listCollections(country).size(), 1);
     }
 
     @Test
     public void testListCollectionsForRegion() throws Exception {
-        Country country = mc.getCountryManager().getCountry(new CountryCode("DE")).get();
-        Region region = country.getRegions().stream().filter(r -> r.getNativeName().equals("Nordrhein-Westfalen")).collect(Collectors.toList()).get(0);
+        Country country = new Country(new CountryCode("DE"), "Deutschland");
+        Region region = new Region("DE-NRW", "Nordrhein-Westfalen");
         assertEquals(cm.listCollections(region).size(), 1);
     }
 
