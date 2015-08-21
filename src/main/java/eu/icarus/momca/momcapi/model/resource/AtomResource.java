@@ -52,11 +52,11 @@ public abstract class AtomResource extends ExistResource {
     }
 
     @NotNull
-    public Optional<IdUser> getCreator() {
+    public final Optional<IdUser> getCreator() {
         return creator;
     }
 
-    public void setCreator(@Nullable String creator) {
+    public final void setCreator(@Nullable String creator) {
 
         if (creator == null || creator.isEmpty()) {
             this.creator = Optional.empty();
@@ -70,18 +70,18 @@ public abstract class AtomResource extends ExistResource {
     public abstract IdAtomId getId();
 
     @NotNull
-    public String getIdentifier() {
+    public final String getIdentifier() {
         return id.getIdentifier();
     }
 
     public abstract void setIdentifier(@NotNull String identifier);
 
     @NotNull
-    public String getName() {
+    public final String getName() {
         return name;
     }
 
-    public void setName(@NotNull String name) {
+    public final void setName(@NotNull String name) {
 
         if (name.isEmpty()) {
             throw new IllegalArgumentException("The name is not allowed to be an empty string.");
