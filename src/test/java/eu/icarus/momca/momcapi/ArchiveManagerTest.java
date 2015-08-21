@@ -28,7 +28,8 @@ public class ArchiveManagerTest {
 
         IdUser author = new IdUser("admin");
         Country country = new Country(new CountryCode("DE"), "Deutschland");
-        Region region = new Region("DE-BW", "Baden-Württemberg");
+        Region region = new Region("Baden-Württemberg");
+        region.setCode("DE-BW");
         String shortName = "DE-GLAK";
         String name = "Landesarchiv Baden-Württemberg, Abt. Generallandesarchiv Karlsruhe";
         Address address = new Address("Karlsruhe", "01234", "Somewhere");
@@ -130,8 +131,14 @@ public class ArchiveManagerTest {
 
     @Test
     public void testListArchivesForSubdivision() throws Exception {
-        assertTrue(am.listArchives(new Region("DE-BW", "Baden-Württemberg")).isEmpty());
-        assertEquals(am.listArchives(new Region("DE-BY", "Bayern")).size(), 1);
+        Region region1 = new Region("Baden-Württemberg");
+        region1.setCode("DE-BW");
+        Region region2 = new Region("Bayern");
+        region2.setCode("DE-BY");
+
+        assertTrue(am.listArchives(region1).isEmpty());
+        assertEquals(am.listArchives(region2).size(), 1);
+
     }
 
 }

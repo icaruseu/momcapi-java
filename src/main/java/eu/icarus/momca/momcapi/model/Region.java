@@ -1,6 +1,7 @@
 package eu.icarus.momca.momcapi.model;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -10,23 +11,17 @@ import java.util.Optional;
 public class Region {
 
     @NotNull
-    private final Optional<String> code;
+    private Optional<String> code = Optional.empty();
     @NotNull
-    private final String nativeName;
+    private String nativeName;
 
-    public Region(@NotNull String code, @NotNull String nativeName) {
-
-        if (nativeName.isEmpty()) {
-            throw new IllegalArgumentException("The regions native name is not allowed to be an empty string.");
-        }
-
-        this.code = code.isEmpty() ? Optional.empty() : Optional.of(code);
-        this.nativeName = nativeName;
-
+    public Region(@Nullable String code, @NotNull String nativeName) {
+        setNativeName(nativeName);
+        setCode(code);
     }
 
     public Region(@NotNull String nativeName) {
-        this("", nativeName);
+        this(null, nativeName);
     }
 
     @NotNull
@@ -34,9 +29,28 @@ public class Region {
         return code;
     }
 
+    public void setCode(@Nullable String code) {
+
+        if (code == null || code.isEmpty()) {
+            this.code = Optional.empty();
+        } else {
+            this.code = Optional.of(code);
+        }
+
+    }
+
     @NotNull
     public String getNativeName() {
         return nativeName;
+    }
+
+    public void setNativeName(@NotNull String nativeName) {
+
+        if (nativeName.isEmpty()) {
+            throw new IllegalArgumentException("The native name is not allowed to be an empty string.");
+        }
+        this.nativeName = nativeName;
+
     }
 
     @Override

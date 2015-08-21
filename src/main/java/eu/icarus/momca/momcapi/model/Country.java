@@ -8,20 +8,13 @@ import org.jetbrains.annotations.NotNull;
 public class Country {
 
     @NotNull
-    private final CountryCode countryCode;
+    private CountryCode countryCode;
     @NotNull
-    private final String nativeName;
-
+    private String nativeName;
 
     public Country(@NotNull CountryCode countryCode, @NotNull String nativeName) {
-
-        if (nativeName.isEmpty()) {
-            throw new IllegalArgumentException("The native name is not allowed to be an empty string.");
-        }
-
-        this.countryCode = countryCode;
-        this.nativeName = nativeName;
-
+        setNativeName(nativeName);
+        setCountryCode(countryCode);
     }
 
     @NotNull
@@ -29,9 +22,23 @@ public class Country {
         return countryCode;
     }
 
+    public void setCountryCode(@NotNull CountryCode countryCode) {
+        this.countryCode = countryCode;
+    }
+
     @NotNull
     public String getNativeName() {
         return nativeName;
+    }
+
+    public void setNativeName(@NotNull String nativeName) {
+
+        if (nativeName.isEmpty()) {
+            throw new IllegalArgumentException("The native name is not allowed to be an empty string.");
+        }
+
+        this.nativeName = nativeName;
+
     }
 
     @Override
