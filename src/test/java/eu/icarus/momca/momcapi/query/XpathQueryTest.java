@@ -1,7 +1,7 @@
 package eu.icarus.momca.momcapi.query;
 
 import eu.icarus.momca.momcapi.TestUtils;
-import eu.icarus.momca.momcapi.model.ExistResource;
+import eu.icarus.momca.momcapi.model.resource.ExistResource;
 import nu.xom.Nodes;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.BeforeClass;

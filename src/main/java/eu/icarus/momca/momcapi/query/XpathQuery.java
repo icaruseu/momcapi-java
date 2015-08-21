@@ -1,6 +1,6 @@
 package eu.icarus.momca.momcapi.query;
 
-import eu.icarus.momca.momcapi.xml.Namespace;
+import eu.icarus.momca.momcapi.model.xml.Namespace;
 import nu.xom.XPathContext;
 import org.jetbrains.annotations.NotNull;
 

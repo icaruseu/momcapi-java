@@ -1,8 +1,12 @@
 package eu.icarus.momca.momcapi;
 
-import eu.icarus.momca.momcapi.model.*;
+import eu.icarus.momca.momcapi.model.Country;
+import eu.icarus.momca.momcapi.model.Region;
+import eu.icarus.momca.momcapi.model.id.IdArchive;
+import eu.icarus.momca.momcapi.model.resource.Archive;
+import eu.icarus.momca.momcapi.model.resource.ResourceRoot;
+import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
-import eu.icarus.momca.momcapi.xml.atom.AtomId;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;

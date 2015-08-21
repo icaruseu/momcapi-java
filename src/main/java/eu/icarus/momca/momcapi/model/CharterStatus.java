@@ -1,5 +1,7 @@
 package eu.icarus.momca.momcapi.model;
 
+import eu.icarus.momca.momcapi.model.resource.ResourceRoot;
+
 /**
  * The status of a charter and the name of the database root collection associated with the status.
  *

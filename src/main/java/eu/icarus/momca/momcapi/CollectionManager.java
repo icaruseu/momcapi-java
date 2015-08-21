@@ -1,10 +1,16 @@
 package eu.icarus.momca.momcapi;
 
-import eu.icarus.momca.momcapi.model.*;
+import eu.icarus.momca.momcapi.model.Country;
+import eu.icarus.momca.momcapi.model.Region;
+import eu.icarus.momca.momcapi.model.id.IdCollection;
+import eu.icarus.momca.momcapi.model.id.IdUser;
+import eu.icarus.momca.momcapi.model.resource.Collection;
+import eu.icarus.momca.momcapi.model.resource.ExistResource;
+import eu.icarus.momca.momcapi.model.resource.ResourceRoot;
+import eu.icarus.momca.momcapi.model.xml.Namespace;
+import eu.icarus.momca.momcapi.model.xml.atom.AtomEntry;
+import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
-import eu.icarus.momca.momcapi.xml.Namespace;
-import eu.icarus.momca.momcapi.xml.atom.AtomEntry;
-import eu.icarus.momca.momcapi.xml.atom.AtomId;
 import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

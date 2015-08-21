@@ -1,9 +1,16 @@
 package eu.icarus.momca.momcapi;
 
-import eu.icarus.momca.momcapi.model.*;
+import eu.icarus.momca.momcapi.model.ImageAccess;
+import eu.icarus.momca.momcapi.model.id.IdArchive;
+import eu.icarus.momca.momcapi.model.id.IdFond;
+import eu.icarus.momca.momcapi.model.id.IdUser;
+import eu.icarus.momca.momcapi.model.resource.Archive;
+import eu.icarus.momca.momcapi.model.resource.ExistResource;
+import eu.icarus.momca.momcapi.model.resource.Fond;
+import eu.icarus.momca.momcapi.model.resource.ResourceRoot;
+import eu.icarus.momca.momcapi.model.xml.atom.AtomEntry;
+import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
-import eu.icarus.momca.momcapi.xml.atom.AtomEntry;
-import eu.icarus.momca.momcapi.xml.atom.AtomId;
 import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

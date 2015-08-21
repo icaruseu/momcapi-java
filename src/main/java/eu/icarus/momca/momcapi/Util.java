@@ -1,6 +1,6 @@
 package eu.icarus.momca.momcapi;
 
-import eu.icarus.momca.momcapi.xml.atom.AtomId;
+import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
 import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.Element;

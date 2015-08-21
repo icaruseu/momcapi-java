@@ -1,10 +1,10 @@
 package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.exception.MomcaException;
-import eu.icarus.momca.momcapi.model.ExistResource;
-import eu.icarus.momca.momcapi.model.IdUser;
-import eu.icarus.momca.momcapi.model.ResourceRoot;
-import eu.icarus.momca.momcapi.model.User;
+import eu.icarus.momca.momcapi.model.id.IdUser;
+import eu.icarus.momca.momcapi.model.resource.ExistResource;
+import eu.icarus.momca.momcapi.model.resource.ResourceRoot;
+import eu.icarus.momca.momcapi.model.resource.User;
 import eu.icarus.momca.momcapi.query.ExistQuery;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
 import org.exist.security.Account;

@@ -1,6 +1,12 @@
 package eu.icarus.momca.momcapi;
 
-import eu.icarus.momca.momcapi.model.*;
+import eu.icarus.momca.momcapi.model.Country;
+import eu.icarus.momca.momcapi.model.CountryCode;
+import eu.icarus.momca.momcapi.model.Region;
+import eu.icarus.momca.momcapi.model.id.IdCollection;
+import eu.icarus.momca.momcapi.model.id.IdUser;
+import eu.icarus.momca.momcapi.model.resource.Collection;
+import eu.icarus.momca.momcapi.model.resource.ResourceRoot;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 

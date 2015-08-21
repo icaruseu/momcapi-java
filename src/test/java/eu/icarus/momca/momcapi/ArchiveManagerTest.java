@@ -1,6 +1,9 @@
 package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.model.*;
+import eu.icarus.momca.momcapi.model.id.IdArchive;
+import eu.icarus.momca.momcapi.model.id.IdUser;
+import eu.icarus.momca.momcapi.model.resource.Archive;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 

@@ -4,11 +4,11 @@ import eu.icarus.momca.momcapi.exception.MomcaException;
 import eu.icarus.momca.momcapi.model.Country;
 import eu.icarus.momca.momcapi.model.CountryCode;
 import eu.icarus.momca.momcapi.model.Region;
-import eu.icarus.momca.momcapi.model.ResourceRoot;
+import eu.icarus.momca.momcapi.model.resource.ResourceRoot;
+import eu.icarus.momca.momcapi.model.xml.eap.EapCountry;
+import eu.icarus.momca.momcapi.model.xml.eap.EapSubdivision;
 import eu.icarus.momca.momcapi.query.ExistQuery;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
-import eu.icarus.momca.momcapi.xml.eap.EapCountry;
-import eu.icarus.momca.momcapi.xml.eap.EapSubdivision;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
