@@ -29,7 +29,7 @@ public class ArchiveManagerTest {
 
         IdUser author = new IdUser("admin");
         Country country = mc.getCountryManager().getCountry(new CountryCode("DE")).get();
-        Region region = country.getRegions().stream().filter(s -> s.getCode().get().equals("DE-BW")).findFirst().get();
+        Region region = mc.getCountryManager().getRegions(country).stream().filter(s -> s.getCode().get().equals("DE-BW")).findFirst().get();
         String shortName = "DE-GLAK";
         String name = "Landesarchiv Baden-Württemberg, Abt. Generallandesarchiv Karlsruhe";
         Address address = new Address("Karlsruhe", "01234", "Somewhere");

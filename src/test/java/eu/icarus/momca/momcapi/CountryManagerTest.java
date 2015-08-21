@@ -120,21 +120,16 @@ public class CountryManagerTest {
         Country country = countryOptional.get();
         assertEquals(country.getCountryCode().getCode(), "DE");
         assertEquals(country.getNativeName(), "Deutschland");
-        assertEquals(country.getHierarchyXml().toXML(), "<eap:country xmlns:eap=\"http://www.monasterium.net/NS/eap\">" +
-                "<eap:code>DE</eap:code><eap:nativeform>Deutschland</eap:nativeform>" +
-                "<eap:subdivisions><eap:subdivision><eap:code>DE-BW</eap:code><eap:nativeform>" +
-                "Baden-Württemberg</eap:nativeform></eap:subdivision><eap:subdivision><eap:code>DE-BY</eap:code>" +
-                "<eap:nativeform>Bayern</eap:nativeform></eap:subdivision></eap:subdivisions></eap:country>");
+        assertEquals(country.getHierarchyXml().toXML(), "<eap:country xmlns:eap=\"http://www.monasterium.net/NS/eap\"><eap:code>DE</eap:code><eap:nativeform>Deutschland</eap:nativeform><eap:subdivisions><eap:subdivision><eap:code>DE-BY</eap:code><eap:nativeform>Bayern</eap:nativeform></eap:subdivision><eap:subdivision><eap:code>DE-BW</eap:code><eap:nativeform>Baden-Württemberg</eap:nativeform></eap:subdivision><eap:subdivision><eap:code>DE-NRW</eap:code><eap:nativeform>Nordrhein-Westfalen</eap:nativeform></eap:subdivision></eap:subdivisions></eap:country>");
 
         List<Region> regions = country.getRegions();
-        assertEquals(regions.size(), 2);
+        assertEquals(regions.size(), 3);
 
-        assertEquals(regions.get(0).getCode().get(), "DE-BW");
-        assertEquals(regions.get(0).getNativeName(), "Baden-Württemberg");
+        assertEquals(regions.get(0).getCode().get(), "DE-BY");
+        assertEquals(regions.get(0).getNativeName(), "Bayern");
 
-
-        assertEquals(regions.get(1).getCode().get(), "DE-BY");
-        assertEquals(regions.get(1).getNativeName(), "Bayern");
+        assertEquals(regions.get(1).getCode().get(), "DE-BW");
+        assertEquals(regions.get(1).getNativeName(), "Baden-Württemberg");
 
     }
 
@@ -144,8 +139,25 @@ public class CountryManagerTest {
     }
 
     @Test
+    public void testGetRegions() throws Exception {
+
+        Country country = cm.getCountry(new CountryCode("DE")).get();
+        List<Region> regions = cm.getRegions(country);
+
+        assertEquals(regions.size(), 3);
+
+        Region region1 = new Region("DE-BY", "Bayern");
+        Region region2 = new Region("DE-BW", "Baden-Württemberg");
+        Region region3 = new Region("DE-NRW", "Nordrhein-Westfalen");
+
+        assertTrue(regions.contains(region1));
+        assertTrue(regions.contains(region2));
+        assertTrue(regions.contains(region3));
+
+    }
+
+    @Test
     public void testListCountries() throws Exception {
         assertEquals(cm.listCountries().size(), 4);
     }
-
 }

@@ -182,6 +182,30 @@ public class CountryManager extends AbstractManager {
 
     }
 
+    @NotNull
+    public List<Region> getRegions(@NotNull Country country) {
+
+        List<Region> regions = new ArrayList<>(0);
+
+        List<String> regionNames =
+                momcaConnection.queryDatabase(ExistQueryFactory.listRegionsNativeNames(country.getCountryCode()));
+
+        for (String name : regionNames) {
+            List<String> codeList = momcaConnection.queryDatabase(ExistQueryFactory.getRegionCode(name));
+
+            if (codeList.size() > 1) {
+                throw new MomcaException(String.format("There are multiple codes for region '%s': %s", name, codeList.toString()));
+            }
+
+            String code = codeList.isEmpty() ? "" : codeList.get(0);
+            regions.add(new Region(code, name));
+
+        }
+
+        return regions;
+
+    }
+
     private boolean isCodeInUseInHierarchy(@NotNull String code) {
         return !momcaConnection.queryDatabase(ExistQueryFactory.getEapCountryXml(code)).isEmpty();
     }

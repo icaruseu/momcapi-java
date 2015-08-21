@@ -116,7 +116,6 @@ public class CollectionManagerTest {
         String identifier = "newcollection";
         String name = "New collection";
         IdUser author = new IdUser("");
-        ;
         Country country = mc.getCountryManager().getCountry(new CountryCode("DE")).get();
         Region region = country.getRegions().get(0);
         String imageServerAddress = "http://images.icar-us.eu";
@@ -197,7 +196,7 @@ public class CollectionManagerTest {
 
         Collection collection1 = cm.getCollection(new IdCollection("AbteiEberbach")).get();
         assertEquals(collection1.getCountryCode().get().getCode(), "DE");
-        assertEquals(collection1.getRegionName().get(), "Bayern");
+        assertEquals(collection1.getRegionName().get(), "Nordrhein-Westfalen");
         assertEquals(collection1.getId().getContentXml().getText(), "tag:www.monasterium.net,2011:/collection/AbteiEberbach");
         assertEquals(collection1.getIdentifier(), "AbteiEberbach");
         assertEquals(collection1.getName(), "Urkundenbuch der Abtei Eberbach (Google data)");
@@ -233,7 +232,7 @@ public class CollectionManagerTest {
     @Test
     public void testListCollectionsForRegion() throws Exception {
         Country country = mc.getCountryManager().getCountry(new CountryCode("DE")).get();
-        Region region = country.getRegions().stream().filter(r -> r.getNativeName().equals("Bayern")).collect(Collectors.toList()).get(0);
+        Region region = country.getRegions().stream().filter(r -> r.getNativeName().equals("Nordrhein-Westfalen")).collect(Collectors.toList()).get(0);
         assertEquals(cm.listCollections(region).size(), 1);
     }
 

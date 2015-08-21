@@ -29,4 +29,23 @@ public class Region {
         return nativeName;
     }
 
+    @Override
+    public int hashCode() {
+        int result = code.hashCode();
+        result = 31 * result + nativeName.hashCode();
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Region region = (Region) o;
+
+        if (!code.equals(region.code)) return false;
+        return nativeName.equals(region.nativeName);
+
+    }
 }
