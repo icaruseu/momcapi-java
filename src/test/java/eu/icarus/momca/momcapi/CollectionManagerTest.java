@@ -4,8 +4,6 @@ import eu.icarus.momca.momcapi.model.*;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.util.stream.Collectors;
-
 import static org.testng.Assert.*;
 
 /**
@@ -41,7 +39,7 @@ public class CollectionManagerTest {
         assertEquals(coll.getId().getContentXml().getText(), new IdCollection(identifier).getContentXml().getText());
         assertEquals(coll.getName(), name);
         assertEquals(coll.getAuthorId().get(), author);
-        assertEquals(coll.getCountryCode().get(), country.getCountryCode());
+        assertEquals(coll.getCountry().get(), country);
         assertEquals(coll.getRegionName().get(), region.getNativeName());
         assertEquals(coll.getImageServerAddress().get(), imageServerAddress);
         assertEquals(coll.getImageFolderName().get(), imageFolderName);
@@ -65,7 +63,7 @@ public class CollectionManagerTest {
         assertEquals(coll.getId().getContentXml().getText(), new IdCollection(identifier).getContentXml().getText());
         assertEquals(coll.getName(), name);
         assertEquals(coll.getAuthorId().get(), author);
-        assertFalse(coll.getCountryCode().isPresent());
+        assertFalse(coll.getCountry().isPresent());
         assertFalse(coll.getRegionName().isPresent());
         assertFalse(coll.getImageServerAddress().isPresent());
         assertFalse(coll.getImageFolderName().isPresent());
@@ -86,7 +84,7 @@ public class CollectionManagerTest {
         assertEquals(coll.getId().getContentXml().getText(), new IdCollection(identifier).getContentXml().getText());
         assertEquals(coll.getName(), name);
         assertEquals(coll.getAuthorId().get(), author);
-        assertFalse(coll.getCountryCode().isPresent());
+        assertFalse(coll.getCountry().isPresent());
         assertFalse(coll.getRegionName().isPresent());
         assertFalse(coll.getImageServerAddress().isPresent());
         assertFalse(coll.getImageFolderName().isPresent());
@@ -195,7 +193,7 @@ public class CollectionManagerTest {
     public void testGetCollection() throws Exception {
 
         Collection collection1 = cm.getCollection(new IdCollection("AbteiEberbach")).get();
-        assertEquals(collection1.getCountryCode().get().getCode(), "DE");
+        assertEquals(collection1.getCountry().get(), new Country(new CountryCode("DE"), "Deutschland"));
         assertEquals(collection1.getRegionName().get(), "Nordrhein-Westfalen");
         assertEquals(collection1.getId().getContentXml().getText(), "tag:www.monasterium.net,2011:/collection/AbteiEberbach");
         assertEquals(collection1.getIdentifier(), "AbteiEberbach");
@@ -206,7 +204,7 @@ public class CollectionManagerTest {
         assertEquals(collection1.getKeyword().get(), "Retrodigitalisierte Urkundeneditionen");
 
         Collection collection2 = cm.getCollection(new IdCollection("emptycollection")).get();
-        assertFalse(collection2.getCountryCode().isPresent());
+        assertFalse(collection2.getCountry().isPresent());
         assertFalse(collection2.getRegionName().isPresent());
         assertEquals(collection2.getId().getContentXml().getText(), "tag:www.monasterium.net,2011:/collection/emptycollection");
         assertEquals(collection2.getIdentifier(), "emptycollection");

@@ -16,7 +16,7 @@ public class Collection extends MomcaResource {
     @NotNull
     private final Optional<IdUser> authorId;
     @NotNull
-    private final Optional<CountryCode> countryCode;
+    private final Optional<Country> country;
     @NotNull
     private final IdCollection id;
     @NotNull
@@ -34,7 +34,7 @@ public class Collection extends MomcaResource {
 
         super(momcaResource);
 
-        countryCode = initCountryCode();
+        country = initCountry();
         regionName = initRegionName();
         id = initId();
         name = initName();
@@ -51,8 +51,8 @@ public class Collection extends MomcaResource {
     }
 
     @NotNull
-    public Optional<CountryCode> getCountryCode() {
-        return countryCode;
+    public Optional<Country> getCountry() {
+        return country;
     }
 
     @NotNull
@@ -100,16 +100,28 @@ public class Collection extends MomcaResource {
 
     }
 
-    private Optional<CountryCode> initCountryCode() {
+    private Optional<Country> initCountry() {
 
         Optional<CountryCode> code = Optional.empty();
-        List<String> queryResults = queryContentAsList(XpathQuery.QUERY_CEI_COUNTRY_ID);
+        List<String> codeResults = queryContentAsList(XpathQuery.QUERY_CEI_COUNTRY_ID);
 
-        if (queryResults.size() == 1 && !queryResults.get(0).isEmpty()) {
-            code = Optional.of(new CountryCode(queryResults.get(0)));
+        if (codeResults.size() == 1 && !codeResults.get(0).isEmpty()) {
+            code = Optional.of(new CountryCode(codeResults.get(0)));
         }
 
-        return code;
+        Optional<String> name = Optional.empty();
+        List<String> nameResults = queryContentAsList(XpathQuery.QUERY_CEI_COUNTRY_TEXT);
+
+        if (nameResults.size() == 1 && !nameResults.get(0).isEmpty()) {
+            name = Optional.of(nameResults.get(0));
+        }
+
+        Optional<Country> country = Optional.empty();
+        if (code.isPresent() && name.isPresent()) {
+            country = Optional.of(new Country(code.get(), name.get()));
+        }
+
+        return country;
 
     }
 
