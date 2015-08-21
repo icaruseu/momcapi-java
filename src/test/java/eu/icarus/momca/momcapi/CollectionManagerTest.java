@@ -28,7 +28,7 @@ public class CollectionManagerTest {
     }
 
     @Test
-    public void testAddCollection1() throws Exception {
+    public void testAddCollection() throws Exception {
 
         String identifier = "newcollection";
         String name = "A new collection";
@@ -39,127 +39,64 @@ public class CollectionManagerTest {
         String imageFolderName = "img/collections/newcollection";
         String keyword = "Random";
 
-        Collection coll = cm.addCollection(identifier, name, author, country, region, imageServerAddress, imageFolderName, keyword);
-        cm.deleteCollection(coll.getId());
+        Collection collectionToAdd = new Collection(identifier, name);
+        cm.addCollection(collectionToAdd);
 
-        assertEquals(coll.getId().getContentXml().getText(), new IdCollection(identifier).getContentXml().getText());
-        assertEquals(coll.getName(), name);
-        assertEquals(coll.getCreator().get(), author);
-        assertEquals(coll.getCountry().get(), country);
-        assertEquals(coll.getRegionName().get(), region.getNativeName());
-        assertEquals(coll.getImageServerAddress().get(), imageServerAddress);
-        assertEquals(coll.getImageFolderName().get(), imageFolderName);
-        assertEquals(coll.getKeyword().get(), keyword);
+        Collection collectionFromDb = cm.getCollection(collectionToAdd.getId()).get();
+        cm.deleteCollection(collectionToAdd.getId());
 
-    }
+        assertEquals(collectionFromDb.getId(), new IdCollection(identifier));
+        assertEquals(collectionFromDb.getName(), name);
+        assertFalse(collectionFromDb.getCreator().isPresent());
+        assertFalse(collectionFromDb.getCountry().isPresent());
+        assertFalse(collectionFromDb.getRegion().isPresent());
+        assertFalse(collectionFromDb.getImageServerAddress().isPresent());
+        assertFalse(collectionFromDb.getImageFolderName().isPresent());
+        assertFalse(collectionFromDb.getKeyword().isPresent());
 
-    @Test
-    public void testAddCollection2() throws Exception {
+        String newIdentifier = "newIdentifier";
+        String newName = "New name";
 
-        String identifier = "anothercollection";
-        String name = "Another collection";
-        IdUser author = new IdUser("admin");
-        String imageServerAddress = "";
-        String imageFolderName = "";
-        String keyword = "";
+        collectionFromDb.setIdentifier(newIdentifier);
+        collectionFromDb.setName(newName);
+        collectionFromDb.setCreator(author.getIdentifier());
+        collectionFromDb.setCountry(country);
+        collectionFromDb.setRegion(region);
+        collectionFromDb.setImageServerAddress(imageServerAddress);
+        collectionFromDb.setImageFolderName(imageFolderName);
+        collectionFromDb.setKeyword(keyword);
 
-        Collection coll = cm.addCollection(identifier, name, author, null, null, imageServerAddress, imageFolderName, keyword);
-        cm.deleteCollection(coll.getId());
+        cm.addCollection(collectionFromDb);
+        Collection changedCollection = cm.getCollection(collectionFromDb.getId()).get();
+        cm.deleteCollection(collectionFromDb.getId());
 
-        assertEquals(coll.getId().getContentXml().getText(), new IdCollection(identifier).getContentXml().getText());
-        assertEquals(coll.getName(), name);
-        assertEquals(coll.getCreator().get(), author);
-        assertFalse(coll.getCountry().isPresent());
-        assertFalse(coll.getRegionName().isPresent());
-        assertFalse(coll.getImageServerAddress().isPresent());
-        assertFalse(coll.getImageFolderName().isPresent());
-        assertFalse(coll.getKeyword().isPresent());
-
-    }
-
-    @Test
-    public void testAddCollection3() throws Exception {
-
-        String identifier = "yetanothercollection";
-        String name = "Yet another collection";
-        IdUser author = new IdUser("admin");
-
-        Collection coll = cm.addCollection(identifier, name, author, null, null, null, null, null);
-        cm.deleteCollection(coll.getId());
-
-        assertEquals(coll.getId().getContentXml().getText(), new IdCollection(identifier).getContentXml().getText());
-        assertEquals(coll.getName(), name);
-        assertEquals(coll.getCreator().get(), author);
-        assertFalse(coll.getCountry().isPresent());
-        assertFalse(coll.getRegionName().isPresent());
-        assertFalse(coll.getImageServerAddress().isPresent());
-        assertFalse(coll.getImageFolderName().isPresent());
-        assertFalse(coll.getKeyword().isPresent());
+        assertEquals(changedCollection.getId(), new IdCollection(newIdentifier));
+        assertEquals(changedCollection.getName(), newName);
+        assertEquals(changedCollection.getCreator().get(), author);
+        assertEquals(changedCollection.getCountry().get(), country);
+        assertEquals(changedCollection.getRegion().get(), region);
+        assertEquals(changedCollection.getImageServerAddress().get(), imageServerAddress);
+        assertEquals(changedCollection.getImageFolderName().get(), imageFolderName);
+        assertEquals(changedCollection.getKeyword().get(), keyword);
 
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddCollectionAlreadyExisting() throws Exception {
-
-        String identifier = "MedDocBulgEmp";
-        String name = "A new collection";
-        IdUser author = new IdUser("user1.testuser@dev.monasterium.net");
-        Country country = new Country(new CountryCode("DE"), "Deutschland");
-        Region region = new Region("DE-BW", "Baden-Württemberg");
-        String imageServerAddress = "http://images.icar-us.eu";
-        String imageFolderName = "img/collections/newcollection";
-        String keyword = "Random";
-
-        cm.addCollection(identifier, name, author, country, region, imageServerAddress, identifier, keyword);
-
-    }
-
-    @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testAddCollectionWithEmptyAuthor() throws Exception {
-
-        String identifier = "newcollection";
-        String name = "New collection";
-        IdUser author = new IdUser("");
-        Country country = new Country(new CountryCode("DE"), "Deutschland");
-        Region region = new Region("DE-BW", "Baden-Württemberg");
-        String imageServerAddress = "http://images.icar-us.eu";
-        String imageFolderName = "img/collections/newcollection";
-        String keyword = "Random";
-
-        cm.addCollection(identifier, name, author, country, region, imageServerAddress, identifier, keyword);
-
+        Collection collection = new Collection("MedDocBulgEmp", "A new collection");
+        cm.addCollection(collection);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddCollectionWithEmptyIdentifier() throws Exception {
-
-        String identifier = "";
-        String name = "A new collection";
-        IdUser author = new IdUser("user1.testuser@dev.monasterium.net");
-        Country country = new Country(new CountryCode("DE"), "Deutschland");
-        Region region = new Region("DE-BW", "Baden-Württemberg");
-        String imageServerAddress = "http://images.icar-us.eu";
-        String imageFolderName = "img/collections/newcollection";
-        String keyword = "Random";
-
-        cm.addCollection(identifier, name, author, country, region, imageServerAddress, identifier, keyword);
-
+        Collection collection = new Collection("", "A new collection");
+        cm.addCollection(collection);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddCollectionWithEmptyName() throws Exception {
-
-        String identifier = "newcollection";
-        String name = "";
-        IdUser author = new IdUser("user1.testuser@dev.monasterium.net");
-        Country country = new Country(new CountryCode("DE"), "Deutschland");
-        Region region = new Region("DE-BW", "Baden-Württemberg");
-        String imageServerAddress = "http://images.icar-us.eu";
-        String imageFolderName = "img/collections/newcollection";
-        String keyword = "Random";
-
-        cm.addCollection(identifier, name, author, country, region, imageServerAddress, identifier, keyword);
-
+        Collection collection = new Collection("newCollection", "");
+        cm.addCollection(collection);
     }
 
     @Test
@@ -167,15 +104,16 @@ public class CollectionManagerTest {
 
         String identifier = "collectionToDelete";
         String name = "Collection to delete";
-        IdUser author = new IdUser("admin");
+        Collection collection = new Collection(identifier, name);
 
-        Collection coll = cm.addCollection(identifier, name, author, null, null, null, null, null);
+        cm.addCollection(collection);
         mc.addCollection(identifier, ResourceRoot.PUBLIC_CHARTERS.getUri()); // add charters collection to test removal
-        cm.deleteCollection(coll.getId());
+
+        cm.deleteCollection(collection.getId());
 
         assertFalse(cm.getCollection(new IdCollection(identifier)).isPresent());
 
-        // Test if collections are removed
+        // Test if eXist collections are removed
         String collectionUri = ResourceRoot.ARCHIVAL_COLLECTIONS.getUri() + "/" + identifier;
         assertFalse(mc.getCollection(collectionUri).isPresent());
         String chartersLocationUri = ResourceRoot.PUBLIC_CHARTERS.getUri() + "/" + identifier;
@@ -200,7 +138,7 @@ public class CollectionManagerTest {
 
         Collection collection1 = cm.getCollection(new IdCollection("AbteiEberbach")).get();
         assertEquals(collection1.getCountry().get(), new Country(new CountryCode("DE"), "Deutschland"));
-        assertEquals(collection1.getRegionName().get(), "Nordrhein-Westfalen");
+        assertEquals(collection1.getRegion().get(), new Region("DE-NRW", "Nordrhein-Westfalen"));
         assertEquals(collection1.getId().getContentXml().getText(), "tag:www.monasterium.net,2011:/collection/AbteiEberbach");
         assertEquals(collection1.getIdentifier(), "AbteiEberbach");
         assertEquals(collection1.getName(), "Urkundenbuch der Abtei Eberbach (Google data)");
@@ -211,7 +149,7 @@ public class CollectionManagerTest {
 
         Collection collection2 = cm.getCollection(new IdCollection("emptycollection")).get();
         assertFalse(collection2.getCountry().isPresent());
-        assertFalse(collection2.getRegionName().isPresent());
+        assertFalse(collection2.getRegion().isPresent());
         assertEquals(collection2.getId().getContentXml().getText(), "tag:www.monasterium.net,2011:/collection/emptycollection");
         assertEquals(collection2.getIdentifier(), "emptycollection");
         assertEquals(collection2.getName(), "Empty Collection");
@@ -235,7 +173,6 @@ public class CollectionManagerTest {
 
     @Test
     public void testListCollectionsForRegion() throws Exception {
-        Country country = new Country(new CountryCode("DE"), "Deutschland");
         Region region = new Region("DE-NRW", "Nordrhein-Westfalen");
         assertEquals(cm.listCollections(region).size(), 1);
     }

@@ -21,11 +21,12 @@ import java.util.List;
 public class ExistResource {
 
     @NotNull
-    private final String parentUri;
+    private String parentUri;
     @NotNull
-    private final String resourceName;
+    private String resourceName;
+    @Deprecated
     @NotNull
-    private final Document xmlDocument;
+    private Document xmlDocument;
 
     /**
      * Instantiates a new ExistResource with an existing resource.
@@ -44,7 +45,7 @@ public class ExistResource {
      * @param resourceName        The name of the resource, e.g. {@code user.xmlDocument}.
      * @param parentCollectionUri The URI of the collection, the resource is stored in in the database,
      *                            e.g. {@code /db/mom-data/xrx.user}.
-     * @param xmlDocument          The xmlDocument content of the resource as {@code String}.
+     * @param xmlDocument         The xmlDocument content of the resource as {@code String}.
      */
     public ExistResource(@NotNull String resourceName, @NotNull String parentCollectionUri, @NotNull String xmlDocument) {
 
@@ -150,6 +151,24 @@ public class ExistResource {
         }
 
         return result;
+
+    }
+
+    public void setParentUri(@NotNull String parentUri) {
+
+        if (parentUri.isEmpty()) {
+            throw new IllegalArgumentException("The parent URI is not allowed to be an empty string.");
+        }
+        this.parentUri = parentUri;
+
+    }
+
+    public void setResourceName(@NotNull String resourceName) {
+
+        if (resourceName.isEmpty()) {
+            throw new IllegalArgumentException("The resource name is not allowed to be an empty string.");
+        }
+        this.resourceName = resourceName;
 
     }
 

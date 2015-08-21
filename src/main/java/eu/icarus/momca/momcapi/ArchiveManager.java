@@ -4,6 +4,7 @@ import eu.icarus.momca.momcapi.model.Country;
 import eu.icarus.momca.momcapi.model.Region;
 import eu.icarus.momca.momcapi.model.id.IdArchive;
 import eu.icarus.momca.momcapi.model.resource.Archive;
+import eu.icarus.momca.momcapi.model.resource.ExistResource;
 import eu.icarus.momca.momcapi.model.resource.ResourceRoot;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
@@ -30,7 +31,10 @@ public class ArchiveManager extends AbstractManager {
         }
 
         momcaConnection.addCollection(newArchive.getIdentifier(), ResourceRoot.ARCHIVES.getUri());
-        momcaConnection.storeExistResource(newArchive);
+
+        ExistResource resource = new ExistResource(newArchive.getResourceName(), newArchive.getParentUri(),
+                newArchive.toDocument().toXML());
+        momcaConnection.storeExistResource(resource);
 
     }
 
@@ -42,8 +46,8 @@ public class ArchiveManager extends AbstractManager {
             throw new IllegalArgumentException(message);
         }
 
-        momcaConnection.deleteCollection(String.format("%s/%s",
-                ResourceRoot.ARCHIVES.getUri(), idArchive.getIdentifier()));
+        momcaConnection.deleteCollection(String.format("%s/%s", ResourceRoot.ARCHIVES.getUri(),
+                idArchive.getIdentifier()));
         momcaConnection.deleteCollection(String.format("%s/%s",
                 ResourceRoot.ARCHIVAL_FONDS.getUri(), idArchive.getIdentifier()));
 

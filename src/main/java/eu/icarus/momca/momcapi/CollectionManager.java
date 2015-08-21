@@ -3,17 +3,12 @@ package eu.icarus.momca.momcapi;
 import eu.icarus.momca.momcapi.model.Country;
 import eu.icarus.momca.momcapi.model.Region;
 import eu.icarus.momca.momcapi.model.id.IdCollection;
-import eu.icarus.momca.momcapi.model.id.IdUser;
 import eu.icarus.momca.momcapi.model.resource.Collection;
 import eu.icarus.momca.momcapi.model.resource.ExistResource;
 import eu.icarus.momca.momcapi.model.resource.ResourceRoot;
-import eu.icarus.momca.momcapi.model.xml.Namespace;
-import eu.icarus.momca.momcapi.model.xml.atom.AtomEntry;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
-import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,106 +25,18 @@ public class CollectionManager extends AbstractManager {
         super(momcaConnection);
     }
 
-    @NotNull
-    public Collection addCollection(@NotNull String identifier, @NotNull String name, @NotNull IdUser authorId,
-                                    @Nullable Country country, @Nullable Region region, @Nullable String imageServerAddress,
-                                    @Nullable String imageFolderName, @Nullable String keyWord) {
+    public void addCollection(@NotNull Collection collection) {
 
-        IdCollection id = new IdCollection(identifier);
-
-        if (name.isEmpty()) {
-            throw new IllegalArgumentException("The name of the new collection is not allowed to be an empty string.");
-        }
-
-        if (authorId.getIdentifier().isEmpty()) {
-            throw new IllegalArgumentException("AuthorEmail is not allowed to be an empty string.");
-        }
-
-        if (getCollection(id).isPresent()) {
-            String message = String.format("An collection for the id '%s' is already existing.", id.getContentXml().getText());
+        if (getCollection(collection.getId()).isPresent()) {
+            String message = String.format("An collection '%s' is already existing.", collection.getIdentifier());
             throw new IllegalArgumentException(message);
         }
 
-        ExistResource resource = createNewCollectionResource(identifier, name, authorId, country, region,
-                imageServerAddress, imageFolderName, keyWord, id);
+        momcaConnection.addCollection(collection.getIdentifier(), ResourceRoot.ARCHIVAL_COLLECTIONS.getUri());
 
-        momcaConnection.addCollection(identifier, ResourceRoot.ARCHIVAL_COLLECTIONS.getUri());
+        ExistResource resource = new ExistResource(collection.getResourceName(), collection.getParentUri(),
+                collection.toDocument().toXML());
         momcaConnection.storeExistResource(resource);
-
-        return getCollection(id).orElseThrow(RuntimeException::new);
-
-    }
-
-    @NotNull
-    private Element createCeiElement(@NotNull String identifier, @NotNull String name, @Nullable Country country,
-                                     @Nullable Region region, @Nullable String imageServerAddress,
-                                     @Nullable String imageFolderName) {
-
-        String countryElement = (country == null) ?
-                "" :
-                String.format("<cei:country id=\"%s\">%s</cei:country>",
-                        country.getCountryCode().getCode(),
-                        country.getNativeName());
-
-        String regionElement = (region == null) ?
-                "" :
-                String.format("<cei:region %s>%s</cei:region>",
-                        region.getCode().isPresent() ?
-                                String.format("id=\"%s\"", region.getCode().get()) :
-                                "",
-                        region.getNativeName());
-
-        String content = String.format(COLLECTION_TEMPLATE,
-                (imageServerAddress == null) ? "" : imageServerAddress,
-                (imageFolderName == null) ? "" : imageFolderName,
-                identifier,
-                name,
-                countryElement,
-                regionElement);
-
-
-        return Util.parseToElement(content);
-
-    }
-
-    @NotNull
-    private Optional<Element> createKeywordsElement(@Nullable String keyword) {
-
-        Optional<Element> keywordsOptional = Optional.empty();
-
-        if (keyword != null && !keyword.isEmpty()) {
-
-            Element keywordsElement = new Element("xrx:keywords", Namespace.XRX.getUri());
-            Element keywordElement = new Element("xrx:keyword", Namespace.XRX.getUri());
-            keywordElement.appendChild(keyword);
-            keywordsElement.appendChild(keywordElement);
-            keywordsOptional = Optional.of(keywordsElement);
-
-        }
-
-        return keywordsOptional;
-
-    }
-
-    @NotNull
-    private ExistResource createNewCollectionResource(@NotNull String identifier, @NotNull String name,
-                                                      @NotNull IdUser idUser, @Nullable Country country,
-                                                      @Nullable Region region, @Nullable String imageServerAddress,
-                                                      @Nullable String imageFolderName, @Nullable String keyWord,
-                                                      @NotNull IdCollection id) {
-
-        String collectionUri = String.format("%s/%s", ResourceRoot.ARCHIVAL_COLLECTIONS.getUri(), identifier);
-        String resourceName = identifier + ".cei.xml";
-
-        Optional<Element> keywords = createKeywordsElement(keyWord);
-        Element cei = createCeiElement(identifier, name, country, region, imageServerAddress, imageFolderName);
-
-        String now = momcaConnection.queryDatabase(ExistQueryFactory.getCurrentDateTime()).get(0);
-        Element resourceContent = new AtomEntry(id.getContentXml(), idUser.getContentXml(), now, cei);
-
-        keywords.ifPresent(element -> resourceContent.insertChild(element, 6));
-
-        return new ExistResource(resourceName, collectionUri, resourceContent.toXML());
 
     }
 

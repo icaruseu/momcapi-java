@@ -1,9 +1,15 @@
 package eu.icarus.momca.momcapi.model.resource;
 
+import eu.icarus.momca.momcapi.Util;
 import eu.icarus.momca.momcapi.model.Country;
 import eu.icarus.momca.momcapi.model.CountryCode;
+import eu.icarus.momca.momcapi.model.Region;
 import eu.icarus.momca.momcapi.model.id.IdCollection;
+import eu.icarus.momca.momcapi.model.xml.Namespace;
+import eu.icarus.momca.momcapi.model.xml.atom.AtomEntry;
 import eu.icarus.momca.momcapi.query.XpathQuery;
+import nu.xom.Document;
+import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,6 +22,7 @@ import java.util.Optional;
  */
 public class Collection extends AtomResource {
 
+    private static final String COLLECTION_TEMPLATE = "<cei:cei xmlns:cei=\"http://www.monasterium.net/NS/cei\"><cei:teiHeader><cei:fileDesc><cei:sourceDesc><cei:p /></cei:sourceDesc></cei:fileDesc></cei:teiHeader><cei:text type=\"collection\"><cei:front><cei:image_server_address>%s</cei:image_server_address><cei:image_server_folder>%s</cei:image_server_folder><cei:user_name /><cei:password /><cei:provenance abbr=\"%s\">%s%s%s</cei:provenance><cei:publicationStmt><cei:availability n=\"ENRICH\" status=\"restricted\" /></cei:publicationStmt><cei:div type=\"preface\" /></cei:front><cei:group /></cei:text></cei:cei>";
     @NotNull
     private Optional<Country> country = Optional.empty();
     @NotNull
@@ -25,7 +32,11 @@ public class Collection extends AtomResource {
     @NotNull
     private Optional<String> keyword = Optional.empty();
     @NotNull
-    private Optional<String> regionName = Optional.empty();
+    private Optional<Region> region = Optional.empty();
+
+    public Collection(@NotNull String identifier, @NotNull String name) {
+        super(identifier, name, ResourceType.COLLECTION, ResourceRoot.ARCHIVAL_COLLECTIONS);
+    }
 
     public Collection(@NotNull ExistResource existResource) {
 
@@ -33,10 +44,54 @@ public class Collection extends AtomResource {
 
         setCreator(readCreatorFromXml());
         readCountryFromXml().ifPresent(this::setCountry);
-        setRegionName(readRegionNameFromXml());
+        readRegionFromXml().ifPresent(this::setRegion);
         setImageFolderName(readImageFolderNameFromXml());
         setImageServerAddress(readImageServerAddressFromXml());
         setKeyword(readKeywordFromXml());
+
+    }
+
+    @NotNull
+    private Element createCeiElement() {
+
+        String countryElement = country.map(c ->
+                String.format("<cei:country id=\"%s\">%s</cei:country>",
+                        c.getCountryCode().getCode(),
+                        c.getNativeName())).orElse("");
+
+
+        String regionElement = region.map(r ->
+                String.format("<cei:region %s>%s</cei:region>",
+                        r.getCode().isPresent() ? String.format("id=\"%s\"", r.getCode().get()) : "",
+                        r.getNativeName()))
+                .orElse("");
+
+        String ceiElement = String.format(COLLECTION_TEMPLATE,
+                imageServerAddress.orElse(""),
+                imageFolderName.orElse(""),
+                id.getIdentifier(),
+                name,
+                countryElement,
+                regionElement);
+
+
+        return Util.parseToElement(ceiElement);
+
+    }
+
+    @NotNull
+    private Optional<Element> createKeywordsElement() {
+
+        return this.keyword.flatMap(kw -> {
+
+            Element keywordsElement = new Element("xrx:keywords", Namespace.XRX.getUri());
+            Element keywordElement = new Element("xrx:keyword", Namespace.XRX.getUri());
+            keywordElement.appendChild(kw);
+            keywordsElement.appendChild(keywordElement);
+            keywordElement.detach();
+            return Optional.of(keywordElement);
+
+        });
 
     }
 
@@ -66,8 +121,8 @@ public class Collection extends AtomResource {
     }
 
     @NotNull
-    public Optional<String> getRegionName() {
-        return regionName;
+    public Optional<Region> getRegion() {
+        return region;
     }
 
     @NotNull
@@ -136,8 +191,19 @@ public class Collection extends AtomResource {
     }
 
     @NotNull
-    private String readRegionNameFromXml() {
-        return queryUniqueElement(XpathQuery.QUERY_CEI_REGION_TEXT);
+    private Optional<Region> readRegionFromXml() {
+
+        Optional<Region> region = Optional.empty();
+
+        String regionName = queryUniqueElement(XpathQuery.QUERY_CEI_REGION_TEXT);
+        String regionCode = queryUniqueElement(XpathQuery.QUERY_CEI_REGION_ID);
+
+        if (!regionName.isEmpty()) {
+            region = Optional.of(new Region(regionCode, regionName));
+        }
+
+        return region;
+
     }
 
     public void setCountry(@NotNull Country country) {
@@ -152,6 +218,9 @@ public class Collection extends AtomResource {
         }
 
         this.id = new IdCollection(identifier);
+
+        setResourceName(identifier + ResourceType.COLLECTION.getNameSuffix());
+        setParentUri(String.format("%s/%s", ResourceRoot.ARCHIVAL_COLLECTIONS.getUri(), identifier));
 
     }
 
@@ -184,13 +253,27 @@ public class Collection extends AtomResource {
 
     }
 
-    public void setRegionName(@Nullable String regionName) {
+    public void setRegion(@Nullable Region region) {
 
-        if (regionName == null || regionName.isEmpty()) {
-            this.regionName = Optional.empty();
+        if (region == null) {
+            this.region = Optional.empty();
         } else {
-            this.regionName = Optional.of(regionName);
+            this.region = Optional.of(region);
         }
+
+    }
+
+    @NotNull
+    @Override
+    public Document toDocument() {
+
+        Optional<Element> keywords = createKeywordsElement();
+        Element cei = createCeiElement();
+
+        Element resourceContent = new AtomEntry(id.getContentXml(), createAtomAuthor(), AtomResource.localTime(), cei);
+        keywords.ifPresent(element -> resourceContent.insertChild(element, 6));
+
+        return new Document(resourceContent);
 
     }
 

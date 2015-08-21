@@ -2,9 +2,13 @@ package eu.icarus.momca.momcapi.model.resource;
 
 import eu.icarus.momca.momcapi.model.id.IdAtomId;
 import eu.icarus.momca.momcapi.model.id.IdUser;
+import eu.icarus.momca.momcapi.model.xml.atom.AtomAuthor;
+import nu.xom.Document;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 /**
@@ -19,11 +23,12 @@ public abstract class AtomResource extends ExistResource {
     @NotNull
     String name;
 
-    AtomResource(@NotNull String identifier, @NotNull String name, @NotNull ResourceType resourceType) {
+    AtomResource(@NotNull String identifier, @NotNull String name,
+                 @NotNull ResourceType resourceType, @NotNull ResourceRoot resourceRoot) {
 
         super(new ExistResource(
                 identifier + resourceType.getNameSuffix(),
-                ResourceRoot.ARCHIVES.getUri() + "/" + identifier,
+                resourceRoot.getUri() + "/" + identifier,
                 "<empty/>"));
 
         setIdentifier(identifier);
@@ -45,6 +50,16 @@ public abstract class AtomResource extends ExistResource {
         setIdentifier(identifierOptional.get());
         setName(nameOptional.get());
 
+    }
+
+    @NotNull
+    static String localTime() {
+        return ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+    }
+
+    @NotNull
+    AtomAuthor createAtomAuthor() {
+        return getCreator().map(IdUser::getContentXml).orElse(new AtomAuthor(""));
     }
 
     @NotNull
@@ -92,5 +107,9 @@ public abstract class AtomResource extends ExistResource {
         this.name = name;
 
     }
+
+    @Override
+    @NotNull
+    public abstract Document toDocument();
 
 }

@@ -9,9 +9,9 @@ import org.jetbrains.annotations.NotNull;
 public abstract class IdAbstract {
 
     @NotNull
-    final Element contentXml;
+    final String identifier;
     @NotNull
-    private final String identifier;
+    Element contentXml;
 
     public IdAbstract(@NotNull Element contentXml, @NotNull String identifier) {
 
@@ -21,6 +21,18 @@ public abstract class IdAbstract {
 
         this.contentXml = contentXml;
         this.identifier = identifier;
+
+    }
+
+    @Override
+    public boolean equals(Object o) {
+
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        IdAbstract that = (IdAbstract) o;
+
+        return identifier.equals(that.identifier);
 
     }
 
@@ -36,17 +48,4 @@ public abstract class IdAbstract {
     public int hashCode() {
         return identifier.hashCode();
     }
-
-    @Override
-    public boolean equals(Object o) {
-
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        IdAbstract that = (IdAbstract) o;
-
-        return identifier.equals(that.identifier);
-
-    }
-
 }

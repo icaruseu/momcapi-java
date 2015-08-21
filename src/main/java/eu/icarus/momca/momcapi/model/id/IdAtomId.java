@@ -16,7 +16,9 @@ public class IdAtomId extends IdAbstract {
     @NotNull
     @Override
     public final AtomId getContentXml() {
-        return (AtomId) contentXml;
+        AtomId id = ((AtomId) contentXml);
+        id.detach();
+        return id;
     }
 
 }

@@ -6,7 +6,6 @@ import eu.icarus.momca.momcapi.model.Country;
 import eu.icarus.momca.momcapi.model.CountryCode;
 import eu.icarus.momca.momcapi.model.id.IdArchive;
 import eu.icarus.momca.momcapi.model.xml.Namespace;
-import eu.icarus.momca.momcapi.model.xml.atom.AtomAuthor;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomEntry;
 import eu.icarus.momca.momcapi.model.xml.eag.EagDesc;
 import eu.icarus.momca.momcapi.query.XpathQuery;
@@ -17,8 +16,6 @@ import nu.xom.Nodes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,10 +36,8 @@ public class Archive extends AtomResource {
     private Optional<String> regionName = Optional.empty();
 
     public Archive(@NotNull String identifier, @NotNull String name, @NotNull Country country) {
-
-        super(identifier, name, ResourceType.ARCHIVE);
+        super(identifier, name, ResourceType.ARCHIVE, ResourceRoot.ARCHIVES);
         setCountry(country);
-
     }
 
     public Archive(@NotNull ExistResource existResource) {
@@ -185,6 +180,9 @@ public class Archive extends AtomResource {
 
         this.id = new IdArchive(identifier);
 
+        setResourceName(identifier + ResourceType.ARCHIVE.getNameSuffix());
+        setParentUri(String.format("%s/%s", ResourceRoot.ARCHIVES.getUri(), identifier));
+
     }
 
     public void setLogoUrl(@Nullable String logoUrl) {
@@ -207,10 +205,9 @@ public class Archive extends AtomResource {
 
     }
 
+    @Override
     @NotNull
     public Document toDocument() {
-
-        String now = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
 
         String regionNativeName = regionName.orElse("");
         String logoUrlString = logoUrl.orElse("");
@@ -220,9 +217,7 @@ public class Archive extends AtomResource {
         EagDesc eagDesc = new EagDesc(country.getNativeName(), regionNativeName, address, contactInformation, logoUrlString);
         Element eag = createEagElement(id.getIdentifier(), getName(), country.getCountryCode().getCode(), eagDesc);
 
-        AtomAuthor author = getCreator().isPresent() ? getCreator().get().getContentXml() : new AtomAuthor("");
-
-        return new Document(new AtomEntry(id.getContentXml(), author, now, eag));
+        return new Document(new AtomEntry(id.getContentXml(), createAtomAuthor(), AtomResource.localTime(), eag));
 
     }
 
