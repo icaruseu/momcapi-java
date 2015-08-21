@@ -35,8 +35,8 @@ public abstract class AtomResource extends ExistResource {
 
         super(existResource);
 
-        Optional<String> nameOptional = getNameFromXml(existResource);
-        Optional<String> identifierOptional = getIdentifierFromXml(existResource);
+        Optional<String> nameOptional = readNameFromXml(existResource);
+        Optional<String> identifierOptional = readIdentifierFromXml(existResource);
         if (!identifierOptional.isPresent() || !nameOptional.isPresent()) {
             throw new IllegalArgumentException("The provided resource content is not a valid ExistResource: "
                     + existResource.toDocument().toXML());
@@ -52,6 +52,25 @@ public abstract class AtomResource extends ExistResource {
         return creator;
     }
 
+    @NotNull
+    public abstract IdAtomId getId();
+
+    @NotNull
+    public final String getIdentifier() {
+        return id.getIdentifier();
+    }
+
+    @NotNull
+    public final String getName() {
+        return name;
+    }
+
+    @NotNull
+    abstract Optional<String> readIdentifierFromXml(ExistResource existResource);
+
+    @NotNull
+    abstract Optional<String> readNameFromXml(ExistResource existResource);
+
     public final void setCreator(@Nullable String creator) {
 
         if (creator == null || creator.isEmpty()) {
@@ -62,23 +81,7 @@ public abstract class AtomResource extends ExistResource {
 
     }
 
-    @NotNull
-    public abstract IdAtomId getId();
-
-    @NotNull
-    public final String getIdentifier() {
-        return id.getIdentifier();
-    }
-
     public abstract void setIdentifier(@NotNull String identifier);
-
-    @NotNull
-    abstract Optional<String> getIdentifierFromXml(ExistResource existResource);
-
-    @NotNull
-    public final String getName() {
-        return name;
-    }
 
     public final void setName(@NotNull String name) {
 
@@ -89,8 +92,5 @@ public abstract class AtomResource extends ExistResource {
         this.name = name;
 
     }
-
-    @NotNull
-    abstract Optional<String> getNameFromXml(ExistResource existResource);
 
 }

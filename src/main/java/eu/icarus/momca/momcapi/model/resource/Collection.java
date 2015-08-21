@@ -3,9 +3,9 @@ package eu.icarus.momca.momcapi.model.resource;
 import eu.icarus.momca.momcapi.model.Country;
 import eu.icarus.momca.momcapi.model.CountryCode;
 import eu.icarus.momca.momcapi.model.id.IdCollection;
-import eu.icarus.momca.momcapi.model.id.IdUser;
 import eu.icarus.momca.momcapi.query.XpathQuery;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,33 +17,26 @@ import java.util.Optional;
 public class Collection extends AtomResource {
 
     @NotNull
-    private Optional<Country> country;
+    private Optional<Country> country = Optional.empty();
     @NotNull
-    private Optional<String> imageFolderName;
+    private Optional<String> imageFolderName = Optional.empty();
     @NotNull
-    private Optional<String> imageServerAddress;
+    private Optional<String> imageServerAddress = Optional.empty();
     @NotNull
-    private Optional<String> keyword;
+    private Optional<String> keyword = Optional.empty();
     @NotNull
-    private Optional<String> regionName;
+    private Optional<String> regionName = Optional.empty();
 
     public Collection(@NotNull ExistResource existResource) {
 
         super(existResource);
 
-        country = initCountry();
-        regionName = initRegionName();
-        creator = initAuthor();
-        imageFolderName = initImageFolderName();
-        imageServerAddress = initImageServerAddress();
-        keyword = initKeyword();
-
-        Optional<String> identifierOptional = getIdentifierFromXml(existResource);
-        if (!identifierOptional.isPresent()) {
-            throw new IllegalArgumentException("The content of the provided eXist resource is not valid for an eXist resource.");
-        }
-
-        setIdentifier(identifierOptional.get());
+        setCreator(readCreatorFromXml());
+        readCountryFromXml().ifPresent(this::setCountry);
+        setRegionName(readRegionNameFromXml());
+        setImageFolderName(readImageFolderNameFromXml());
+        setImageServerAddress(readImageServerAddressFromXml());
+        setKeyword(readKeywordFromXml());
 
     }
 
@@ -52,47 +45,9 @@ public class Collection extends AtomResource {
         return country;
     }
 
-    public void setCountry(@NotNull Optional<Country> country) {
-        this.country = country;
-    }
-
     @NotNull
     public IdCollection getId() {
         return (IdCollection) id;
-    }
-
-    public void setId(@NotNull IdCollection id) {
-        this.id = id;
-    }
-
-    @Override
-    public void setIdentifier(@NotNull String identifier) {
-
-        if (identifier.isEmpty()) {
-            throw new IllegalArgumentException("The identifier is not allowed to be an empty string.");
-        }
-
-        this.id = new IdCollection(identifier);
-
-    }
-
-    @Override
-    @NotNull
-    Optional<String> getIdentifierFromXml(ExistResource existResource) {
-        List<String> identifierList = existResource.queryContentAsList(XpathQuery.QUERY_CEI_PROVENANCE_ABBR);
-        return identifierList.isEmpty() ? Optional.<String>empty() : Optional.of(identifierList.get(0));
-    }
-
-    @NotNull
-    @Override
-    Optional<String> getNameFromXml(ExistResource existResource) {
-
-        List<String> queryResults = queryContentAsList(XpathQuery.QUERY_CEI_PROVENANCE_TEXT);
-
-        return queryResults.isEmpty() ?
-                Optional.empty() :
-                Optional.of(queryResults.get(0).replaceAll("\\s+", " ")); // Normalize whitespace due to nested elements in the xml content
-
     }
 
     @NotNull
@@ -100,17 +55,9 @@ public class Collection extends AtomResource {
         return imageFolderName;
     }
 
-    public void setImageFolderName(@NotNull Optional<String> imageFolderName) {
-        this.imageFolderName = imageFolderName;
-    }
-
     @NotNull
     public Optional<String> getImageServerAddress() {
         return imageServerAddress;
-    }
-
-    public void setImageServerAddress(@NotNull Optional<String> imageServerAddress) {
-        this.imageServerAddress = imageServerAddress;
     }
 
     @NotNull
@@ -118,31 +65,13 @@ public class Collection extends AtomResource {
         return keyword;
     }
 
-    public void setKeyword(@NotNull Optional<String> keyword) {
-        this.keyword = keyword;
-    }
-
     @NotNull
     public Optional<String> getRegionName() {
         return regionName;
     }
 
-    public void setRegionName(@NotNull Optional<String> regionName) {
-        this.regionName = regionName;
-    }
-
-    private Optional<IdUser> initAuthor() {
-
-        Optional<IdUser> author = Optional.empty();
-        String authorEmail = queryUniqueElement(XpathQuery.QUERY_ATOM_EMAIL);
-        if (!authorEmail.isEmpty()) {
-            author = Optional.of(new IdUser(authorEmail));
-        }
-        return author;
-
-    }
-
-    private Optional<Country> initCountry() {
+    @NotNull
+    private Optional<Country> readCountryFromXml() {
 
         Optional<CountryCode> code = Optional.empty();
         List<String> codeResults = queryContentAsList(XpathQuery.QUERY_CEI_COUNTRY_ID);
@@ -167,50 +96,101 @@ public class Collection extends AtomResource {
 
     }
 
-    private Optional<String> initImageFolderName() {
+    @NotNull
+    private String readCreatorFromXml() {
+        return queryUniqueElement(XpathQuery.QUERY_ATOM_EMAIL);
+    }
 
-        Optional<String> folder = Optional.empty();
-        String folderText = queryUniqueElement(XpathQuery.QUERY_CEI_IMAGE_SERVER_FOLDER);
-        if (!folderText.isEmpty()) {
-            folder = Optional.of(folderText);
-        }
-        return folder;
+    @Override
+    @NotNull
+    Optional<String> readIdentifierFromXml(ExistResource existResource) {
+        List<String> identifierList = existResource.queryContentAsList(XpathQuery.QUERY_CEI_PROVENANCE_ABBR);
+        return identifierList.isEmpty() ? Optional.<String>empty() : Optional.of(identifierList.get(0));
+    }
+
+    @NotNull
+    private String readImageFolderNameFromXml() {
+        return queryUniqueElement(XpathQuery.QUERY_CEI_IMAGE_SERVER_FOLDER);
+    }
+
+    @NotNull
+    private String readImageServerAddressFromXml() {
+        return queryUniqueElement(XpathQuery.QUERY_CEI_IMAGE_SERVER_ADDRESS);
+    }
+
+    @NotNull
+    private String readKeywordFromXml() {
+        return queryUniqueElement(XpathQuery.QUERY_XRX_KEYWORD);
+    }
+
+    @NotNull
+    @Override
+    Optional<String> readNameFromXml(ExistResource existResource) {
+
+        List<String> queryResults = queryContentAsList(XpathQuery.QUERY_CEI_PROVENANCE_TEXT);
+
+        return queryResults.isEmpty() ?
+                Optional.empty() :
+                Optional.of(queryResults.get(0).replaceAll("\\s+", " ")); // Normalize whitespace due to nested elements in the xml content
 
     }
 
-    private Optional<String> initImageServerAddress() {
+    @NotNull
+    private String readRegionNameFromXml() {
+        return queryUniqueElement(XpathQuery.QUERY_CEI_REGION_TEXT);
+    }
 
-        Optional<String> url = Optional.empty();
-        String urlString = queryUniqueElement(XpathQuery.QUERY_CEI_IMAGE_SERVER_ADDRESS);
-        if (!urlString.isEmpty()) {
-            url = Optional.of(urlString);
+    public void setCountry(@NotNull Country country) {
+        this.country = Optional.of(country);
+    }
+
+    @Override
+    public void setIdentifier(@NotNull String identifier) {
+
+        if (identifier.isEmpty()) {
+            throw new IllegalArgumentException("The identifier is not allowed to be an empty string.");
         }
-        return url;
+
+        this.id = new IdCollection(identifier);
 
     }
 
-    private Optional<String> initKeyword() {
+    public void setImageFolderName(@Nullable String imageFolderName) {
 
-        Optional<String> keyword = Optional.empty();
-        String keywordText = queryUniqueElement(XpathQuery.QUERY_XRX_KEYWORD);
-        if (!keywordText.isEmpty()) {
-            keyword = Optional.of(keywordText);
+        if (imageFolderName == null || imageFolderName.isEmpty()) {
+            this.imageFolderName = Optional.empty();
+        } else {
+            this.imageFolderName = Optional.of(imageFolderName);
         }
-        return keyword;
 
     }
 
-    private Optional<String> initRegionName() {
+    public void setImageServerAddress(@Nullable String imageServerAddress) {
 
-        Optional<String> name = Optional.empty();
+        if (imageServerAddress == null || imageServerAddress.isEmpty()) {
+            this.imageServerAddress = Optional.empty();
+        } else {
+            this.imageServerAddress = Optional.of(imageServerAddress);
+        }
+    }
 
-        List<String> queryResults = queryContentAsList(XpathQuery.QUERY_CEI_REGION_TEXT);
+    public void setKeyword(@Nullable String keyword) {
 
-        if (queryResults.size() == 1 && !queryResults.get(0).isEmpty()) {
-            name = Optional.of(queryResults.get(0));
+        if (keyword == null || keyword.isEmpty()) {
+            this.keyword = Optional.empty();
+        } else {
+            this.keyword = Optional.of(keyword);
         }
 
-        return name;
+    }
+
+    public void setRegionName(@Nullable String regionName) {
+
+        if (regionName == null || regionName.isEmpty()) {
+            this.regionName = Optional.empty();
+        } else {
+            this.regionName = Optional.of(regionName);
+        }
 
     }
 

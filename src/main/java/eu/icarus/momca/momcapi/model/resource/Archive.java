@@ -103,6 +103,46 @@ public class Archive extends AtomResource {
         return address;
     }
 
+    @NotNull
+    public Optional<ContactInformation> getContactInformation() {
+        return contactInformation;
+    }
+
+    @NotNull
+    public Country getCountry() {
+        return country;
+    }
+
+    @NotNull
+    @Override
+    public IdArchive getId() {
+        return (IdArchive) id;
+    }
+
+    @NotNull
+    public Optional<String> getLogoUrl() {
+        return logoUrl;
+    }
+
+    @NotNull
+    public Optional<String> getRegionName() {
+        return regionName;
+    }
+
+    @Override
+    @NotNull
+    Optional<String> readIdentifierFromXml(ExistResource existResource) {
+        List<String> identifierList = existResource.queryContentAsList(XpathQuery.QUERY_EAG_REPOSITORID);
+        return identifierList.isEmpty() ? Optional.empty() : Optional.of(identifierList.get(0));
+    }
+
+    @NotNull
+    @Override
+    Optional<String> readNameFromXml(ExistResource existResource) {
+        List<String> nameList = existResource.queryContentAsList(XpathQuery.QUERY_EAG_AUTFORM);
+        return nameList.isEmpty() ? Optional.empty() : Optional.of(nameList.get(0));
+    }
+
     public void setAddress(@Nullable Address address) {
 
         if (address == null ||
@@ -115,11 +155,6 @@ public class Archive extends AtomResource {
         } else {
             this.address = Optional.of(address);
         }
-    }
-
-    @NotNull
-    public Optional<ContactInformation> getContactInformation() {
-        return contactInformation;
     }
 
     public void setContactInformation(@Nullable ContactInformation contactInformation) {
@@ -137,19 +172,8 @@ public class Archive extends AtomResource {
         }
     }
 
-    @NotNull
-    public Country getCountry() {
-        return country;
-    }
-
     public void setCountry(@NotNull Country country) {
         this.country = country;
-    }
-
-    @NotNull
-    @Override
-    public IdArchive getId() {
-        return (IdArchive) id;
     }
 
     @Override
@@ -163,25 +187,6 @@ public class Archive extends AtomResource {
 
     }
 
-    @Override
-    @NotNull
-    Optional<String> getIdentifierFromXml(ExistResource existResource) {
-        List<String> identifierList = existResource.queryContentAsList(XpathQuery.QUERY_EAG_REPOSITORID);
-        return identifierList.isEmpty() ? Optional.empty() : Optional.of(identifierList.get(0));
-    }
-
-    @NotNull
-    @Override
-    Optional<String> getNameFromXml(ExistResource existResource) {
-        List<String> nameList = existResource.queryContentAsList(XpathQuery.QUERY_EAG_AUTFORM);
-        return nameList.isEmpty() ? Optional.empty() : Optional.of(nameList.get(0));
-    }
-
-    @NotNull
-    public Optional<String> getLogoUrl() {
-        return logoUrl;
-    }
-
     public void setLogoUrl(@Nullable String logoUrl) {
 
         if (logoUrl == null || logoUrl.isEmpty()) {
@@ -190,11 +195,6 @@ public class Archive extends AtomResource {
             this.logoUrl = Optional.of(logoUrl);
         }
 
-    }
-
-    @NotNull
-    public Optional<String> getRegionName() {
-        return regionName;
     }
 
     public void setRegionName(@Nullable String regionName) {
