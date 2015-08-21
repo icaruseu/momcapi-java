@@ -31,11 +31,11 @@ public class UserTest {
     private final List<IdCharter> bookmarkedCharters = new ArrayList<>(0);
     @NotNull
     private final List<IdCharter> savedCharters = new ArrayList<>(0);
-    private MomcaResource resource;
+    private ExistResource resource;
 
     @BeforeClass
     public void setUp() throws Exception {
-        resource = new MomcaResource(NAME, PARENT_URI, XML_CONTENT);
+        resource = new ExistResource(NAME, PARENT_URI, XML_CONTENT);
         bookmarkedCharters.add(new IdCharter(new AtomId("tag:www.monasterium.net,2011:/charter/CH-KAE/Urkunden/KAE_Urkunde_Nr_1")));
         savedCharters.add(new IdCharter(new AtomId("tag:www.monasterium.net,2011:/charter/CH-KAE/Urkunden/KAE_Urkunde_Nr_2")));
         savedCharters.add(new IdCharter(new AtomId("tag:www.monasterium.net,2011:/charter/CH-KAE/Urkunden/KAE_Urkunde_Nr_1")));
@@ -51,7 +51,7 @@ public class UserTest {
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConstructorWithWrongXml() throws Exception {
-        MomcaResource wrongResource = new MomcaResource(NAME, PARENT_URI, WRONG_XML_CONTENT);
+        ExistResource wrongResource = new ExistResource(NAME, PARENT_URI, WRONG_XML_CONTENT);
         new User(wrongResource);
     }
 

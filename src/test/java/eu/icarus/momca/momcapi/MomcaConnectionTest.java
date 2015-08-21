@@ -1,6 +1,6 @@
 package eu.icarus.momca.momcapi;
 
-import eu.icarus.momca.momcapi.model.MomcaResource;
+import eu.icarus.momca.momcapi.model.ExistResource;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -53,7 +53,7 @@ public class MomcaConnectionTest {
     @Test
     public void testDeleteExistResource() throws Exception {
 
-        MomcaResource res = new MomcaResource("deleteTest.xml", "/db", "<empty/>");
+        ExistResource res = new ExistResource("deleteTest.xml", "/db", "<empty/>");
         momcaConnection.storeExistResource(res);
         momcaConnection.deleteExistResource(res);
         assertFalse(momcaConnection.getExistResource(res.getResourceName(), res.getParentUri()).isPresent());
@@ -62,7 +62,7 @@ public class MomcaConnectionTest {
 
     @Test
     public void testStoreExistResource() throws Exception {
-        MomcaResource res = new MomcaResource("write@Test.xml", "/db", "<empty/>");
+        ExistResource res = new ExistResource("write@Test.xml", "/db", "<empty/>");
         momcaConnection.storeExistResource(res);
         assertTrue(momcaConnection.getExistResource(res.getResourceName(), res.getParentUri()).isPresent());
         momcaConnection.deleteExistResource(res);

@@ -11,12 +11,12 @@ import java.util.Optional;
 /**
  * Created by daniel on 17.07.2015.
  */
-public class Fond extends MomcaResource {
+public class Fond extends ExistResource {
 
     @NotNull
     private final Optional<URL> dummyImageUrl;
     @NotNull
-    private final Optional<MomcaResource> fondPreferences;
+    private final Optional<ExistResource> fondPreferences;
     @NotNull
     private final IdFond id;
     @NotNull
@@ -26,7 +26,7 @@ public class Fond extends MomcaResource {
     @NotNull
     private final String name;
 
-    public Fond(@NotNull MomcaResource fondResource, @NotNull Optional<MomcaResource> fondPreferences) {
+    public Fond(@NotNull ExistResource fondResource, @NotNull Optional<ExistResource> fondPreferences) {
 
         super(fondResource);
 

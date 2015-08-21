@@ -13,7 +13,7 @@ import java.util.Optional;
  * @author Daniel Jeller
  *         Created on 25.06.2015.
  */
-public class IdCharter extends IdAbstract {
+public class IdCharter extends IdAtomId {
 
     @NotNull
     private final Optional<IdCollection> idCollection;
@@ -97,9 +97,24 @@ public class IdCharter extends IdAbstract {
     }
 
     @NotNull
-    @Override
-    public AtomId getContentXml() {
-        return (AtomId) contentXml;
+    private IdFond getFondFromAtomId(@NotNull AtomId atomId) {
+
+        String[] parts = atomId.getText().split("/");
+        String archiveIdentifier = Util.decode(parts[parts.length - 3]);
+        String fondIdentifier = Util.decode(parts[parts.length - 2]);
+
+        return new IdFond(archiveIdentifier, fondIdentifier);
+
+    }
+
+    @NotNull
+    public Optional<IdCollection> getIdCollection() {
+        return idCollection;
+    }
+
+    @NotNull
+    public Optional<IdFond> getIdFond() {
+        return idFond;
     }
 
     @Override
@@ -121,27 +136,6 @@ public class IdCharter extends IdAbstract {
         if (!idCollection.equals(idCharter.idCollection)) return false;
         return idFond.equals(idCharter.idFond);
 
-    }
-
-    @NotNull
-    private IdFond getFondFromAtomId(@NotNull AtomId atomId) {
-
-        String[] parts = atomId.getText().split("/");
-        String archiveIdentifier = Util.decode(parts[parts.length - 3]);
-        String fondIdentifier = Util.decode(parts[parts.length - 2]);
-
-        return new IdFond(archiveIdentifier, fondIdentifier);
-
-    }
-
-    @NotNull
-    public Optional<IdCollection> getIdCollection() {
-        return idCollection;
-    }
-
-    @NotNull
-    public Optional<IdFond> getIdFond() {
-        return idFond;
     }
 
     public boolean isInFond() {

@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Daniel Jeller
  *         Created on 21.07.2015.
  */
-public class IdFond extends IdAbstract {
+public class IdFond extends IdAtomId {
 
     @NotNull
     private final IdArchive idArchive;
@@ -60,9 +60,8 @@ public class IdFond extends IdAbstract {
     }
 
     @NotNull
-    @Override
-    public AtomId getContentXml() {
-        return (AtomId) contentXml;
+    public IdArchive getIdArchive() {
+        return idArchive;
     }
 
     @Override
@@ -83,11 +82,6 @@ public class IdFond extends IdAbstract {
 
         return idArchive.equals(idFond.idArchive);
 
-    }
-
-    @NotNull
-    public IdArchive getIdArchive() {
-        return idArchive;
     }
 
 }

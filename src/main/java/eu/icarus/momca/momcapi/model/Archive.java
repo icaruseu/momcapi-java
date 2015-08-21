@@ -4,7 +4,6 @@ import eu.icarus.momca.momcapi.query.XpathQuery;
 import eu.icarus.momca.momcapi.xml.Namespace;
 import eu.icarus.momca.momcapi.xml.atom.AtomAuthor;
 import eu.icarus.momca.momcapi.xml.atom.AtomEntry;
-import eu.icarus.momca.momcapi.xml.atom.AtomId;
 import eu.icarus.momca.momcapi.xml.eag.EagDesc;
 import nu.xom.Attribute;
 import nu.xom.Document;
@@ -21,7 +20,7 @@ import java.util.Optional;
 /**
  * Created by daniel on 17.07.2015.
  */
-public class Archive extends MomcaResource {
+public class Archive extends AtomResource {
 
     @NotNull
     private Optional<Address> address = Optional.empty();
@@ -30,51 +29,35 @@ public class Archive extends MomcaResource {
     @NotNull
     private Country country;
     @NotNull
-    private Optional<IdUser> creator = Optional.empty();
-    @NotNull
-    private IdArchive id;
-    @NotNull
     private Optional<String> logoUrl = Optional.empty();
-    @NotNull
-    private String name;
     @NotNull
     private Optional<String> regionName = Optional.empty();
 
     public Archive(@NotNull String identifier, @NotNull String name, @NotNull Country country) {
 
-        super(new MomcaResource(
-                identifier + ResourceType.ARCHIVE.getNameSuffix(),
-                ResourceRoot.ARCHIVES.getUri() + "/" + identifier,
-                "<empty/>"));
-
-        setIdentifier(identifier);
-        setName(name);
+        super(identifier, name, ResourceType.ARCHIVE);
         setCountry(country);
 
     }
 
-    public Archive(@NotNull MomcaResource momcaResource) {
+    public Archive(@NotNull ExistResource existResource) {
 
-        super(momcaResource);
+        super(existResource);
 
-        List<String> identifierList = momcaResource.queryContentAsList(XpathQuery.QUERY_EAG_REPOSITORID);
-        List<String> nameList = momcaResource.queryContentAsList(XpathQuery.QUERY_EAG_AUTFORM);
-        List<String> authorEmailList = momcaResource.queryContentAsList(XpathQuery.QUERY_ATOM_EMAIL);
-        List<String> countryCodeList = momcaResource.queryContentAsList(XpathQuery.QUERY_EAG_COUNTRYCODE);
-        Nodes descNodes = momcaResource.queryContentAsNodes(XpathQuery.QUERY_EAG_DESC);
 
-        if (identifierList.size() != 1 || nameList.size() != 1 || countryCodeList.size() != 1 || descNodes.size() != 1) {
-            throw new IllegalArgumentException("The provided MomcaResource content is not valid for an archive: "
-                    + momcaResource.toDocument().toXML());
+        List<String> authorEmailList = existResource.queryContentAsList(XpathQuery.QUERY_ATOM_EMAIL);
+        List<String> countryCodeList = existResource.queryContentAsList(XpathQuery.QUERY_EAG_COUNTRYCODE);
+        Nodes descNodes = existResource.queryContentAsNodes(XpathQuery.QUERY_EAG_DESC);
+
+        if (countryCodeList.size() != 1 || descNodes.size() != 1) {
+            throw new IllegalArgumentException("The provided ExistResource content is not valid for an archive: "
+                    + existResource.toDocument().toXML());
         }
-
-        setIdentifier(identifierList.get(0));
 
         EagDesc eagDesc = new EagDesc((Element) descNodes.get(0));
 
         setAddress(eagDesc.getAddress());
         setContactInformation(eagDesc.getContactInformation());
-        setName(nameList.get(0));
         setCreator(authorEmailList.isEmpty() ? "" : authorEmailList.get(0));
         setCountry(new Country(new CountryCode(countryCodeList.get(0)), eagDesc.getCountryName()));
         setRegionName(eagDesc.getSubdivisionName().isEmpty() ? "" : eagDesc.getSubdivisionName());
@@ -160,30 +143,12 @@ public class Archive extends MomcaResource {
     }
 
     @NotNull
-    public Optional<IdUser> getCreator() {
-        return creator;
-    }
-
-    public void setCreator(@Nullable String creator) {
-
-        if (creator == null || creator.isEmpty()) {
-            this.creator = Optional.empty();
-        } else {
-            this.creator = Optional.of(new IdUser(creator));
-        }
-
-    }
-
-    @NotNull
+    @Override
     public IdArchive getId() {
-        return id;
+        return (IdArchive) id;
     }
 
-    @NotNull
-    public String getIdentifier() {
-        return id.getIdentifier();
-    }
-
+    @Override
     public void setIdentifier(@NotNull String identifier) {
 
         if (identifier.isEmpty()) {
@@ -210,21 +175,6 @@ public class Archive extends MomcaResource {
     }
 
     @NotNull
-    public String getName() {
-        return name;
-    }
-
-    public void setName(@NotNull String name) {
-
-        if (name.isEmpty()) {
-            throw new IllegalArgumentException("The name is not allowed to be an empty string.");
-        }
-
-        this.name = name;
-
-    }
-
-    @NotNull
     public Optional<String> getRegionName() {
         return regionName;
     }
@@ -240,20 +190,6 @@ public class Archive extends MomcaResource {
     }
 
     @NotNull
-    private IdArchive initId() {
-
-        String idString = queryUniqueElement(XpathQuery.QUERY_ATOM_ID);
-
-        if (idString.isEmpty()) {
-            String errorMessage = String.format("No atom:id in xml content: '%s'", toDocument().toXML());
-            throw new IllegalArgumentException(errorMessage);
-        } else {
-            return new IdArchive(new AtomId(idString));
-        }
-
-    }
-
-    @NotNull
     public Document toDocument() {
 
         String now = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
@@ -264,9 +200,9 @@ public class Archive extends MomcaResource {
         ContactInformation contactInformation = this.contactInformation.orElse(new ContactInformation("", "", "", ""));
 
         EagDesc eagDesc = new EagDesc(country.getNativeName(), regionNativeName, address, contactInformation, logoUrlString);
-        Element eag = createEagElement(id.getIdentifier(), name, country.getCountryCode().getCode(), eagDesc);
+        Element eag = createEagElement(id.getIdentifier(), getName(), country.getCountryCode().getCode(), eagDesc);
 
-        AtomAuthor author = creator.isPresent() ? creator.get().getContentXml() : new AtomAuthor("");
+        AtomAuthor author = getCreator().isPresent() ? getCreator().get().getContentXml() : new AtomAuthor("");
 
         return new Document(new AtomEntry(id.getContentXml(), author, now, eag));
 

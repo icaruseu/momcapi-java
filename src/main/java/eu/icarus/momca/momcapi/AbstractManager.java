@@ -1,7 +1,7 @@
 package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.exception.MomcaException;
-import eu.icarus.momca.momcapi.model.MomcaResource;
+import eu.icarus.momca.momcapi.model.ExistResource;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
 import eu.icarus.momca.momcapi.xml.atom.AtomId;
 import org.jetbrains.annotations.NotNull;
@@ -22,11 +22,11 @@ abstract class AbstractManager {
     }
 
     @NotNull
-    Optional<MomcaResource> getMomcaResource(@NotNull AtomId atomId) {
+    Optional<ExistResource> getMomcaResource(@NotNull AtomId atomId) {
 
         List<String> resourceUris = momcaConnection.queryDatabase(ExistQueryFactory.getResourceUri(atomId, null));
 
-        Optional<MomcaResource> resource = Optional.empty();
+        Optional<ExistResource> resource = Optional.empty();
 
         if (!resourceUris.isEmpty()) {
 
@@ -44,7 +44,7 @@ abstract class AbstractManager {
     }
 
     @NotNull
-    Optional<MomcaResource> getMomcaResource(@NotNull String resourceUri) {
+    Optional<ExistResource> getMomcaResource(@NotNull String resourceUri) {
         String resourceName = Util.getLastUriPart(resourceUri);
         String parentUri = Util.getParentUri(resourceUri);
         return momcaConnection.getExistResource(resourceName, parentUri);

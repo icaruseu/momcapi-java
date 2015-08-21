@@ -31,7 +31,7 @@ import java.util.Optional;
  * @author Daniel Jeller
  *         Created on 25.06.2015.
  */
-public class Charter extends MomcaResource {
+public class Charter extends ExistResource {
 
     @NotNull
     private final Optional<IdUser> author;
@@ -52,14 +52,14 @@ public class Charter extends MomcaResource {
     /**
      * Instantiates a new Charter.
      *
-     * @param momcaResource The eXist-resource that the charter is based on. The XML-content is validated against the <a href="https://github.com/icaruseu/mom-ca/blob/master/my/XRX/src/mom/app/cei/xsd/cei10.xsd">CEI Schema</a>.
+     * @param existResource The eXist-resource that the charter is based on. The XML-content is validated against the <a href="https://github.com/icaruseu/mom-ca/blob/master/my/XRX/src/mom/app/cei/xsd/cei10.xsd">CEI Schema</a>.
      */
-    public Charter(@NotNull MomcaResource momcaResource) {
+    public Charter(@NotNull ExistResource existResource) {
 
-        super(momcaResource);
+        super(existResource);
 
         try {
-            validateCei(momcaResource);
+            validateCei(existResource);
         } catch (@NotNull SAXException | IOException | ParsingException | ParserConfigurationException e) {
             throw new IllegalArgumentException("Failed to validate the resource.", e);
         }
@@ -278,7 +278,7 @@ public class Charter extends MomcaResource {
 
     }
 
-    private void validateCei(@NotNull MomcaResource resource)
+    private void validateCei(@NotNull ExistResource resource)
             throws SAXException, ParserConfigurationException, ParsingException, IOException {
 
         SAXParserFactory factory = SAXParserFactory.newInstance();

@@ -1,7 +1,7 @@
 package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.exception.MomcaException;
-import eu.icarus.momca.momcapi.model.MomcaResource;
+import eu.icarus.momca.momcapi.model.ExistResource;
 import eu.icarus.momca.momcapi.query.ExistQuery;
 import org.exist.xmldb.RemoteCollection;
 import org.exist.xmldb.RemoteCollectionManagementService;
@@ -117,7 +117,7 @@ public class MomcaConnection {
     }
 
     @NotNull
-    private Optional<MomcaResource> createExistResourceFromXMLResource(@NotNull String resourceName, @NotNull String parentCollectionPath, @NotNull XMLResource resource) {
+    private Optional<ExistResource> createExistResourceFromXMLResource(@NotNull String resourceName, @NotNull String parentCollectionPath, @NotNull XMLResource resource) {
 
         String content;
         try {
@@ -125,7 +125,7 @@ public class MomcaConnection {
         } catch (XMLDBException e) {
             throw new MomcaException(String.format("Failed to get content of resource '%s'.", resourceName), e);
         }
-        return Optional.of(new MomcaResource(resourceName, parentCollectionPath, content));
+        return Optional.of(new ExistResource(resourceName, parentCollectionPath, content));
 
     }
 
@@ -144,7 +144,7 @@ public class MomcaConnection {
      *
      * @param resourceToDelete The resource to delete.
      */
-    void deleteExistResource(@NotNull MomcaResource resourceToDelete) {
+    void deleteExistResource(@NotNull ExistResource resourceToDelete) {
         getCollection(resourceToDelete.getParentUri()).ifPresent(parent -> removeResourceInExist(resourceToDelete, parent));
     }
 
@@ -220,10 +220,10 @@ public class MomcaConnection {
      *
      * @param resourceName         The name of the resource, e.g. {@code admin.xml}.
      * @param parentCollectionPath The absolute URI of the parent collection in the database, e.g. {@code /db/mom-data/xrx.user}.
-     * @return The MomcaResource.
+     * @return The ExistResource.
      */
     @NotNull
-    Optional<MomcaResource> getExistResource(@NotNull String resourceName, @NotNull String parentCollectionPath) {
+    Optional<ExistResource> getExistResource(@NotNull String resourceName, @NotNull String parentCollectionPath) {
         return getCollection(parentCollectionPath)
                 .flatMap(collection -> getXMLResource(resourceName, collection)
                         .flatMap(resource -> createExistResourceFromXMLResource(resourceName, parentCollectionPath, resource)));
@@ -335,7 +335,7 @@ public class MomcaConnection {
 
     }
 
-    private void removeResourceInExist(@NotNull MomcaResource resourceToDelete, @NotNull Collection collection) {
+    private void removeResourceInExist(@NotNull ExistResource resourceToDelete, @NotNull Collection collection) {
 
         try {
             Resource res = collection.getResource(findMatchingResource(resourceToDelete.getResourceName(), collection.listResources()));
@@ -349,15 +349,15 @@ public class MomcaConnection {
     }
 
     /**
-     * Stores a MomcaResource in the database.
+     * Stores a ExistResource in the database.
      *
      * @param resource The resource to store in the database. If a resource with the same uri is already existing, it gets overwritten.
      */
-    void storeExistResource(@NotNull MomcaResource resource) {
+    void storeExistResource(@NotNull ExistResource resource) {
         getCollection(resource.getParentUri()).ifPresent(collection -> storeResourceInExist(resource, collection));
     }
 
-    private void storeResourceInExist(@NotNull MomcaResource resource, @NotNull Collection collection) {
+    private void storeResourceInExist(@NotNull ExistResource resource, @NotNull Collection collection) {
 
         try {
 

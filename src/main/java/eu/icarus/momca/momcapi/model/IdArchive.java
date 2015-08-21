@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Daniel Jeller
  *         Created on 20.07.2015.
  */
-public class IdArchive extends IdAbstract {
+public class IdArchive extends IdAtomId {
 
     public IdArchive(@NotNull String identifier) {
         super(initAtomId(identifier), identifier);
@@ -41,12 +41,6 @@ public class IdArchive extends IdAbstract {
     private static String initIdentifier(@NotNull AtomId atomId) {
         String[] idParts = atomId.getText().split("/");
         return Util.decode(idParts[idParts.length - 1]);
-    }
-
-    @NotNull
-    @Override
-    public AtomId getContentXml() {
-        return (AtomId) contentXml;
     }
 
 }

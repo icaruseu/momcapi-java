@@ -1,7 +1,7 @@
 package eu.icarus.momca.momcapi.query;
 
 import eu.icarus.momca.momcapi.TestUtils;
-import eu.icarus.momca.momcapi.model.MomcaResource;
+import eu.icarus.momca.momcapi.model.ExistResource;
 import nu.xom.Nodes;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.BeforeClass;
@@ -23,22 +23,22 @@ public class XpathQueryTest {
     private static final String NAME = "testfile.xml";
     @NotNull
     private static final String PARENT_URI = "/db/mom-data/";
-    private MomcaResource resource;
+    private ExistResource resource;
 
-    private List<String> queryContentAsList(@NotNull MomcaResource resource, @NotNull XpathQuery query)
+    private List<String> queryContentAsList(@NotNull ExistResource resource, @NotNull XpathQuery query)
             throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
 
-        Method queryMethod = MomcaResource.class.
+        Method queryMethod = ExistResource.class.
                 getDeclaredMethod("queryContentAsList", XpathQuery.class);
         queryMethod.setAccessible(true);
         return (List<String>) queryMethod.invoke(resource, query);
 
     }
 
-    private Nodes queryContentAsNodes(@NotNull MomcaResource resource, @NotNull XpathQuery query)
+    private Nodes queryContentAsNodes(@NotNull ExistResource resource, @NotNull XpathQuery query)
             throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
 
-        Method queryMethod = MomcaResource.class.
+        Method queryMethod = ExistResource.class.
                 getDeclaredMethod("queryContentAsNodes", XpathQuery.class);
         queryMethod.setAccessible(true);
         return (Nodes) queryMethod.invoke(resource, query);
@@ -48,7 +48,7 @@ public class XpathQueryTest {
     @BeforeClass
     public void setUp() throws Exception {
         String testXml = TestUtils.getXmlFromResource("XpathQueryTestXml.xml").toXML();
-        resource = new MomcaResource(NAME, PARENT_URI, testXml);
+        resource = new ExistResource(NAME, PARENT_URI, testXml);
     }
 
     @Test

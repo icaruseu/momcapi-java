@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
  * @author Daniel Jeller
  *         Created on 24.06.2015.
  */
-public class User extends MomcaResource {
+public class User extends ExistResource {
 
     @NotNull
     private final IdUser id;
@@ -24,21 +24,21 @@ public class User extends MomcaResource {
     /**
      * Instantiates a new User.
      *
-     * @param momcaResource The eXist Resource of the user in the database.
+     * @param existResource The eXist Resource of the user in the database.
      */
-    public User(@NotNull MomcaResource momcaResource) {
-        this(momcaResource, false);
+    public User(@NotNull ExistResource existResource) {
+        this(existResource, false);
     }
 
     /**
      * Instantiates a new User.
      *
-     * @param momcaResource The eXist Resource of the user in the database.
+     * @param existResource The eXist Resource of the user in the database.
      * @param isInitialized Whether or not the user is already initialized in the database.
      */
-    public User(@NotNull MomcaResource momcaResource, boolean isInitialized) {
+    public User(@NotNull ExistResource existResource, boolean isInitialized) {
 
-        super(momcaResource);
+        super(existResource);
 
         this.id = new IdUser(queryUniqueFieldValue(XpathQuery.QUERY_XRX_EMAIL));
         this.idModerator = new IdUser(queryUniqueFieldValue(XpathQuery.QUERY_XRX_MODERATOR));

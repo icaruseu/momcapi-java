@@ -18,7 +18,7 @@ import java.util.List;
  * @author Daniel Jeller
  *         Created on 24.06.2015.
  */
-public class MomcaResource {
+public class ExistResource {
 
     @NotNull
     private final String parentUri;
@@ -28,25 +28,25 @@ public class MomcaResource {
     private final Document xmlDocument;
 
     /**
-     * Instantiates a new MomcaResource with an existing resource.
+     * Instantiates a new ExistResource with an existing resource.
      *
-     * @param momcaResource The MomcaResource to use.
+     * @param existResource The ExistResource to use.
      */
-    MomcaResource(@NotNull MomcaResource momcaResource) {
-        this.resourceName = momcaResource.getResourceName();
-        this.xmlDocument = momcaResource.toDocument();
-        this.parentUri = momcaResource.getParentUri();
+    ExistResource(@NotNull ExistResource existResource) {
+        this.resourceName = existResource.getResourceName();
+        this.xmlDocument = existResource.toDocument();
+        this.parentUri = existResource.getParentUri();
     }
 
     /**
-     * Instantiates a new MomcaResource.
+     * Instantiates a new ExistResource.
      *
      * @param resourceName        The name of the resource, e.g. {@code user.xmlDocument}.
      * @param parentCollectionUri The URI of the collection, the resource is stored in in the database,
      *                            e.g. {@code /db/mom-data/xrx.user}.
      * @param xmlDocument          The xmlDocument content of the resource as {@code String}.
      */
-    public MomcaResource(@NotNull String resourceName, @NotNull String parentCollectionUri, @NotNull String xmlDocument) {
+    public ExistResource(@NotNull String resourceName, @NotNull String parentCollectionUri, @NotNull String xmlDocument) {
 
         if (resourceName.isEmpty() || parentCollectionUri.isEmpty() || xmlDocument.isEmpty()) {
             throw new IllegalArgumentException("Constructor strings are not allowed to be empty.");
@@ -164,7 +164,7 @@ public class MomcaResource {
     @NotNull
     @Override
     public String toString() {
-        return "MomcaResource{" +
+        return "ExistResource{" +
                 "resourceName='" + resourceName + '\'' +
                 ", xmlDocument=" + xmlDocument +
                 ", parentUri='" + parentUri + '\'' +

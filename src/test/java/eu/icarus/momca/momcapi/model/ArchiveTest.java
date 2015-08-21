@@ -26,7 +26,7 @@ public class ArchiveTest {
 
     @BeforeMethod
     public void setUp() throws Exception {
-        archive1 = new Archive(new MomcaResource("CH-KAE.eag.xml", "/db/mom-data/metadata.archive.public/CH-KAE", CORRECT_XML));
+        archive1 = new Archive(new ExistResource("CH-KAE.eag.xml", "/db/mom-data/metadata.archive.public/CH-KAE", CORRECT_XML));
         archive2 = new Archive(IDENTIFIER, NAME, COUNTRY);
     }
 

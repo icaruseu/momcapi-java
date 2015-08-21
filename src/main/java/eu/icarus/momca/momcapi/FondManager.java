@@ -58,12 +58,12 @@ public class FondManager extends AbstractManager {
 
         String eadName = identifier + ".ead.xml";
         Element eadContent = createEadContent(userId, id.getContentXml(), identifier, name);
-        MomcaResource eadResource = new MomcaResource(eadName, fondCollectionUri, eadContent.toXML());
+        ExistResource eadResource = new ExistResource(eadName, fondCollectionUri, eadContent.toXML());
 
         String preferencesName = identifier + ".preferences.xml";
         Optional<Element> preferencesContent = createPreferencesContent(imageAccess, imagesUrl, dummyImageUrl);
-        Optional<MomcaResource> preferencesResource = preferencesContent.map(element
-                -> new MomcaResource(preferencesName, fondCollectionUri, element.toXML()));
+        Optional<ExistResource> preferencesResource = preferencesContent.map(element
+                -> new ExistResource(preferencesName, fondCollectionUri, element.toXML()));
 
 
         momcaConnection.addCollection(archive.getIdentifier(), ResourceRoot.ARCHIVAL_FONDS.getUri());
@@ -130,12 +130,12 @@ public class FondManager extends AbstractManager {
 
         Optional<Fond> fond = Optional.empty();
 
-        Optional<MomcaResource> fondResource = getMomcaResource(idFond.getContentXml());
+        Optional<ExistResource> fondResource = getMomcaResource(idFond.getContentXml());
 
         if (fondResource.isPresent()) {
 
             String prefsUrl = fondResource.get().getUri().replace("ead", "preferences");
-            Optional<MomcaResource> fondPrefs = getMomcaResource(prefsUrl);
+            Optional<ExistResource> fondPrefs = getMomcaResource(prefsUrl);
 
             fond = Optional.of(new Fond(fondResource.get(), fondPrefs));
 

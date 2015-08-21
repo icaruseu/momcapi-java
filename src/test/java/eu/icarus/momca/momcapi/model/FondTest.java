@@ -23,10 +23,10 @@ public class FondTest {
     @BeforeMethod
     public void setUp() throws Exception {
 
-        MomcaResource fondEad =
-                new MomcaResource("Urkunden.ead.xml", "/db/mom-data/metadata.fond.public/CH-KASchwyz", FOND_EAD_STRING);
-        MomcaResource fondPreferences =
-                new MomcaResource("Urkunden.preferences.xml", "/db/mom-data/metadata.fond.public/CH-KASchwyz", FOND_PREFERENCES_STRING);
+        ExistResource fondEad =
+                new ExistResource("Urkunden.ead.xml", "/db/mom-data/metadata.fond.public/CH-KASchwyz", FOND_EAD_STRING);
+        ExistResource fondPreferences =
+                new ExistResource("Urkunden.preferences.xml", "/db/mom-data/metadata.fond.public/CH-KASchwyz", FOND_PREFERENCES_STRING);
 
         correctFond = new Fond(fondEad, Optional.of(fondPreferences));
 

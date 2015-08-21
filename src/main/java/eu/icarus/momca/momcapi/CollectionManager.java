@@ -44,7 +44,7 @@ public class CollectionManager extends AbstractManager {
             throw new IllegalArgumentException(message);
         }
 
-        MomcaResource resource = createNewCollectionResource(identifier, name, authorId, country, region,
+        ExistResource resource = createNewCollectionResource(identifier, name, authorId, country, region,
                 imageServerAddress, imageFolderName, keyWord, id);
 
         momcaConnection.addCollection(identifier, ResourceRoot.ARCHIVAL_COLLECTIONS.getUri());
@@ -106,7 +106,7 @@ public class CollectionManager extends AbstractManager {
     }
 
     @NotNull
-    private MomcaResource createNewCollectionResource(@NotNull String identifier, @NotNull String name,
+    private ExistResource createNewCollectionResource(@NotNull String identifier, @NotNull String name,
                                                       @NotNull IdUser idUser, @Nullable Country country,
                                                       @Nullable Region region, @Nullable String imageServerAddress,
                                                       @Nullable String imageFolderName, @Nullable String keyWord,
@@ -123,7 +123,7 @@ public class CollectionManager extends AbstractManager {
 
         keywords.ifPresent(element -> resourceContent.insertChild(element, 6));
 
-        return new MomcaResource(resourceName, collectionUri, resourceContent.toXML());
+        return new ExistResource(resourceName, collectionUri, resourceContent.toXML());
 
     }
 

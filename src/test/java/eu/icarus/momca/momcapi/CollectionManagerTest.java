@@ -38,7 +38,7 @@ public class CollectionManagerTest {
 
         assertEquals(coll.getId().getContentXml().getText(), new IdCollection(identifier).getContentXml().getText());
         assertEquals(coll.getName(), name);
-        assertEquals(coll.getAuthorId().get(), author);
+        assertEquals(coll.getCreator().get(), author);
         assertEquals(coll.getCountry().get(), country);
         assertEquals(coll.getRegionName().get(), region.getNativeName());
         assertEquals(coll.getImageServerAddress().get(), imageServerAddress);
@@ -62,7 +62,7 @@ public class CollectionManagerTest {
 
         assertEquals(coll.getId().getContentXml().getText(), new IdCollection(identifier).getContentXml().getText());
         assertEquals(coll.getName(), name);
-        assertEquals(coll.getAuthorId().get(), author);
+        assertEquals(coll.getCreator().get(), author);
         assertFalse(coll.getCountry().isPresent());
         assertFalse(coll.getRegionName().isPresent());
         assertFalse(coll.getImageServerAddress().isPresent());
@@ -83,7 +83,7 @@ public class CollectionManagerTest {
 
         assertEquals(coll.getId().getContentXml().getText(), new IdCollection(identifier).getContentXml().getText());
         assertEquals(coll.getName(), name);
-        assertEquals(coll.getAuthorId().get(), author);
+        assertEquals(coll.getCreator().get(), author);
         assertFalse(coll.getCountry().isPresent());
         assertFalse(coll.getRegionName().isPresent());
         assertFalse(coll.getImageServerAddress().isPresent());
@@ -198,7 +198,7 @@ public class CollectionManagerTest {
         assertEquals(collection1.getId().getContentXml().getText(), "tag:www.monasterium.net,2011:/collection/AbteiEberbach");
         assertEquals(collection1.getIdentifier(), "AbteiEberbach");
         assertEquals(collection1.getName(), "Urkundenbuch der Abtei Eberbach (Google data)");
-        assertFalse(collection1.getAuthorId().isPresent());
+        assertFalse(collection1.getCreator().isPresent());
         assertEquals(collection1.getImageServerAddress().get(), "www.mom-image.uni-koeln.de");
         assertEquals(collection1.getImageFolderName().get(), "google/Teil1/AbteiEberbach");
         assertEquals(collection1.getKeyword().get(), "Retrodigitalisierte Urkundeneditionen");
@@ -209,7 +209,7 @@ public class CollectionManagerTest {
         assertEquals(collection2.getId().getContentXml().getText(), "tag:www.monasterium.net,2011:/collection/emptycollection");
         assertEquals(collection2.getIdentifier(), "emptycollection");
         assertEquals(collection2.getName(), "Empty Collection");
-        assertEquals(collection2.getAuthorId().get().getIdentifier(), "admin");
+        assertEquals(collection2.getCreator().get().getIdentifier(), "admin");
         assertFalse(collection2.getImageServerAddress().isPresent());
         assertFalse(collection2.getImageFolderName().isPresent());
         assertFalse(collection2.getKeyword().isPresent());

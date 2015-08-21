@@ -3,6 +3,7 @@ package eu.icarus.momca.momcapi.model;
 import eu.icarus.momca.momcapi.query.XpathQuery;
 import eu.icarus.momca.momcapi.xml.atom.AtomId;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,12 +12,12 @@ import java.util.Optional;
  * @author daniel
  *         Created on 17.07.2015.
  */
-public class Collection extends MomcaResource {
+public class Collection extends ExistResource {
 
     @NotNull
-    private Optional<IdUser> authorId;
-    @NotNull
     private Optional<Country> country;
+    @NotNull
+    private Optional<IdUser> creator;
     @NotNull
     private IdCollection id;
     @NotNull
@@ -30,15 +31,15 @@ public class Collection extends MomcaResource {
     @NotNull
     private Optional<String> regionName;
 
-    public Collection(@NotNull MomcaResource momcaResource) {
+    public Collection(@NotNull ExistResource existResource) {
 
-        super(momcaResource);
+        super(existResource);
 
         country = initCountry();
         regionName = initRegionName();
         id = initId();
         name = initName();
-        authorId = initAuthor();
+        creator = initAuthor();
         imageFolderName = initImageFolderName();
         imageServerAddress = initImageServerAddress();
         keyword = initKeyword();
@@ -46,18 +47,36 @@ public class Collection extends MomcaResource {
     }
 
     @NotNull
-    public Optional<IdUser> getAuthorId() {
-        return authorId;
+    public Optional<Country> getCountry() {
+        return country;
+    }
+
+    public void setCountry(@NotNull Optional<Country> country) {
+        this.country = country;
     }
 
     @NotNull
-    public Optional<Country> getCountry() {
-        return country;
+    public Optional<IdUser> getCreator() {
+        return creator;
+    }
+
+    public void setCreator(@Nullable String creator) {
+
+        if (creator == null || creator.isEmpty()) {
+            this.creator = Optional.empty();
+        } else {
+            this.creator = Optional.of(new IdUser(creator));
+        }
+
     }
 
     @NotNull
     public IdCollection getId() {
         return id;
+    }
+
+    public void setId(@NotNull IdCollection id) {
+        this.id = id;
     }
 
     public String getIdentifier() {
@@ -69,9 +88,17 @@ public class Collection extends MomcaResource {
         return imageFolderName;
     }
 
+    public void setImageFolderName(@NotNull Optional<String> imageFolderName) {
+        this.imageFolderName = imageFolderName;
+    }
+
     @NotNull
     public Optional<String> getImageServerAddress() {
         return imageServerAddress;
+    }
+
+    public void setImageServerAddress(@NotNull Optional<String> imageServerAddress) {
+        this.imageServerAddress = imageServerAddress;
     }
 
     @NotNull
@@ -79,14 +106,26 @@ public class Collection extends MomcaResource {
         return keyword;
     }
 
+    public void setKeyword(@NotNull Optional<String> keyword) {
+        this.keyword = keyword;
+    }
+
     @NotNull
     public String getName() {
         return name;
     }
 
+    public void setName(@NotNull String name) {
+        this.name = name;
+    }
+
     @NotNull
     public Optional<String> getRegionName() {
         return regionName;
+    }
+
+    public void setRegionName(@NotNull Optional<String> regionName) {
+        this.regionName = regionName;
     }
 
     private Optional<IdUser> initAuthor() {

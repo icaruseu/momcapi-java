@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
  *         Created on 21.07.2015.
  * @see IdCollection
  */
-public class IdMyCollection extends IdAbstract {
+public class IdMyCollection extends IdAtomId {
 
     public IdMyCollection(@NotNull String identifier) {
         super(initAtomId(identifier), identifier);
@@ -44,12 +44,6 @@ public class IdMyCollection extends IdAbstract {
     private static String initIdentifier(@NotNull AtomId atomId) {
         String[] idParts = atomId.getText().split("/");
         return Util.decode(idParts[idParts.length - 1]);
-    }
-
-    @NotNull
-    @Override
-    public AtomId getContentXml() {
-        return (AtomId) contentXml;
     }
 
 }

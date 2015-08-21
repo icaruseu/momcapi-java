@@ -1,8 +1,8 @@
 package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.exception.MomcaException;
+import eu.icarus.momca.momcapi.model.ExistResource;
 import eu.icarus.momca.momcapi.model.IdUser;
-import eu.icarus.momca.momcapi.model.MomcaResource;
 import eu.icarus.momca.momcapi.model.ResourceRoot;
 import eu.icarus.momca.momcapi.model.User;
 import eu.icarus.momca.momcapi.query.ExistQuery;
@@ -68,7 +68,7 @@ public class UserManager extends AbstractManager {
             }
 
             String xmlContent = createUserResourceContent(userName, moderatorName, firstName, lastName);
-            MomcaResource userResource = new MomcaResource(userName + ".xml", ResourceRoot.USER_DATA.getUri(), xmlContent);
+            ExistResource userResource = new ExistResource(userName + ".xml", ResourceRoot.USER_DATA.getUri(), xmlContent);
             momcaConnection.storeExistResource(userResource);
             initializeUser(idUser, password);
 
