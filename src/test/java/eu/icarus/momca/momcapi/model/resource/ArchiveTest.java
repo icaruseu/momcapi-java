@@ -29,11 +29,13 @@ public class ArchiveTest {
     private String REGION_NAME = "Schwyz";
     private Archive archive1;
     private Archive archive2;
+    private Archive archive3;
 
     @BeforeMethod
     public void setUp() throws Exception {
-        archive1 = new Archive(new ExistResource("CH-KAE.eag.xml", "/db/mom-data/metadata.archive.public/CH-KAE", CORRECT_XML));
+        archive1 = new Archive(new IdArchive("CH-KAE"), CORRECT_XML);
         archive2 = new Archive(IDENTIFIER, NAME, COUNTRY);
+        archive3 = new Archive(new ExistResource("CH-KAE.eag.xml", "/db/mom-data/metadata.archive.public/CH-KAE", CORRECT_XML));
     }
 
     @Test
@@ -65,6 +67,22 @@ public class ArchiveTest {
         assertFalse(archive2.getContactInformation().isPresent());
         assertFalse(archive2.getRegionName().isPresent());
         assertFalse(archive2.getLogoUrl().isPresent());
+
+    }
+
+    @Test
+    public void testGetters3() throws Exception {
+
+        assertEquals(archive3.getId(), ID);
+        assertEquals(archive3.getIdentifier(), IDENTIFIER);
+        assertEquals(archive3.getName(), NAME);
+        assertEquals(archive3.getCountry().getCountryCode(), COUNTRY.getCountryCode());
+
+        assertEquals(archive3.getCreator().get(), CREATOR);
+        assertEquals(archive3.getAddress().get(), ADDRESS);
+        assertEquals(archive3.getContactInformation().get(), CONTACT_INFORMATION);
+        assertEquals(archive3.getRegionName().get(), REGION_NAME);
+        assertEquals(archive3.getLogoUrl().get(), LOGO_URL);
 
     }
 

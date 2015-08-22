@@ -40,6 +40,15 @@ public class Archive extends AtomResource {
         setCountry(country);
     }
 
+    public Archive(@NotNull IdArchive id, @NotNull String xmlContent) {
+
+        this(new ExistResource(
+                String.format("%s%s", id.getIdentifier(), ResourceType.ARCHIVE.getNameSuffix()),
+                String.format("%s/%s", ResourceRoot.ARCHIVES.getUri(), id.getIdentifier()),
+                xmlContent));
+
+    }
+
     public Archive(@NotNull ExistResource existResource) {
 
         super(existResource);

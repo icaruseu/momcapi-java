@@ -47,7 +47,6 @@ public class ArchiveManager extends AbstractManager {
 
         });
 
-
         momcaConnection.addCollection(newArchive.getIdentifier(), ResourceRoot.ARCHIVES.getUri());
 
         ExistResource resource = new ExistResource(newArchive.getResourceName(), newArchive.getParentUri(),
@@ -73,7 +72,7 @@ public class ArchiveManager extends AbstractManager {
 
     @NotNull
     public Optional<Archive> getArchive(@NotNull IdArchive idArchive) {
-        return getMomcaResource(idArchive.getContentXml()).map(Archive::new);
+        return getExistResource(idArchive.getContentXml()).map(Archive::new);
     }
 
     @NotNull

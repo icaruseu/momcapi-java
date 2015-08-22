@@ -1,10 +1,8 @@
 package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
-import nu.xom.Builder;
-import nu.xom.Document;
-import nu.xom.Element;
-import nu.xom.ParsingException;
+import eu.icarus.momca.momcapi.query.XpathQuery;
+import nu.xom.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -12,6 +10,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -91,6 +90,13 @@ public class Util {
     }
 
     @NotNull
+    private static XPathContext getxPathContext(@NotNull Element root, @NotNull XpathQuery query) {
+        XPathContext context = XPathContext.makeNamespaceContext(root);
+        query.getNamespaces().forEach(n -> context.addNamespace(n.getPrefix(), n.getUri()));
+        return context;
+    }
+
+    @NotNull
     public static Document parseToDocument(@NotNull String xml) {
 
         Builder builder = new Builder();
@@ -110,6 +116,69 @@ public class Util {
     public static Element parseToElement(@NotNull String xml) {
         Document doc = parseToDocument(xml);
         return (Element) doc.getRootElement().copy();
+    }
+
+    /**
+     * The Xpath Query to execute on the content.
+     *
+     * @param query the query
+     * @return A list of the results as strings.
+     */
+    @NotNull
+    public static List<String> queryXmlToList(@NotNull Element xml, @NotNull XpathQuery query) {
+
+        Nodes nodes = queryXmlToNodes(xml, query);
+        List<String> results = new LinkedList<>();
+
+        for (int i = 0; i < nodes.size(); i++) {
+            results.add(nodes.get(i).getValue());
+        }
+
+        return results;
+
+    }
+
+    /**
+     * Query the resource's XML content.
+     *
+     * @param query The Xpath Query to execute on the content.
+     * @return The nodes containing the results.
+     */
+    @NotNull
+    public static Nodes queryXmlToNodes(@NotNull Element xml, @NotNull XpathQuery query) {
+
+        String queryString = query.asString();
+        XPathContext context = getxPathContext(xml, query);
+
+        return xml.query(queryString, context);
+
+    }
+
+    @NotNull
+    public static String queryXmlToString(@NotNull Element xml, @NotNull XpathQuery query) {
+
+        List<String> queryResults = queryXmlToList(xml, query);
+
+        String result;
+
+        switch (queryResults.size()) {
+
+            case 0:
+                result = "";
+                break;
+
+            case 1:
+                result = queryResults.get(0);
+                break;
+
+            default:
+                String errorMessage = String.format("More than one results for Query '%s'", query.asString());
+                throw new IllegalArgumentException(errorMessage);
+
+        }
+
+        return result;
+
     }
 
     private static void testIfUri(@NotNull String possibleUri) {

@@ -22,7 +22,7 @@ abstract class AbstractManager {
     }
 
     @NotNull
-    Optional<ExistResource> getMomcaResource(@NotNull AtomId atomId) {
+    Optional<ExistResource> getExistResource(@NotNull AtomId atomId) {
 
         List<String> resourceUris = momcaConnection.queryDatabase(ExistQueryFactory.getResourceUri(atomId, null));
 
@@ -35,7 +35,7 @@ abstract class AbstractManager {
                 throw new MomcaException(message);
             }
 
-            resource = getMomcaResource(resourceUris.get(0));
+            resource = getExistResource(resourceUris.get(0));
 
         }
 
@@ -44,7 +44,7 @@ abstract class AbstractManager {
     }
 
     @NotNull
-    Optional<ExistResource> getMomcaResource(@NotNull String resourceUri) {
+    Optional<ExistResource> getExistResource(@NotNull String resourceUri) {
         String resourceName = Util.getLastUriPart(resourceUri);
         String parentUri = Util.getParentUri(resourceUri);
         return momcaConnection.getExistResource(resourceName, parentUri);

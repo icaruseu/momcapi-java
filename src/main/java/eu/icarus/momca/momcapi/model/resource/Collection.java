@@ -38,6 +38,15 @@ public class Collection extends AtomResource {
         super(identifier, name, ResourceType.COLLECTION, ResourceRoot.ARCHIVAL_COLLECTIONS);
     }
 
+    public Collection(@NotNull IdCollection id, @NotNull String xmlContent) {
+
+        this(new ExistResource(
+                String.format("%s%s", id.getIdentifier(), ResourceType.COLLECTION.getNameSuffix()),
+                String.format("%s/%s", ResourceRoot.ARCHIVAL_COLLECTIONS.getUri(), id.getIdentifier()),
+                xmlContent));
+
+    }
+
     public Collection(@NotNull ExistResource existResource) {
 
         super(existResource);
@@ -182,7 +191,8 @@ public class Collection extends AtomResource {
     @Override
     Optional<String> readNameFromXml(ExistResource existResource) {
 
-        List<String> queryResults = queryContentAsList(XpathQuery.QUERY_CEI_PROVENANCE_TEXT);
+        List<String> queryResults =
+                Util.queryXmlToList(toDocument().getRootElement(), XpathQuery.QUERY_CEI_PROVENANCE_TEXT);
 
         return queryResults.isEmpty() ?
                 Optional.empty() :

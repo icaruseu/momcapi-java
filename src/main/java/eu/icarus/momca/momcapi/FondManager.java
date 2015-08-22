@@ -137,12 +137,12 @@ public class FondManager extends AbstractManager {
 
         Optional<Fond> fond = Optional.empty();
 
-        Optional<ExistResource> fondResource = getMomcaResource(idFond.getContentXml());
+        Optional<ExistResource> fondResource = getExistResource(idFond.getContentXml());
 
         if (fondResource.isPresent()) {
 
             String prefsUrl = fondResource.get().getUri().replace("ead", "preferences");
-            Optional<ExistResource> fondPrefs = getMomcaResource(prefsUrl);
+            Optional<ExistResource> fondPrefs = getExistResource(prefsUrl);
 
             fond = Optional.of(new Fond(fondResource.get(), fondPrefs));
 

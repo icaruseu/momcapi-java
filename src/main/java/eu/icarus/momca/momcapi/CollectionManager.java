@@ -58,7 +58,7 @@ public class CollectionManager extends AbstractManager {
 
     @NotNull
     public Optional<Collection> getCollection(@NotNull IdCollection idCollection) {
-        return getMomcaResource(idCollection.getContentXml()).map(Collection::new);
+        return getExistResource(idCollection.getContentXml()).map(Collection::new);
     }
 
     @NotNull
