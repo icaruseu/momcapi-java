@@ -1,5 +1,6 @@
 package eu.icarus.momca.momcapi;
 
+import eu.icarus.momca.momcapi.exception.MomcaException;
 import eu.icarus.momca.momcapi.model.Country;
 import eu.icarus.momca.momcapi.model.Region;
 import eu.icarus.momca.momcapi.model.id.IdArchive;
@@ -29,6 +30,23 @@ public class ArchiveManager extends AbstractManager {
             String message = String.format("The archive '%s' that is to be added already exists.", newArchive.getId());
             throw new IllegalArgumentException(message);
         }
+
+        newArchive.getRegionName().ifPresent(s -> {
+
+            if (momcaConnection.getCountryManager().getRegions(newArchive.getCountry())
+                    .stream().noneMatch(region -> s.equals(region.getNativeName()))
+                    ) {
+
+                String message = String.format("The region of the archive ('%s') to be added is not part of the " +
+                                "archive's country ('%s') in the database.",
+                        newArchive.getRegionName(),
+                        newArchive.getCountry().getNativeName());
+                throw new MomcaException(message);
+
+            }
+
+        });
+
 
         momcaConnection.addCollection(newArchive.getIdentifier(), ResourceRoot.ARCHIVES.getUri());
 

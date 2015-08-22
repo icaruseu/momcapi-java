@@ -1,5 +1,6 @@
 package eu.icarus.momca.momcapi;
 
+import eu.icarus.momca.momcapi.exception.MomcaException;
 import eu.icarus.momca.momcapi.model.*;
 import eu.icarus.momca.momcapi.model.id.IdArchive;
 import eu.icarus.momca.momcapi.model.id.IdUser;
@@ -105,6 +106,16 @@ public class ArchiveManagerTest {
         am.addArchive(new Archive("sarchive", "", new Country(new CountryCode("DE"), "Deutschland")));
     }
 
+    @Test(expectedExceptions = MomcaException.class)
+    public void testAddArchiveWithWrongRegion() throws Exception {
+
+        Archive archive = new Archive("DE-StAM", "Staatsarchiv München",
+                new Country(new CountryCode("DE"), "Deutschland"));
+        archive.setRegionName("Campania");
+        am.addArchive(archive);
+
+    }
+
     @Test
     public void testDeleteArchive() throws Exception {
 
@@ -159,7 +170,7 @@ public class ArchiveManagerTest {
     public void testListArchivesForRegion() throws Exception {
 
         Region region1 = new Region("DE-BW", "Baden-Württemberg");
-        Region region2 = new Region("DE-BY","Bayern");
+        Region region2 = new Region("DE-BY", "Bayern");
 
         assertTrue(am.listArchives(region1).isEmpty());
         assertEquals(am.listArchives(region2).size(), 1);
