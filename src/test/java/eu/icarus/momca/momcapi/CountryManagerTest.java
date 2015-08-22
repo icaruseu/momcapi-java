@@ -148,6 +148,7 @@ public class CountryManagerTest {
 
     @Test
     public void testListCountries() throws Exception {
-        assertEquals(cm.listCountries().size(), 4);
+        assertEquals(cm.listCountries().size(), 5);
     }
+
 }

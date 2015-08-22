@@ -29,57 +29,80 @@ public class ArchiveManagerTest {
     @Test
     public void testAddArchive() throws Exception {
 
-        IdUser author = new IdUser("admin");
-        Country country = new Country(new CountryCode("DE"), "Deutschland");
-        Region region = new Region("Baden-Württemberg");
-        region.setCode("DE-BW");
-        String shortName = "DE-GLAK";
+        String identifier = "DE-GLAK";
         String name = "Landesarchiv Baden-Württemberg, Abt. Generallandesarchiv Karlsruhe";
-        Address address = new Address("Karlsruhe", "01234", "Somewhere");
-        ContactInformation contactInformation =
-                new ContactInformation("http://example.com", "01234557", "0123458952", "alpha@example.com");
+        Country country = new Country(new CountryCode("DE"), "Deutschland");
+
+        Archive archiveToAdd = new Archive(identifier, name, country);
+        am.addArchive(archiveToAdd);
+
+        Optional<Archive> archiveFromDbOptional = am.getArchive(archiveToAdd.getId());
+        am.deleteArchive(archiveToAdd.getId());
+        assertTrue(archiveFromDbOptional.isPresent());
+        Archive archiveFromDb = archiveFromDbOptional.get();
+
+        assertEquals(archiveFromDb.getId(), new IdArchive(identifier));
+        assertEquals(archiveFromDb.getIdentifier(), identifier);
+        assertEquals(archiveFromDb.getCountry(), country);
+        assertFalse(archiveFromDb.getRegionName().isPresent());
+        assertFalse(archiveFromDb.getCreator().isPresent());
+        assertFalse(archiveFromDb.getAddress().isPresent());
+        assertFalse(archiveFromDb.getContactInformation().isPresent());
+        assertFalse(archiveFromDb.getLogoUrl().isPresent());
+
+        String newIdentifier = "CH-BLAK";
+        String newName = "New archive name";
+        IdUser creator = new IdUser("admin");
+        Country newCountry = new Country(new CountryCode("IT"), "Italia");
+        Region region = new Region("IT-CAM", "Campania");
+        Address address = new Address("Napoli", "80138", "Piazzetta del Grande Archivio, 5");
+        ContactInformation contactInformation = new ContactInformation(
+                "http://dev.monasterium.net/mom/IT-ASNA/www.archiviodistatonapoli.it", "0039/ 81 56 38 - 300",
+                "0039/ 81 56 38 - 111", "as-na@beniculturali.it");
         String logoUrl = "http://example.com/image.png";
 
-        Archive newArchive = new Archive(shortName, name, country);
-        newArchive.setCreator(author.getIdentifier());
-        newArchive.setRegionName(region.getNativeName());
-        newArchive.setAddress(address);
-        newArchive.setContactInformation(contactInformation);
-        newArchive.setLogoUrl(logoUrl);
+        archiveFromDb.setIdentifier(newIdentifier);
+        archiveFromDb.setName(newName);
+        archiveFromDb.setCreator(creator.getIdentifier());
+        archiveFromDb.setCountry(newCountry);
+        archiveFromDb.setRegionName(region.getNativeName());
+        archiveFromDb.setAddress(address);
+        archiveFromDb.setContactInformation(contactInformation);
+        archiveFromDb.setLogoUrl(logoUrl);
 
-        am.addArchive(newArchive);
-        Optional<Archive> addedArchiveOptional = am.getArchive(newArchive.getId());
-        am.deleteArchive(newArchive.getId());
+        am.addArchive(archiveFromDb);
+        Optional<Archive> changedArchiveOptional = am.getArchive(archiveFromDb.getId());
+        am.deleteArchive(archiveFromDb.getId());
+        assertTrue(changedArchiveOptional.isPresent());
+        Archive changedArchive = changedArchiveOptional.get();
 
-        assertTrue(addedArchiveOptional.isPresent());
-
-        Archive addedArchive = addedArchiveOptional.get();
-
-        assertEquals(addedArchive.getId().getIdentifier(), shortName);
-
-        assertEquals(addedArchive.getIdentifier(), shortName);
-        assertEquals(addedArchive.getName(), name);
-
-        assertEquals(addedArchive.getCountry().getCountryCode(), country.getCountryCode());
-        assertEquals(addedArchive.getRegionName().get(), region.getNativeName());
-
-        assertEquals(addedArchive.getAddress().get(), address);
-        assertEquals(addedArchive.getContactInformation().get(), contactInformation);
-        assertEquals(addedArchive.getLogoUrl().get(), logoUrl);
+        assertEquals(changedArchive.getId(), new IdArchive(newIdentifier));
+        assertEquals(changedArchive.getIdentifier(), newIdentifier);
+        assertEquals(changedArchive.getName(), newName);
+        assertEquals(changedArchive.getCreator().get(), creator);
+        assertEquals(changedArchive.getCountry(), newCountry);
+        assertEquals(changedArchive.getRegionName().get(), region.getNativeName());
+        assertEquals(changedArchive.getAddress().get(), address);
+        assertEquals(changedArchive.getContactInformation().get(), contactInformation);
+        assertEquals(changedArchive.getLogoUrl().get(), logoUrl);
 
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddArchiveAlreadyExisting() throws Exception {
+        am.addArchive(
+                new Archive("DE-BayHStA", "München, Bayerisches Hauptstaatsarchiv",
+                        new Country(new CountryCode("DE"), "Deutschland")));
+    }
 
-        Country country = new Country(new CountryCode("DE"), "Deutschland");
-        String shortName = "DE-BayHStA";
-        String name = "München, Bayerisches Hauptstaatsarchiv";
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testAddArchiveWithEmptyIdentifier() throws Exception {
+        am.addArchive(new Archive("", "Some Archive", new Country(new CountryCode("DE"), "Deutschland")));
+    }
 
-        Archive newArchive = new Archive(shortName, name, country);
-
-        am.addArchive(newArchive);
-
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testAddArchiveWithEmptyName() throws Exception {
+        am.addArchive(new Archive("sarchive", "", new Country(new CountryCode("DE"), "Deutschland")));
     }
 
     @Test
@@ -133,11 +156,10 @@ public class ArchiveManagerTest {
     }
 
     @Test
-    public void testListArchivesForSubdivision() throws Exception {
-        Region region1 = new Region("Baden-Württemberg");
-        region1.setCode("DE-BW");
-        Region region2 = new Region("Bayern");
-        region2.setCode("DE-BY");
+    public void testListArchivesForRegion() throws Exception {
+
+        Region region1 = new Region("DE-BW", "Baden-Württemberg");
+        Region region2 = new Region("DE-BY","Bayern");
 
         assertTrue(am.listArchives(region1).isEmpty());
         assertEquals(am.listArchives(region2).size(), 1);

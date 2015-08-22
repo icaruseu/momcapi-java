@@ -10,6 +10,8 @@ import eu.icarus.momca.momcapi.model.resource.ResourceRoot;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.util.Optional;
+
 import static org.testng.Assert.*;
 
 /**
@@ -32,18 +34,14 @@ public class CollectionManagerTest {
 
         String identifier = "newcollection";
         String name = "A new collection";
-        IdUser author = new IdUser("user1.testuser@dev.monasterium.net");
-        Country country = new Country(new CountryCode("DE"), "Deutschland");
-        Region region = new Region("DE-BW", "Baden-Württemberg");
-        String imageServerAddress = "http://images.icar-us.eu";
-        String imageFolderName = "img/collections/newcollection";
-        String keyword = "Random";
 
         Collection collectionToAdd = new Collection(identifier, name);
         cm.addCollection(collectionToAdd);
 
-        Collection collectionFromDb = cm.getCollection(collectionToAdd.getId()).get();
+        Optional<Collection> collectionFromDbOptional = cm.getCollection(collectionToAdd.getId());
         cm.deleteCollection(collectionToAdd.getId());
+        assertTrue(collectionFromDbOptional.isPresent());
+        Collection collectionFromDb = collectionFromDbOptional.get();
 
         assertEquals(collectionFromDb.getId(), new IdCollection(identifier));
         assertEquals(collectionFromDb.getName(), name);
@@ -56,10 +54,16 @@ public class CollectionManagerTest {
 
         String newIdentifier = "newIdentifier";
         String newName = "New name";
+        IdUser creator = new IdUser("user1.testuser@dev.monasterium.net");
+        Country country = new Country(new CountryCode("DE"), "Deutschland");
+        Region region = new Region("DE-BW", "Baden-Württemberg");
+        String imageServerAddress = "http://images.icar-us.eu";
+        String imageFolderName = "img/collections/newcollection";
+        String keyword = "Random";
 
         collectionFromDb.setIdentifier(newIdentifier);
         collectionFromDb.setName(newName);
-        collectionFromDb.setCreator(author.getIdentifier());
+        collectionFromDb.setCreator(creator.getIdentifier());
         collectionFromDb.setCountry(country);
         collectionFromDb.setRegion(region);
         collectionFromDb.setImageServerAddress(imageServerAddress);
@@ -67,12 +71,14 @@ public class CollectionManagerTest {
         collectionFromDb.setKeyword(keyword);
 
         cm.addCollection(collectionFromDb);
-        Collection changedCollection = cm.getCollection(collectionFromDb.getId()).get();
+        Optional<Collection> changedCollectionOptional = cm.getCollection(collectionFromDb.getId());
         cm.deleteCollection(collectionFromDb.getId());
+        assertTrue(changedCollectionOptional.isPresent());
+        Collection changedCollection = changedCollectionOptional.get();
 
         assertEquals(changedCollection.getId(), new IdCollection(newIdentifier));
         assertEquals(changedCollection.getName(), newName);
-        assertEquals(changedCollection.getCreator().get(), author);
+        assertEquals(changedCollection.getCreator().get(), creator);
         assertEquals(changedCollection.getCountry().get(), country);
         assertEquals(changedCollection.getRegion().get(), region);
         assertEquals(changedCollection.getImageServerAddress().get(), imageServerAddress);
