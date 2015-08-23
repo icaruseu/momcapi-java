@@ -1,5 +1,6 @@
 package eu.icarus.momca.momcapi.model.id;
 
+import eu.icarus.momca.momcapi.Util;
 import eu.icarus.momca.momcapi.model.resource.ResourceType;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
 import org.jetbrains.annotations.NotNull;
@@ -15,14 +16,19 @@ public class IdAtomId extends IdAbstract {
     }
 
     public IdAtomId(@NotNull AtomId atomIdXml) {
-        super(atomIdXml, atomIdXml.getText().split("/")[atomIdXml.getText().split("/").length - 1]);
+        super(atomIdXml, initIdentifier(atomIdXml));
+    }
+
+    @NotNull
+    private static String initIdentifier(@NotNull AtomId atomId) {
+        String[] idParts = atomId.getText().split("/");
+        return Util.decode(idParts[idParts.length - 1]);
     }
 
     @NotNull
     @Override
     public final AtomId getContentXml() {
-        AtomId id = ((AtomId) contentXml);
-        return id;
+        return ((AtomId) contentXml);
     }
 
     public final ResourceType getType() {

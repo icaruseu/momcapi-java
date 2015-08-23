@@ -23,7 +23,7 @@ public class IdCharter extends IdAtomId {
 
     public IdCharter(@NotNull AtomId atomId) {
 
-        super(atomId, initIdentifier(atomId));
+        super(atomId);
 
         if (getContentXml().getType() != ResourceType.CHARTER) {
             throw new IllegalArgumentException(getContentXml().getText() + " is not a charter atom:id.");
@@ -40,18 +40,22 @@ public class IdCharter extends IdAtomId {
     }
 
     public IdCharter(@NotNull String archiveIdentifier, @NotNull String fondIdentifier, @NotNull String charterIdentifier) {
-        super(initAtomIdForFond(archiveIdentifier, fondIdentifier, charterIdentifier), charterIdentifier);
+        super(initAtomIdForFond(archiveIdentifier, fondIdentifier, charterIdentifier));
         idFond = Optional.of(new IdFond(archiveIdentifier, fondIdentifier));
         idCollection = Optional.empty();
     }
 
     public IdCharter(@NotNull String collectionIdentifier, @NotNull String charterIdentifier) {
-        super(initAtomIdForCollection(collectionIdentifier, charterIdentifier), charterIdentifier);
+        super(initAtomIdForCollection(collectionIdentifier, charterIdentifier));
         idCollection = Optional.of(new IdCollection(collectionIdentifier));
         idFond = Optional.empty();
     }
 
     private static AtomId initAtomIdForCollection(@NotNull String collectionIdentifier, @NotNull String charterIdentifier) {
+
+        if (collectionIdentifier.isEmpty() || charterIdentifier.isEmpty()) {
+            throw new IllegalArgumentException("The identifiers are not allowed to be empty strings.");
+        }
 
         if (collectionIdentifier.contains("/") || charterIdentifier.contains("/")) {
             throw new IllegalArgumentException("One of the identifiers contains '/'" +
@@ -68,6 +72,10 @@ public class IdCharter extends IdAtomId {
 
     private static AtomId initAtomIdForFond(@NotNull String archiveIdentifier, @NotNull String fondIdentifier, @NotNull String charterIdentifier) {
 
+        if (archiveIdentifier.isEmpty() || fondIdentifier.isEmpty() || charterIdentifier.isEmpty()) {
+            throw new IllegalArgumentException("The identifiers are not allowed to be empty strings.");
+        }
+
         if (archiveIdentifier.contains("/") || fondIdentifier.contains("/")) {
             throw new IllegalArgumentException("One of the identifiers contains '/'" +
                     " which is forbidden. Maybe the string is an atom:id text and not just an identifier?");
@@ -82,10 +90,17 @@ public class IdCharter extends IdAtomId {
 
     }
 
-    @NotNull
-    private static String initIdentifier(@NotNull AtomId atomId) {
-        String[] idParts = atomId.getText().split("/");
-        return Util.decode(idParts[idParts.length - 1]);
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        IdCharter idCharter = (IdCharter) o;
+
+        if (!idCollection.equals(idCharter.idCollection)) return false;
+        return idFond.equals(idCharter.idFond);
+
     }
 
     @NotNull
@@ -124,19 +139,6 @@ public class IdCharter extends IdAtomId {
         result = 31 * result + idCollection.hashCode();
         result = 31 * result + idFond.hashCode();
         return result;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-
-        IdCharter idCharter = (IdCharter) o;
-
-        if (!idCollection.equals(idCharter.idCollection)) return false;
-        return idFond.equals(idCharter.idFond);
-
     }
 
     public boolean isInFond() {

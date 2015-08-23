@@ -18,7 +18,7 @@ public class IdFond extends IdAtomId {
 
     public IdFond(@NotNull AtomId atomId) {
 
-        super(atomId, initIdentifier(atomId));
+        super(atomId);
 
         if (getContentXml().getType() != ResourceType.FOND) {
             throw new IllegalArgumentException(getContentXml().getText() + " is not a fond atom:id text.");
@@ -29,11 +29,15 @@ public class IdFond extends IdAtomId {
     }
 
     public IdFond(@NotNull String archiveIdentifier, @NotNull String fondIdentifier) {
-        super(initAtomId(archiveIdentifier, fondIdentifier), fondIdentifier);
+        super(initAtomId(archiveIdentifier, fondIdentifier));
         idArchive = new IdArchive(archiveIdentifier);
     }
 
     private static AtomId initAtomId(@NotNull String archiveIdentifier, @NotNull String fondIdentifier) {
+
+        if (archiveIdentifier.isEmpty() || fondIdentifier.isEmpty()) {
+            throw new IllegalArgumentException("The identifiers are not allowed to be empty strings.");
+        }
 
         if (archiveIdentifier.contains("/") || fondIdentifier.contains("/")) {
             throw new IllegalArgumentException("One of the identifiers contains '/'" +
@@ -48,10 +52,17 @@ public class IdFond extends IdAtomId {
 
     }
 
-    @NotNull
-    private static String initIdentifier(@NotNull AtomId atomId) {
-        String[] idParts = atomId.getText().split("/");
-        return Util.decode(idParts[idParts.length - 1]);
+    @Override
+    public boolean equals(Object o) {
+
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        IdFond idFond = (IdFond) o;
+
+        return idArchive.equals(idFond.idArchive);
+
     }
 
     @NotNull
@@ -70,19 +81,6 @@ public class IdFond extends IdAtomId {
         int result = super.hashCode();
         result = 31 * result + idArchive.hashCode();
         return result;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-
-        IdFond idFond = (IdFond) o;
-
-        return idArchive.equals(idFond.idArchive);
-
     }
 
 }

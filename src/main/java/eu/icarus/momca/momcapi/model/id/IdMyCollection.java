@@ -1,6 +1,5 @@
 package eu.icarus.momca.momcapi.model.id;
 
-import eu.icarus.momca.momcapi.Util;
 import eu.icarus.momca.momcapi.model.resource.ResourceType;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +21,7 @@ public class IdMyCollection extends IdAtomId {
 
     public IdMyCollection(@NotNull AtomId atomId) {
 
-        super(atomId, initIdentifier(atomId));
+        super(atomId);
 
         if (getContentXml().getType() != ResourceType.MY_COLLECTION) {
             throw new IllegalArgumentException(getContentXml().getText() + " is not a myCollection atom:id text.");
@@ -39,12 +38,6 @@ public class IdMyCollection extends IdAtomId {
 
         return new AtomId(String.join("/", AtomId.DEFAULT_PREFIX, ResourceType.MY_COLLECTION.getNameInId(), identifier));
 
-    }
-
-    @NotNull
-    private static String initIdentifier(@NotNull AtomId atomId) {
-        String[] idParts = atomId.getText().split("/");
-        return Util.decode(idParts[idParts.length - 1]);
     }
 
 }

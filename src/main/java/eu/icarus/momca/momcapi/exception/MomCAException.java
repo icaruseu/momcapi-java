@@ -4,8 +4,6 @@ import org.jetbrains.annotations.NotNull;
 
 
 /**
- * A MomCA-exception.
- *
  * @author Daniel Jeller
  *         Created on 25.06.2015.
  */

@@ -1,6 +1,5 @@
 package eu.icarus.momca.momcapi.model.id;
 
-import eu.icarus.momca.momcapi.Util;
 import eu.icarus.momca.momcapi.model.resource.ResourceType;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
 import org.jetbrains.annotations.NotNull;
@@ -17,12 +16,12 @@ import org.jetbrains.annotations.NotNull;
 public class IdCollection extends IdAtomId {
 
     public IdCollection(@NotNull String identifier) {
-        super(initAtomId(identifier), identifier);
+        super(initAtomId(identifier));
     }
 
     public IdCollection(@NotNull AtomId atomId) {
 
-        super(atomId, initIdentifier(atomId));
+        super(atomId);
 
         if (getContentXml().getType() != ResourceType.COLLECTION) {
             throw new IllegalArgumentException(getContentXml().getText() + " is not a collection atom:id text.");
@@ -39,12 +38,6 @@ public class IdCollection extends IdAtomId {
 
         return new AtomId(String.join("/", AtomId.DEFAULT_PREFIX, ResourceType.COLLECTION.getNameInId(), identifier));
 
-    }
-
-    @NotNull
-    private static String initIdentifier(@NotNull AtomId atomId) {
-        String[] idParts = atomId.getText().split("/");
-        return Util.decode(idParts[idParts.length - 1]);
     }
 
 }
