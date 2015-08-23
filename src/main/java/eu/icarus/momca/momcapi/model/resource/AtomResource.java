@@ -1,9 +1,11 @@
 package eu.icarus.momca.momcapi.model.resource;
 
+import eu.icarus.momca.momcapi.Util;
 import eu.icarus.momca.momcapi.model.id.*;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomAuthor;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
 import eu.icarus.momca.momcapi.query.XpathQuery;
+import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -100,6 +102,20 @@ public abstract class AtomResource extends ExistResource {
     @NotNull
     public final String getIdentifier() {
         return id.getIdentifier();
+    }
+
+    @NotNull
+    Optional<IdUser> readCreatorFromXml(@NotNull Element xml) {
+
+        Optional<IdUser> result = Optional.empty();
+        String queryResult = Util.queryXmlToString(xml, XpathQuery.QUERY_ATOM_EMAIL);
+
+        if (!queryResult.isEmpty()) {
+            result = Optional.of(new IdUser(queryResult));
+        }
+
+        return result;
+
     }
 
     public final void setCreator(@Nullable String creator) {

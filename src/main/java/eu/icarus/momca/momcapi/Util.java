@@ -12,6 +12,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Utility functions.
@@ -151,6 +152,20 @@ public class Util {
         XPathContext context = getxPathContext(xml, query);
 
         return xml.query(queryString, context);
+
+    }
+
+    @NotNull
+    public static Optional<String> queryXmlToOptional(@NotNull Element xml, @NotNull XpathQuery query) {
+
+        String queryResult = queryXmlToString(xml, query);
+        Optional<String> result = Optional.empty();
+
+        if (!queryResult.isEmpty()) {
+            result = Optional.of(queryResult);
+        }
+
+        return result;
 
     }
 

@@ -16,94 +16,83 @@ import static org.testng.Assert.assertFalse;
  */
 public class CollectionTest {
 
+    private static final Country COUNTRY = new Country(new CountryCode("DE"), "Deutschland");
+    private static final IdUser CREATOR = new IdUser("user1.testuser@dev.monasterium.net");
+    private static final String IDENTIFIER = "MedDocBulgEmp";
+    private static final String IMAGE_FOLDER_NAME = "img/collections/MedDocBulgEmp";
+    private static final String IMAGE_SERVER_ADDRESS = "http://images.icar-us.eu";
+    private static final String KEYWORD = "Random";
+    private static final String NAME = "Documents of Bulgaria";
+    private static final Region REGION = new Region("DE-BW", "Baden-Württemberg");
+    private static final String XML = "<?xml version=\"1.0\"?>\n<atom:entry xmlns:atom=\"http://www.w3.org/2005/Atom\"><atom:id>tag:www.monasterium.net,2011:/collection/MedDocBulgEmp</atom:id><atom:title /><atom:published>2015-08-22T20:05:58.053+02:00</atom:published><atom:updated>2015-08-22T20:05:58.053+02:00</atom:updated><atom:author><atom:email>user1.testuser@dev.monasterium.net</atom:email></atom:author><app:control xmlns:app=\"http://www.w3.org/2007/app\"><app:draft>no</app:draft></app:control><xrx:keyword xmlns:xrx=\"http://www.monasterium.net/NS/xrx\">Random</xrx:keyword><atom:content type=\"application/xml\"><cei:cei xmlns:cei=\"http://www.monasterium.net/NS/cei\"><cei:teiHeader><cei:fileDesc><cei:sourceDesc><cei:p /></cei:sourceDesc></cei:fileDesc></cei:teiHeader><cei:text type=\"collection\"><cei:front><cei:image_server_address>http://images.icar-us.eu</cei:image_server_address><cei:image_server_folder>img/collections/MedDocBulgEmp</cei:image_server_folder><cei:user_name /><cei:password /><cei:provenance abbr=\"MedDocBulgEmp\">Documents of Bulgaria<cei:country id=\"DE\">Deutschland</cei:country><cei:region id=\"DE-BW\">Baden-Württemberg</cei:region></cei:provenance><cei:publicationStmt><cei:availability n=\"ENRICH\" status=\"restricted\" /></cei:publicationStmt><cei:div type=\"preface\" /></cei:front><cei:group /></cei:text></cei:cei></atom:content></atom:entry>";
     private Collection collection;
-    private Country country = new Country(new CountryCode("DE"), "Deutschland");
-    private IdUser creator = new IdUser("user1.testuser@dev.monasterium.net");
-    private String identifier = "MedDocBulgEmp";
-    private String imageFolderName = "img/collections/MedDocBulgEmp";
-    private String imageServerAddress = "http://images.icar-us.eu";
-    private String keyword = "Random";
-    private String name = "Documents of Bulgaria";
-    private Region region = new Region("DE-BW", "Baden-Württemberg");
     private ExistResource resource;
-    private String xml = "<?xml version=\"1.0\"?>\n<atom:entry xmlns:atom=\"http://www.w3.org/2005/Atom\"><atom:id>tag:www.monasterium.net,2011:/collection/MedDocBulgEmp</atom:id><atom:title /><atom:published>2015-08-22T20:05:58.053+02:00</atom:published><atom:updated>2015-08-22T20:05:58.053+02:00</atom:updated><atom:author><atom:email>user1.testuser@dev.monasterium.net</atom:email></atom:author><app:control xmlns:app=\"http://www.w3.org/2007/app\"><app:draft>no</app:draft></app:control><xrx:keyword xmlns:xrx=\"http://www.monasterium.net/NS/xrx\">Random</xrx:keyword><atom:content type=\"application/xml\"><cei:cei xmlns:cei=\"http://www.monasterium.net/NS/cei\"><cei:teiHeader><cei:fileDesc><cei:sourceDesc><cei:p /></cei:sourceDesc></cei:fileDesc></cei:teiHeader><cei:text type=\"collection\"><cei:front><cei:image_server_address>http://images.icar-us.eu</cei:image_server_address><cei:image_server_folder>img/collections/MedDocBulgEmp</cei:image_server_folder><cei:user_name /><cei:password /><cei:provenance abbr=\"MedDocBulgEmp\">Documents of Bulgaria<cei:country id=\"DE\">Deutschland</cei:country><cei:region id=\"DE-BW\">Baden-Württemberg</cei:region></cei:provenance><cei:publicationStmt><cei:availability n=\"ENRICH\" status=\"restricted\" /></cei:publicationStmt><cei:div type=\"preface\" /></cei:front><cei:group /></cei:text></cei:cei></atom:content></atom:entry>";
 
     @BeforeMethod
     public void setUp() throws Exception {
 
-        collection = new Collection(identifier, name);
-        collection.setCreator(creator.getIdentifier());
-        collection.setCountry(country);
-        collection.setRegion(region);
-        collection.setImageServerAddress(imageServerAddress);
-        collection.setImageFolderName(imageFolderName);
-        collection.setKeyword(keyword);
+        collection = new Collection(IDENTIFIER, NAME);
+        collection.setCreator(CREATOR.getIdentifier());
+        collection.setCountry(COUNTRY);
+        collection.setRegion(REGION);
+        collection.setImageServerAddress(IMAGE_SERVER_ADDRESS);
+        collection.setImageFolderName(IMAGE_FOLDER_NAME);
+        collection.setKeyword(KEYWORD);
 
         resource = new ExistResource(
-                String.format("%s%s", identifier, ResourceType.COLLECTION.getNameSuffix()),
-                String.format("%s/%s", ResourceRoot.ARCHIVAL_COLLECTIONS, identifier),
-                xml);
+                String.format("%s%s", IDENTIFIER, ResourceType.COLLECTION.getNameSuffix()),
+                String.format("%s/%s", ResourceRoot.ARCHIVAL_COLLECTIONS, IDENTIFIER),
+                XML);
 
     }
 
     @Test
     public void testConstructor() throws Exception {
 
+        assertEquals(collection.getName(), NAME);
+        assertEquals(collection.getCountry().get(), COUNTRY);
+        assertEquals(collection.getIdentifier(), IDENTIFIER);
+        assertEquals(collection.getId(), new IdCollection(IDENTIFIER));
+        assertEquals(collection.getImageFolderName().get(), IMAGE_FOLDER_NAME);
+        assertEquals(collection.getImageServerAddress().get(), IMAGE_SERVER_ADDRESS);
+        assertEquals(collection.getKeyword().get(), KEYWORD);
+        assertEquals(collection.getRegion().get(), REGION);
+
         collection = new Collection(resource);
-        assertEquals(collection.getName(), name);
-        assertEquals(collection.getCountry().get(), country);
-        assertEquals(collection.getIdentifier(), identifier);
-        assertEquals(collection.getId(), new IdCollection(identifier));
-        assertEquals(collection.getImageFolderName().get(), imageFolderName);
-        assertEquals(collection.getImageServerAddress().get(), imageServerAddress);
-        assertEquals(collection.getKeyword().get(), keyword);
-        assertEquals(collection.getRegion().get(), region);
+        assertEquals(collection.getName(), NAME);
+        assertEquals(collection.getCountry().get(), COUNTRY);
+        assertEquals(collection.getIdentifier(), IDENTIFIER);
+        assertEquals(collection.getId(), new IdCollection(IDENTIFIER));
+        assertEquals(collection.getImageFolderName().get(), IMAGE_FOLDER_NAME);
+        assertEquals(collection.getImageServerAddress().get(), IMAGE_SERVER_ADDRESS);
+        assertEquals(collection.getKeyword().get(), KEYWORD);
+        assertEquals(collection.getRegion().get(), REGION);
 
-        collection = new Collection(new IdCollection(identifier), resource.toXML());
-        assertEquals(collection.getName(), name);
-        assertEquals(collection.getCountry().get(), country);
-        assertEquals(collection.getIdentifier(), identifier);
-        assertEquals(collection.getId(), new IdCollection(identifier));
-        assertEquals(collection.getImageFolderName().get(), imageFolderName);
-        assertEquals(collection.getImageServerAddress().get(), imageServerAddress);
-        assertEquals(collection.getKeyword().get(), keyword);
-        assertEquals(collection.getRegion().get(), region);
+        collection = new Collection(new IdCollection(IDENTIFIER), XML);
+        assertEquals(collection.getName(), NAME);
+        assertEquals(collection.getCountry().get(), COUNTRY);
+        assertEquals(collection.getIdentifier(), IDENTIFIER);
+        assertEquals(collection.getId(), new IdCollection(IDENTIFIER));
+        assertEquals(collection.getImageFolderName().get(), IMAGE_FOLDER_NAME);
+        assertEquals(collection.getImageServerAddress().get(), IMAGE_SERVER_ADDRESS);
+        assertEquals(collection.getKeyword().get(), KEYWORD);
+        assertEquals(collection.getRegion().get(), REGION);
+
+        collection = new Collection(collection);
+        assertEquals(collection.getName(), NAME);
+        assertEquals(collection.getCountry().get(), COUNTRY);
+        assertEquals(collection.getIdentifier(), IDENTIFIER);
+        assertEquals(collection.getId(), new IdCollection(IDENTIFIER));
+        assertEquals(collection.getImageFolderName().get(), IMAGE_FOLDER_NAME);
+        assertEquals(collection.getImageServerAddress().get(), IMAGE_SERVER_ADDRESS);
+        assertEquals(collection.getKeyword().get(), KEYWORD);
+        assertEquals(collection.getRegion().get(), REGION);
 
     }
 
-    @Test
-    public void testGetCountry() throws Exception {
-        assertEquals(collection.getCountry().get(), country);
-    }
-
-    @Test
-    public void testGetId() throws Exception {
-        assertEquals(collection.getId(), new IdCollection(identifier));
-    }
-
-    @Test
-    public void testGetImageFolderName() throws Exception {
-        assertEquals(collection.getImageFolderName().get(), imageFolderName);
-    }
-
-    @Test
-    public void testGetImageServerAddress() throws Exception {
-        assertEquals(collection.getImageServerAddress().get(), imageServerAddress);
-    }
-
-    @Test
-    public void testGetKeyword() throws Exception {
-        assertEquals(collection.getKeyword().get(), keyword);
-    }
-
-    @Test
-    public void testGetName() throws Exception {
-        assertEquals(collection.getName(), name);
-    }
-
-    @Test
-    public void testGetRegion() throws Exception {
-        assertEquals(collection.getRegion().get(), region);
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testConstructorWithoutName() throws Exception {
+        new Collection(IDENTIFIER, "");
     }
 
     @Test
@@ -170,9 +159,10 @@ public class CollectionTest {
     @Test
     public void testSetName() throws Exception {
         String newName = "New name";
-        collection.setName(name);
-        assertEquals(collection.getName(), name);
+        collection.setName(NAME);
+        assertEquals(collection.getName(), NAME);
     }
+
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testSetNameEmpty() throws Exception {

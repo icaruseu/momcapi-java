@@ -1,5 +1,6 @@
 package eu.icarus.momca.momcapi.model.resource;
 
+import eu.icarus.momca.momcapi.Util;
 import eu.icarus.momca.momcapi.model.Address;
 import eu.icarus.momca.momcapi.model.ContactInformation;
 import eu.icarus.momca.momcapi.model.Country;
@@ -16,7 +17,6 @@ import nu.xom.Nodes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -63,23 +63,23 @@ public class Archive extends AtomResource {
 
         super(existResource);
 
-        List<String> authorEmailList = existResource.queryContentAsList(XpathQuery.QUERY_ATOM_EMAIL);
-        List<String> countryCodeList = existResource.queryContentAsList(XpathQuery.QUERY_EAG_COUNTRYCODE);
-        Nodes descNodes = existResource.queryContentAsNodes(XpathQuery.QUERY_EAG_DESC);
+        Element xml = toDocument().getRootElement();
+        Nodes descNodes = Util.queryXmlToNodes(xml, XpathQuery.QUERY_EAG_DESC);
+        EagDesc eagDesc = new EagDesc((Element) descNodes.get(0));
 
-        if (countryCodeList.size() != 1 || descNodes.size() != 1) {
+        if (descNodes.size() != 1) {
             throw new IllegalArgumentException("The provided ExistResource content is not valid for an archive: "
                     + existResource.toDocument().toXML());
         }
 
-        EagDesc eagDesc = new EagDesc((Element) descNodes.get(0));
-
-        setAddress(eagDesc.getAddress());
-        setContactInformation(eagDesc.getContactInformation());
-        setCreator(authorEmailList.isEmpty() ? "" : authorEmailList.get(0));
-        setCountry(new Country(new CountryCode(countryCodeList.get(0)), eagDesc.getCountryName()));
-        setRegionName(eagDesc.getSubdivisionName().isEmpty() ? "" : eagDesc.getSubdivisionName());
-        setLogoUrl(eagDesc.getLogoUrl().isEmpty() ? "" : eagDesc.getLogoUrl());
+        this.name = Util.queryXmlToOptional(xml, XpathQuery.QUERY_EAG_AUTFORM)
+                .orElseThrow(IllegalArgumentException::new);
+        this.country = readCountryFromXml(xml, eagDesc).orElseThrow(IllegalArgumentException::new);
+        this.regionName = readRegionNameFromXml(eagDesc);
+        this.creator = readCreatorFromXml(xml);
+        this.address = readAddressFromXml(eagDesc);
+        this.contactInformation = readContactInformationFromXml(eagDesc);
+        this.logoUrl = readLogoUrlFromXml(eagDesc);
 
     }
 
@@ -149,20 +149,48 @@ public class Archive extends AtomResource {
     }
 
     @NotNull
-    Optional<String> readNameFromXml(ExistResource existResource) {
-        List<String> nameList = existResource.queryContentAsList(XpathQuery.QUERY_EAG_AUTFORM);
-        return nameList.isEmpty() ? Optional.empty() : Optional.of(nameList.get(0));
+    private Optional<Address> readAddressFromXml(@NotNull EagDesc eagDesc) {
+        Address address = eagDesc.getAddress();
+        return address.isEmpty() ? Optional.empty() : Optional.of(address);
+    }
+
+    @NotNull
+    private Optional<ContactInformation> readContactInformationFromXml(@NotNull EagDesc eagDesc) {
+        ContactInformation contactInformation = eagDesc.getContactInformation();
+        return contactInformation.isEmpty() ? Optional.empty() : Optional.of(contactInformation);
+    }
+
+    @NotNull
+    private Optional<Country> readCountryFromXml(@NotNull Element xml, @NotNull EagDesc eagDesc) {
+
+        String countryCode = Util.queryXmlToString(xml, XpathQuery.QUERY_EAG_COUNTRYCODE);
+        String countryName = eagDesc.getCountryName();
+
+        Optional<Country> country = Optional.empty();
+
+        if (!countryCode.isEmpty() && !countryName.isEmpty()) {
+            country = Optional.of(new Country(new CountryCode(countryCode), countryName));
+        }
+
+        return country;
+
+    }
+
+    @NotNull
+    private Optional<String> readLogoUrlFromXml(@NotNull EagDesc eagDesc) {
+        String logoUrl = eagDesc.getLogoUrl();
+        return logoUrl.isEmpty() ? Optional.empty() : Optional.of(logoUrl);
+    }
+
+    @NotNull
+    private Optional<String> readRegionNameFromXml(@NotNull EagDesc eagDesc) {
+        return eagDesc.getSubdivisionName().isEmpty() ? Optional.empty() : Optional.of(eagDesc.getSubdivisionName());
     }
 
     public void setAddress(@Nullable Address address) {
 
-        if (address == null ||
-                (address.getStreet().isEmpty() &&
-                        address.getMunicipality().isEmpty() &&
-                        address.getMunicipality().isEmpty())) {
-
+        if (address == null || address.isEmpty()) {
             this.address = Optional.empty();
-
         } else {
             this.address = Optional.of(address);
         }
@@ -173,14 +201,8 @@ public class Archive extends AtomResource {
 
     public void setContactInformation(@Nullable ContactInformation contactInformation) {
 
-        if (contactInformation == null ||
-                (contactInformation.getEmail().isEmpty() &&
-                        contactInformation.getFax().isEmpty() &&
-                        contactInformation.getTelephone().isEmpty() &&
-                        contactInformation.getWebpage().isEmpty())) {
-
+        if (contactInformation == null || contactInformation.isEmpty()) {
             this.contactInformation = Optional.empty();
-
         } else {
             this.contactInformation = Optional.of(contactInformation);
         }

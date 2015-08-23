@@ -24,6 +24,20 @@ public class ContactInformation {
         this.webpage = webpage;
     }
 
+    @Override
+    public boolean equals(@Nullable Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ContactInformation that = (ContactInformation) o;
+
+        if (!email.equals(that.email)) return false;
+        if (!fax.equals(that.fax)) return false;
+        if (!telephone.equals(that.telephone)) return false;
+        return webpage.equals(that.webpage);
+
+    }
+
     @NotNull
     public String getEmail() {
         return email;
@@ -53,18 +67,8 @@ public class ContactInformation {
         return result;
     }
 
-    @Override
-    public boolean equals(@Nullable Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        ContactInformation that = (ContactInformation) o;
-
-        if (!email.equals(that.email)) return false;
-        if (!fax.equals(that.fax)) return false;
-        if (!telephone.equals(that.telephone)) return false;
-        return webpage.equals(that.webpage);
-
+    public boolean isEmpty() {
+        return getEmail().isEmpty() && getFax().isEmpty() && getTelephone().isEmpty() && getWebpage().isEmpty();
     }
 
     @Override
@@ -77,4 +81,5 @@ public class ContactInformation {
                 ", webpage='" + webpage + '\'' +
                 '}';
     }
+
 }

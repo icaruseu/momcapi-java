@@ -96,6 +96,7 @@ public class ExistResource {
      * @return A list of the results as strings.
      */
     @NotNull
+    @Deprecated
     final List<String> queryContentAsList(@NotNull XpathQuery query) {
 
         Nodes nodes = queryContentAsNodes(query);
@@ -116,6 +117,7 @@ public class ExistResource {
      * @return The nodes containing the results.
      */
     @NotNull
+    @Deprecated
     final Nodes queryContentAsNodes(@NotNull XpathQuery query) {
 
         Element rootElement = xmlContent.getRootElement();
@@ -127,6 +129,7 @@ public class ExistResource {
     }
 
     @NotNull
+    @Deprecated
     String queryUniqueElement(@NotNull XpathQuery query) {
 
         List<String> queryResults = queryContentAsList(query);

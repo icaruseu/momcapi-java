@@ -21,6 +21,19 @@ public class Address {
         this.municipality = municipality;
     }
 
+    @Override
+    public boolean equals(@Nullable Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Address address = (Address) o;
+
+        if (!municipality.equals(address.municipality)) return false;
+        if (!postalcode.equals(address.postalcode)) return false;
+        return street.equals(address.street);
+
+    }
+
     @NotNull
     public String getMunicipality() {
         return municipality;
@@ -44,17 +57,8 @@ public class Address {
         return result;
     }
 
-    @Override
-    public boolean equals(@Nullable Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Address address = (Address) o;
-
-        if (!municipality.equals(address.municipality)) return false;
-        if (!postalcode.equals(address.postalcode)) return false;
-        return street.equals(address.street);
-
+    public boolean isEmpty() {
+        return getStreet().isEmpty() && getMunicipality().isEmpty() && getMunicipality().isEmpty();
     }
 
     @Override
@@ -66,4 +70,5 @@ public class Address {
                 ", street='" + street + '\'' +
                 '}';
     }
+
 }
