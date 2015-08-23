@@ -1,7 +1,7 @@
 package eu.icarus.momca.momcapi.model.id;
 
+import eu.icarus.momca.momcapi.model.resource.ResourceType;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
-import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -9,8 +9,13 @@ import org.jetbrains.annotations.NotNull;
  */
 public class IdAtomId extends IdAbstract {
 
-    public IdAtomId(@NotNull Element contentXml, @NotNull String identifier) {
-        super(contentXml, identifier);
+    @Deprecated
+    public IdAtomId(@NotNull AtomId atomIdXml, @NotNull String identifier) {
+        super(atomIdXml, identifier);
+    }
+
+    public IdAtomId(@NotNull AtomId atomIdXml) {
+        super(atomIdXml, atomIdXml.getText().split("/")[atomIdXml.getText().split("/").length - 1]);
     }
 
     @NotNull
@@ -19,6 +24,10 @@ public class IdAtomId extends IdAbstract {
         AtomId id = ((AtomId) contentXml);
         id.detach();
         return id;
+    }
+
+    public final ResourceType getType() {
+        return getContentXml().getType();
     }
 
 }

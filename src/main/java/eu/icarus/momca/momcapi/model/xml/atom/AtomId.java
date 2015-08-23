@@ -25,7 +25,6 @@ public class AtomId extends Element {
     public static final String DEFAULT_PREFIX = "tag:www.monasterium.net,2011:";
     private static final int MAX_ID_PARTS = 5;
     private static final int MIN_ID_PARTS = 3;
-    private static final int MIN_ID_PARTS_WITHOUT_PREFIX = 2;
     @NotNull
     private final String text;
     @NotNull

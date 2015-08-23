@@ -50,7 +50,19 @@ public class CollectionTest {
     public void testConstructor() throws Exception {
 
         collection = new Collection(resource);
+        assertEquals(collection.getName(), name);
         assertEquals(collection.getCountry().get(), country);
+        assertEquals(collection.getIdentifier(), identifier);
+        assertEquals(collection.getId(), new IdCollection(identifier));
+        assertEquals(collection.getImageFolderName().get(), imageFolderName);
+        assertEquals(collection.getImageServerAddress().get(), imageServerAddress);
+        assertEquals(collection.getKeyword().get(), keyword);
+        assertEquals(collection.getRegion().get(), region);
+
+        collection = new Collection(new IdCollection(identifier), resource.toXML());
+        assertEquals(collection.getName(), name);
+        assertEquals(collection.getCountry().get(), country);
+        assertEquals(collection.getIdentifier(), identifier);
         assertEquals(collection.getId(), new IdCollection(identifier));
         assertEquals(collection.getImageFolderName().get(), imageFolderName);
         assertEquals(collection.getImageServerAddress().get(), imageServerAddress);
@@ -85,18 +97,13 @@ public class CollectionTest {
     }
 
     @Test
+    public void testGetName() throws Exception {
+        assertEquals(collection.getName(), name);
+    }
+
+    @Test
     public void testGetRegion() throws Exception {
         assertEquals(collection.getRegion().get(), region);
-    }
-
-    @Test
-    public void testReadIdentifierFromXml() throws Exception {
-        assertEquals(collection.readIdentifierFromXml(resource).get(), identifier);
-    }
-
-    @Test
-    public void testReadNameFromXml() throws Exception {
-        assertEquals(collection.readNameFromXml(collection).get(), name);
     }
 
     @Test
@@ -158,6 +165,18 @@ public class CollectionTest {
         collection.setKeyword(null);
         assertFalse(collection.getKeyword().isPresent());
 
+    }
+
+    @Test
+    public void testSetName() throws Exception {
+        String newName = "New name";
+        collection.setName(name);
+        assertEquals(collection.getName(), name);
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testSetNameEmpty() throws Exception {
+        collection.setName("");
     }
 
     @Test

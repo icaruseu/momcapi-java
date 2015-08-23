@@ -25,6 +25,8 @@ import java.util.Optional;
 public class Archive extends AtomResource {
 
     @NotNull
+    String name;
+    @NotNull
     private Optional<Address> address = Optional.empty();
     @NotNull
     private Optional<ContactInformation> contactInformation = Optional.empty();
@@ -36,8 +38,16 @@ public class Archive extends AtomResource {
     private Optional<String> regionName = Optional.empty();
 
     public Archive(@NotNull String identifier, @NotNull String name, @NotNull Country country) {
-        super(new IdArchive(identifier), name, ResourceType.ARCHIVE, ResourceRoot.ARCHIVES);
-        setCountry(country);
+
+        super(new IdArchive(identifier), ResourceType.ARCHIVE, ResourceRoot.ARCHIVES);
+
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException("The name is not allowed to be an empty string.");
+        }
+
+        this.name = name;
+        this.country = country;
+
     }
 
     public Archive(@NotNull IdArchive id, @NotNull String xmlContent) {
@@ -129,19 +139,16 @@ public class Archive extends AtomResource {
     }
 
     @NotNull
+    public final String getName() {
+        return name;
+    }
+
+    @NotNull
     public Optional<String> getRegionName() {
         return regionName;
     }
 
-    @Override
     @NotNull
-    Optional<String> readIdentifierFromXml(ExistResource existResource) {
-        List<String> identifierList = existResource.queryContentAsList(XpathQuery.QUERY_EAG_REPOSITORID);
-        return identifierList.isEmpty() ? Optional.empty() : Optional.of(identifierList.get(0));
-    }
-
-    @NotNull
-    @Override
     Optional<String> readNameFromXml(ExistResource existResource) {
         List<String> nameList = existResource.queryContentAsList(XpathQuery.QUERY_EAG_AUTFORM);
         return nameList.isEmpty() ? Optional.empty() : Optional.of(nameList.get(0));
@@ -209,6 +216,18 @@ public class Archive extends AtomResource {
         } else {
             this.logoUrl = Optional.of(logoUrl);
         }
+
+    }
+
+    public final void setName(@NotNull String name) {
+
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException("The name is not allowed to be an empty string.");
+        }
+
+        this.name = name;
+
+        updateXmlContent();
 
     }
 

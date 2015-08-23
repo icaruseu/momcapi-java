@@ -1,8 +1,9 @@
 package eu.icarus.momca.momcapi.model.resource;
 
-import eu.icarus.momca.momcapi.model.id.IdAtomId;
-import eu.icarus.momca.momcapi.model.id.IdUser;
+import eu.icarus.momca.momcapi.model.id.*;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomAuthor;
+import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
+import eu.icarus.momca.momcapi.query.XpathQuery;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,23 +20,15 @@ public abstract class AtomResource extends ExistResource {
     Optional<IdUser> creator = Optional.empty();
     @NotNull
     IdAtomId id;
-    @NotNull
-    String name;
 
-    AtomResource(@NotNull IdAtomId id, @NotNull String name,
-                 @NotNull ResourceType resourceType, @NotNull ResourceRoot resourceRoot) {
+    AtomResource(@NotNull IdAtomId id, @NotNull ResourceType resourceType, @NotNull ResourceRoot resourceRoot) {
 
         super(new ExistResource(
                 String.format("%s%s", id.getIdentifier(), resourceType.getNameSuffix()),
                 String.format("%s/%s", resourceRoot.getUri(), id),
                 "<empty/>"));
 
-        if (name.isEmpty()) {
-            throw new IllegalArgumentException("The name is not allowed to be an empty string.");
-        }
-
         this.id = id;
-        this.name = name;
 
     }
 
@@ -43,16 +36,14 @@ public abstract class AtomResource extends ExistResource {
 
         super(existResource);
 
-        Optional<String> nameOptional = readNameFromXml(existResource);
-        Optional<String> identifierOptional = readIdentifierFromXml(existResource);
+        String atomIdString = queryUniqueElement(XpathQuery.QUERY_ATOM_ID);
 
-        if (!identifierOptional.isPresent() || !nameOptional.isPresent()) {
-            throw new IllegalArgumentException("The provided resource content is not a valid ExistResource: "
+        if (atomIdString.isEmpty()) {
+            throw new IllegalArgumentException("The provided atom resource content does not contain an atom:id: "
                     + existResource.toDocument().toXML());
         }
 
-        setIdentifier(identifierOptional.get());
-        setName(nameOptional.get());
+        getIdFromString(atomIdString);
 
     }
 
@@ -74,21 +65,42 @@ public abstract class AtomResource extends ExistResource {
     @NotNull
     public abstract IdAtomId getId();
 
+    private void getIdFromString(String atomIdString) {
+
+        AtomId atomId = new AtomId(atomIdString);
+
+        switch (atomId.getType()) {
+
+            case ANNOTATION_IMAGE:
+                this.id = new IdAnnotation(atomId);
+                break;
+            case ARCHIVE:
+                this.id = new IdArchive(atomId);
+                break;
+            case CHARTER:
+                this.id = new IdCharter(atomId);
+                break;
+            case COLLECTION:
+                this.id = new IdCollection(atomId);
+                break;
+            case FOND:
+                this.id = new IdFond(atomId);
+                break;
+            case MY_COLLECTION:
+                this.id = new IdMyCollection(atomId);
+                break;
+            case SVG:
+                this.id = new IdSvg(atomId);
+                break;
+
+        }
+
+    }
+
     @NotNull
     public final String getIdentifier() {
         return id.getIdentifier();
     }
-
-    @NotNull
-    public final String getName() {
-        return name;
-    }
-
-    @NotNull
-    abstract Optional<String> readIdentifierFromXml(ExistResource existResource);
-
-    @NotNull
-    abstract Optional<String> readNameFromXml(ExistResource existResource);
 
     public final void setCreator(@Nullable String creator) {
 
@@ -103,18 +115,6 @@ public abstract class AtomResource extends ExistResource {
     }
 
     public abstract void setIdentifier(@NotNull String identifier);
-
-    public final void setName(@NotNull String name) {
-
-        if (name.isEmpty()) {
-            throw new IllegalArgumentException("The name is not allowed to be an empty string.");
-        }
-
-        this.name = name;
-
-        updateXmlContent();
-
-    }
 
     abstract void updateXmlContent();
 

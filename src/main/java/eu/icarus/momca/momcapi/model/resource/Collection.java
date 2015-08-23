@@ -25,6 +25,8 @@ public class Collection extends AtomResource {
 
     private static final String COLLECTION_TEMPLATE = "<cei:cei xmlns:cei=\"http://www.monasterium.net/NS/cei\"><cei:teiHeader><cei:fileDesc><cei:sourceDesc><cei:p /></cei:sourceDesc></cei:fileDesc></cei:teiHeader><cei:text type=\"collection\"><cei:front><cei:image_server_address>%s</cei:image_server_address><cei:image_server_folder>%s</cei:image_server_folder><cei:user_name /><cei:password /><cei:provenance abbr=\"%s\">%s%s%s</cei:provenance><cei:publicationStmt><cei:availability n=\"ENRICH\" status=\"restricted\" /></cei:publicationStmt><cei:div type=\"preface\" /></cei:front><cei:group /></cei:text></cei:cei>";
     @NotNull
+    String name;
+    @NotNull
     private Optional<Country> country = Optional.empty();
     @NotNull
     private Optional<String> imageFolderName = Optional.empty();
@@ -36,7 +38,15 @@ public class Collection extends AtomResource {
     private Optional<Region> region = Optional.empty();
 
     public Collection(@NotNull String identifier, @NotNull String name) {
-        super(new IdCollection(identifier), name, ResourceType.COLLECTION, ResourceRoot.ARCHIVAL_COLLECTIONS);
+
+        super(new IdCollection(identifier), ResourceType.COLLECTION, ResourceRoot.ARCHIVAL_COLLECTIONS);
+
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException("The name is not allowed to be an empty string.");
+        }
+
+        this.name = name;
+
     }
 
     public Collection(@NotNull IdCollection id, @NotNull String xmlContent) {
@@ -52,6 +62,7 @@ public class Collection extends AtomResource {
 
         super(existResource);
 
+        this.name = readNameFromXml().orElseThrow(IllegalArgumentException::new);
         this.creator = readCreatorFromXml();
         this.country = readCountryFromXml();
         this.region = readRegionFromXml();
@@ -131,6 +142,11 @@ public class Collection extends AtomResource {
     }
 
     @NotNull
+    public String getName() {
+        return name;
+    }
+
+    @NotNull
     public Optional<Region> getRegion() {
         return region;
     }
@@ -175,16 +191,8 @@ public class Collection extends AtomResource {
 
     }
 
-    @Override
     @NotNull
-    Optional<String> readIdentifierFromXml(ExistResource existResource) {
-        List<String> identifierList = existResource.queryContentAsList(XpathQuery.QUERY_CEI_PROVENANCE_ABBR);
-        return identifierList.isEmpty() ? Optional.<String>empty() : Optional.of(identifierList.get(0));
-    }
-
-    @NotNull
-    @Override
-    Optional<String> readNameFromXml(ExistResource existResource) {
+    private Optional<String> readNameFromXml() {
 
         List<String> queryResults =
                 Util.queryXmlToList(toDocument().getRootElement(), XpathQuery.QUERY_CEI_PROVENANCE_TEXT);
@@ -277,6 +285,18 @@ public class Collection extends AtomResource {
         } else {
             this.keyword = Optional.of(keyword);
         }
+
+        updateXmlContent();
+
+    }
+
+    public final void setName(@NotNull String name) {
+
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException("The name is not allowed to be an empty string.");
+        }
+
+        this.name = name;
 
         updateXmlContent();
 
