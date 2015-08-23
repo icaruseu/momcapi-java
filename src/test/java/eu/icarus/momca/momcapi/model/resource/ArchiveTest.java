@@ -157,8 +157,8 @@ public class ArchiveTest {
     @Test
     public void testSetName() throws Exception {
         String newName = "New name";
-        archive.setName(NAME);
-        assertEquals(archive.getName(), NAME);
+        archive.setName(newName);
+        assertEquals(archive.getName(), newName);
     }
 
 

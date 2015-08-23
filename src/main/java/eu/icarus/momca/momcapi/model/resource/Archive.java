@@ -8,6 +8,7 @@ import eu.icarus.momca.momcapi.model.CountryCode;
 import eu.icarus.momca.momcapi.model.id.IdArchive;
 import eu.icarus.momca.momcapi.model.xml.Namespace;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomEntry;
+import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
 import eu.icarus.momca.momcapi.model.xml.eag.EagDesc;
 import eu.icarus.momca.momcapi.query.XpathQuery;
 import nu.xom.Attribute;
@@ -47,6 +48,8 @@ public class Archive extends AtomResource {
 
         this.name = name;
         this.country = country;
+
+        updateXmlContent();
 
     }
 
@@ -213,6 +216,7 @@ public class Archive extends AtomResource {
 
     public void setCountry(@NotNull Country country) {
         this.country = country;
+        updateXmlContent();
     }
 
     @Override
@@ -238,6 +242,8 @@ public class Archive extends AtomResource {
         } else {
             this.logoUrl = Optional.of(logoUrl);
         }
+
+        updateXmlContent();
 
     }
 
@@ -275,8 +281,9 @@ public class Archive extends AtomResource {
 
         EagDesc eagDesc = new EagDesc(country.getNativeName(), regionNativeName, address, contactInformation, logoUrlString);
         Element eag = createEagElement(id.getIdentifier(), getName(), country.getCountryCode().getCode(), eagDesc);
+        AtomId id = new AtomId(this.getId().getContentXml().getText());
 
-        setXmlContent(new Document(new AtomEntry(id.getContentXml(), createAtomAuthor(), AtomResource.localTime(), eag)));
+        setXmlContent(new Document(new AtomEntry(id, createAtomAuthor(), AtomResource.localTime(), eag)));
 
     }
 

@@ -5,7 +5,6 @@ import eu.icarus.momca.momcapi.model.Country;
 import eu.icarus.momca.momcapi.model.Region;
 import eu.icarus.momca.momcapi.model.id.IdArchive;
 import eu.icarus.momca.momcapi.model.resource.Archive;
-import eu.icarus.momca.momcapi.model.resource.ExistResource;
 import eu.icarus.momca.momcapi.model.resource.ResourceRoot;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
@@ -27,7 +26,8 @@ public class ArchiveManager extends AbstractManager {
     public void addArchive(@NotNull Archive newArchive) {
 
         if (getArchive(newArchive.getId()).isPresent()) {
-            String message = String.format("The archive '%s' that is to be added already exists.", newArchive.getId());
+            String message = String.format("The archive '%s' that is to be added already exists.",
+                    newArchive.getId().getIdentifier());
             throw new IllegalArgumentException(message);
         }
 
@@ -48,10 +48,7 @@ public class ArchiveManager extends AbstractManager {
         });
 
         momcaConnection.addCollection(newArchive.getIdentifier(), ResourceRoot.ARCHIVES.getUri());
-
-        ExistResource resource = new ExistResource(newArchive.getResourceName(), newArchive.getParentUri(),
-                newArchive.toDocument().toXML());
-        momcaConnection.storeExistResource(resource);
+        momcaConnection.storeExistResource(newArchive);
 
     }
 

@@ -27,7 +27,7 @@ public abstract class AtomResource extends ExistResource {
 
         super(new ExistResource(
                 String.format("%s%s", id.getIdentifier(), resourceType.getNameSuffix()),
-                String.format("%s/%s", resourceRoot.getUri(), id),
+                String.format("%s/%s", resourceRoot.getUri(), id.getIdentifier()),
                 "<empty/>"));
 
         this.id = id;
@@ -56,7 +56,7 @@ public abstract class AtomResource extends ExistResource {
 
     @NotNull
     AtomAuthor createAtomAuthor() {
-        return getCreator().map(IdUser::getContentXml).orElse(new AtomAuthor(""));
+        return new AtomAuthor(getCreator().map(IdAbstract::getIdentifier).orElse(""));
     }
 
     @NotNull

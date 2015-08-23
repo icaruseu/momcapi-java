@@ -22,7 +22,6 @@ public class IdAtomId extends IdAbstract {
     @Override
     public final AtomId getContentXml() {
         AtomId id = ((AtomId) contentXml);
-        id.detach();
         return id;
     }
 

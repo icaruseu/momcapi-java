@@ -159,8 +159,8 @@ public class CollectionTest {
     @Test
     public void testSetName() throws Exception {
         String newName = "New name";
-        collection.setName(NAME);
-        assertEquals(collection.getName(), NAME);
+        collection.setName(newName);
+        assertEquals(collection.getName(), newName);
     }
 
 

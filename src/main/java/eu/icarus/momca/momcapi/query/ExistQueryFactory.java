@@ -163,8 +163,8 @@ public class ExistQueryFactory {
     public static ExistQuery getResourceUri(@NotNull AtomId resourceAtomId, @Nullable ResourceRoot resourceRoot) {
 
         String query = String.format(
-                "%s let $nodes := collection('%s')//atom:entry[.//atom:id/text()='%s']" +
-                        " for $node in $nodes" +
+                "%s let $nodes := collection('%s')//atom:entry[.//atom:id/text()='%s']\n" +
+                        " for $node in $nodes\n" +
                         " return concat(util:collection-name($node), '/', util:document-name($node))",
                 getNamespaceDeclaration(Namespace.ATOM),
                 getRootCollectionString(resourceRoot),

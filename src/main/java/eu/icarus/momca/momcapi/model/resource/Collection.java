@@ -7,6 +7,7 @@ import eu.icarus.momca.momcapi.model.Region;
 import eu.icarus.momca.momcapi.model.id.IdCollection;
 import eu.icarus.momca.momcapi.model.xml.Namespace;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomEntry;
+import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
 import eu.icarus.momca.momcapi.query.XpathQuery;
 import nu.xom.Document;
 import nu.xom.Element;
@@ -45,6 +46,8 @@ public class Collection extends AtomResource {
         }
 
         this.name = name;
+
+        updateXmlContent();
 
     }
 
@@ -283,7 +286,8 @@ public class Collection extends AtomResource {
         Optional<Element> keywords = createKeywordsElement();
         Element cei = createCeiElement();
 
-        Element resourceContent = new AtomEntry(id.getContentXml(), createAtomAuthor(), AtomResource.localTime(), cei);
+        AtomId id = new AtomId(this.getId().getContentXml().getText());
+        Element resourceContent = new AtomEntry(id, createAtomAuthor(), AtomResource.localTime(), cei);
         keywords.ifPresent(element -> resourceContent.insertChild(element, 6));
 
         setXmlContent(new Document(resourceContent));
