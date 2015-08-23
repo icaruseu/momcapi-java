@@ -5,6 +5,7 @@ import eu.icarus.momca.momcapi.model.Country;
 import eu.icarus.momca.momcapi.model.CountryCode;
 import eu.icarus.momca.momcapi.model.Region;
 import eu.icarus.momca.momcapi.model.id.IdCollection;
+import eu.icarus.momca.momcapi.model.id.IdUser;
 import eu.icarus.momca.momcapi.model.xml.Namespace;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomEntry;
 import eu.icarus.momca.momcapi.query.XpathQuery;
@@ -35,7 +36,7 @@ public class Collection extends AtomResource {
     private Optional<Region> region = Optional.empty();
 
     public Collection(@NotNull String identifier, @NotNull String name) {
-        super(identifier, name, ResourceType.COLLECTION, ResourceRoot.ARCHIVAL_COLLECTIONS);
+        super(new IdCollection(identifier), name, ResourceType.COLLECTION, ResourceRoot.ARCHIVAL_COLLECTIONS);
     }
 
     public Collection(@NotNull IdCollection id, @NotNull String xmlContent) {
@@ -51,12 +52,12 @@ public class Collection extends AtomResource {
 
         super(existResource);
 
-        setCreator(readCreatorFromXml());
-        readCountryFromXml().ifPresent(this::setCountry);
-        readRegionFromXml().ifPresent(this::setRegion);
-        setImageFolderName(readImageFolderNameFromXml());
-        setImageServerAddress(readImageServerAddressFromXml());
-        setKeyword(readKeywordFromXml());
+        this.creator = readCreatorFromXml();
+        this.country = readCountryFromXml();
+        this.region = readRegionFromXml();
+        this.imageFolderName = readStringValueFromXml(XpathQuery.QUERY_CEI_IMAGE_SERVER_FOLDER);
+        this.imageServerAddress = readStringValueFromXml(XpathQuery.QUERY_CEI_IMAGE_SERVER_ADDRESS);
+        this.keyword = readStringValueFromXml(XpathQuery.QUERY_XRX_KEYWORD);
 
     }
 
@@ -161,8 +162,17 @@ public class Collection extends AtomResource {
     }
 
     @NotNull
-    private String readCreatorFromXml() {
-        return queryUniqueElement(XpathQuery.QUERY_ATOM_EMAIL);
+    private Optional<IdUser> readCreatorFromXml() {
+
+        Optional<IdUser> result = Optional.empty();
+        String queryResult = queryUniqueElement(XpathQuery.QUERY_ATOM_EMAIL);
+
+        if (!queryResult.isEmpty()) {
+            result = Optional.of(new IdUser(queryResult));
+        }
+
+        return result;
+
     }
 
     @Override
@@ -170,21 +180,6 @@ public class Collection extends AtomResource {
     Optional<String> readIdentifierFromXml(ExistResource existResource) {
         List<String> identifierList = existResource.queryContentAsList(XpathQuery.QUERY_CEI_PROVENANCE_ABBR);
         return identifierList.isEmpty() ? Optional.<String>empty() : Optional.of(identifierList.get(0));
-    }
-
-    @NotNull
-    private String readImageFolderNameFromXml() {
-        return queryUniqueElement(XpathQuery.QUERY_CEI_IMAGE_SERVER_FOLDER);
-    }
-
-    @NotNull
-    private String readImageServerAddressFromXml() {
-        return queryUniqueElement(XpathQuery.QUERY_CEI_IMAGE_SERVER_ADDRESS);
-    }
-
-    @NotNull
-    private String readKeywordFromXml() {
-        return queryUniqueElement(XpathQuery.QUERY_XRX_KEYWORD);
     }
 
     @NotNull
@@ -216,8 +211,23 @@ public class Collection extends AtomResource {
 
     }
 
+    @NotNull
+    private Optional<String> readStringValueFromXml(@NotNull XpathQuery query) {
+
+        String queryResult = queryUniqueElement(query);
+        Optional<String> result = Optional.empty();
+
+        if (!queryResult.isEmpty()) {
+            result = Optional.of(queryResult);
+        }
+
+        return result;
+
+    }
+
     public void setCountry(@NotNull Country country) {
         this.country = Optional.of(country);
+        updateXmlContent();
     }
 
     @Override
@@ -232,6 +242,8 @@ public class Collection extends AtomResource {
         setResourceName(identifier + ResourceType.COLLECTION.getNameSuffix());
         setParentUri(String.format("%s/%s", ResourceRoot.ARCHIVAL_COLLECTIONS.getUri(), identifier));
 
+        updateXmlContent();
+
     }
 
     public void setImageFolderName(@Nullable String imageFolderName) {
@@ -242,6 +254,8 @@ public class Collection extends AtomResource {
             this.imageFolderName = Optional.of(imageFolderName);
         }
 
+        updateXmlContent();
+
     }
 
     public void setImageServerAddress(@Nullable String imageServerAddress) {
@@ -251,6 +265,9 @@ public class Collection extends AtomResource {
         } else {
             this.imageServerAddress = Optional.of(imageServerAddress);
         }
+
+        updateXmlContent();
+
     }
 
     public void setKeyword(@Nullable String keyword) {
@@ -260,6 +277,8 @@ public class Collection extends AtomResource {
         } else {
             this.keyword = Optional.of(keyword);
         }
+
+        updateXmlContent();
 
     }
 
@@ -271,11 +290,12 @@ public class Collection extends AtomResource {
             this.region = Optional.of(region);
         }
 
+        updateXmlContent();
+
     }
 
-    @NotNull
     @Override
-    public Document toDocument() {
+    void updateXmlContent() {
 
         Optional<Element> keywords = createKeywordsElement();
         Element cei = createCeiElement();
@@ -283,7 +303,7 @@ public class Collection extends AtomResource {
         Element resourceContent = new AtomEntry(id.getContentXml(), createAtomAuthor(), AtomResource.localTime(), cei);
         keywords.ifPresent(element -> resourceContent.insertChild(element, 6));
 
-        return new Document(resourceContent);
+        setXmlContent(new Document(resourceContent));
 
     }
 

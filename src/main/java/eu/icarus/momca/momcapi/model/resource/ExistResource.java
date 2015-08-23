@@ -24,9 +24,8 @@ public class ExistResource {
     private String parentUri;
     @NotNull
     private String resourceName;
-    @Deprecated
     @NotNull
-    private Document xmlDocument;
+    private Document xmlContent;
 
     /**
      * Instantiates a new ExistResource with an existing resource.
@@ -35,27 +34,27 @@ public class ExistResource {
      */
     ExistResource(@NotNull ExistResource existResource) {
         this.resourceName = existResource.getResourceName();
-        this.xmlDocument = existResource.toDocument();
+        this.xmlContent = existResource.toDocument();
         this.parentUri = existResource.getParentUri();
     }
 
     /**
      * Instantiates a new ExistResource.
      *
-     * @param resourceName        The name of the resource, e.g. {@code user.xmlDocument}.
+     * @param resourceName        The name of the resource, e.g. {@code user.xmlContent}.
      * @param parentCollectionUri The URI of the collection, the resource is stored in in the database,
      *                            e.g. {@code /db/mom-data/xrx.user}.
-     * @param xmlDocument         The xmlDocument content of the resource as {@code String}.
+     * @param xmlContent          The xmlContent content of the resource as {@code String}.
      */
-    public ExistResource(@NotNull String resourceName, @NotNull String parentCollectionUri, @NotNull String xmlDocument) {
+    public ExistResource(@NotNull String resourceName, @NotNull String parentCollectionUri, @NotNull String xmlContent) {
 
-        if (resourceName.isEmpty() || parentCollectionUri.isEmpty() || xmlDocument.isEmpty()) {
+        if (resourceName.isEmpty() || parentCollectionUri.isEmpty() || xmlContent.isEmpty()) {
             throw new IllegalArgumentException("Constructor strings are not allowed to be empty.");
         }
 
         this.resourceName = Util.encode(resourceName);
-        this.xmlDocument = Util.parseToDocument(xmlDocument).getDocument();
         this.parentUri = Util.encode(parentCollectionUri);
+        this.xmlContent = Util.parseToDocument(xmlContent);
 
     }
 
@@ -68,7 +67,7 @@ public class ExistResource {
     }
 
     /**
-     * @return The name of the resource in the database, e.g. {@code user.xmlDocument}
+     * @return The name of the resource in the database, e.g. {@code user.xmlContent}
      */
     @NotNull
     public String getResourceName() {
@@ -76,7 +75,7 @@ public class ExistResource {
     }
 
     /**
-     * @return The URI of the resource in the database, e.g. {@code /db/mom-data/xrx.user/user.xmlDocument}.
+     * @return The URI of the resource in the database, e.g. {@code /db/mom-data/xrx.user/user.xmlContent}.
      */
     @NotNull
     public String getUri() {
@@ -119,7 +118,7 @@ public class ExistResource {
     @NotNull
     final Nodes queryContentAsNodes(@NotNull XpathQuery query) {
 
-        Element rootElement = xmlDocument.getRootElement();
+        Element rootElement = xmlContent.getRootElement();
         String queryString = query.asString();
         XPathContext context = getxPathContext(rootElement, query);
 
@@ -154,22 +153,30 @@ public class ExistResource {
 
     }
 
-    public void setParentUri(@NotNull String parentUri) {
+    void setParentUri(@NotNull String parentUri) {
 
         if (parentUri.isEmpty()) {
             throw new IllegalArgumentException("The parent URI is not allowed to be an empty string.");
         }
-        this.parentUri = parentUri;
+        this.parentUri = Util.encode(parentUri);
 
     }
 
-    public void setResourceName(@NotNull String resourceName) {
+    void setResourceName(@NotNull String resourceName) {
 
         if (resourceName.isEmpty()) {
             throw new IllegalArgumentException("The resource name is not allowed to be an empty string.");
         }
-        this.resourceName = resourceName;
+        this.resourceName = Util.encode(resourceName);
 
+    }
+
+    void setXmlContent(@NotNull String xmlContent) {
+        this.xmlContent = Util.parseToDocument(xmlContent);
+    }
+
+    void setXmlContent(@NotNull Document xmlContent) {
+        this.xmlContent = xmlContent;
     }
 
     /**
@@ -177,7 +184,7 @@ public class ExistResource {
      */
     @NotNull
     public Document toDocument() {
-        return xmlDocument;
+        return xmlContent;
     }
 
     @NotNull
@@ -185,9 +192,14 @@ public class ExistResource {
     public String toString() {
         return "ExistResource{" +
                 "resourceName='" + resourceName + '\'' +
-                ", xmlDocument=" + xmlDocument +
+                ", xmlContent=" + xmlContent +
                 ", parentUri='" + parentUri + '\'' +
                 '}';
+    }
+
+    @NotNull
+    public String toXML() {
+        return xmlContent.toXML();
     }
 
 }

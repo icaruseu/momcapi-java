@@ -3,7 +3,6 @@ package eu.icarus.momca.momcapi.model.resource;
 import eu.icarus.momca.momcapi.model.id.IdAtomId;
 import eu.icarus.momca.momcapi.model.id.IdUser;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomAuthor;
-import nu.xom.Document;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,16 +22,20 @@ public abstract class AtomResource extends ExistResource {
     @NotNull
     String name;
 
-    AtomResource(@NotNull String identifier, @NotNull String name,
+    AtomResource(@NotNull IdAtomId id, @NotNull String name,
                  @NotNull ResourceType resourceType, @NotNull ResourceRoot resourceRoot) {
 
         super(new ExistResource(
-                identifier + resourceType.getNameSuffix(),
-                resourceRoot.getUri() + "/" + identifier,
+                String.format("%s%s", id.getIdentifier(), resourceType.getNameSuffix()),
+                String.format("%s/%s", resourceRoot.getUri(), id),
                 "<empty/>"));
 
-        setIdentifier(identifier);
-        setName(name);
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException("The name is not allowed to be an empty string.");
+        }
+
+        this.id = id;
+        this.name = name;
 
     }
 
@@ -42,6 +45,7 @@ public abstract class AtomResource extends ExistResource {
 
         Optional<String> nameOptional = readNameFromXml(existResource);
         Optional<String> identifierOptional = readIdentifierFromXml(existResource);
+
         if (!identifierOptional.isPresent() || !nameOptional.isPresent()) {
             throw new IllegalArgumentException("The provided resource content is not a valid ExistResource: "
                     + existResource.toDocument().toXML());
@@ -94,6 +98,8 @@ public abstract class AtomResource extends ExistResource {
             this.creator = Optional.of(new IdUser(creator));
         }
 
+        updateXmlContent();
+
     }
 
     public abstract void setIdentifier(@NotNull String identifier);
@@ -106,10 +112,10 @@ public abstract class AtomResource extends ExistResource {
 
         this.name = name;
 
+        updateXmlContent();
+
     }
 
-    @Override
-    @NotNull
-    public abstract Document toDocument();
+    abstract void updateXmlContent();
 
 }

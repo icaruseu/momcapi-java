@@ -36,7 +36,7 @@ public class Archive extends AtomResource {
     private Optional<String> regionName = Optional.empty();
 
     public Archive(@NotNull String identifier, @NotNull String name, @NotNull Country country) {
-        super(identifier, name, ResourceType.ARCHIVE, ResourceRoot.ARCHIVES);
+        super(new IdArchive(identifier), name, ResourceType.ARCHIVE, ResourceRoot.ARCHIVES);
         setCountry(country);
     }
 
@@ -159,6 +159,9 @@ public class Archive extends AtomResource {
         } else {
             this.address = Optional.of(address);
         }
+
+        updateXmlContent();
+
     }
 
     public void setContactInformation(@Nullable ContactInformation contactInformation) {
@@ -174,6 +177,9 @@ public class Archive extends AtomResource {
         } else {
             this.contactInformation = Optional.of(contactInformation);
         }
+
+        updateXmlContent();
+
     }
 
     public void setCountry(@NotNull Country country) {
@@ -191,6 +197,8 @@ public class Archive extends AtomResource {
 
         setResourceName(identifier + ResourceType.ARCHIVE.getNameSuffix());
         setParentUri(String.format("%s/%s", ResourceRoot.ARCHIVES.getUri(), identifier));
+
+        updateXmlContent();
 
     }
 
@@ -212,11 +220,12 @@ public class Archive extends AtomResource {
             this.regionName = Optional.of(regionName);
         }
 
+        updateXmlContent();
+
     }
 
     @Override
-    @NotNull
-    public Document toDocument() {
+    void updateXmlContent() {
 
         String regionNativeName = regionName.orElse("");
         String logoUrlString = logoUrl.orElse("");
@@ -226,7 +235,7 @@ public class Archive extends AtomResource {
         EagDesc eagDesc = new EagDesc(country.getNativeName(), regionNativeName, address, contactInformation, logoUrlString);
         Element eag = createEagElement(id.getIdentifier(), getName(), country.getCountryCode().getCode(), eagDesc);
 
-        return new Document(new AtomEntry(id.getContentXml(), createAtomAuthor(), AtomResource.localTime(), eag));
+        setXmlContent(new Document(new AtomEntry(id.getContentXml(), createAtomAuthor(), AtomResource.localTime(), eag)));
 
     }
 
