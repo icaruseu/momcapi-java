@@ -21,6 +21,10 @@ public class Bibliography extends Element {
     @NotNull
     private final Optional<Heading> heading;
 
+    public Bibliography() {
+        this(null);
+    }
+
     public Bibliography(@Nullable String heading, @NotNull String... entries) {
 
         super("ead:bibliography", EAD_URI);

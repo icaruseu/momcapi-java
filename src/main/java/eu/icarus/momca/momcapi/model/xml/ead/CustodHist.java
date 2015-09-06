@@ -8,6 +8,11 @@ import org.jetbrains.annotations.Nullable;
  */
 public class CustodHist extends DescriptiveElement {
 
+    public CustodHist() {
+        this(null);
+    }
+
+
     public CustodHist(@Nullable String heading, @NotNull String... paragraphs) {
         super(DescriptiveElementName.CUSTODHIST, heading, paragraphs);
     }

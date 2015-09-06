@@ -8,6 +8,10 @@ import org.jetbrains.annotations.Nullable;
  */
 public class BiogHist extends DescriptiveElement {
 
+    public BiogHist() {
+        this(null);
+    }
+
     public BiogHist(@Nullable String heading, @NotNull String... paragraphs) {
         super(DescriptiveElementName.BIOGHIST, heading, paragraphs);
     }

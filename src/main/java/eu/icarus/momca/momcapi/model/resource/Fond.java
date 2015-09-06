@@ -4,13 +4,14 @@ import eu.icarus.momca.momcapi.model.ImageAccess;
 import eu.icarus.momca.momcapi.model.id.IdArchive;
 import eu.icarus.momca.momcapi.model.id.IdFond;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
-import eu.icarus.momca.momcapi.model.xml.ead.BiogHist;
-import eu.icarus.momca.momcapi.model.xml.ead.Did;
+import eu.icarus.momca.momcapi.model.xml.ead.*;
 import eu.icarus.momca.momcapi.query.XpathQuery;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -19,7 +20,11 @@ import java.util.Optional;
 public class Fond extends AtomResource {
 
     @NotNull
-    private BiogHist biogHist;
+    private Bibliography bibliography = new Bibliography();
+    @NotNull
+    private BiogHist biogHist = new BiogHist();
+    @NotNull
+    private CustodHist custodHist = new CustodHist();
     @NotNull
     private Optional<URL> dummyImageUrl = Optional.empty();
     @NotNull
@@ -30,6 +35,8 @@ public class Fond extends AtomResource {
     private Optional<URL> imagesUrl = Optional.empty();
     @NotNull
     private String name;
+    @NotNull
+    private List<Odd> oddList = new ArrayList<>(0);
 
 
     public Fond(@NotNull String identifier, @NotNull IdArchive parentArchive, @NotNull String name) {
@@ -41,6 +48,8 @@ public class Fond extends AtomResource {
         }
 
         this.name = name;
+
+        oddList.add(new Odd());
 
         updateXmlContent();
 

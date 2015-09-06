@@ -8,6 +8,11 @@ import org.jetbrains.annotations.Nullable;
  */
 public class Odd extends DescriptiveElement {
 
+    public Odd() {
+        this(null);
+    }
+
+
     public Odd(@Nullable String heading, @NotNull String... paragraphs) {
         super(DescriptiveElementName.ODD, heading, paragraphs);
     }

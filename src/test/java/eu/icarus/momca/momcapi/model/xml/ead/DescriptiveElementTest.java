@@ -12,7 +12,7 @@ public class DescriptiveElementTest {
 
 
     @Test
-    public void test() throws Exception {
+    public void testWithContent() throws Exception {
 
         String heading = "Heading";
         String paragraph1 = "Paragraph 1";
@@ -25,16 +25,23 @@ public class DescriptiveElementTest {
         assertEquals(element.getParagraphs().get(0).getContent().get(), paragraph1);
         assertEquals(element.getParagraphs().get(1).getContent().get(), paragraph2);
 
-        assertEquals(element.toXML(), "<ead:odd xmlns:ead=\"urn:isbn:1-931666-22-9\"><ead:head>Heading</ead:head><ead:p>Paragraph 1</ead:p><ead:p>Paragraph 2</ead:p></ead:odd>");
+        String xml = "<ead:odd xmlns:ead=\"urn:isbn:1-931666-22-9\"><ead:head>Heading</ead:head><ead:p>Paragraph 1</ead:p><ead:p>Paragraph 2</ead:p></ead:odd>";
+        assertEquals(element.toXML(), xml);
 
-        element = new BiogHist(null);
+    }
+
+    @Test
+    public void testWithoutContent() throws Exception {
+
+        DescriptiveElement element = new BiogHist(null);
 
         assertFalse(element.getHeading().getText().isPresent());
 
         assertEquals(element.getParagraphs().size(), 1);
         assertFalse(element.getParagraphs().get(0).getContent().isPresent());
 
-        assertEquals(element.toXML(), "<ead:bioghist xmlns:ead=\"urn:isbn:1-931666-22-9\"><ead:head /><ead:p /></ead:bioghist>");
+        String xml = "<ead:bioghist xmlns:ead=\"urn:isbn:1-931666-22-9\"><ead:head /><ead:p /></ead:bioghist>";
+        assertEquals(element.toXML(), xml);
 
     }
 
