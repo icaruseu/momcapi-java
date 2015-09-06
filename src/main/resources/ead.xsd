@@ -69,8 +69,10 @@
         conform to xlink.xsd instance used by MODS and METS (20080421)
 
     -->
-    <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="../../xml/xsd/xml.xsd"/>
-    <xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="../../xlink/xsd/xlink.xsd"/>
+    <xs:import namespace="http://www.w3.org/XML/1998/namespace"
+               schemaLocation="http://www.monasterium.net/mom/resource/?atomid=tag:www.monasterium.net,2011:/mom/resource/xsd/xml"/>
+    <xs:import namespace="http://www.w3.org/1999/xlink"
+               schemaLocation="http://www.monasterium.net/mom/resource/?atomid=tag:www.monasterium.net,2011:/mom/resource/xsd/xlink"/>
     <xs:attributeGroup name="am.date.normal">
         <xs:attribute name="normal">
             <xs:simpleType>

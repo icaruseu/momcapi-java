@@ -53,7 +53,7 @@ public class BibliographyTest {
 
         assertTrue(bibliography.getEntries().isEmpty());
 
-        String xml = "<ead:bibliography xmlns:ead=\"urn:isbn:1-931666-22-9\" />";
+        String xml = "<ead:bibliography xmlns:ead=\"urn:isbn:1-931666-22-9\"><ead:bibref /></ead:bibliography>";
         assertEquals(bibliography.toXML(), xml);
 
     }

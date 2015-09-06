@@ -281,7 +281,7 @@ public class Archive extends AtomResource {
 
         EagDesc eagDesc = new EagDesc(country.getNativeName(), regionNativeName, address, contactInformation, logoUrlString);
         Element eag = createEagElement(id.getIdentifier(), getName(), country.getCountryCode().getCode(), eagDesc);
-        AtomId id = new AtomId(this.getId().getContentXml().getText());
+        AtomId id = new AtomId(getId().getContentXml().getText());
 
         setXmlContent(new Document(new AtomEntry(id, createAtomAuthor(), AtomResource.localTime(), eag)));
 

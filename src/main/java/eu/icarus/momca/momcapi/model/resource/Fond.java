@@ -3,11 +3,25 @@ package eu.icarus.momca.momcapi.model.resource;
 import eu.icarus.momca.momcapi.model.ImageAccess;
 import eu.icarus.momca.momcapi.model.id.IdArchive;
 import eu.icarus.momca.momcapi.model.id.IdFond;
+import eu.icarus.momca.momcapi.model.xml.Namespace;
+import eu.icarus.momca.momcapi.model.xml.atom.AtomEntry;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
 import eu.icarus.momca.momcapi.model.xml.ead.*;
 import eu.icarus.momca.momcapi.query.XpathQuery;
+import nu.xom.*;
 import org.jetbrains.annotations.NotNull;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.XMLReader;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.SchemaFactory;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -38,10 +52,9 @@ public class Fond extends AtomResource {
     @NotNull
     private List<Odd> oddList = new ArrayList<>(0);
 
-
     public Fond(@NotNull String identifier, @NotNull IdArchive parentArchive, @NotNull String name) {
 
-        super(new IdFond(identifier, parentArchive.getIdentifier()), ResourceType.FOND, ResourceRoot.ARCHIVAL_FONDS);
+        super(new IdFond(parentArchive.getIdentifier(), identifier), ResourceType.FOND, ResourceRoot.ARCHIVAL_FONDS);
 
         if (name.isEmpty()) {
             throw new IllegalArgumentException("The name is not allowed to be an empty string.");
@@ -65,6 +78,43 @@ public class Fond extends AtomResource {
         this.imageAccess = initImageAccess();
         this.dummyImageUrl = initDummyImageUrl();
         this.imagesUrl = initImagesUrl();
+
+    }
+
+    @NotNull
+    private Element createEadElement() {
+
+        String uri = Namespace.EAD.getUri();
+
+
+        Element ead = new Element("ead:ead", uri);
+        ead.appendChild(new EadHeader());
+
+        Element archdesc = new Element("ead:archdesc", uri);
+
+        archdesc.addAttribute(new Attribute("level", "otherlevel"));
+        Element didEmpty = new Element("ead:did", uri);
+        didEmpty.appendChild(new Element("ead:abstract", uri));
+
+        archdesc.appendChild(didEmpty);
+
+        Element dsc = new Element("ead:dsc", uri);
+
+        Element c = new Element("ead:c", uri);
+        c.addAttribute(new Attribute("level", "fonds"));
+        c.appendChild(new Did(id.getIdentifier(), name));
+        c.appendChild(biogHist);
+        c.appendChild(custodHist);
+        c.appendChild(bibliography);
+        oddList.forEach(c::appendChild);
+
+        dsc.appendChild(c);
+
+        archdesc.appendChild(dsc);
+
+        ead.appendChild(archdesc);
+
+        return ead;
 
     }
 
@@ -93,8 +143,28 @@ public class Fond extends AtomResource {
     }
 
     @NotNull
+    public Bibliography getBibliography() {
+        return bibliography;
+    }
+
+    @NotNull
+    public BiogHist getBiogHist() {
+        return biogHist;
+    }
+
+    @NotNull
+    public CustodHist getCustodHist() {
+        return custodHist;
+    }
+
+    @NotNull
     public Optional<URL> getDummyImageUrl() {
         return dummyImageUrl;
+    }
+
+    @NotNull
+    public Optional<ExistResource> getFondPreferences() {
+        return fondPreferences;
     }
 
     @NotNull
@@ -115,6 +185,11 @@ public class Fond extends AtomResource {
     @NotNull
     public String getName() {
         return name;
+    }
+
+    @NotNull
+    public List<Odd> getOddList() {
+        return oddList;
     }
 
     @NotNull
@@ -177,6 +252,17 @@ public class Fond extends AtomResource {
     @Override
     public void setIdentifier(@NotNull String identifier) {
 
+        if (identifier.isEmpty()) {
+            throw new IllegalArgumentException("The identifier is not allowed to be an empty string.");
+        }
+
+        this.id = new IdFond(getArchiveId().getIdentifier(), identifier);
+
+        setResourceName(identifier + ResourceType.FOND.getNameSuffix());
+        setParentUri(String.format("%s/%s", ResourceRoot.ARCHIVAL_FONDS.getUri(), identifier));
+
+        updateXmlContent();
+
     }
 
     @NotNull
@@ -195,8 +281,67 @@ public class Fond extends AtomResource {
     @Override
     void updateXmlContent() {
 
-        Did didElement = new Did(id.getIdentifier(), name);
+        Element ead = createEadElement();
+        List<String> validationErrors = new ArrayList<>(0);
 
+        try {
+            validationErrors.addAll(validateEad(ead));
+        } catch (SAXException | ParserConfigurationException | IOException | ParsingException e) {
+            throw new RuntimeException("Failed to validate EAD.", e);
+        }
+
+        if (!validationErrors.isEmpty()) {
+            throw new IllegalArgumentException("EAD is not valid. The following errors were reported:\n" + validationErrors.toString());
+        }
+
+        AtomId id = new AtomId(getId().getContentXml().getText());
+        setXmlContent(new Document(new AtomEntry(id, createAtomAuthor(), AtomResource.localTime(), ead)));
+
+    }
+
+    private List<String> validateEad(@NotNull Element ead) throws SAXException, ParserConfigurationException, ParsingException, IOException {
+
+        SAXParserFactory factory = SAXParserFactory.newInstance();
+        factory.setValidating(false);
+        factory.setNamespaceAware(true);
+
+        SchemaFactory schemaFactory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
+        factory.setSchema(schemaFactory.newSchema(new Source[]{
+                new StreamSource(this.getClass().getResourceAsStream("/ead.xsd"))}));
+
+        SAXParser parser = factory.newSAXParser();
+        XMLReader reader = parser.getXMLReader();
+        reader.setErrorHandler(new SimpleErrorHandler());
+
+        Builder builder = new Builder(reader);
+        builder.build(ead.toXML(), Namespace.EAD.getUri());
+
+        return ((SimpleErrorHandler) reader.getErrorHandler()).getErrorMessages();
+
+    }
+
+    private class SimpleErrorHandler implements ErrorHandler {
+
+        private List<String> errorMessages = new ArrayList<>(0);
+
+        @Override
+        public void error(SAXParseException exception) throws SAXException {
+            errorMessages.add(exception.getMessage());
+        }
+
+        @Override
+        public void fatalError(SAXParseException exception) throws SAXException {
+            errorMessages.add(exception.getMessage());
+        }
+
+        public List<String> getErrorMessages() {
+            return errorMessages;
+        }
+
+        @Override
+        public void warning(SAXParseException exception) throws SAXException {
+            errorMessages.add(exception.getMessage());
+        }
 
     }
 

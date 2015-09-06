@@ -33,14 +33,25 @@ public class Bibliography extends Element {
         this.entries = Arrays.asList(entries);
 
         this.heading.ifPresent(this::appendChild);
-        this.entries.forEach(this::appendEntryElement);
+
+        if (this.entries.isEmpty()) {
+            appendEntryElement("");
+        } else {
+            this.entries.forEach(this::appendEntryElement);
+        }
 
     }
 
     private void appendEntryElement(@NotNull String text) {
+
         Element element = new Element(BIBREF_NAME, EAD_URI);
-        element.appendChild(text);
+
+        if (!text.isEmpty()) {
+            element.appendChild(text);
+        }
+
         this.appendChild(element);
+
     }
 
     @NotNull
