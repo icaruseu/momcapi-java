@@ -157,7 +157,7 @@ public class ArchiveManagerTest {
 
     @Test
     public void testListArchives() throws Exception {
-        assertEquals(am.listArchives().size(), 5);
+        assertEquals(am.listArchives().size(), 6);
     }
 
     @Test

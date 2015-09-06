@@ -4,6 +4,8 @@ import eu.icarus.momca.momcapi.model.ImageAccess;
 import eu.icarus.momca.momcapi.model.id.IdArchive;
 import eu.icarus.momca.momcapi.model.id.IdFond;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
+import eu.icarus.momca.momcapi.model.xml.ead.BiogHist;
+import eu.icarus.momca.momcapi.model.xml.ead.Did;
 import eu.icarus.momca.momcapi.query.XpathQuery;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,20 +16,35 @@ import java.util.Optional;
 /**
  * Created by daniel on 17.07.2015.
  */
-public class Fond extends ExistResource {
+public class Fond extends AtomResource {
 
     @NotNull
-    private final Optional<URL> dummyImageUrl;
+    private BiogHist biogHist;
     @NotNull
-    private final Optional<ExistResource> fondPreferences;
+    private Optional<URL> dummyImageUrl = Optional.empty();
     @NotNull
-    private final IdFond id;
+    private Optional<ExistResource> fondPreferences = Optional.empty();
     @NotNull
-    private final Optional<ImageAccess> imageAccess;
+    private Optional<ImageAccess> imageAccess = Optional.empty();
     @NotNull
-    private final Optional<URL> imagesUrl;
+    private Optional<URL> imagesUrl = Optional.empty();
     @NotNull
-    private final String name;
+    private String name;
+
+
+    public Fond(@NotNull String identifier, @NotNull IdArchive parentArchive, @NotNull String name) {
+
+        super(new IdFond(identifier, parentArchive.getIdentifier()), ResourceType.FOND, ResourceRoot.ARCHIVAL_FONDS);
+
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException("The name is not allowed to be an empty string.");
+        }
+
+        this.name = name;
+
+        updateXmlContent();
+
+    }
 
     public Fond(@NotNull ExistResource fondResource, @NotNull Optional<ExistResource> fondPreferences) {
 
@@ -63,7 +80,7 @@ public class Fond extends ExistResource {
 
     @NotNull
     public IdArchive getArchiveId() {
-        return id.getIdArchive();
+        return getId().getIdArchive();
     }
 
     @NotNull
@@ -73,12 +90,7 @@ public class Fond extends ExistResource {
 
     @NotNull
     public IdFond getId() {
-        return id;
-    }
-
-    @NotNull
-    public String getIdentifier() {
-        return id.getIdentifier();
+        return (IdFond) id;
     }
 
     @NotNull
@@ -153,6 +165,11 @@ public class Fond extends ExistResource {
 
     }
 
+    @Override
+    public void setIdentifier(@NotNull String identifier) {
+
+    }
+
     @NotNull
     @Override
     public String toString() {
@@ -164,6 +181,14 @@ public class Fond extends ExistResource {
                 ", imagesUrl=" + imagesUrl +
                 ", name='" + name + '\'' +
                 "} " + super.toString();
+    }
+
+    @Override
+    void updateXmlContent() {
+
+        Did didElement = new Did(id.getIdentifier(), name);
+
+
     }
 
 }

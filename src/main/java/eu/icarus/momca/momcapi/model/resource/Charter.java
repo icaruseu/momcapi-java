@@ -290,7 +290,7 @@ public class Charter extends ExistResource {
 
         SchemaFactory schemaFactory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
         factory.setSchema(schemaFactory.newSchema(new Source[]{
-                new StreamSource(this.getClass().getResourceAsStream("/cei10.xsd"))}));
+                new StreamSource(this.getClass().getResourceAsStream("/cei.xsd"))}));
 
         SAXParser parser = factory.newSAXParser();
         XMLReader reader = parser.getXMLReader();
@@ -316,16 +316,16 @@ public class Charter extends ExistResource {
             validationProblems.add(new XmlValidationProblem(severityLevel, e.getLineNumber(), e.getColumnNumber(), e.getMessage()));
         }
 
-        public void warning(@NotNull SAXParseException e) throws SAXException {
-            addToXmlValidationProblem(XmlValidationProblem.SeverityLevel.WARNING, e);
-        }
-
         public void error(@NotNull SAXParseException e) throws SAXException {
             addToXmlValidationProblem(XmlValidationProblem.SeverityLevel.ERROR, e);
         }
 
         public void fatalError(@NotNull SAXParseException e) throws SAXException {
             addToXmlValidationProblem(XmlValidationProblem.SeverityLevel.FATAL_ERROR, e);
+        }
+
+        public void warning(@NotNull SAXParseException e) throws SAXException {
+            addToXmlValidationProblem(XmlValidationProblem.SeverityLevel.WARNING, e);
         }
 
     }

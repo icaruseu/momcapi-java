@@ -127,8 +127,17 @@ public class FondManager extends AbstractManager {
             throw new IllegalArgumentException("There are still existing charters for fond '" + idFond.getIdentifier() + "'");
         }
 
-        momcaConnection.deleteCollection(String.format("%s/%s/%s", ResourceRoot.PUBLIC_CHARTERS.getUri(), idFond.getIdArchive().getIdentifier(), idFond.getIdentifier()));
-        momcaConnection.deleteCollection(String.format("%s/%s/%s", ResourceRoot.ARCHIVAL_FONDS.getUri(), idFond.getIdArchive().getIdentifier(), idFond.getIdentifier()));
+        momcaConnection.deleteCollection(
+                String.format("%s/%s/%s",
+                        ResourceRoot.PUBLIC_CHARTERS.getUri(),
+                        idFond.getIdArchive().getIdentifier(),
+                        idFond.getIdentifier()));
+
+        momcaConnection.deleteCollection(
+                String.format("%s/%s/%s",
+                        ResourceRoot.ARCHIVAL_FONDS.getUri(),
+                        idFond.getIdArchive().getIdentifier(),
+                        idFond.getIdentifier()));
 
     }
 
