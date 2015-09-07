@@ -135,6 +135,7 @@ public class ArchiveTest {
         archive.setIdentifier(newIdentifier);
         assertEquals(archive.getIdentifier(), newIdentifier);
         assertEquals(archive.getId(), new IdArchive(newIdentifier));
+        assertEquals(archive.getUri(), "/db/mom-data/metadata.archive.public/newIdentifier/newIdentifier.eag.xml");
 
     }
 

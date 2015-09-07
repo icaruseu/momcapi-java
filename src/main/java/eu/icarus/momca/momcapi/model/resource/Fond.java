@@ -103,10 +103,10 @@ public class Fond extends AtomResource {
         Element c = new Element("ead:c", uri);
         c.addAttribute(new Attribute("level", "fonds"));
         c.appendChild(new Did(id.getIdentifier(), name));
-        c.appendChild(biogHist);
-        c.appendChild(custodHist);
-        c.appendChild(bibliography);
-        oddList.forEach(c::appendChild);
+        c.appendChild(biogHist.copy());
+        c.appendChild(custodHist.copy());
+        c.appendChild(bibliography.copy());
+        oddList.forEach(odd -> c.appendChild(odd.copy()));
 
         dsc.appendChild(c);
 
@@ -249,6 +249,17 @@ public class Fond extends AtomResource {
 
     }
 
+    public void setArchiveId(@NotNull IdArchive idArchive) {
+        this.id = new IdFond(idArchive.getIdentifier(), getId().getIdentifier());
+        updateParentUri();
+        updateXmlContent();
+    }
+
+    public void setBibliography(@NotNull Bibliography bibliography) {
+        this.bibliography = bibliography;
+        updateXmlContent();
+    }
+
     @Override
     public void setIdentifier(@NotNull String identifier) {
 
@@ -259,7 +270,19 @@ public class Fond extends AtomResource {
         this.id = new IdFond(getArchiveId().getIdentifier(), identifier);
 
         setResourceName(identifier + ResourceType.FOND.getNameSuffix());
-        setParentUri(String.format("%s/%s", ResourceRoot.ARCHIVAL_FONDS.getUri(), identifier));
+        updateParentUri();
+
+        updateXmlContent();
+
+    }
+
+    public final void setName(@NotNull String name) {
+
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException("The name is not allowed to be an empty string.");
+        }
+
+        this.name = name;
 
         updateXmlContent();
 
@@ -276,6 +299,11 @@ public class Fond extends AtomResource {
                 ", imagesUrl=" + imagesUrl +
                 ", name='" + name + '\'' +
                 "} " + super.toString();
+    }
+
+    private void updateParentUri() {
+        setParentUri(String.format("%s/%s/%s", ResourceRoot.ARCHIVAL_FONDS.getUri(),
+                getId().getIdArchive().getIdentifier(), getIdentifier()));
     }
 
     @Override
