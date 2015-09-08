@@ -3,8 +3,12 @@ package eu.icarus.momca.momcapi.model.resource;
 import eu.icarus.momca.momcapi.model.id.IdArchive;
 import eu.icarus.momca.momcapi.model.id.IdFond;
 import eu.icarus.momca.momcapi.model.xml.ead.Bibliography;
+import eu.icarus.momca.momcapi.model.xml.ead.Odd;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.testng.Assert.*;
 
@@ -71,11 +75,6 @@ public class FondTest {
     }
 
     @Test
-    public void testGetOddList() throws Exception {
-
-    }
-
-    @Test
     public void testSetArchiveId() throws Exception {
 
         IdArchive newIdArchive = new IdArchive("NewArchive");
@@ -96,12 +95,16 @@ public class FondTest {
         Bibliography bibliography = new Bibliography("Heading", "First entry", "Second entry");
         fond.setBibliography(bibliography);
 
-        assertTrue(fond.getBibliography().getEntries().size() == 2);
+        assertEquals(fond.getBibliography().getEntries().size(), 2);
         assertTrue(fond.getBibliography().getHeading().isPresent());
 
         assertTrue(fond.toXML().contains("<ead:head>Heading</ead:head>"));
         assertTrue(fond.toXML().contains("<ead:bibref>First entry</ead:bibref>"));
         assertTrue(fond.toXML().contains("<ead:bibref>Second entry</ead:bibref>"));
+
+        fond.setBibliography(null);
+
+        assertTrue(fond.getBibliography().getEntries().isEmpty());
 
     }
 
@@ -118,6 +121,12 @@ public class FondTest {
 
     }
 
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testSetIdentifierEmpty() throws Exception {
+        fond.setIdentifier("");
+    }
+
+
     @Test
     public void testSetName() throws Exception {
 
@@ -126,6 +135,35 @@ public class FondTest {
 
         assertEquals(fond.getName(), newName);
         assertTrue(fond.toXML().contains("<ead:unittitle>New name</ead:unittitle>"));
+
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testSetNameEmpty() throws Exception {
+        fond.setName("");
+    }
+
+    @Test
+    public void testSetOddList() throws Exception {
+
+        assertEquals(fond.getOddList().size(), 1);
+
+        List<Odd> oddList = new ArrayList<>();
+        oddList.add(new Odd("First Odd:", "Paragraph 1", "Paragraph2"));
+        oddList.add(new Odd("Second Odd:", "Paragraph 3", "Paragraph 4"));
+
+        fond.setOddList(oddList);
+
+        assertEquals(fond.getOddList().size(), 2);
+        assertTrue(fond.toXML().contains("<ead:head>First Odd:</ead:head>"));
+        assertTrue(fond.toXML().contains("<ead:p>Paragraph 3</ead:p>"));
+
+        fond.setOddList(new ArrayList<>(0));
+
+        assertEquals(fond.getOddList().size(), 1);
+
+        assertFalse(fond.toXML().contains("<ead:head>First Odd:</ead:head>"));
+        assertFalse(fond.toXML().contains("<ead:p>Paragraph 3</ead:p>"));
 
     }
 

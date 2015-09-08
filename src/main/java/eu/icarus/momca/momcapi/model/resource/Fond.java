@@ -10,6 +10,7 @@ import eu.icarus.momca.momcapi.model.xml.ead.*;
 import eu.icarus.momca.momcapi.query.XpathQuery;
 import nu.xom.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -61,8 +62,7 @@ public class Fond extends AtomResource {
         }
 
         this.name = name;
-
-        oddList.add(new Odd());
+        resetOddList();
 
         updateXmlContent();
 
@@ -249,15 +249,27 @@ public class Fond extends AtomResource {
 
     }
 
+    private void resetOddList() {
+        oddList.clear();
+        oddList.add(new Odd());
+    }
+
     public void setArchiveId(@NotNull IdArchive idArchive) {
         this.id = new IdFond(idArchive.getIdentifier(), getId().getIdentifier());
         updateParentUri();
         updateXmlContent();
     }
 
-    public void setBibliography(@NotNull Bibliography bibliography) {
-        this.bibliography = bibliography;
+    public void setBibliography(@Nullable Bibliography bibliography) {
+
+        if (bibliography == null) {
+            this.bibliography = new Bibliography();
+        } else {
+            this.bibliography = bibliography;
+        }
+
         updateXmlContent();
+
     }
 
     @Override
@@ -283,6 +295,19 @@ public class Fond extends AtomResource {
         }
 
         this.name = name;
+
+        updateXmlContent();
+
+    }
+
+    public void setOddList(@Nullable List<Odd> oddList) {
+
+        if (oddList == null || oddList.isEmpty()) {
+            resetOddList();
+        } else {
+            this.oddList.clear();
+            this.oddList.addAll(oddList);
+        }
 
         updateXmlContent();
 
