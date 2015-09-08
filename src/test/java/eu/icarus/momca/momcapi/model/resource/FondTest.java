@@ -9,6 +9,7 @@ import eu.icarus.momca.momcapi.model.xml.ead.Odd;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,18 +32,11 @@ public class FondTest {
 
     @Test
     public void testConstructor1() throws Exception {
+
         assertEquals(fond.getIdentifier(), identifier);
         assertEquals(fond.getArchiveId(), idArchive);
         assertFalse(fond.getCreator().isPresent());
-    }
-
-    @Test
-    public void testGetArchiveId() throws Exception {
-
-    }
-
-    @Test
-    public void testGetDummyImageUrl() throws Exception {
+        assertFalse(fond.getFondPreferences().isPresent());
 
     }
 
@@ -69,12 +63,15 @@ public class FondTest {
     @Test
     public void testSetArchiveId() throws Exception {
 
+        fond.setDummyImageUrl(new URL("http://example.org/img.png"));
+
         IdArchive newIdArchive = new IdArchive("NewArchive");
         fond.setArchiveId(newIdArchive);
 
         assertEquals(fond.getArchiveId(), newIdArchive);
         assertTrue(fond.toXML().contains("<atom:id>tag:www.monasterium.net,2011:/fond/NewArchive/000-Introduction</atom:id>"));
         assertEquals(fond.getUri(), "/db/mom-data/metadata.fond.public/NewArchive/000-Introduction/000-Introduction.ead.xml");
+        assertEquals(fond.getFondPreferences().get().getUri(), "/db/mom-data/metadata.fond.public/NewArchive/000-Introduction/000-Introduction.preferences.xml");
 
     }
 
@@ -161,7 +158,30 @@ public class FondTest {
     }
 
     @Test
+    public void testSetDummyImageUrl() throws Exception {
+
+        assertFalse(fond.getDummyImageUrl().isPresent());
+        assertFalse(fond.getFondPreferences().isPresent());
+
+        URL dummyImageUrl = new URL("http://example.org/img.png");
+        fond.setDummyImageUrl(dummyImageUrl);
+
+        assertTrue(fond.getDummyImageUrl().isPresent());
+        assertEquals(fond.getDummyImageUrl().get(), dummyImageUrl);
+        assertTrue(fond.getFondPreferences().isPresent());
+        assertTrue(fond.getFondPreferences().get().toXML().contains("<xrx:param name=\"dummy-image-url\">http://example.org/img.png</xrx:param>"));
+
+        fond.setDummyImageUrl(null);
+
+        assertFalse(fond.getDummyImageUrl().isPresent());
+        assertFalse(fond.getFondPreferences().isPresent());
+
+    }
+
+    @Test
     public void testSetIdentifier() throws Exception {
+
+        fond.setDummyImageUrl(new URL("http://example.org/img.png"));
 
         String newIdentifier = "NewIdentifier";
         fond.setIdentifier(newIdentifier);
@@ -170,6 +190,7 @@ public class FondTest {
         assertTrue(fond.toXML().contains("<ead:unitid identifier=\"NewIdentifier\">NewIdentifier</ead:unitid>"));
         assertTrue(fond.toXML().contains("<atom:id>tag:www.monasterium.net,2011:/fond/IT-BSNSP/NewIdentifier</atom:id>"));
         assertEquals(fond.getUri(), "/db/mom-data/metadata.fond.public/IT-BSNSP/NewIdentifier/NewIdentifier.ead.xml");
+        assertEquals(fond.getFondPreferences().get().getUri(), "/db/mom-data/metadata.fond.public/IT-BSNSP/NewIdentifier/NewIdentifier.preferences.xml");
 
     }
 

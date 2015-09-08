@@ -192,6 +192,7 @@ public class Fond extends AtomResource {
         return oddList;
     }
 
+    @Deprecated
     @NotNull
     private Optional<URL> initDummyImageUrl() {
 
@@ -255,9 +256,13 @@ public class Fond extends AtomResource {
     }
 
     public void setArchiveId(@NotNull IdArchive idArchive) {
+
         this.id = new IdFond(idArchive.getIdentifier(), getId().getIdentifier());
+
         updateParentUri();
         updateXmlContent();
+        updatePreferencesResource();
+
     }
 
     public void setBibliography(@Nullable Bibliography bibliography) {
@@ -296,6 +301,18 @@ public class Fond extends AtomResource {
 
     }
 
+    public void setDummyImageUrl(@Nullable URL dummyImageUrl) {
+
+        if (dummyImageUrl == null) {
+            this.dummyImageUrl = Optional.empty();
+        } else {
+            this.dummyImageUrl = Optional.of(dummyImageUrl);
+        }
+
+        updatePreferencesResource();
+
+    }
+
     @Override
     public void setIdentifier(@NotNull String identifier) {
 
@@ -309,6 +326,7 @@ public class Fond extends AtomResource {
         updateParentUri();
 
         updateXmlContent();
+        updatePreferencesResource();
 
     }
 
@@ -353,6 +371,42 @@ public class Fond extends AtomResource {
     private void updateParentUri() {
         setParentUri(String.format("%s/%s/%s", ResourceRoot.ARCHIVAL_FONDS.getUri(),
                 getId().getIdArchive().getIdentifier(), getIdentifier()));
+    }
+
+    private void updatePreferencesResource() {
+
+        if (this.imageAccess.isPresent() || this.imagesUrl.isPresent() || this.dummyImageUrl.isPresent()) {
+
+            String namespaceUri = Namespace.XRX.getUri();
+
+            String preferencesName = getIdentifier() + ".preferences.xml";
+            String preferencesUri = getParentUri();
+
+            Element preferences = new Element("xrx:preferences", namespaceUri);
+
+            Element imageAccess = new Element("xrx:param", namespaceUri);
+            imageAccess.addAttribute(new Attribute("name", "image-access"));
+            imageAccess.appendChild(this.imageAccess.map(ImageAccess::getText).orElse(ImageAccess.FREE.getText()));
+            preferences.appendChild(imageAccess);
+
+            Element dummyImageUrl = new Element("xrx:param", namespaceUri);
+            dummyImageUrl.addAttribute(new Attribute("name", "dummy-image-url"));
+            this.dummyImageUrl.ifPresent(url -> dummyImageUrl.appendChild(url.toExternalForm()));
+            preferences.appendChild(dummyImageUrl);
+
+            Element imageServerBaseUrl = new Element("xrx:param", namespaceUri);
+            imageServerBaseUrl.addAttribute(new Attribute("name", "image-server-base-url"));
+            this.imagesUrl.ifPresent(url -> imageServerBaseUrl.appendChild(url.toExternalForm()));
+            preferences.appendChild(imageServerBaseUrl);
+
+            this.fondPreferences = Optional.of(new ExistResource(preferencesName, preferencesUri, preferences.toXML()));
+
+        } else {
+
+            this.fondPreferences = Optional.empty();
+
+        }
+
     }
 
     @Override
