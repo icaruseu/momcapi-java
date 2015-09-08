@@ -3,6 +3,7 @@ package eu.icarus.momca.momcapi.model.resource;
 import eu.icarus.momca.momcapi.model.id.IdArchive;
 import eu.icarus.momca.momcapi.model.id.IdFond;
 import eu.icarus.momca.momcapi.model.xml.ead.Bibliography;
+import eu.icarus.momca.momcapi.model.xml.ead.CustodHist;
 import eu.icarus.momca.momcapi.model.xml.ead.Odd;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -41,11 +42,6 @@ public class FondTest {
 
     @Test
     public void testGetBiogHist() throws Exception {
-
-    }
-
-    @Test
-    public void testGetCustodHist() throws Exception {
 
     }
 
@@ -105,6 +101,36 @@ public class FondTest {
         fond.setBibliography(null);
 
         assertTrue(fond.getBibliography().getEntries().isEmpty());
+
+    }
+
+    @Test
+    public void testSetCustodHist() throws Exception {
+
+        assertFalse(fond.getCustodHist().getHeading().getText().isPresent());
+        assertEquals(fond.getCustodHist().getParagraphs().size(), 1);
+        assertFalse(fond.getCustodHist().getParagraphs().get(0).getContent().isPresent());
+
+        CustodHist custodHist = new CustodHist("CustodHist", "Paragraph 1", "Paragraph 2");
+        fond.setCustodHist(custodHist);
+
+        assertTrue(fond.getCustodHist().getHeading().getText().isPresent());
+        assertEquals(fond.getCustodHist().getHeading().getText().get(), "CustodHist");
+        assertEquals(fond.getCustodHist().getParagraphs().size(), 2);
+        assertEquals(fond.getCustodHist().getParagraphs().get(0).getContent().get(), "Paragraph 1");
+        assertEquals(fond.getCustodHist().getParagraphs().get(1).getContent().get(), "Paragraph 2");
+        assertTrue(fond.toXML().contains("<ead:head>CustodHist</ead:head>"));
+        assertTrue(fond.toXML().contains("<ead:p>Paragraph 1</ead:p>"));
+        assertTrue(fond.toXML().contains("<ead:p>Paragraph 2</ead:p>"));
+
+        fond.setCustodHist(null);
+
+        assertFalse(fond.getCustodHist().getHeading().getText().isPresent());
+        assertEquals(fond.getCustodHist().getParagraphs().size(), 1);
+        assertFalse(fond.getCustodHist().getParagraphs().get(0).getContent().isPresent());
+        assertFalse(fond.toXML().contains("<ead:head>CustodHist</ead:head>"));
+        assertFalse(fond.toXML().contains("<ead:p>Paragraph 1</ead:p>"));
+        assertFalse(fond.toXML().contains("<ead:p>Paragraph 2</ead:p>"));
 
     }
 

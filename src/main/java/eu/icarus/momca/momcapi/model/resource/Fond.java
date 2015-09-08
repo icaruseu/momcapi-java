@@ -272,6 +272,18 @@ public class Fond extends AtomResource {
 
     }
 
+    public void setCustodHist(@Nullable CustodHist custodHist) {
+
+        if (custodHist == null) {
+            this.custodHist = new CustodHist();
+        } else {
+            this.custodHist = custodHist;
+        }
+
+        updateXmlContent();
+
+    }
+
     @Override
     public void setIdentifier(@NotNull String identifier) {
 
