@@ -330,6 +330,30 @@ public class Fond extends AtomResource {
 
     }
 
+    public void setImageAccess(@Nullable ImageAccess imageAccess) {
+
+        if (imageAccess == null) {
+            this.imageAccess = Optional.empty();
+        } else {
+            this.imageAccess = Optional.of(imageAccess);
+        }
+
+        updatePreferencesResource();
+
+    }
+
+    public void setImagesUrl(@Nullable URL imagesUrl) {
+
+        if (imagesUrl == null) {
+            this.imagesUrl = Optional.empty();
+        } else {
+            this.imagesUrl = Optional.of(imagesUrl);
+        }
+
+        updatePreferencesResource();
+
+    }
+
     public final void setName(@NotNull String name) {
 
         if (name.isEmpty()) {

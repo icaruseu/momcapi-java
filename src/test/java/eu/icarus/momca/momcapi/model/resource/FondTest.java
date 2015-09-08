@@ -1,5 +1,6 @@
 package eu.icarus.momca.momcapi.model.resource;
 
+import eu.icarus.momca.momcapi.model.ImageAccess;
 import eu.icarus.momca.momcapi.model.id.IdArchive;
 import eu.icarus.momca.momcapi.model.id.IdFond;
 import eu.icarus.momca.momcapi.model.xml.ead.Bibliography;
@@ -48,16 +49,6 @@ public class FondTest {
     @Test
     public void testGetId() throws Exception {
         assertEquals(fond.getId(), new IdFond(idArchive.getIdentifier(), identifier));
-    }
-
-    @Test
-    public void testGetImageAccess() throws Exception {
-
-    }
-
-    @Test
-    public void testGetImagesUrl() throws Exception {
-
     }
 
     @Test
@@ -172,9 +163,10 @@ public class FondTest {
         assertTrue(fond.getFondPreferences().get().toXML().contains("<xrx:param name=\"dummy-image-url\">http://example.org/img.png</xrx:param>"));
 
         fond.setDummyImageUrl(null);
+        fond.setImageAccess(ImageAccess.RESTRICTED);
 
         assertFalse(fond.getDummyImageUrl().isPresent());
-        assertFalse(fond.getFondPreferences().isPresent());
+        assertFalse(fond.getFondPreferences().get().toXML().contains("<xrx:param name=\"dummy-image-url\"/>"));
 
     }
 
@@ -199,6 +191,47 @@ public class FondTest {
         fond.setIdentifier("");
     }
 
+    @Test
+    public void testSetImageAccess() throws Exception {
+
+        assertFalse(fond.getImageAccess().isPresent());
+        assertFalse(fond.getFondPreferences().isPresent());
+
+        fond.setImageAccess(ImageAccess.RESTRICTED);
+
+        assertTrue(fond.getImageAccess().isPresent());
+        assertEquals(fond.getImageAccess().get(), ImageAccess.RESTRICTED);
+        assertTrue(fond.getFondPreferences().get().toXML().contains("<xrx:param name=\"image-access\">restricted</xrx:param>"));
+
+        fond.setImageAccess(null);
+        fond.setDummyImageUrl(new URL("http://www.url.de/image.png"));
+
+        assertFalse(fond.getImageAccess().isPresent());
+        assertTrue(fond.getFondPreferences().get().toXML().contains("<xrx:param name=\"image-access\">free</xrx:param>"));
+
+    }
+
+    @Test
+    public void testSetImagesUrl() throws Exception {
+
+        assertFalse(fond.getImagesUrl().isPresent());
+        assertFalse(fond.getFondPreferences().isPresent());
+
+        URL ImagesUrl = new URL("http://example.org");
+        fond.setImagesUrl(ImagesUrl);
+
+        assertTrue(fond.getImagesUrl().isPresent());
+        assertEquals(fond.getImagesUrl().get(), ImagesUrl);
+        assertTrue(fond.getFondPreferences().isPresent());
+        assertTrue(fond.getFondPreferences().get().toXML().contains("<xrx:param name=\"image-server-base-url\">http://example.org</xrx:param>"));
+
+        fond.setImagesUrl(null);
+        fond.setImageAccess(ImageAccess.RESTRICTED);
+
+        assertFalse(fond.getImagesUrl().isPresent());
+        assertFalse(fond.getFondPreferences().get().toXML().contains("<xrx:param name=\"image-server-base-url\"/>"));
+
+    }
 
     @Test
     public void testSetName() throws Exception {
