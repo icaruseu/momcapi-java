@@ -1,5 +1,6 @@
 package eu.icarus.momca.momcapi.model.resource;
 
+import eu.icarus.momca.momcapi.Util;
 import eu.icarus.momca.momcapi.model.ImageAccess;
 import eu.icarus.momca.momcapi.model.id.IdArchive;
 import eu.icarus.momca.momcapi.model.id.IdFond;
@@ -68,16 +69,35 @@ public class Fond extends AtomResource {
 
     }
 
-    public Fond(@NotNull ExistResource fondResource, @NotNull Optional<ExistResource> fondPreferences) {
+    public Fond(@NotNull IdFond idFond, @NotNull String fondXmlContent, @Nullable String preferencesXmlContent) {
+
+        this(
+                new ExistResource(
+                        String.format("%s%s", idFond.getIdentifier(), ResourceType.FOND.getNameSuffix()),
+                        String.format("%s/%s/%s", ResourceRoot.ARCHIVAL_FONDS.getUri(), idFond.getIdArchive().getIdentifier(), idFond.getIdentifier()),
+                        fondXmlContent),
+                preferencesXmlContent == null ?
+                        Optional.empty() :
+                        Optional.of(new ExistResource(
+                                String.format("%s%s", idFond.getIdentifier(), ".preferences.xml"),
+                                String.format("%s/%s/%s", ResourceRoot.ARCHIVAL_FONDS.getUri(), idFond.getIdArchive().getIdentifier(), idFond.getIdentifier()),
+                                preferencesXmlContent
+                        )));
+
+    }
+
+    public Fond(@NotNull ExistResource fondResource, @NotNull Optional<ExistResource> fondPreferencesResource) {
 
         super(fondResource);
 
-        id = initId();
-        this.fondPreferences = fondPreferences;
-        this.name = queryUniqueElement(XpathQuery.QUERY_EAD_UNITTITLE);
-        this.imageAccess = initImageAccess();
-        this.dummyImageUrl = initDummyImageUrl();
-        this.imagesUrl = initImagesUrl();
+        Element fondXml = toDocument().getRootElement();
+
+        this.id = readId(fondXml);
+        this.name = readName(fondXml);
+
+        this.oddList = readOddList(fondXml);
+
+        fondPreferencesResource.ifPresent(this::initFondPreferences);
 
     }
 
@@ -117,6 +137,20 @@ public class Fond extends AtomResource {
         return ead;
 
     }
+
+//    @Deprecated
+//    public Fond(@NotNull ExistResource fondResource, @NotNull Optional<ExistResource> fondPreferences) {
+//
+//        super(fondResource);
+//
+////        id = readId();
+//        this.fondPreferences = fondPreferences;
+//        this.name = queryUniqueElement(XpathQuery.QUERY_EAD_UNITTITLE);
+//        this.imageAccess = initImageAccess();
+//        this.dummyImageUrl = initDummyImageUrl();
+//        this.imagesUrl = initImagesUrl();
+//
+//    }
 
     @NotNull
     private Optional<URL> createUrl(@NotNull String urlString) {
@@ -207,20 +241,15 @@ public class Fond extends AtomResource {
 
     }
 
-    @NotNull
-    private IdFond initId() {
+    private void initFondPreferences(ExistResource existResource) {
+        Element fondPreferencesElement = existResource.toDocument().getRootElement();
 
-        String idString = queryUniqueElement(XpathQuery.QUERY_ATOM_ID);
-
-        if (idString.isEmpty()) {
-            String errorMessage = String.format("No atom:id in xml content: '%s'", toDocument().toXML());
-            throw new IllegalArgumentException(errorMessage);
-        } else {
-            return new IdFond(new AtomId(idString));
-        }
-
+        this.imageAccess = readImageAccess(fondPreferencesElement);
+        this.dummyImageUrl = readDummyImageUrl(fondPreferencesElement);
+        this.imagesUrl = readImagesUrl(fondPreferencesElement);
     }
 
+    @Deprecated
     @NotNull
     private Optional<ImageAccess> initImageAccess() {
 
@@ -236,6 +265,7 @@ public class Fond extends AtomResource {
         return access;
     }
 
+    @Deprecated
     @NotNull
     private Optional<URL> initImagesUrl() {
 
@@ -247,6 +277,50 @@ public class Fond extends AtomResource {
         }
 
         return url;
+
+    }
+
+    private Optional<URL> readDummyImageUrl(@NotNull Element xml) {
+        String urlString = Util.queryXmlToString(xml, XpathQuery.QUERY_XRX_DUMMY_IMAGE_URL);
+        return createUrl(urlString);
+    }
+
+    @NotNull
+    private IdFond readId(@NotNull Element xml) {
+
+        String idString = Util.queryXmlToString(xml, XpathQuery.QUERY_ATOM_ID);
+
+        if (idString.isEmpty()) {
+            String errorMessage = String.format("No atom:id in xml content: '%s'", toDocument().toXML());
+            throw new IllegalArgumentException(errorMessage);
+        } else {
+            return new IdFond(new AtomId(idString));
+        }
+
+    }
+
+    private Optional<ImageAccess> readImageAccess(Element xml) {
+        String imageAccessString = Util.queryXmlToString(xml, XpathQuery.QUERY_XRX_IMAGE_ACCESS);
+        return Optional.of(ImageAccess.fromText(imageAccessString));
+    }
+
+    private Optional<URL> readImagesUrl(@NotNull Element xml) {
+        String urlString = Util.queryXmlToString(xml, XpathQuery.QUERY_XRX_IMAGE_SERVER_BASE_URL);
+        return createUrl(urlString);
+    }
+
+    @NotNull
+    private String readName(Element xml) {
+        return Util.queryXmlToString(xml, XpathQuery.QUERY_EAD_UNITTITLE);
+    }
+
+    @NotNull
+    private List<Odd> readOddList(@NotNull Element xml) {
+
+        List<Odd> results = new ArrayList<>();
+
+
+        return results;
 
     }
 

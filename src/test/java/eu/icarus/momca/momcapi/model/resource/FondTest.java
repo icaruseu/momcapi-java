@@ -42,6 +42,29 @@ public class FondTest {
     }
 
     @Test
+    public void testConstructor3() throws Exception {
+
+        fond.setImageAccess(ImageAccess.RESTRICTED);
+        URL dummyUrl = new URL("http://example.org/image.png");
+        fond.setDummyImageUrl(dummyUrl);
+        URL imagesUrl = new URL("http://example.org");
+        fond.setImagesUrl(imagesUrl);
+
+        Fond newFond = new Fond(fond, fond.getFondPreferences());
+
+        assertEquals(newFond.getIdentifier(), identifier);
+        assertEquals(newFond.getArchiveId(), idArchive);
+        assertFalse(newFond.getCreator().isPresent());
+        assertTrue(newFond.getImageAccess().isPresent());
+        assertEquals(newFond.getImageAccess().get(), ImageAccess.RESTRICTED);
+        assertTrue(newFond.getDummyImageUrl().isPresent());
+        assertEquals(newFond.getDummyImageUrl().get(), dummyUrl);
+        assertTrue(newFond.getImagesUrl().isPresent());
+        assertEquals(newFond.getImagesUrl().get(), imagesUrl);
+
+    }
+
+    @Test
     public void testGetFondPreferences() throws Exception {
 
     }
