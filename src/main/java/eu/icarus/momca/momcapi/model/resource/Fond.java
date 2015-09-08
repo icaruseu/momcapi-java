@@ -138,20 +138,6 @@ public class Fond extends AtomResource {
 
     }
 
-//    @Deprecated
-//    public Fond(@NotNull ExistResource fondResource, @NotNull Optional<ExistResource> fondPreferences) {
-//
-//        super(fondResource);
-//
-////        id = readId();
-//        this.fondPreferences = fondPreferences;
-//        this.name = queryUniqueElement(XpathQuery.QUERY_EAD_UNITTITLE);
-//        this.imageAccess = initImageAccess();
-//        this.dummyImageUrl = initDummyImageUrl();
-//        this.imagesUrl = initImagesUrl();
-//
-//    }
-
     @NotNull
     private Optional<URL> createUrl(@NotNull String urlString) {
 
@@ -226,58 +212,12 @@ public class Fond extends AtomResource {
         return oddList;
     }
 
-    @Deprecated
-    @NotNull
-    private Optional<URL> initDummyImageUrl() {
-
-        Optional<URL> url = Optional.empty();
-
-        if (fondPreferences.isPresent()) {
-            String urlString = fondPreferences.get().queryUniqueElement(XpathQuery.QUERY_XRX_DUMMY_IMAGE_URL);
-            url = createUrl(urlString);
-        }
-
-        return url;
-
-    }
-
     private void initFondPreferences(ExistResource existResource) {
         Element fondPreferencesElement = existResource.toDocument().getRootElement();
 
         this.imageAccess = readImageAccess(fondPreferencesElement);
         this.dummyImageUrl = readDummyImageUrl(fondPreferencesElement);
         this.imagesUrl = readImagesUrl(fondPreferencesElement);
-    }
-
-    @Deprecated
-    @NotNull
-    private Optional<ImageAccess> initImageAccess() {
-
-        Optional<ImageAccess> access = Optional.empty();
-
-        if (fondPreferences.isPresent()) {
-
-            String imageAccessString = fondPreferences.get().queryUniqueElement(XpathQuery.QUERY_XRX_IMAGE_ACCESS);
-            access = Optional.of(ImageAccess.fromText(imageAccessString));
-
-        }
-
-        return access;
-    }
-
-    @Deprecated
-    @NotNull
-    private Optional<URL> initImagesUrl() {
-
-        Optional<URL> url = Optional.empty();
-
-        if (fondPreferences.isPresent()) {
-            String urlString = fondPreferences.get().queryUniqueElement(XpathQuery.QUERY_XRX_IMAGE_SERVER_BASE_URL);
-            url = createUrl(urlString);
-        }
-
-        return url;
-
     }
 
     private Optional<URL> readDummyImageUrl(@NotNull Element xml) {
@@ -319,7 +259,7 @@ public class Fond extends AtomResource {
 
         List<Odd> results = new ArrayList<>();
 
-
+        // TODO
         return results;
 
     }

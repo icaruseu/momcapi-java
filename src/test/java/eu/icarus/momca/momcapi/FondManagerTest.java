@@ -3,13 +3,11 @@ package eu.icarus.momca.momcapi;
 import eu.icarus.momca.momcapi.model.ImageAccess;
 import eu.icarus.momca.momcapi.model.id.IdArchive;
 import eu.icarus.momca.momcapi.model.id.IdFond;
-import eu.icarus.momca.momcapi.model.id.IdUser;
 import eu.icarus.momca.momcapi.model.resource.Archive;
 import eu.icarus.momca.momcapi.model.resource.Fond;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,78 +31,40 @@ public class FondManagerTest {
     @Test
     public void testAddFond() throws Exception {
 
-        Archive archive = mc.getArchiveManager().getArchive(new IdArchive("DE-SAMuenchen")).get();
+        String identifier = "Urkunden";
+        String archiveIdentifier = "DE-SAMuenchen";
+        IdArchive idArchive = new IdArchive(archiveIdentifier);
+        String name = "Alle Urkunden";
 
-        Fond fond1 = fm.addFond(new IdUser("admin"), archive, "Urkunden", "Alle Urkunden", null,
-                new URL("http://ex.com/img"), null);
-        assertTrue(mc.getExistResource("Urkunden.preferences.xml", "/db/mom-data/metadata.fond.public/DE-SAMuenchen/Urkunden").isPresent());
-        fm.deleteFond(fond1.getId());
+        Fond newFond = new Fond(identifier, idArchive, name);
 
-        assertEquals(fond1.getId().getContentXml().getText(), "tag:www.monasterium.net,2011:/fond/DE-SAMuenchen/Urkunden");
-        assertEquals(fond1.getIdentifier(), "Urkunden");
-        assertEquals(fond1.getArchiveId().getContentXml().getText(), "tag:www.monasterium.net,2011:/archive/DE-SAMuenchen");
-        assertEquals(fond1.getName(), "Alle Urkunden");
-        assertEquals(fond1.getImageAccess().get(), ImageAccess.FREE);
-        assertEquals(fond1.getImagesUrl().get().toExternalForm(), "http://ex.com/img");
-        assertFalse(fond1.getDummyImageUrl().isPresent());
+        fm.addFond(newFond);
 
-        Fond fond2 = fm.addFond(new IdUser("admin"), archive, "Urkunden1", "Andere Urkunden", ImageAccess.RESTRICTED,
-                null, new URL("http://ex.com/dummy.png"));
-        fm.deleteFond(fond2.getId());
+        Optional<Fond> fondFromTheDatabaseOptional = fm.getFond(new IdFond(archiveIdentifier, identifier));
+        fm.deleteFond(newFond.getId());
 
-        assertEquals(fond2.getImageAccess().get(), ImageAccess.RESTRICTED);
-        assertFalse(fond2.getImagesUrl().isPresent());
-        assertEquals(fond2.getDummyImageUrl().get().toExternalForm(), "http://ex.com/dummy.png");
-
-        Fond fond3 = fm.addFond(new IdUser("admin"), archive, "Urkunden2", "Noch andere Urkunden", null,
-                null, null);
-        assertFalse(mc.getExistResource("Urkunden2.preferences.xml", "/db/mom-data/metadata.fond.public/DE-SAMuenchen/Urkunden2").isPresent());
-        fm.deleteFond(fond3.getId());
-
-        assertFalse(fond3.getImageAccess().isPresent());
-        assertFalse(fond3.getImagesUrl().isPresent());
-        assertFalse(fond3.getDummyImageUrl().isPresent());
+        assertTrue(fondFromTheDatabaseOptional.isPresent());
+        assertEquals(fondFromTheDatabaseOptional.get().getIdentifier(), identifier);
+        assertEquals(fondFromTheDatabaseOptional.get().getArchiveId(), idArchive);
+        assertEquals(fondFromTheDatabaseOptional.get().getName(), name);
 
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddFondExisting() throws Exception {
-        Archive archive = mc.getArchiveManager().getArchive(new IdArchive("CH-KAE")).get();
-        fm.addFond(new IdUser("admin"), archive, "Urkunden", "Urkunden (0947-1483)", ImageAccess.FREE,
-                new URL("http://www.klosterarchiv.ch/urkunden/urkunden-3000"), null);
-    }
-
-    @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testAddFondNoIdentifier() throws Exception {
-        Archive archive = mc.getArchiveManager().getArchive(new IdArchive("CH-KAE")).get();
-        fm.addFond(new IdUser("admin"), archive, "", "Weitere Urkunden", ImageAccess.FREE,
-                new URL("http://www.klosterarchiv.ch/urkunden/urkunden-3000"), null);
-    }
-
-    @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testAddFondNoName() throws Exception {
-        Archive archive = mc.getArchiveManager().getArchive(new IdArchive("CH-KAE")).get();
-        fm.addFond(new IdUser("admin"), archive, "Urkunden2", "", ImageAccess.FREE,
-                new URL("http://www.klosterarchiv.ch/urkunden/urkunden-3000"), null);
-    }
-
-    @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testAddFondNonexistentAuthor() throws Exception {
-        Archive archive = mc.getArchiveManager().getArchive(new IdArchive("CH-KAE")).get();
-        fm.addFond(new IdUser("someAuthor"), archive, "Urkunden2", "Weitere Urkunden", ImageAccess.FREE,
-                new URL("http://www.klosterarchiv.ch/urkunden/urkunden-3000"), null);
+        fm.addFond(new Fond("Urkunden", new IdArchive("CH-KAE"), "Klosterurkunden"));
     }
 
     @Test
     public void testDeleteFond() throws Exception {
 
-        Archive archive = mc.getArchiveManager().getArchive(new IdArchive("DE-SAMuenchen")).get();
+        IdArchive idArchive = new IdArchive("DE-SAMuenchen");
+        IdFond id = new IdFond(idArchive.getIdentifier(), "MUrkunden");
 
-        Fond fond = fm.addFond(new IdUser("admin"), archive, "MUrkunden", "Mehrere Urkunden", null,
-                new URL("http://ex.com/img"), null);
-        fm.deleteFond(fond.getId());
+        fm.addFond(new Fond("MUrkunden", new IdArchive("DE-SAMuenchen"), "Mehrere Urkunden"));
+        fm.deleteFond(id);
 
-        assertFalse(fm.getFond(fond.getId()).isPresent());
+        assertFalse(fm.getFond(id).isPresent());
         assertFalse(mc.getCollection("/db/mom-data/metadata.charter.public/DE-SAMuenchen/MUrkunden").isPresent());
         assertFalse(mc.getCollection("/db/mom-data/metadata.fond.public/DE-SAMuenchen/MUrkunden").isPresent());
 

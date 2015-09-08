@@ -38,6 +38,7 @@ public class FondTest {
         assertEquals(fond.getArchiveId(), idArchive);
         assertFalse(fond.getCreator().isPresent());
         assertFalse(fond.getFondPreferences().isPresent());
+        assertEquals(fond.getUri(), "/db/mom-data/metadata.fond.public/IT-BSNSP/000-Introduction/000-Introduction.ead.xml");
 
     }
 
@@ -51,6 +52,8 @@ public class FondTest {
         fond.setImagesUrl(imagesUrl);
 
         Fond newFond = new Fond(fond, fond.getFondPreferences());
+
+        assertEquals(fond.getUri(), "/db/mom-data/metadata.fond.public/IT-BSNSP/000-Introduction/000-Introduction.ead.xml");
 
         assertEquals(newFond.getIdentifier(), identifier);
         assertEquals(newFond.getArchiveId(), idArchive);
