@@ -99,6 +99,7 @@ public class Fond extends AtomResource {
         this.oddList = readOddList(fondXml);
         this.biogHist = readBiogHist(fondXml);
         this.custodHist = readCustodHist(fondXml);
+        this.bibliography = readBibliography(fondXml);
 
         fondPreferencesResource.ifPresent(this::initFondPreferences);
 
@@ -221,6 +222,31 @@ public class Fond extends AtomResource {
         this.imageAccess = readImageAccess(fondPreferencesElement);
         this.dummyImageUrl = readDummyImageUrl(fondPreferencesElement);
         this.imagesUrl = readImagesUrl(fondPreferencesElement);
+    }
+
+    private Bibliography readBibliography(Element xml) {
+
+        Nodes bibliographyElements = Util.queryXmlToNodes(xml, XpathQuery.QUERY_EAD_BIBLIOGRAPHY);
+
+        if (bibliographyElements.size() != 1) {
+            throw new MomcaException("The EAD XML needs to include exactly one 'ead:bibliography' element.");
+        }
+
+
+        Element bibliographyElement = (Element) bibliographyElements.get(0);
+
+        String heading = readHeading(bibliographyElement);
+
+        Elements referenceElements = bibliographyElement.getChildElements("bibref", Namespace.EAD.getUri());
+
+        List<String> referenceTexts = new ArrayList<>();
+        for (int i = 0; i < referenceElements.size(); i++) {
+            Element bibref = referenceElements.get(i);
+            referenceTexts.add(bibref.getValue());
+        }
+
+        return new Bibliography(heading, referenceTexts.toArray(new String[referenceTexts.size()]));
+
     }
 
     @NotNull

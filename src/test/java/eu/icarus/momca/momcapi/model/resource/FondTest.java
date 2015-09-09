@@ -64,6 +64,9 @@ public class FondTest {
         CustodHist custodHist = new CustodHist("Custodhist:", "Custod-Paragraph1", "Another paragraph.");
         fond.setCustodHist(custodHist);
 
+        Bibliography bibliography = new Bibliography("BibHeading", "Entry 1", "Entry 2", "Entry 3");
+        fond.setBibliography(bibliography);
+
         Fond newFond = new Fond(fond, fond.getFondPreferences());
 
         assertEquals(fond.getUri(), "/db/mom-data/metadata.fond.public/IT-BSNSP/000-Introduction/000-Introduction.ead.xml");
@@ -89,6 +92,10 @@ public class FondTest {
         assertEquals(newFond.getCustodHist().getHeading().getText(), custodHist.getHeading().getText());
         assertEquals(newFond.getCustodHist().getParagraphs().size(), 2);
         assertEquals(newFond.getCustodHist().getParagraphs().get(1).getContent(), custodHist.getParagraphs().get(1).getContent());
+
+        assertEquals(newFond.getBibliography().getHeading().get().getText(), bibliography.getHeading().get().getText());
+        assertEquals(newFond.getBibliography().getEntries().size(), 3);
+        assertEquals(newFond.getBibliography().getEntries().get(2), bibliography.getEntries().get(2));
 
     }
 
