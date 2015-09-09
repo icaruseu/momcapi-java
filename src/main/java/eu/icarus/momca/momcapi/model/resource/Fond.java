@@ -259,7 +259,33 @@ public class Fond extends AtomResource {
 
         List<Odd> results = new ArrayList<>();
 
-        // TODO
+
+        Nodes queryResults = Util.queryXmlToNodes(xml, XpathQuery.QUERY_EAD_ODD);
+
+        for (int i = 0; i < queryResults.size(); i++) {
+
+            Element oddElement = (Element) queryResults.get(i);
+            Element headElement = oddElement.getFirstChildElement("head", Namespace.EAD.getUri());
+
+            String heading = "";
+            if (headElement != null) {
+                heading = headElement.getValue();
+            }
+
+            Elements paragraphElements = oddElement.getChildElements("p", Namespace.EAD.getUri());
+
+            List<String> paragraphs = new ArrayList<>();
+
+            for (int j = 0; j < paragraphElements.size(); j++) {
+                Element paragraphElement = paragraphElements.get(j);
+                paragraphs.add(paragraphElement.getValue());
+            }
+
+            results.add(new Odd(heading, paragraphs.toArray(new String[paragraphs.size()])));
+
+
+        }
+
         return results;
 
     }
@@ -391,19 +417,6 @@ public class Fond extends AtomResource {
 
         updateXmlContent();
 
-    }
-
-    @NotNull
-    @Override
-    public String toString() {
-        return "Fond{" +
-                "id=" + id +
-                ", dummyImageUrl=" + dummyImageUrl +
-                ", fondPreferences=" + fondPreferences +
-                ", imageAccess=" + imageAccess +
-                ", imagesUrl=" + imagesUrl +
-                ", name='" + name + '\'' +
-                "} " + super.toString();
     }
 
     private void updateParentUri() {

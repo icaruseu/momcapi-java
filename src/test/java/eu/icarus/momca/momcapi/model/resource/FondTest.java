@@ -46,10 +46,17 @@ public class FondTest {
     public void testConstructor3() throws Exception {
 
         fond.setImageAccess(ImageAccess.RESTRICTED);
+
         URL dummyUrl = new URL("http://example.org/image.png");
         fond.setDummyImageUrl(dummyUrl);
+
         URL imagesUrl = new URL("http://example.org");
         fond.setImagesUrl(imagesUrl);
+
+        List<Odd> oddList = new ArrayList<>();
+        oddList.add(new Odd("First Odd:", "Paragraph 1", "Paragraph2"));
+        oddList.add(new Odd("Second Odd:", "Paragraph 3", "Paragraph 4"));
+        fond.setOddList(oddList);
 
         Fond newFond = new Fond(fond, fond.getFondPreferences());
 
@@ -64,6 +71,10 @@ public class FondTest {
         assertEquals(newFond.getDummyImageUrl().get(), dummyUrl);
         assertTrue(newFond.getImagesUrl().isPresent());
         assertEquals(newFond.getImagesUrl().get(), imagesUrl);
+
+        assertEquals(newFond.getOddList().size(), 2);
+        assertEquals(newFond.getOddList().get(0).getHeading().getText().get(), "First Odd:");
+        assertEquals(newFond.getOddList().get(1).getParagraphs().get(1).getContent().get(), "Paragraph 4");
 
     }
 
