@@ -1,6 +1,7 @@
 package eu.icarus.momca.momcapi.model.resource;
 
 import eu.icarus.momca.momcapi.Util;
+import eu.icarus.momca.momcapi.exception.MomcaException;
 import eu.icarus.momca.momcapi.model.ImageAccess;
 import eu.icarus.momca.momcapi.model.id.IdArchive;
 import eu.icarus.momca.momcapi.model.id.IdFond;
@@ -96,6 +97,8 @@ public class Fond extends AtomResource {
         this.name = readName(fondXml);
 
         this.oddList = readOddList(fondXml);
+        this.biogHist = readBiogHist(fondXml);
+        this.custodHist = readCustodHist(fondXml);
 
         fondPreferencesResource.ifPresent(this::initFondPreferences);
 
@@ -220,9 +223,54 @@ public class Fond extends AtomResource {
         this.imagesUrl = readImagesUrl(fondPreferencesElement);
     }
 
+    @NotNull
+    private BiogHist readBiogHist(@NotNull Element xml) {
+
+        Nodes queryResult = Util.queryXmlToNodes(xml, XpathQuery.QUERY_EAD_BIOGHIST);
+
+        if (queryResult.size() != 1) {
+            throw new MomcaException("The EAD XML needs to contain exactly one 'ead:bioghist' Element.");
+        }
+
+        Element biogHist = (Element) queryResult.get(0);
+
+        String heading = readHeading(biogHist);
+        List<String> paragraphs = readParagraphs(biogHist);
+
+        return new BiogHist(heading, paragraphs.toArray(new String[paragraphs.size()]));
+
+    }
+
+    private CustodHist readCustodHist(Element xml) {
+
+        Nodes queryResult = Util.queryXmlToNodes(xml, XpathQuery.QUERY_EAD_CUSTODHIST);
+
+        if (queryResult.size() != 1) {
+            throw new MomcaException("The EAD XML needs to contain exactly one 'ead:custodhist' Element.");
+        }
+
+        Element custodHist = (Element) queryResult.get(0);
+
+        String heading = readHeading(custodHist);
+        List<String> paragraphs = readParagraphs(custodHist);
+
+        return new CustodHist(heading, paragraphs.toArray(new String[paragraphs.size()]));
+
+    }
+
     private Optional<URL> readDummyImageUrl(@NotNull Element xml) {
         String urlString = Util.queryXmlToString(xml, XpathQuery.QUERY_XRX_DUMMY_IMAGE_URL);
         return createUrl(urlString);
+    }
+
+    private String readHeading(Element element) {
+        Element headElement = element.getFirstChildElement("head", Namespace.EAD.getUri());
+
+        String heading = "";
+        if (headElement != null) {
+            heading = headElement.getValue();
+        }
+        return heading;
     }
 
     @NotNull
@@ -259,35 +307,37 @@ public class Fond extends AtomResource {
 
         List<Odd> results = new ArrayList<>();
 
-
         Nodes queryResults = Util.queryXmlToNodes(xml, XpathQuery.QUERY_EAD_ODD);
+
+        if (queryResults.size() == 0) {
+            throw new MomcaException("The EAD XML must include at least one 'ead:odd' Element.");
+        }
 
         for (int i = 0; i < queryResults.size(); i++) {
 
             Element oddElement = (Element) queryResults.get(i);
-            Element headElement = oddElement.getFirstChildElement("head", Namespace.EAD.getUri());
-
-            String heading = "";
-            if (headElement != null) {
-                heading = headElement.getValue();
-            }
-
-            Elements paragraphElements = oddElement.getChildElements("p", Namespace.EAD.getUri());
-
-            List<String> paragraphs = new ArrayList<>();
-
-            for (int j = 0; j < paragraphElements.size(); j++) {
-                Element paragraphElement = paragraphElements.get(j);
-                paragraphs.add(paragraphElement.getValue());
-            }
+            String heading = readHeading(oddElement);
+            List<String> paragraphs = readParagraphs(oddElement);
 
             results.add(new Odd(heading, paragraphs.toArray(new String[paragraphs.size()])));
-
 
         }
 
         return results;
 
+    }
+
+    @NotNull
+    private List<String> readParagraphs(Element element) {
+        Elements paragraphElements = element.getChildElements("p", Namespace.EAD.getUri());
+
+        List<String> paragraphs = new ArrayList<>();
+
+        for (int j = 0; j < paragraphElements.size(); j++) {
+            Element paragraphElement = paragraphElements.get(j);
+            paragraphs.add(paragraphElement.getValue());
+        }
+        return paragraphs;
     }
 
     private void resetOddList() {

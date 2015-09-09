@@ -58,6 +58,12 @@ public class FondTest {
         oddList.add(new Odd("Second Odd:", "Paragraph 3", "Paragraph 4"));
         fond.setOddList(oddList);
 
+        BiogHist biogHist = new BiogHist("Bioghist:", "Biog-Paragraph1", "The next paragraph.");
+        fond.setBiogHist(biogHist);
+
+        CustodHist custodHist = new CustodHist("Custodhist:", "Custod-Paragraph1", "Another paragraph.");
+        fond.setCustodHist(custodHist);
+
         Fond newFond = new Fond(fond, fond.getFondPreferences());
 
         assertEquals(fond.getUri(), "/db/mom-data/metadata.fond.public/IT-BSNSP/000-Introduction/000-Introduction.ead.xml");
@@ -75,6 +81,14 @@ public class FondTest {
         assertEquals(newFond.getOddList().size(), 2);
         assertEquals(newFond.getOddList().get(0).getHeading().getText().get(), "First Odd:");
         assertEquals(newFond.getOddList().get(1).getParagraphs().get(1).getContent().get(), "Paragraph 4");
+
+        assertEquals(newFond.getBiogHist().getHeading().getText(), biogHist.getHeading().getText());
+        assertEquals(newFond.getBiogHist().getParagraphs().size(), 2);
+        assertEquals(newFond.getBiogHist().getParagraphs().get(1).getContent(), biogHist.getParagraphs().get(1).getContent());
+
+        assertEquals(newFond.getCustodHist().getHeading().getText(), custodHist.getHeading().getText());
+        assertEquals(newFond.getCustodHist().getParagraphs().size(), 2);
+        assertEquals(newFond.getCustodHist().getParagraphs().get(1).getContent(), custodHist.getParagraphs().get(1).getContent());
 
     }
 

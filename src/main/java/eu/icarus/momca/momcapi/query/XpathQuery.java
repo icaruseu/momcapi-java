@@ -31,6 +31,8 @@ public enum XpathQuery {
     QUERY_CEI_PROVENANCE_TEXT("//cei:provenance/text()", Namespace.CEI),
     QUERY_CEI_PROVENANCE_ABBR("//cei:provenance/@abbr", Namespace.CEI),
     QUERY_CEI_TEXT("//cei:text", Namespace.CEI),
+    QUERY_EAD_BIOGHIST("//ead:bioghist", Namespace.EAD),
+    QUERY_EAD_CUSTODHIST("//ead:custodhist", Namespace.EAD),
     QUERY_EAD_ODD("//ead:odd", Namespace.EAD),
     QUERY_EAD_UNITTITLE("//ead:unittitle/text()", Namespace.EAD),
     QUERY_EAG_AUTFORM("//eag:autform/text()", Namespace.EAG),
