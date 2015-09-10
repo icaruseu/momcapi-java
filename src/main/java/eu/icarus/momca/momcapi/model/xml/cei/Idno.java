@@ -57,15 +57,4 @@ public class Idno extends Element {
         return text;
     }
 
-    @NotNull
-    @Override
-    public String toString() {
-
-        return "Idno{" +
-                "id='" + id + '\'' +
-                ", text='" + text + '\'' +
-                "} " + super.toString();
-
-    }
-
 }
