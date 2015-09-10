@@ -161,7 +161,7 @@ public class Charter extends ExistResource {
                 Element dateElement = dateElements.get(0);
                 String value = dateElement.getAttributeValue("value");
                 String literalDate = dateElement.getValue();
-                ceiDateOptional = Optional.of(new Date(value, literalDate));
+                ceiDateOptional = Optional.of(new DateExact(value, literalDate));
 
             } else if (dateElements.size() == 0 && dateRangeElements.size() == 1) {
 

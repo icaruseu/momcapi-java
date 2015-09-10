@@ -9,7 +9,7 @@ import static org.testng.Assert.*;
  */
 public class DateTest {
 
-    private static final Date CEI_DATE = new Date("12310801", "01. August 1231");
+    private static final DateExact CEI_DATE = new DateExact("12310801", "01. August 1231");
 
     @Test
     public void testConstructor() throws Exception {
@@ -34,13 +34,13 @@ public class DateTest {
     @Test
     public void testIsValid() throws Exception {
         assertTrue(CEI_DATE.isValid());
-        assertFalse(new Date("310801", "01. August 1231").isValid());
+        assertFalse(new DateExact("310801", "01. August 1231").isValid());
     }
 
     @Test
     public void testIsWrongDateType() throws Exception {
-        assertTrue(new Date("12310899", "August 1231").couldBeOtherDateType());
-        assertTrue(new Date("9319999", "1231").couldBeOtherDateType());
+        assertTrue(new DateExact("12310899", "August 1231").couldBeOtherDateType());
+        assertTrue(new DateExact("9319999", "1231").couldBeOtherDateType());
     }
 
 }
