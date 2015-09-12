@@ -47,8 +47,11 @@ public class DateTest {
         DateAbstract dateExact = new DateExact("9870203", "3rd February 987");
         Date date = new Date(dateExact);
 
+        assertEquals(date.toCeiDate().toXML(), dateExact.toXML());
+
+        date = new Date(LocalDate.of(987, 2, 3), 0);
+
         assertEquals(date.toCeiDate().toXML(), "<cei:date xmlns:cei=\"http://www.monasterium.net/NS/cei\" value=\"9870203\">0987-02-03</cei:date>");
-        assertEquals(date.toCeiDate(dateExact.getLiteralDate()).toXML(), dateExact.toXML());
 
     }
 
@@ -182,8 +185,11 @@ public class DateTest {
         DateAbstract dateRange = new DateRange("9870301", "9870331", "March 987");
         Date date = new Date(dateRange);
 
+        assertEquals(date.toCeiDate().toXML(), dateRange.toXML());
+
+        date = new Date(LocalDate.of(987, 3, 31), 30);
+
         assertEquals(date.toCeiDate().toXML(), "<cei:dateRange xmlns:cei=\"http://www.monasterium.net/NS/cei\" from=\"9870301\" to=\"9870331\">0987-03-01 - 0987-03-31</cei:dateRange>");
-        assertEquals(date.toCeiDate(dateRange.getLiteralDate()).toXML(), dateRange.toXML());
 
     }
 

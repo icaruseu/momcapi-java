@@ -21,11 +21,25 @@ public class Date {
 
     private long dayOffset;
     @NotNull
+    private String literalDate;
+    @NotNull
     private LocalDate sortingDate = LocalDate.now();
 
-    public Date(@NotNull LocalDate sortingDate, int dayOffset) {
+    public Date(@NotNull LocalDate sortingDate, int dayOffset, @NotNull String literalDate) {
         this.sortingDate = sortingDate;
         this.dayOffset = dayOffset;
+        this.literalDate = literalDate;
+    }
+
+    public Date(@NotNull LocalDate sortingDate, int dayOffset) {
+
+        this.sortingDate = sortingDate;
+        this.dayOffset = dayOffset;
+        this.literalDate =
+                dayOffset == 0 ?
+                        sortingDate.format(DateTimeFormatter.ISO_DATE) :
+                        getOffsetDate().get().format(DateTimeFormatter.ISO_DATE) + " - " + sortingDate.format(DateTimeFormatter.ISO_DATE);
+
     }
 
     public Date(@NotNull DateAbstract ceiDate) {
@@ -46,11 +60,17 @@ public class Date {
             initDateRange((DateRange) ceiDate);
         }
 
+        this.literalDate = ceiDate.getLiteralDate();
 
     }
 
     public long getDayOffset() {
         return dayOffset;
+    }
+
+    @NotNull
+    public String getLiteralDate() {
+        return literalDate;
     }
 
     @NotNull
@@ -154,11 +174,8 @@ public class Date {
         return valueString.isEmpty() || valueString.equals("99999999");
     }
 
-    public DateAbstract toCeiDate() {
-        return toCeiDate("");
-    }
 
-    public DateAbstract toCeiDate(@NotNull String literalDate) {
+    public DateAbstract toCeiDate() {
 
         DateAbstract date;
 
@@ -167,9 +184,7 @@ public class Date {
             String value = String.valueOf(sortingDate.getYear()) +
                     String.format("%02d", sortingDate.getMonth().getValue()) +
                     String.format("%02d", sortingDate.getDayOfMonth());
-            date = new DateExact(
-                    value,
-                    literalDate.isEmpty() ? sortingDate.format(DateTimeFormatter.ISO_DATE) : literalDate);
+            date = new DateExact(value, literalDate);
 
         } else {
 
@@ -183,12 +198,7 @@ public class Date {
                     String.format("%02d", sortingDate.getMonth().getValue()) +
                     String.format("%02d", sortingDate.getDayOfMonth());
 
-            date = new DateRange(
-                    valueFrom,
-                    valueTo,
-                    literalDate.isEmpty() ?
-                            offsetDate.format(DateTimeFormatter.ISO_DATE) + " - " + sortingDate.format(DateTimeFormatter.ISO_DATE) :
-                            literalDate);
+            date = new DateRange(valueFrom, valueTo, literalDate);
 
         }
 
