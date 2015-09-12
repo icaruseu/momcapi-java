@@ -48,22 +48,6 @@ public class DateRange extends DateAbstract {
         return fromDateValue.equals(toDateValue);
     }
 
-    @Override
-    public boolean isValid() {
-        return fromDateValue.isValid() && toDateValue.isValid();
-    }
-
-    @Override
-    @NotNull
-    public String toString() {
-
-        return "DateRange{" +
-                "fromDateValue=" + fromDateValue +
-                ", toDateValue=" + toDateValue +
-                "} " + super.toString();
-
-    }
-
     /**
      * @return The numeric {@code from} date value, e.g. {@code 12970301} (== {@code cei:dateRange/@from}).
      */
@@ -80,6 +64,30 @@ public class DateRange extends DateAbstract {
     @NotNull
     public DateValue getToDateValue() {
         return toDateValue;
+    }
+
+    @Override
+    public boolean isUndated() {
+
+        return !getFromDateValue().getYear().isPresent() && !getToDateValue().getYear().isPresent();
+
+
+    }
+
+    @Override
+    public boolean isValid() {
+        return fromDateValue.isValid() && toDateValue.isValid();
+    }
+
+    @Override
+    @NotNull
+    public String toString() {
+
+        return "DateRange{" +
+                "fromDateValue=" + fromDateValue +
+                ", toDateValue=" + toDateValue +
+                "} " + super.toString();
+
     }
 
 }

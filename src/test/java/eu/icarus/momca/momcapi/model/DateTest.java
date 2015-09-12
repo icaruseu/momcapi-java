@@ -1,0 +1,297 @@
+package eu.icarus.momca.momcapi.model;
+
+import eu.icarus.momca.momcapi.exception.MomcaException;
+import eu.icarus.momca.momcapi.model.xml.cei.DateAbstract;
+import eu.icarus.momca.momcapi.model.xml.cei.DateExact;
+import eu.icarus.momca.momcapi.model.xml.cei.DateRange;
+import org.testng.annotations.Test;
+
+import java.time.LocalDate;
+
+import static org.testng.Assert.*;
+
+/**
+ * Created by djell on 12/09/2015.
+ */
+public class DateTest {
+
+    @Test
+    public void testDateExact() throws Exception {
+
+        DateAbstract dateExact = new DateExact("14690203", "3rd February 1469");
+
+        Date date = new Date(dateExact);
+
+        assertEquals(date.getSortingDate(), LocalDate.of(1469, 2, 3));
+        assertFalse(date.getOffsetDate().isPresent());
+        assertEquals(date.getDayOffset(), 0);
+
+    }
+
+    @Test
+    public void testDateExactBeforeYearThousand() throws Exception {
+
+        DateAbstract dateExact = new DateExact("9870203", "3rd February 987");
+
+        Date date = new Date(dateExact);
+
+        assertEquals(date.getSortingDate(), LocalDate.of(987, 2, 3));
+        assertFalse(date.getOffsetDate().isPresent());
+        assertEquals(date.getDayOffset(), 0);
+
+    }
+
+    @Test
+    public void testDateExactToCeiDate() throws Exception {
+
+        DateAbstract dateExact = new DateExact("9870203", "3rd February 987");
+        Date date = new Date(dateExact);
+
+        assertEquals(date.toCeiDate().toXML(), "<cei:date xmlns:cei=\"http://www.monasterium.net/NS/cei\" value=\"9870203\">0987-02-03</cei:date>");
+        assertEquals(date.toCeiDate(dateExact.getLiteralDate()).toXML(), dateExact.toXML());
+
+    }
+
+    @Test
+    public void testDateExactUnknownDay() throws Exception {
+
+        DateAbstract dateExact = new DateExact("14690299", "February 1469");
+
+        Date date = new Date(dateExact);
+
+        assertEquals(date.getSortingDate(), LocalDate.of(1469, 2, 28));
+        assertTrue(date.getOffsetDate().isPresent());
+        assertEquals(date.getOffsetDate().get(), LocalDate.of(1469, 2, 1));
+        assertEquals(date.getDayOffset(), 27);
+
+    }
+
+    @Test
+    public void testDateExactUnknownDayLeapYear() throws Exception {
+
+        DateAbstract dateExact = new DateExact("14680299", "February 1468");
+
+        Date date = new Date(dateExact);
+
+        assertEquals(date.getSortingDate(), LocalDate.of(1468, 2, 29));
+        assertTrue(date.getOffsetDate().isPresent());
+        assertEquals(date.getOffsetDate().get(), LocalDate.of(1468, 2, 1));
+        assertEquals(date.getDayOffset(), 28);
+
+    }
+
+    @Test
+    public void testDateExactUnknownMonthAndDay() throws Exception {
+
+        DateAbstract dateExact = new DateExact("14699999", "1469");
+
+        Date date = new Date(dateExact);
+
+        assertEquals(date.getSortingDate(), LocalDate.of(1469, 12, 31));
+        assertTrue(date.getOffsetDate().isPresent());
+        assertEquals(date.getOffsetDate().get(), LocalDate.of(1469, 1, 1));
+        assertEquals(date.getDayOffset(), 364);
+
+    }
+
+    @Test
+    public void testDateExactUnknownMonthAndDayLeapYear() throws Exception {
+
+        DateAbstract dateExact = new DateExact("14689999", "1468");
+
+        Date date = new Date(dateExact);
+
+        assertEquals(date.getSortingDate(), LocalDate.of(1468, 12, 31));
+        assertTrue(date.getOffsetDate().isPresent());
+        assertEquals(date.getOffsetDate().get(), LocalDate.of(1468, 1, 1));
+        assertEquals(date.getDayOffset(), 365);
+
+    }
+
+    @Test
+    public void testDateExactUnknownMonthKnownDay() throws Exception {
+
+        DateAbstract dateExact = new DateExact("14399903", "1st on a month in 1439");
+
+        Date date = new Date(dateExact);
+
+        assertEquals(date.getSortingDate(), LocalDate.of(1439, 12, 3));
+        assertTrue(date.getOffsetDate().isPresent());
+        assertEquals(date.getOffsetDate().get(), LocalDate.of(1439, 1, 3));
+        assertEquals(date.getDayOffset(), 334);
+
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testDateExactUnknownYear() throws Exception {
+        DateAbstract dateExact = new DateExact("99990203", "3rd February");
+        new Date(dateExact);
+    }
+
+    @Test
+    public void testDateRange() throws Exception {
+
+        DateAbstract dateRange = new DateRange("12170201", "12170228", "February 1217");
+
+        Date date = new Date(dateRange);
+
+        assertEquals(date.getSortingDate(), LocalDate.of(1217, 2, 28));
+        assertTrue(date.getOffsetDate().isPresent());
+        assertEquals(date.getOffsetDate().get(), LocalDate.of(1217, 2, 1));
+        assertEquals(date.getDayOffset(), 27);
+
+    }
+
+    @Test
+    public void testDateRangeArbitraryRange() throws Exception {
+
+        DateAbstract dateRange = new DateRange("12500101", "12991231", "Second half of 13th century");
+
+        Date date = new Date(dateRange);
+
+        assertEquals(date.getSortingDate(), LocalDate.of(1299, 12, 31));
+        assertTrue(date.getOffsetDate().isPresent());
+        assertEquals(date.getOffsetDate().get(), LocalDate.of(1250, 1, 1));
+        assertEquals(date.getDayOffset(), 18261);
+
+    }
+
+    @Test(expectedExceptions = MomcaException.class)
+    public void testDateRangeInvalidDate() throws Exception {
+        DateAbstract dateRange = new DateRange("12170322", "", "12th January 1217");
+        new Date(dateRange);
+    }
+
+    @Test
+    public void testDateRangeLeapYear() throws Exception {
+
+        DateAbstract dateRange = new DateRange("14680201", "14680229", "February 1468");
+
+        Date date = new Date(dateRange);
+
+        assertEquals(date.getSortingDate(), LocalDate.of(1468, 2, 29));
+        assertTrue(date.getOffsetDate().isPresent());
+        assertEquals(date.getOffsetDate().get(), LocalDate.of(1468, 2, 1));
+        assertEquals(date.getDayOffset(), 28);
+
+    }
+
+    @Test
+    public void testDateRangeToCeiDate() throws Exception {
+
+        DateAbstract dateRange = new DateRange("9870301", "9870331", "March 987");
+        Date date = new Date(dateRange);
+
+        assertEquals(date.toCeiDate().toXML(), "<cei:dateRange xmlns:cei=\"http://www.monasterium.net/NS/cei\" from=\"9870301\" to=\"9870331\">0987-03-01 - 0987-03-31</cei:dateRange>");
+        assertEquals(date.toCeiDate(dateRange.getLiteralDate()).toXML(), dateRange.toXML());
+
+    }
+
+    @Test
+    public void testDateRangeUnclearFromDateDay() throws Exception {
+
+        DateAbstract dateRange = new DateRange("12170799", "12170731", "Sometime in July 1217");
+
+        Date date = new Date(dateRange);
+
+        assertEquals(date.getSortingDate(), LocalDate.of(1217, 7, 31));
+        assertTrue(date.getOffsetDate().isPresent());
+        assertEquals(date.getOffsetDate().get(), LocalDate.of(1217, 7, 1));
+        assertEquals(date.getDayOffset(), 30);
+
+    }
+
+    @Test
+    public void testDateRangeUnclearFromDateMonth() throws Exception {
+
+        DateAbstract dateRange = new DateRange("12179901", "12170228", "Sometime in 1217");
+
+        Date date = new Date(dateRange);
+
+        assertEquals(date.getSortingDate(), LocalDate.of(1217, 2, 28));
+        assertTrue(date.getOffsetDate().isPresent());
+        assertEquals(date.getOffsetDate().get(), LocalDate.of(1217, 1, 1));
+        assertEquals(date.getDayOffset(), 58);
+
+    }
+
+    @Test
+    public void testDateRangeUnclearFromYear() throws Exception {
+
+        DateAbstract dateRange = new DateRange("99990301", "12170331", "Sometime");
+
+        Date date = new Date(dateRange);
+
+        assertEquals(date.getSortingDate(), LocalDate.of(1217, 03, 31));
+        assertFalse(date.getOffsetDate().isPresent());
+
+    }
+
+    @Test
+    public void testDateRangeUnclearToDateDay() throws Exception {
+
+        DateAbstract dateRange = new DateRange("12170305", "12170399", "Sometime in March 1217");
+
+        Date date = new Date(dateRange);
+
+        assertEquals(date.getSortingDate(), LocalDate.of(1217, 3, 31));
+        assertTrue(date.getOffsetDate().isPresent());
+        assertEquals(date.getOffsetDate().get(), LocalDate.of(1217, 3, 5));
+        assertEquals(date.getDayOffset(), 26);
+
+    }
+
+    @Test
+    public void testDateRangeUnclearToDateMonth() throws Exception {
+
+        DateAbstract dateRange = new DateRange("12171001", "12179928", "Sometime in 1217");
+
+        Date date = new Date(dateRange);
+
+        assertEquals(date.getSortingDate(), LocalDate.of(1217, 12, 28));
+        assertTrue(date.getOffsetDate().isPresent());
+        assertEquals(date.getOffsetDate().get(), LocalDate.of(1217, 10, 1));
+        assertEquals(date.getDayOffset(), 88);
+
+    }
+
+    @Test
+    public void testDateRangeUnclearToYear() throws Exception {
+
+        DateAbstract dateRange = new DateRange("12170999", "99990112", "Sometime");
+
+        Date date = new Date(dateRange);
+
+        assertEquals(date.getSortingDate(), LocalDate.of(1217, 9, 30));
+        assertTrue(date.getOffsetDate().isPresent());
+        assertEquals(date.getOffsetDate().get(), LocalDate.of(1217, 9, 1));
+        assertEquals(date.getDayOffset(), 29);
+
+    }
+
+    @Test
+    public void testDateRangeUnknownFromDate() throws Exception {
+
+        DateAbstract dateRange = new DateRange("99999999", "12180112", "12th January 1218");
+
+        Date date = new Date(dateRange);
+
+        assertEquals(date.getSortingDate(), LocalDate.of(1218, 1, 12));
+        assertFalse(date.getOffsetDate().isPresent());
+        assertEquals(date.getDayOffset(), 0);
+
+    }
+
+    @Test
+    public void testDateRangeUnknownToDate() throws Exception {
+
+        DateAbstract dateRange = new DateRange("12170322", "99999999", "12th January 1217");
+
+        Date date = new Date(dateRange);
+
+        assertEquals(date.getSortingDate(), LocalDate.of(1217, 3, 22));
+        assertFalse(date.getOffsetDate().isPresent());
+        assertEquals(date.getDayOffset(), 0);
+
+    }
+}

@@ -7,7 +7,7 @@ import static org.testng.Assert.*;
 /**
  * Created by daniel on 10.07.2015.
  */
-public class DateTest {
+public class DateExactTest {
 
     private static final DateExact CEI_DATE = new DateExact("12310801", "01. August 1231");
 
@@ -32,6 +32,12 @@ public class DateTest {
     }
 
     @Test
+    public void testIsUndated() throws Exception {
+        assertTrue(new DateExact("99990812", "12th August").isUndated());
+        assertFalse(new DateExact("12180812", "12th August 1218").isUndated());
+    }
+
+    @Test
     public void testIsValid() throws Exception {
         assertTrue(CEI_DATE.isValid());
         assertFalse(new DateExact("310801", "01. August 1231").isValid());
@@ -42,5 +48,4 @@ public class DateTest {
         assertTrue(new DateExact("12310899", "August 1231").couldBeOtherDateType());
         assertTrue(new DateExact("9319999", "1231").couldBeOtherDateType());
     }
-
 }

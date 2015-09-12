@@ -58,6 +58,11 @@ public class DateExact extends DateAbstract {
     }
 
     @Override
+    public boolean isUndated() {
+        return !getDateValue().getYear().isPresent();
+    }
+
+    @Override
     public boolean isValid() {
         return dateValue.isValid();
     }

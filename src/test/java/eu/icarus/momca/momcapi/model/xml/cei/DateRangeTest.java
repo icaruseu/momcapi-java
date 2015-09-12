@@ -32,6 +32,16 @@ public class DateRangeTest {
     }
 
     @Test
+    public void testIsUndated() throws Exception {
+
+        assertFalse(new DateRange("14970801", "14970831", "August 1497").isUndated());
+        assertFalse(new DateRange("99990801", "14970831", "August 1497").isUndated());
+        assertFalse(new DateRange("14970801", "99990831", "August 1497").isUndated());
+        assertTrue(new DateRange("99990801", "99990831", "August").isUndated());
+
+    }
+
+    @Test
     public void testIsValid() throws Exception {
         assertTrue(CEI_DATE_RANGE.isValid());
         assertFalse(new DateRange("970801", "14970810", "01. - 10. August 1497").isValid());
@@ -44,5 +54,4 @@ public class DateRangeTest {
         DateRange wrongDateRange = new DateRange("14970801", "14970801", "01. August 1497");
         assertTrue(wrongDateRange.couldBeOtherDateType());
     }
-
 }

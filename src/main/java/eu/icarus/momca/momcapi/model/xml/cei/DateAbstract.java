@@ -48,6 +48,8 @@ public abstract class DateAbstract extends Element {
         return literalDate;
     }
 
+    public abstract boolean isUndated();
+
     /**
      * @return {@code True} if the date is a valid {@code cei:date}.
      */
