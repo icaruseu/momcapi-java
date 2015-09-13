@@ -10,9 +10,14 @@ import org.jetbrains.annotations.NotNull;
  */
 abstract class MixedContentElement extends Element {
 
+    @NotNull
+    private String content;
+
     MixedContentElement(@NotNull String content, @NotNull String localizedRootElementName) {
 
         super(createXmlContent(content, localizedRootElementName));
+
+        this.content = content;
 
     }
 
@@ -52,6 +57,11 @@ abstract class MixedContentElement extends Element {
     @NotNull
     private static String removeNamespaceNames(String stringToParse) {
         return stringToParse.replace("/cei:", "/").replace("<cei:", "<").replace(":cei=", "=");
+    }
+
+    @NotNull
+    public String getContent() {
+        return content;
     }
 
 }
