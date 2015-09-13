@@ -5,8 +5,7 @@ import org.testng.annotations.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 
 /**
  * Created by djell on 10/09/2015.
@@ -26,9 +25,13 @@ public class SourceDescTest {
 
         SourceDesc sourceDesc = new SourceDesc(listAbstract, listTenor);
 
-        assertEquals(sourceDesc.getBiblAbstract(), listAbstract);
-        assertEquals(sourceDesc.getBiblTenor(), listTenor);
         assertEquals(sourceDesc.toXML(), expectedXml);
+
+        assertTrue(sourceDesc.getBibliographyAbstract().isPresent());
+        assertEquals(sourceDesc.getBibliographyAbstract().get().getEntries().size(), 1);
+
+        assertTrue(sourceDesc.getBibliographyTenor().isPresent());
+        assertEquals(sourceDesc.getBibliographyTenor().get().getEntries().size(), 2);
 
     }
 
@@ -37,8 +40,8 @@ public class SourceDescTest {
 
         SourceDesc sourceDesc = new SourceDesc();
 
-        assertTrue(sourceDesc.getBiblAbstract().isEmpty());
-        assertTrue(sourceDesc.getBiblTenor().isEmpty());
+        assertFalse(sourceDesc.getBibliographyAbstract().isPresent());
+        assertFalse(sourceDesc.getBibliographyTenor().isPresent());
         assertEquals(sourceDesc.toXML(), "<cei:sourceDesc xmlns:cei=\"http://www.monasterium.net/NS/cei\" />");
 
     }
@@ -54,8 +57,11 @@ public class SourceDescTest {
 
         SourceDesc sourceDesc = new SourceDesc(null, listTenor);
 
-        assertTrue(sourceDesc.getBiblAbstract().isEmpty());
-        assertEquals(sourceDesc.getBiblTenor(), listTenor);
+        assertFalse(sourceDesc.getBibliographyAbstract().isPresent());
+
+        assertTrue(sourceDesc.getBibliographyTenor().isPresent());
+        assertEquals(sourceDesc.getBibliographyTenor().get().getEntries().size(), 2);
+
         assertEquals(sourceDesc.toXML(), expectedXml);
 
     }
@@ -70,8 +76,11 @@ public class SourceDescTest {
 
         SourceDesc sourceDesc = new SourceDesc(listAbstract, new ArrayList<>(0));
 
-        assertEquals(sourceDesc.getBiblAbstract(), listAbstract);
-        assertTrue(sourceDesc.getBiblTenor().isEmpty());
+        assertTrue(sourceDesc.getBibliographyAbstract().isPresent());
+        assertEquals(sourceDesc.getBibliographyAbstract().get().getEntries().size(), 1);
+
+        assertFalse(sourceDesc.getBibliographyTenor().isPresent());
+
         assertEquals(sourceDesc.toXML(), expectedXml);
 
     }

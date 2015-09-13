@@ -5,8 +5,9 @@ import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Created by djell on 10/09/2015.
@@ -14,55 +15,48 @@ import java.util.List;
 public class SourceDesc extends Element {
 
     public static final String CEI_URI = Namespace.CEI.getUri();
-    private List<String> biblAbstract = new ArrayList<>(0);
-    private List<String> biblTenor = new ArrayList<>(0);
+    @NotNull
+    private Optional<Bibliography> bibliographyAbstract = Optional.empty();
+    @NotNull
+    private Optional<Bibliography> bibliographyTenor = Optional.empty();
 
     public SourceDesc() {
         super("cei:sourceDesc", CEI_URI);
     }
 
-    public SourceDesc(@Nullable List<String> biblAbstract, @Nullable List<String> biblTenor) {
+    public SourceDesc(@Nullable List<String> abstractBiblEntries, @Nullable List<String> tenorBiblEntries) {
 
         this();
 
-        if (biblAbstract != null) {
-            this.biblAbstract = biblAbstract;
-            appendBibElements("sourceDescRegest", biblAbstract);
+        if (abstractBiblEntries != null && !abstractBiblEntries.isEmpty()) {
+            bibliographyAbstract = initBibliography("sourceDescRegest", abstractBiblEntries);
+            appendChild(bibliographyAbstract.get());
         }
 
-        if (biblTenor != null) {
-            this.biblTenor = biblTenor;
-            appendBibElements("sourceDescVolltext", biblTenor);
-        }
-
-    }
-
-    private void appendBibElements(@NotNull String localElementName, @NotNull List<String> biblAbstract) {
-
-        if (!localElementName.isEmpty() && !biblAbstract.isEmpty()) {
-
-            Element newElement = new Element("cei:" + localElementName, CEI_URI);
-
-            for (String bibl : biblAbstract) {
-
-                Element biblElement = new Element("cei:bibl", CEI_URI);
-                biblElement.appendChild(bibl);
-                newElement.appendChild(biblElement);
-
-            }
-
-            this.appendChild(newElement);
-
+        if (tenorBiblEntries != null && !tenorBiblEntries.isEmpty()) {
+            bibliographyTenor = initBibliography("sourceDescVolltext", tenorBiblEntries);
+            appendChild(bibliographyTenor.get());
         }
 
     }
 
-    public List<String> getBiblAbstract() {
-        return biblAbstract;
+    @NotNull
+    public Optional<Bibliography> getBibliographyAbstract() {
+        return bibliographyAbstract;
     }
 
-    public List<String> getBiblTenor() {
-        return biblTenor;
+    @NotNull
+    public Optional<Bibliography> getBibliographyTenor() {
+        return bibliographyTenor;
+    }
+
+    private Optional<Bibliography> initBibliography(@NotNull String bibliographyName, @NotNull List<String> entries) {
+
+        List<Bibl> list = entries.stream().map(Bibl::new).collect(Collectors.toList());
+        Bibliography bibliography = new Bibliography(bibliographyName, list);
+
+        return Optional.of(bibliography);
+
     }
 
 }
