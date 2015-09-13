@@ -25,29 +25,32 @@ public class Date {
     @NotNull
     private LocalDate sortingDate = LocalDate.now();
 
-    public Date(@NotNull LocalDate sortingDate, int daysInRange, @NotNull String literalDate) {
+    public Date(@NotNull LocalDate sortingDate, long daysInRange, @NotNull String literalDate) {
         this.sortingDate = sortingDate;
         this.daysInRange = daysInRange;
         this.literalDate = literalDate;
     }
 
-    public Date(@NotNull LocalDate sortingDate, @NotNull String literalDate) {
-        this(sortingDate, 0, literalDate);
+    public Date(@NotNull LocalDate sortingDate, long daysInRange) {
+        this.sortingDate = sortingDate;
+        this.daysInRange = daysInRange;
+        this.literalDate = createLiteralDate(sortingDate, daysInRange);
     }
 
     public Date(@NotNull LocalDate sortingDate) {
         this(sortingDate, 0);
     }
 
-    public Date(@NotNull LocalDate sortingDate, int daysInRange) {
+    public Date(@NotNull LocalDate sortingDate, @NotNull String literalDate) {
+        this(sortingDate, 0, literalDate);
+    }
 
-        this.sortingDate = sortingDate;
-        this.daysInRange = daysInRange;
-        this.literalDate =
-                daysInRange == 0 ?
-                        sortingDate.format(DateTimeFormatter.ISO_DATE) :
-                        getEarliestPossibleDate().get().format(DateTimeFormatter.ISO_DATE) + " - " + sortingDate.format(DateTimeFormatter.ISO_DATE);
+    public Date(@NotNull LocalDate sortingDate, @NotNull LocalDate earliestPossibleDate, @NotNull String literalDate) {
+        this(sortingDate, calculateDaysInRange(earliestPossibleDate, sortingDate), literalDate);
+    }
 
+    public Date(@NotNull LocalDate sortingDate, @NotNull LocalDate earliestPossibleDate) {
+        this(sortingDate, calculateDaysInRange(earliestPossibleDate, sortingDate));
     }
 
     public Date(@NotNull DateAbstract ceiDate) {
@@ -72,6 +75,22 @@ public class Date {
 
     }
 
+    private static long calculateDaysInRange(@NotNull LocalDate startDate, @NotNull LocalDate endDate) {
+        return Duration.between(startDate.atStartOfDay(), endDate.atStartOfDay()).toDays();
+    }
+
+    private static String createLiteralDate(@NotNull LocalDate sortingDate, long daysInRange) {
+        return daysInRange == 0 ?
+                sortingDate.format(DateTimeFormatter.ISO_DATE) :
+                String.format("%s - %s",
+                        subtractDays(sortingDate, daysInRange).format(DateTimeFormatter.ISO_DATE),
+                        sortingDate.format(DateTimeFormatter.ISO_DATE));
+    }
+
+    public static LocalDate subtractDays(@NotNull LocalDate date, long daysToSubtract) {
+        return date.minusDays(daysToSubtract);
+    }
+
     public long getDaysInRange() {
         return daysInRange;
     }
@@ -82,7 +101,7 @@ public class Date {
         Optional<LocalDate> offsetDate = Optional.empty();
 
         if (daysInRange != 0) {
-            offsetDate = Optional.of(getSortingDate().minusDays(getDaysInRange()));
+            offsetDate = Optional.of(subtractDays(sortingDate, daysInRange));
         }
 
         return offsetDate;
@@ -114,13 +133,13 @@ public class Date {
 
             sortingDate = LocalDate.of(year.get(), Month.DECEMBER, day.get());
             LocalDate firstDay = LocalDate.of(year.get(), Month.JANUARY, day.get());
-            daysInRange = Duration.between(firstDay.atStartOfDay(), sortingDate.atStartOfDay()).toDays();
+            daysInRange = calculateDaysInRange(firstDay, sortingDate);
 
         } else if (year.isPresent() && !month.isPresent() && !day.isPresent()) {
 
             sortingDate = LocalDate.of(year.get(), Month.DECEMBER, 31);
             LocalDate firstDay = LocalDate.of(year.get(), Month.JANUARY, 1);
-            daysInRange = Duration.between(firstDay.atStartOfDay(), sortingDate.atStartOfDay()).toDays();
+            daysInRange = calculateDaysInRange(firstDay, sortingDate);
 
         } else {
 
@@ -171,7 +190,7 @@ public class Date {
                 Date startDate = new Date(fromDateExact);
                 LocalDate earliestStartDate = startDate.getEarliestPossibleDate().orElse(startDate.getSortingDate());
 
-                daysInRange = Duration.between(earliestStartDate.atStartOfDay(), sortingDate.atStartOfDay()).toDays();
+                daysInRange = calculateDaysInRange(earliestStartDate, sortingDate);
             }
         }
 

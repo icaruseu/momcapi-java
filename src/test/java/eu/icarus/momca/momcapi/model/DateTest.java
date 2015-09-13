@@ -143,6 +143,13 @@ public class DateTest {
         assertEquals(date.getEarliestPossibleDate().get(), LocalDate.of(1217, 2, 1));
         assertEquals(date.getDaysInRange(), 27);
 
+        date = new Date(LocalDate.of(1217, 2, 28), LocalDate.of(1217, 2, 1), "February 1217");
+
+        assertEquals(date.getSortingDate(), LocalDate.of(1217, 2, 28));
+        assertTrue(date.getEarliestPossibleDate().isPresent());
+        assertEquals(date.getEarliestPossibleDate().get(), LocalDate.of(1217, 2, 1));
+        assertEquals(date.getDaysInRange(), 27);
+
     }
 
     @Test
