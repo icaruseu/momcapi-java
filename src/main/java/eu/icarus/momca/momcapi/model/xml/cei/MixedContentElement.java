@@ -28,20 +28,24 @@ abstract class MixedContentElement extends Element {
             throw new IllegalArgumentException("Content and localizedRootElementName are not allowed to be an empty string");
         }
 
-        String stringToParse = content;
+        if (localizedRootElementName.contains(":")) {
+            throw new IllegalArgumentException("Localized content is not supposed to include ':'");
+        }
 
-        if (!content.startsWith("<" + localizedRootElementName) && !content.endsWith(localizedRootElementName + ">")) {
-            stringToParse = String.format("<%s xmlns='http://www.monasterium.net/NS/cei'>%s</%s>",
+//        String stringToParse = content;
+
+//        if (!content.startsWith("<" + localizedRootElementName) && !content.endsWith(localizedRootElementName + ">")) {
+        String stringToParse = String.format("<cei:%s xmlns:cei='http://www.monasterium.net/NS/cei'>%s</cei:%s>",
                     localizedRootElementName,
                     content,
                     localizedRootElementName);
-        }
+//        }
 
-        Element xml = Util.parseToElement(removeNamespaceNames(stringToParse));
+        Element xml = Util.parseToElement(stringToParse);
 
-        if (!xml.getNamespaceURI().equals(Namespace.CEI.getUri())) {
-            xml = getXmlWithCorrectedNamespace(xml);
-        }
+//        if (!xml.getNamespaceURI().equals(Namespace.CEI.getUri())) {
+//            xml = getXmlWithCorrectedNamespace(xml);
+//        }
 
         return xml;
 

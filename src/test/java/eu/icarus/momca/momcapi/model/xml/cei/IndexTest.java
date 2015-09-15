@@ -19,7 +19,7 @@ public class IndexTest {
         assertFalse(index.getLemma().isPresent());
         assertFalse(index.getSublemma().isPresent());
 
-        String correctXml = "<index xmlns=\"http://www.monasterium.net/NS/cei\">Urkunde</index>";
+        String correctXml = "<cei:index xmlns:cei=\"http://www.monasterium.net/NS/cei\">Urkunde</cei:index>";
         assertEquals(index.toXML(), correctXml);
 
         index = new Index("Waldi", "Tiere", "Hund", "Dackel");
@@ -33,7 +33,7 @@ public class IndexTest {
         assertEquals(index.getSublemma().get(), "Dackel");
 
 
-        correctXml = "<index xmlns=\"http://www.monasterium.net/NS/cei\" indexName=\"Tiere\" lemma=\"Hund\" sublemma=\"Dackel\">Waldi</index>";
+        correctXml = "<cei:index xmlns:cei=\"http://www.monasterium.net/NS/cei\" indexName=\"Tiere\" lemma=\"Hund\" sublemma=\"Dackel\">Waldi</cei:index>";
         assertEquals(index.toXML(), correctXml);
 
     }

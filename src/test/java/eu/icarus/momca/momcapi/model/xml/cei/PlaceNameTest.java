@@ -19,7 +19,7 @@ public class PlaceNameTest {
         assertFalse(placeName.getReg().isPresent());
         assertFalse(placeName.getType().isPresent());
 
-        String correctXml = "<placeName xmlns=\"http://www.monasterium.net/NS/cei\">Aachen</placeName>";
+        String correctXml = "<cei:placeName xmlns:cei=\"http://www.monasterium.net/NS/cei\">Aachen</cei:placeName>";
         assertEquals(placeName.toXML(), correctXml);
 
         placeName = new PlaceName("Iuuauensis", "", "Salzburg", "");
@@ -30,7 +30,7 @@ public class PlaceNameTest {
         assertFalse(placeName.getCertainty().isPresent());
         assertFalse(placeName.getType().isPresent());
 
-        correctXml = "<placeName xmlns=\"http://www.monasterium.net/NS/cei\" reg=\"Salzburg\">Iuuauensis</placeName>";
+        correctXml = "<cei:placeName xmlns:cei=\"http://www.monasterium.net/NS/cei\" reg=\"Salzburg\">Iuuauensis</cei:placeName>";
         assertEquals(placeName.toXML(), correctXml);
 
     }

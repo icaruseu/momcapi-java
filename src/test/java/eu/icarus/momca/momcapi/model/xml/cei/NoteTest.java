@@ -16,7 +16,7 @@ public class NoteTest {
 
         Note note = new Note(content);
         assertEquals(note.getContent(), content);
-        assertEquals(note.toXML(), "<note xmlns=\"http://www.monasterium.net/NS/cei\">" + content + "</note>");
+        assertEquals(note.toXML(), "<cei:note xmlns:cei=\"http://www.monasterium.net/NS/cei\">" + content + "</cei:note>");
         assertFalse(note.getPlace().isPresent());
 
         note = new Note(content, "Line 2");

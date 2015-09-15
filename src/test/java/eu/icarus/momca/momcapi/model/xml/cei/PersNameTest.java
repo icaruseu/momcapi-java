@@ -19,7 +19,7 @@ public class PersNameTest {
         assertFalse(persName.getReg().isPresent());
         assertFalse(persName.getType().isPresent());
 
-        String correctXml = "<persName xmlns=\"http://www.monasterium.net/NS/cei\">Josef</persName>";
+        String correctXml = "<cei:persName xmlns:cei=\"http://www.monasterium.net/NS/cei\">Josef</cei:persName>";
         assertEquals(persName.toXML(), correctXml);
 
         persName = new PersName("Carolus", "100%", "Karl", "König");
@@ -33,7 +33,7 @@ public class PersNameTest {
         assertEquals(persName.getType().get(), "König");
 
 
-        correctXml = "<persName xmlns=\"http://www.monasterium.net/NS/cei\" certainty=\"100%\" reg=\"Karl\" type=\"König\">Carolus</persName>";
+        correctXml = "<cei:persName xmlns:cei=\"http://www.monasterium.net/NS/cei\" certainty=\"100%\" reg=\"Karl\" type=\"König\">Carolus</cei:persName>";
         assertEquals(persName.toXML(), correctXml);
 
     }
