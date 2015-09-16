@@ -1,4 +1,4 @@
-package eu.icarus.momca.momcapi.model.xml.cei;
+package eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement;
 
 import org.testng.annotations.Test;
 

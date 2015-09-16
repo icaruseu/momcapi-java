@@ -1,6 +1,7 @@
 package eu.icarus.momca.momcapi.model.xml.cei;
 
 import eu.icarus.momca.momcapi.model.xml.Namespace;
+import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.Bibl;
 import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

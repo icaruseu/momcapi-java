@@ -1,4 +1,4 @@
-package eu.icarus.momca.momcapi.model.xml.cei;
+package eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement;
 
 import nu.xom.Attribute;
 import org.jetbrains.annotations.NotNull;
@@ -8,7 +8,7 @@ import java.util.Optional;
 /**
  * Created by djell on 13/09/2015.
  */
-public class Note extends MixedContentElement {
+public class Note extends AbstractMixedContentElement {
 
     @NotNull
     private Optional<String> place = Optional.empty();

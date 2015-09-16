@@ -1,4 +1,4 @@
-package eu.icarus.momca.momcapi.model.xml.cei;
+package eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement;
 
 import nu.xom.Attribute;
 import org.jetbrains.annotations.NotNull;
@@ -8,7 +8,7 @@ import java.util.Optional;
 /**
  * Created by djell on 13/09/2015.
  */
-public class PersName extends MixedContentElement {
+public class PlaceName extends AbstractMixedContentElement {
 
     @NotNull
     private Optional<String> certainty = Optional.empty();
@@ -17,9 +17,9 @@ public class PersName extends MixedContentElement {
     @NotNull
     private Optional<String> type = Optional.empty();
 
-    PersName(@NotNull String content, @NotNull String certainty, @NotNull String reg, @NotNull String type) {
+    PlaceName(@NotNull String content, @NotNull String certainty, @NotNull String reg, @NotNull String type) {
 
-        super(content, "persName");
+        super(content, "placeName");
 
         if (!certainty.isEmpty()) {
             addAttribute(new Attribute("certainty", certainty));
@@ -38,7 +38,7 @@ public class PersName extends MixedContentElement {
 
     }
 
-    PersName(@NotNull String content) {
+    PlaceName(@NotNull String content) {
         this(content, "", "", "");
     }
 

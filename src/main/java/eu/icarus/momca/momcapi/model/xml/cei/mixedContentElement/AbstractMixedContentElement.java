@@ -1,4 +1,4 @@
-package eu.icarus.momca.momcapi.model.xml.cei;
+package eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement;
 
 import eu.icarus.momca.momcapi.Util;
 import eu.icarus.momca.momcapi.model.xml.Namespace;
@@ -8,12 +8,12 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by djell on 12/09/2015.
  */
-abstract class MixedContentElement extends Element {
+abstract class AbstractMixedContentElement extends Element {
 
     @NotNull
     private String content;
 
-    MixedContentElement(@NotNull String content, @NotNull String localizedRootElementName) {
+    AbstractMixedContentElement(@NotNull String content, @NotNull String localizedRootElementName) {
 
         super(createXmlContent(content, localizedRootElementName));
 
