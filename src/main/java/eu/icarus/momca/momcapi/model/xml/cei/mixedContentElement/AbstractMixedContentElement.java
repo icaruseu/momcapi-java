@@ -36,9 +36,9 @@ abstract class AbstractMixedContentElement extends Element {
 
 //        if (!content.startsWith("<" + localizedRootElementName) && !content.endsWith(localizedRootElementName + ">")) {
         String stringToParse = String.format("<cei:%s xmlns:cei='http://www.monasterium.net/NS/cei'>%s</cei:%s>",
-                    localizedRootElementName,
-                    content,
-                    localizedRootElementName);
+                localizedRootElementName,
+                content,
+                localizedRootElementName);
 //        }
 
         Element xml = Util.parseToElement(stringToParse);
