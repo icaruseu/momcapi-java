@@ -179,7 +179,7 @@ public class CharterManagerTest {
 
     @Test
     public void testListChartersSaved() throws Exception {
-        assertEquals(cm.listChartersSaved().size(), 2);
+        assertEquals(cm.listChartersSaved().size(), 3);
     }
 
     @Test

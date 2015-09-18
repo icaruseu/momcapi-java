@@ -95,6 +95,12 @@ public class UserTest {
                 "            </xrx:data>\n" +
                 "        </xrx:annotationelement>");
 
+        assertEquals(user.getSavedCharters().size(), 2);
+        assertEquals(user.getSavedCharters().get(1).getId().getIdentifier(), "KAE_Urkunde_Nr_1");
+
+        assertEquals(user.getBookmarkedCharters().size(), 1);
+        assertEquals(user.getBookmarkedCharters().get(0).getContentXml().getText(), "tag:www.monasterium.net,2011:/charter/CH-KAE/Urkunden/KAE_Urkunde_Nr_1");
+
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)

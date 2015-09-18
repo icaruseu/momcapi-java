@@ -6,7 +6,6 @@ import eu.icarus.momca.momcapi.model.xml.Namespace;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomAuthor;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
 import eu.icarus.momca.momcapi.model.xml.xrx.Saved;
-import eu.icarus.momca.momcapi.query.XpathQuery;
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Elements;
@@ -15,7 +14,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Represents a user in MOM-CA.
@@ -70,34 +68,32 @@ public class User extends ExistResource {
         updateXmlContent();
 
     }
-
-    /**
-     * Instantiates a new User.
-     *
-     * @param existResource The eXist Resource of the user in the database.
-     */
+    
     public User(@NotNull ExistResource existResource) {
 
         super(existResource);
 
         Element xml = this.toDocument().getRootElement();
 
-        this.id = getChildElement(xml, "email").map(element -> new IdUser(element.getValue())).orElseThrow(RuntimeException::new);
-        this.idModerator = getChildElement(xml, "moderator").map(element -> new IdUser(element.getValue())).orElseThrow(RuntimeException::new);
+        this.id = readChildElement(xml, "email").map(element -> new IdUser(element.getValue())).orElseThrow(RuntimeException::new);
+        this.idModerator = readChildElement(xml, "moderator").map(element -> new IdUser(element.getValue())).orElseThrow(RuntimeException::new);
 
-        this.firstname = getChildElement(xml, "firstname").map(Element::getValue).orElse("");
-        this.name = getChildElement(xml, "name").map(Element::getValue).orElse("");
-        this.street = getChildElement(xml, "street").map(Element::getValue).orElse("");
-        this.zip = getChildElement(xml, "zip").map(Element::getValue).orElse("");
-        this.town = getChildElement(xml, "town").map(Element::getValue).orElse("");
-        this.phone = getChildElement(xml, "phone").map(Element::getValue).orElse("");
-        this.institution = getChildElement(xml, "institution").map(Element::getValue).orElse("");
-        this.info = getChildElement(xml, "info").map(Element::getValue).orElse("");
+        this.firstname = readChildElement(xml, "firstname").map(Element::getValue).orElse("");
+        this.name = readChildElement(xml, "name").map(Element::getValue).orElse("");
+        this.street = readChildElement(xml, "street").map(Element::getValue).orElse("");
+        this.zip = readChildElement(xml, "zip").map(Element::getValue).orElse("");
+        this.town = readChildElement(xml, "town").map(Element::getValue).orElse("");
+        this.phone = readChildElement(xml, "phone").map(Element::getValue).orElse("");
+        this.institution = readChildElement(xml, "institution").map(Element::getValue).orElse("");
+        this.info = readChildElement(xml, "info").map(Element::getValue).orElse("");
 
-        this.askElements = getListElements(xml, "askelements");
-        this.croppings = getListElements(xml, "cropping");
-        this.annotations = getListElements(xml, "annotations");
+        this.askElements = readListElements(xml, "askelements");
+        this.croppings = readListElements(xml, "cropping");
+        this.annotations = readListElements(xml, "annotations");
 
+        Optional<Element> storage = readChildElement(xml, "storage");
+        storage.ifPresent(element -> this.savedCharters = readSavedCharters(element));
+        storage.ifPresent(element -> this.bookmarkedCharters = readBookmarkedCharters(element));
 
     }
 
@@ -111,6 +107,7 @@ public class User extends ExistResource {
         }
 
         return element;
+
 
     }
 
@@ -127,19 +124,6 @@ public class User extends ExistResource {
     @NotNull
     public List<IdCharter> getBookmarkedCharters() {
         return bookmarkedCharters;
-    }
-
-    private Optional<Element> getChildElement(@NotNull Element xml, @NotNull String localName) {
-
-        Optional<Element> result = Optional.empty();
-
-        Element child = xml.getFirstChildElement(localName, Namespace.XRX.getUri());
-        if (child != null) {
-            result = Optional.of(child);
-        }
-
-        return result;
-
     }
 
     @NotNull
@@ -162,9 +146,6 @@ public class User extends ExistResource {
         return idModerator;
     }
 
-    /**
-     * @return The name of the user.
-     */
     @NotNull
     public String getIdentifier() {
         return id.getIdentifier();
@@ -178,26 +159,6 @@ public class User extends ExistResource {
     @NotNull
     public String getInstitution() {
         return institution;
-    }
-
-    private List<Element> getListElements(Element xml, String localName) {
-
-        List<Element> elements = new ArrayList<>(0);
-
-        Optional<Element> element = getChildElement(xml, localName);
-
-        if (element.isPresent()) {
-
-            Elements childElements = element.get().getChildElements();
-
-            for (int i = 0; i < childElements.size(); i++) {
-                elements.add(childElements.get(i));
-            }
-
-        }
-
-        return elements;
-
     }
 
     @NotNull
@@ -230,38 +191,67 @@ public class User extends ExistResource {
         return zip;
     }
 
-    /**
-     * @return A list of the charters the user has bookmarked.
-     */
-    @NotNull
-    public List<IdCharter> listBookmarkedCharterIds() {
-        return queryContentAsList(XpathQuery.QUERY_XRX_BOOKMARK).stream()
-                .map(AtomId::new).map(IdCharter::new).collect(Collectors.toList());
+
+    private List<IdCharter> readBookmarkedCharters(Element xml) {
+
+        List<IdCharter> bookmarked = new ArrayList<>(0);
+
+        List<Element> bookmarkedElements = readListElements(xml, "bookmark_list");
+
+        bookmarkedElements.forEach(element -> bookmarked.add(new IdCharter(new AtomId(element.getValue()))));
+
+        return bookmarked;
+
     }
 
-    /**
-     * @return A list of the charters the user has saved.
-     */
-    @NotNull
-    public List<IdCharter> listSavedCharterIds() {
-        return queryContentAsList(XpathQuery.QUERY_XRX_SAVED_ID).stream()
-                .map(AtomId::new).map(IdCharter::new).collect(Collectors.toList());
-    }
+    private Optional<Element> readChildElement(@NotNull Element xml, @NotNull String localName) {
 
-    @NotNull
-    private String queryUniqueFieldValue(@NotNull XpathQuery query) {
+        Optional<Element> result = Optional.empty();
 
-        List<String> queryResults = queryContentAsList(query);
-
-        if (queryResults.size() == 1) {
-            return queryResults.get(0);
-        } else {
-            throw new IllegalArgumentException("The XML content of the resource doesn't have an 'xrx:name' element. " +
-                    "It's probably not a valid user resource.");
+        Element child = xml.getFirstChildElement(localName, Namespace.XRX.getUri());
+        if (child != null) {
+            result = Optional.of(child);
         }
 
+        return result;
+
     }
 
+    private List<Element> readListElements(Element xml, String localName) {
+
+        List<Element> elements = new ArrayList<>(0);
+
+        Optional<Element> element = readChildElement(xml, localName);
+
+        if (element.isPresent()) {
+
+            Elements childElements = element.get().getChildElements();
+
+            for (int i = 0; i < childElements.size(); i++) {
+                elements.add(childElements.get(i));
+            }
+
+        }
+
+        return elements;
+
+    }
+
+    private List<Saved> readSavedCharters(Element xml) {
+
+        List<Saved> saved = new ArrayList<>(0);
+
+        List<Element> savedElements = readListElements(xml, "saved_list");
+
+        savedElements.forEach(element -> saved.add(
+                new Saved(
+                        new IdCharter(new AtomId(readChildElement(element, "id").get().getValue())),
+                        readChildElement(element, "start_time").get().getValue(),
+                        readChildElement(element, "freigabe").get().getValue())));
+
+        return saved;
+
+    }
 
     public void setAnnotations(@NotNull List<Element> annotations) {
         this.annotations = annotations;

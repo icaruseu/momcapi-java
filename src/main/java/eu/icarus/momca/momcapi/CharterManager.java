@@ -5,6 +5,7 @@ import eu.icarus.momca.momcapi.model.id.*;
 import eu.icarus.momca.momcapi.model.resource.Charter;
 import eu.icarus.momca.momcapi.model.resource.ResourceRoot;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
+import eu.icarus.momca.momcapi.model.xml.xrx.Saved;
 import eu.icarus.momca.momcapi.query.ExistQuery;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
 import org.jetbrains.annotations.NotNull;
@@ -114,13 +115,11 @@ public class CharterManager extends AbstractManager {
 
         List<IdCharter> results = new ArrayList<>(0);
 
-        momcaConnection.getUserManager().getUser(idUser).ifPresent(user -> {
-
-            results.addAll(user.listSavedCharterIds().stream()
-                    .filter(idCharter -> !isCharterExisting(idCharter, ResourceRoot.ARCHIVAL_CHARTERS_BEING_EDITED))
-                    .collect(Collectors.toList()));
-
-        });
+        momcaConnection.getUserManager().getUser(idUser).ifPresent(user ->
+                results.addAll(user.getSavedCharters().stream()
+                        .map(Saved::getId)
+                        .filter(idCharter -> !isCharterExisting(idCharter, ResourceRoot.ARCHIVAL_CHARTERS_BEING_EDITED))
+                        .collect(Collectors.toList())));
 
         return results;
 
