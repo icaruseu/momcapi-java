@@ -112,7 +112,6 @@ public class UserManagerTest {
         User user = userManager.getUser(new IdUser(userName)).get();
         assertEquals(user.getIdentifier(), userName);
         assertEquals(user.getIdModerator().getIdentifier(), moderator);
-        assertTrue(user.isInitialized());
 
     }
 
@@ -141,7 +140,7 @@ public class UserManagerTest {
 
         // initialize user
         User initializedUser = userManager.initializeUser(user.getId(), newUserPassword);
-        assertTrue(initializedUser.isInitialized());
+        assertTrue(userManager.isUserInitialized(initializedUser.getId()));
 
         // test initialization success directly in the database
         Optional<ExistResource> resourceOptional = momcaConnection.getExistResource(newUserName + ".xml", parentCollection);

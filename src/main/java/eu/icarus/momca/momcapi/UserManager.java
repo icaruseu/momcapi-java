@@ -186,9 +186,8 @@ public class UserManager extends AbstractManager {
      */
     @NotNull
     public Optional<User> getUser(@NotNull IdUser idUser) {
-        boolean isInitialized = isUserInitialized(idUser);
         return momcaConnection.getExistResource(idUser.getIdentifier() + ".xml", ResourceRoot.USER_DATA.getUri())
-                .flatMap(existResource -> Optional.of(new User(existResource, isInitialized)));
+                .flatMap(existResource -> Optional.of(new User(existResource)));
     }
 
     @NotNull

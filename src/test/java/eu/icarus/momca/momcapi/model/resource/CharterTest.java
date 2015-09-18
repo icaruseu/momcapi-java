@@ -1,9 +1,11 @@
 package eu.icarus.momca.momcapi.model.resource;
 
 import eu.icarus.momca.momcapi.TestUtils;
+import eu.icarus.momca.momcapi.model.Date;
 import eu.icarus.momca.momcapi.model.id.IdCharter;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomAuthor;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomEntry;
+import eu.icarus.momca.momcapi.model.xml.cei.DateExact;
 import nu.xom.Element;
 import nu.xom.ParsingException;
 import org.jetbrains.annotations.NotNull;
@@ -42,6 +44,17 @@ public class CharterTest {
         ExistResource resource = getExistResource(identifier);
 
         return new Charter(resource);
+    }
+
+    @Test
+    public void testConstructor1() throws Exception {
+
+        IdCharter id = new IdCharter("collection", "charter1");
+        Date date = new Date(new DateExact("14180201", "February 1st, 1418"));
+//        User user = new User();
+//
+//        Charter charter = new Charter(id, CharterStatus.PUBLIC, user, date);
+
     }
 
     @Test

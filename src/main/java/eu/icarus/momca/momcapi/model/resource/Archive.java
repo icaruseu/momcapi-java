@@ -40,7 +40,7 @@ public class Archive extends AtomResource {
 
     public Archive(@NotNull String identifier, @NotNull String name, @NotNull Country country) {
 
-        super(new IdArchive(identifier), ResourceType.ARCHIVE, ResourceRoot.ARCHIVES);
+        super(new IdArchive(identifier), ResourceType.ARCHIVE, ResourceRoot.ARCHIVES.getUri());
 
         if (name.isEmpty()) {
             throw new IllegalArgumentException("The name is not allowed to be an empty string.");

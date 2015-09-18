@@ -57,7 +57,7 @@ public class Fond extends AtomResource {
 
     public Fond(@NotNull String identifier, @NotNull IdArchive parentArchive, @NotNull String name) {
 
-        super(new IdFond(parentArchive.getIdentifier(), identifier), ResourceType.FOND, ResourceRoot.ARCHIVAL_FONDS);
+        super(new IdFond(parentArchive.getIdentifier(), identifier), ResourceType.FOND, ResourceRoot.ARCHIVAL_FONDS.getUri());
 
         if (name.isEmpty()) {
             throw new IllegalArgumentException("The name is not allowed to be an empty string.");

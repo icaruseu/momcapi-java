@@ -23,11 +23,11 @@ public abstract class AtomResource extends ExistResource {
     @NotNull
     IdAtomId id;
 
-    AtomResource(@NotNull IdAtomId id, @NotNull ResourceType resourceType, @NotNull ResourceRoot resourceRoot) {
+    AtomResource(@NotNull IdAtomId id, @NotNull ResourceType resourceType, @NotNull String baseUri) {
 
         super(new ExistResource(
                 String.format("%s%s", id.getIdentifier(), resourceType.getNameSuffix()),
-                createResourceUri(id, resourceType, resourceRoot), "<empty />"));
+                createResourceUri(id, resourceType, baseUri), "<empty />"));
 
         this.id = id;
 
@@ -48,41 +48,40 @@ public abstract class AtomResource extends ExistResource {
 
     }
 
-    private static String createResourceUri(IdAtomId id, ResourceType resourceType, ResourceRoot resourceRoot) {
+    private static String createResourceUri(IdAtomId id, ResourceType resourceType, String baseUri) {
 
         String url = "";
         String identifier = id.getIdentifier();
 
-        String rootUri = resourceRoot.getUri();
         switch (resourceType) {
 
             case ANNOTATION_IMAGE:
                 url = ""; // TODO
                 break;
             case ARCHIVE:
-                url = String.format("%s/%s", rootUri, identifier);
+                url = String.format("%s/%s", baseUri, identifier);
                 break;
             case CHARTER:
                 IdCharter idCharter = (IdCharter) id;
                 if (idCharter.isInFond()) {
                     String archiveIdentifier = idCharter.getIdFond().get().getIdArchive().getIdentifier();
                     String fondIdentifier = idCharter.getIdFond().get().getIdentifier();
-                    url = String.format("%s/%s/%s", rootUri, archiveIdentifier, fondIdentifier);
+                    url = String.format("%s/%s/%s", baseUri, archiveIdentifier, fondIdentifier);
                 } else {
                     String collectionIdentifier = idCharter.getIdCollection().get().getIdentifier();
-                    url = String.format("%s/%s", rootUri, collectionIdentifier);
+                    url = String.format("%s/%s", baseUri, collectionIdentifier);
                 }
                 break;
             case COLLECTION:
-                url = String.format("%s/%s", rootUri, identifier);
+                url = String.format("%s/%s", baseUri, identifier);
                 break;
             case FOND:
                 IdFond idFond = (IdFond) id;
                 String archiveIdentifier = idFond.getIdArchive().getIdentifier();
-                url = String.format("%s/%s/%s", rootUri, archiveIdentifier, identifier);
+                url = String.format("%s/%s/%s", baseUri, archiveIdentifier, identifier);
                 break;
             case MY_COLLECTION:
-                url = String.format("%s/%s", rootUri, identifier);
+                url = String.format("%s/%s", baseUri, identifier);
                 break;
             case SVG:
                 url = ""; // TODO

@@ -2,6 +2,7 @@ package eu.icarus.momca.momcapi.model.resource;
 
 
 import eu.icarus.momca.momcapi.model.CharterStatus;
+import eu.icarus.momca.momcapi.model.Date;
 import eu.icarus.momca.momcapi.model.id.IdCharter;
 import eu.icarus.momca.momcapi.model.xml.Namespace;
 import eu.icarus.momca.momcapi.model.xml.XmlValidationProblem;
@@ -33,6 +34,17 @@ public class Charter extends AtomResource {
 
     @NotNull
     private final List<XmlValidationProblem> validationProblems = new ArrayList<>(0);
+    @NotNull
+    private CharterStatus charterStatus;
+
+    public Charter(@NotNull IdCharter id, @NotNull CharterStatus charterStatus, @NotNull User author, @NotNull Date date) {
+
+        super(id, ResourceType.CHARTER, initBaseUri(charterStatus, author));
+        this.charterStatus = charterStatus;
+
+        updateXmlContent();
+
+    }
 
     public Charter(@NotNull ExistResource existResource) {
 
@@ -44,6 +56,36 @@ public class Charter extends AtomResource {
             throw new IllegalArgumentException("Failed to validate the resource.", e);
         }
 
+        this.charterStatus = readCharterStatus();
+
+    }
+
+    private static String initBaseUri(@NotNull CharterStatus charterStatus, @NotNull User author) {
+
+        String baseUri = "";
+
+        switch (charterStatus) {
+            case PRIVATE:
+                baseUri = ResourceRoot.USER_DATA.getUri() + "/" + author.getIdentifier();
+                break;
+            case IMPORTED:
+                baseUri = ResourceRoot.IMPORTED_ARCHIVAL_CHARTERS.getUri();
+                break;
+            case PUBLIC:
+                baseUri = ResourceRoot.PUBLIC_CHARTERS.getUri();
+                break;
+            case SAVED:
+                baseUri = ResourceRoot.ARCHIVAL_CHARTERS_BEING_EDITED.getUri();
+                break;
+        }
+
+        return baseUri;
+
+    }
+
+    @NotNull
+    public CharterStatus getCharterStatus() {
+        return charterStatus;
     }
 
     @NotNull
@@ -52,14 +94,16 @@ public class Charter extends AtomResource {
         return (IdCharter) id;
     }
 
-
     @NotNull
     public List<XmlValidationProblem> getValidationProblems() {
         return validationProblems;
     }
 
+    public boolean isValidCei() {
+        return validationProblems.isEmpty();
+    }
 
-    private CharterStatus initStatus() {
+    private CharterStatus readCharterStatus() {
 
         CharterStatus status;
 
@@ -77,8 +121,8 @@ public class Charter extends AtomResource {
 
     }
 
-    public boolean isValidCei() {
-        return validationProblems.isEmpty();
+    public void setCharterStatus(@NotNull CharterStatus charterStatus) {
+        this.charterStatus = charterStatus;
     }
 
     @Override

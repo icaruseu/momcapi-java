@@ -39,7 +39,7 @@ public class Collection extends AtomResource {
 
     public Collection(@NotNull String identifier, @NotNull String name) {
 
-        super(new IdCollection(identifier), ResourceType.COLLECTION, ResourceRoot.ARCHIVAL_COLLECTIONS);
+        super(new IdCollection(identifier), ResourceType.COLLECTION, ResourceRoot.ARCHIVAL_COLLECTIONS.getUri());
 
         if (name.isEmpty()) {
             throw new IllegalArgumentException("The name is not allowed to be an empty string.");
