@@ -2,7 +2,6 @@ package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.exception.MomcaException;
 import eu.icarus.momca.momcapi.model.id.IdUser;
-import eu.icarus.momca.momcapi.model.resource.ExistResource;
 import eu.icarus.momca.momcapi.model.resource.ResourceRoot;
 import eu.icarus.momca.momcapi.model.resource.User;
 import eu.icarus.momca.momcapi.query.ExistQuery;
@@ -30,13 +29,6 @@ import java.util.stream.Collectors;
  */
 public class UserManager extends AbstractManager {
 
-    @NotNull
-    private static final String NEW_USER_CONTENT = "<xrx:user xmlns:xrx=\"http://www.monasterium.net/NS/xrx\">" +
-            " <xrx:username /> <xrx:password /> <xrx:firstname>%s</xrx:firstname> <xrx:name>%s</xrx:name> " +
-            "<xrx:email>%s</xrx:email> <xrx:moderator>%s</xrx:moderator> <xrx:street /> <xrx:zip /> <xrx:town />" +
-            " <xrx:phone /> <xrx:institution /> <xrx:info /> <xrx:storage> <xrx:saved_list /> <xrx:bookmark_list />" +
-            " </xrx:storage> </xrx:user>";
-
     /**
      * Instantiates a new UserManager.
      *
@@ -49,45 +41,23 @@ public class UserManager extends AbstractManager {
     /**
      * Adds a new user to MOM-CA.
      *
-     * @param userName      The name of the user.
-     * @param password      The password of the user.
-     * @param moderatorName The name of an existing moderator.
-     * @param firstName     The first name of the user.
-     * @param lastName      The last name of the user.
-     * @return The user just added to the database.
+     * @param user The user to be added to the database.
      */
-    public User addUser(@NotNull String userName, @NotNull String password, @NotNull String moderatorName,
-                        @NotNull String firstName, @NotNull String lastName) {
+    public void addUser(@NotNull User user, @NotNull String password) {
 
-        IdUser idUser = new IdUser(userName);
 
-        if (!getUser(idUser).isPresent()) {
+        if (!getUser(user.getId()).isPresent()) {
 
-            if (!getUser(new IdUser(moderatorName)).isPresent()) {
-                throw new IllegalArgumentException("Moderator '" + moderatorName + "' not existing in database.");
+            if (!getUser(user.getIdModerator()).isPresent()) {
+                String message = String.format("Moderator '%s' not existing in database.", user.getIdModerator().getIdentifier());
+                throw new IllegalArgumentException(message);
             }
 
-            String xmlContent = createUserResourceContent(userName, moderatorName, firstName, lastName);
-            ExistResource userResource = new ExistResource(userName + ".xml", ResourceRoot.USER_DATA.getUri(), xmlContent);
-            momcaConnection.storeExistResource(userResource);
-            initializeUser(idUser, password);
+            momcaConnection.storeExistResource(user);
+            initializeUser(user.getId(), password);
 
         }
 
-        return getUser(idUser).orElseThrow(RuntimeException::new);
-
-    }
-
-    /**
-     * Adds a new user to MOM-CA.
-     *
-     * @param userName      The name of the user.
-     * @param password      The password of the user.
-     * @param moderatorName The name of an existing moderator.
-     * @return The user just added to the database.
-     */
-    public User addUser(@NotNull String userName, @NotNull String password, @NotNull String moderatorName) {
-        return addUser(userName, password, moderatorName, "New", "User");
     }
 
     /**
@@ -134,11 +104,6 @@ public class UserManager extends AbstractManager {
             throw new MomcaException("Failed to change the password for '" + userName + "'", e);
         }
 
-    }
-
-    private String createUserResourceContent(@NotNull String userName, @NotNull String moderatorName,
-                                             @NotNull String firstName, @NotNull String lastName) {
-        return String.format(NEW_USER_CONTENT, firstName, lastName, userName, moderatorName);
     }
 
     /**

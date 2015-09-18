@@ -36,7 +36,7 @@ public class UserManagerTest {
         IdUser id = new IdUser(userName);
         String password = "newPassword";
         String moderator = "admin";
-        userManager.addUser(userName, password, moderator);
+        userManager.addUser(new User(userName, moderator), password);
 
         assertTrue(userManager.getUser(id).isPresent());
         assertTrue(userManager.isUserInitialized(id));
@@ -51,7 +51,7 @@ public class UserManagerTest {
         String userName = "newUser@dev.monasterium.net";
         String password = "newPassword";
         String moderator = "notExistingModerator";
-        userManager.addUser(userName, password, moderator);
+        userManager.addUser(new User(userName, moderator), password);
 
     }
 
@@ -63,8 +63,9 @@ public class UserManagerTest {
         User oldModerator = userManager.getUser(new IdUser("admin")).get();
         User newModerator = userManager.getUser(new IdUser("user1.testuser@dev.monasterium.net")).get();
 
-        User user = userManager.addUser(userName, "", oldModerator.getIdentifier());
-        User updatedUser = userManager.changeModerator(user, newModerator);
+        userManager.addUser(new User(userName, "admin"), "");
+        User originalUser = userManager.getUser(new IdUser(userName)).get();
+        User updatedUser = userManager.changeModerator(originalUser, newModerator);
 
         assertEquals(updatedUser.getIdModerator().getIdentifier(), newModerator.getIdentifier());
 
@@ -78,7 +79,8 @@ public class UserManagerTest {
         String userName = "removeAccountTest@dev.monasterium.net";
         String password = "testing123";
         String moderator = "admin";
-        User user = userManager.addUser(userName, password, moderator);
+        userManager.addUser(new User(userName, moderator), password);
+        User user = userManager.getUser(new IdUser(userName)).get();
         userManager.deleteExistUserAccount(userName);
 
         assertFalse(userManager.isUserInitialized(new IdUser(userName)));
@@ -95,7 +97,7 @@ public class UserManagerTest {
         String password = "testing123";
         String moderator = "admin";
 
-        userManager.addUser(userName, password, moderator);
+        userManager.addUser(new User(userName, moderator), password);
         userManager.deleteUser(id);
 
         assertFalse(userManager.getUser(id).isPresent());
