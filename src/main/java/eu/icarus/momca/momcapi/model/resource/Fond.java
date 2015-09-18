@@ -57,7 +57,9 @@ public class Fond extends AtomResource {
 
     public Fond(@NotNull String identifier, @NotNull IdArchive parentArchive, @NotNull String name) {
 
-        super(new IdFond(parentArchive.getIdentifier(), identifier), ResourceType.FOND, ResourceRoot.ARCHIVAL_FONDS.getUri());
+        super(new IdFond(parentArchive.getIdentifier(), identifier),
+                String.format("%s/%s/%s", ResourceRoot.ARCHIVAL_FONDS.getUri(), parentArchive.getIdentifier(), identifier),
+                String.format("%s%s", identifier, ResourceType.FOND.getNameSuffix()));
 
         if (name.isEmpty()) {
             throw new IllegalArgumentException("The name is not allowed to be an empty string.");
@@ -67,23 +69,6 @@ public class Fond extends AtomResource {
         resetOddList();
 
         updateXmlContent();
-
-    }
-
-    public Fond(@NotNull IdFond idFond, @NotNull String fondXmlContent, @Nullable String preferencesXmlContent) {
-
-        this(
-                new ExistResource(
-                        String.format("%s%s", idFond.getIdentifier(), ResourceType.FOND.getNameSuffix()),
-                        String.format("%s/%s/%s", ResourceRoot.ARCHIVAL_FONDS.getUri(), idFond.getIdArchive().getIdentifier(), idFond.getIdentifier()),
-                        fondXmlContent),
-                preferencesXmlContent == null ?
-                        Optional.empty() :
-                        Optional.of(new ExistResource(
-                                String.format("%s%s", idFond.getIdentifier(), ".preferences.xml"),
-                                String.format("%s/%s/%s", ResourceRoot.ARCHIVAL_FONDS.getUri(), idFond.getIdArchive().getIdentifier(), idFond.getIdentifier()),
-                                preferencesXmlContent
-                        )));
 
     }
 

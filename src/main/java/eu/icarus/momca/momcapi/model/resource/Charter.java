@@ -46,7 +46,7 @@ public class Charter extends AtomResource {
 
     public Charter(@NotNull IdCharter id, @NotNull CharterStatus charterStatus, @NotNull User author, @NotNull Date date) {
 
-        super(id, createResourceName(id, charterStatus), createParentUri(id, charterStatus, author.getId()));
+        super(id, createParentUri(id, charterStatus, author.getId()), createResourceName(id, charterStatus));
         this.charterStatus = charterStatus;
         this.creator = Optional.of(author.getId());
         this.idno = new Idno(id.getIdentifier(), id.getIdentifier());
