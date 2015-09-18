@@ -1,6 +1,7 @@
 package eu.icarus.momca.momcapi.model.resource;
 
 import eu.icarus.momca.momcapi.TestUtils;
+import eu.icarus.momca.momcapi.model.CharterStatus;
 import eu.icarus.momca.momcapi.model.Date;
 import eu.icarus.momca.momcapi.model.id.IdCharter;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomAuthor;
@@ -13,8 +14,7 @@ import org.testng.annotations.Test;
 
 import java.io.IOException;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.*;
 
 /**
  * Created by daniel on 27.06.2015.
@@ -51,17 +51,30 @@ public class CharterTest {
 
         IdCharter id = new IdCharter("collection", "charter1");
         Date date = new Date(new DateExact("14180201", "February 1st, 1418"));
-//        User user = new User();
-//
-//        Charter charter = new Charter(id, CharterStatus.PUBLIC, user, date);
+        User user = new User("user", "moderator");
+
+        Charter charter = new Charter(id, CharterStatus.PUBLIC, user, date);
+
+        assertEquals(charter.getCharterStatus(), CharterStatus.PUBLIC);
+        assertEquals(charter.getParentUri(), "/db/mom-data/metadata.charter.public/collection");
+        assertEquals(charter.getResourceName(), "charter1.charter.xml");
+
+        assertEquals(charter.getId(), id);
+        assertTrue(charter.getCreator().isPresent());
+        assertEquals(charter.getCreator().get(), user.getId());
+        assertEquals(charter.getIdno().getId(), "charter1");
+        assertEquals(charter.getIdno().getText(), "charter1");
+        assertEquals(charter.getDate(), date);
+
+        String correctXml = "";
+        assertEquals(charter.toXML(), correctXml);
 
     }
 
     @Test
-    public void testEmptyCharter() throws Exception {
+    public void testConstructor2WithEmptyCharter() throws Exception {
 
         Charter charter = createCharter("empty_charter");
-
 
     }
 
@@ -90,6 +103,38 @@ public class CharterTest {
     }
 
     @Test
+    public void testIsValidCei() throws Exception {
+        Charter charter = createCharter("invalid_charter");
+        assertFalse(charter.isValidCei());
+    }
+
+    @Test
+    public void testSetCharterStatus() throws Exception {
+
+        IdCharter id = new IdCharter("collection", "charter1");
+        Date date = new Date(new DateExact("14180201", "February 1st, 1418"));
+        User user = new User("user", "moderator");
+
+        Charter charter = new Charter(id, CharterStatus.PUBLIC, user, date);
+
+        charter.setCharterStatus(CharterStatus.IMPORTED);
+        assertEquals(charter.getCharterStatus(), CharterStatus.IMPORTED);
+        assertEquals(charter.getParentUri(), "/db/mom-data/metadata.charter.import/collection");
+        assertEquals(charter.getResourceName(), "charter1.charter.xml");
+
+        charter.setCharterStatus(CharterStatus.PRIVATE);
+        assertEquals(charter.getCharterStatus(), CharterStatus.PRIVATE);
+        assertEquals(charter.getParentUri(), "/db/mom-data/xrx.user/user/metadata.charter/collection");
+        assertEquals(charter.getResourceName(), "charter1.charter.xml");
+
+        charter.setCharterStatus(CharterStatus.SAVED);
+        assertEquals(charter.getCharterStatus(), CharterStatus.SAVED);
+        assertEquals(charter.getParentUri(), "/db/mom-data/metadata.charter.saved");
+        assertEquals(charter.getResourceName(), "tag%3Awww.monasterium.net%2C2011%3A%23charter%23collection%23charter1.xml");
+
+    }
+
+    @Test
     public void testSetIdentifier() throws Exception {
 
         Charter charter = createCharter("empty_charter");
@@ -100,11 +145,4 @@ public class CharterTest {
         assertEquals(charter.getId(), new IdCharter("collection", new_identifier));
 
     }
-
-    @Test
-    public void testtestIsValidCei() throws Exception {
-        Charter charter = createCharter("invalid_charter");
-        assertFalse(charter.isValidCei());
-    }
-
 }

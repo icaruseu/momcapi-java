@@ -23,11 +23,17 @@ public abstract class AtomResource extends ExistResource {
     @NotNull
     IdAtomId id;
 
+    AtomResource(@NotNull IdAtomId id, @NotNull String resourceName, @NotNull String parentUri) {
+        super(new ExistResource(resourceName, parentUri, "<empty />"));
+        this.id = id;
+    }
+
     AtomResource(@NotNull IdAtomId id, @NotNull ResourceType resourceType, @NotNull String baseUri) {
 
         super(new ExistResource(
                 String.format("%s%s", id.getIdentifier(), resourceType.getNameSuffix()),
-                createResourceUri(id, resourceType, baseUri), "<empty />"));
+                createResourceUri(id, resourceType, baseUri),
+                "<empty />"));
 
         this.id = id;
 

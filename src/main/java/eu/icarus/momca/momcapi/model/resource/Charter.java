@@ -4,8 +4,10 @@ package eu.icarus.momca.momcapi.model.resource;
 import eu.icarus.momca.momcapi.model.CharterStatus;
 import eu.icarus.momca.momcapi.model.Date;
 import eu.icarus.momca.momcapi.model.id.IdCharter;
+import eu.icarus.momca.momcapi.model.id.IdUser;
 import eu.icarus.momca.momcapi.model.xml.Namespace;
 import eu.icarus.momca.momcapi.model.xml.XmlValidationProblem;
+import eu.icarus.momca.momcapi.model.xml.cei.Idno;
 import eu.icarus.momca.momcapi.query.XpathQuery;
 import nu.xom.Builder;
 import nu.xom.Element;
@@ -26,6 +28,7 @@ import javax.xml.validation.SchemaFactory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by daniel on 25.06.2015.
@@ -36,11 +39,18 @@ public class Charter extends AtomResource {
     private final List<XmlValidationProblem> validationProblems = new ArrayList<>(0);
     @NotNull
     private CharterStatus charterStatus;
+    @NotNull
+    private Date date;
+    @NotNull
+    private Idno idno;
 
     public Charter(@NotNull IdCharter id, @NotNull CharterStatus charterStatus, @NotNull User author, @NotNull Date date) {
 
-        super(id, ResourceType.CHARTER, initBaseUri(charterStatus, author));
+        super(id, createResourceName(id, charterStatus), createParentUri(id, charterStatus, author.getId()));
         this.charterStatus = charterStatus;
+        this.creator = Optional.of(author.getId());
+        this.idno = new Idno(id.getIdentifier(), id.getIdentifier());
+        this.date = date;
 
         updateXmlContent();
 
@@ -60,26 +70,75 @@ public class Charter extends AtomResource {
 
     }
 
-    private static String initBaseUri(@NotNull CharterStatus charterStatus, @NotNull User author) {
+    private static String createParentUri(@NotNull IdCharter idCharter, @NotNull CharterStatus charterStatus, @NotNull IdUser creator) {
 
-        String baseUri = "";
+        String parentUri = "";
 
         switch (charterStatus) {
+
             case PRIVATE:
-                baseUri = ResourceRoot.USER_DATA.getUri() + "/" + author.getIdentifier();
+                parentUri = String.format("%s/%s/%s/%s",
+                        ResourceRoot.USER_DATA.getUri(),
+                        creator.getIdentifier(),
+                        "metadata.charter",
+                        idCharter.getIdCollection().get().getIdentifier());
                 break;
+
             case IMPORTED:
-                baseUri = ResourceRoot.IMPORTED_ARCHIVAL_CHARTERS.getUri();
+                parentUri = String.format("%s/%s",
+                        ResourceRoot.IMPORTED_ARCHIVAL_CHARTERS.getUri(),
+                        getHierarchicalUriPart(idCharter));
                 break;
+
             case PUBLIC:
-                baseUri = ResourceRoot.PUBLIC_CHARTERS.getUri();
+                parentUri = String.format("%s/%s",
+                        ResourceRoot.PUBLIC_CHARTERS.getUri(),
+                        getHierarchicalUriPart(idCharter));
                 break;
+
             case SAVED:
-                baseUri = ResourceRoot.ARCHIVAL_CHARTERS_BEING_EDITED.getUri();
+                parentUri = ResourceRoot.ARCHIVAL_CHARTERS_BEING_EDITED.getUri();
                 break;
+
         }
 
-        return baseUri;
+        return parentUri;
+
+    }
+
+    @NotNull
+    private static String createResourceName(@NotNull IdCharter id, @NotNull CharterStatus charterStatus) {
+
+        String resourceName;
+
+        if (charterStatus == CharterStatus.SAVED) {
+            resourceName = id.getContentXml().getText().replace("/", "#") + ".xml";
+        } else {
+            resourceName = String.format("%s%s", id.getIdentifier(), ResourceType.CHARTER.getNameSuffix());
+        }
+
+        return resourceName;
+
+    }
+
+    @NotNull
+    private static String getHierarchicalUriPart(@NotNull IdCharter idCharter) {
+
+        String idPart;
+
+        if (idCharter.isInFond()) {
+
+            String archiveIdentifier = idCharter.getIdFond().get().getIdArchive().getIdentifier();
+            String fondIdentifier = idCharter.getIdFond().get().getIdentifier();
+            idPart = archiveIdentifier + "/" + fondIdentifier;
+
+        } else {
+
+            idPart = idCharter.getIdCollection().get().getIdentifier();
+
+        }
+
+        return idPart;
 
     }
 
@@ -89,9 +148,19 @@ public class Charter extends AtomResource {
     }
 
     @NotNull
+    public Date getDate() {
+        return date;
+    }
+
+    @NotNull
     @Override
     public IdCharter getId() {
         return (IdCharter) id;
+    }
+
+    @NotNull
+    public Idno getIdno() {
+        return idno;
     }
 
     @NotNull
@@ -123,6 +192,8 @@ public class Charter extends AtomResource {
 
     public void setCharterStatus(@NotNull CharterStatus charterStatus) {
         this.charterStatus = charterStatus;
+        setParentUri(createParentUri(getId(), charterStatus, creator.get()));
+        setResourceName(createResourceName(getId(), charterStatus));
     }
 
     @Override
