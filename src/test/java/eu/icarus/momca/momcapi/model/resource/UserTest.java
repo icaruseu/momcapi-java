@@ -40,6 +40,16 @@ public class UserTest {
 
     }
 
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testConstructor1WithoutModerator() throws Exception {
+        new User("user", "");
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testConstructor1WithoutUser() throws Exception {
+        new User("", "moderator");
+    }
+
     @Test
     public void testConstructor2() throws Exception {
 
@@ -84,6 +94,26 @@ public class UserTest {
                 "                <xrx:url>http://www.klosterarchiv.ch/archivalien/KAE_A_II_1-1440/KAE_A_II_1-0058.jpg</xrx:url>\n" +
                 "            </xrx:data>\n" +
                 "        </xrx:annotationelement>");
+
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testConstructor2WithoutModerator() throws Exception {
+
+        String invalidUserXml = "<xrx:user xmlns:xrx=\"http://www.monasterium.net/NS/xrx\"> <xrx:username>momcapitest</xrx:username> <xrx:password>momcapitest</xrx:password> <xrx:firstname>User1</xrx:firstname> <xrx:name>Testuser</xrx:name> <xrx:email>user1.testuser@dev.monasterium.net.xml</xrx:email> <xrx:moderator></xrx:moderator> <xrx:street /> <xrx:zip /> <xrx:town /> <xrx:phone /> <xrx:institution /> <xrx:info /> <xrx:storage> <xrx:saved_list /> <xrx:bookmark_list /> </xrx:storage> </xrx:user>\n";
+        ExistResource resource = new ExistResource("user1.testuser@dev.monasterium.net.xml", "/db/mom-data/xrx.user", invalidUserXml);
+
+        new User(resource);
+
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testConstructor2WithoutUser() throws Exception {
+
+        String invalidUserXml = "<xrx:user xmlns:xrx=\"http://www.monasterium.net/NS/xrx\"> <xrx:username>momcapitest</xrx:username> <xrx:password>momcapitest</xrx:password> <xrx:firstname>User1</xrx:firstname> <xrx:name>Testuser</xrx:name> <xrx:email></xrx:email> <xrx:moderator>admin</xrx:moderator> <xrx:street /> <xrx:zip /> <xrx:town /> <xrx:phone /> <xrx:institution /> <xrx:info /> <xrx:storage> <xrx:saved_list /> <xrx:bookmark_list /> </xrx:storage> </xrx:user>\n";
+        ExistResource resource = new ExistResource("user1.testuser@dev.monasterium.net.xml", "/db/mom-data/xrx.user", invalidUserXml);
+
+        new User(resource);
 
     }
 
@@ -187,6 +217,12 @@ public class UserTest {
 
     }
 
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testSetIdentifierError() throws Exception {
+        User user = new User("user", "moderator");
+        user.setIdentifier("");
+    }
+
     @Test
     public void testSetModerator() throws Exception {
 
@@ -199,6 +235,12 @@ public class UserTest {
         assertEquals(user.getIdModerator(), new IdUser("newModerator"));
         assertEquals(user.toXML(), correctXml);
 
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testSetModeratorError() throws Exception {
+        User user = new User("user", "moderator");
+        user.setModerator("");
     }
 
     @Test
