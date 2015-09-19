@@ -205,6 +205,13 @@ public class Charter extends AtomResource {
     @Override
     void updateXmlContent() {
 
+
+        try {
+            validateCei(this);
+        } catch (@NotNull SAXException | IOException | ParsingException | ParserConfigurationException e) {
+            throw new IllegalArgumentException("Failed to validate the resource.", e);
+        }
+
     }
 
     private void validateCei(@NotNull ExistResource resource)
