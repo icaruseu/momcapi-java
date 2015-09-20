@@ -23,18 +23,16 @@ public class Date {
     @NotNull
     private String literalDate;
     @NotNull
-    private LocalDate sortingDate = LocalDate.now();
+    private Optional<LocalDate> sortingDate = Optional.empty();
 
     public Date(@NotNull LocalDate sortingDate, long daysInRange, @NotNull String literalDate) {
-        this.sortingDate = sortingDate;
+        this.sortingDate = Optional.of(sortingDate);
         this.daysInRange = daysInRange;
         this.literalDate = literalDate;
     }
 
     public Date(@NotNull LocalDate sortingDate, long daysInRange) {
-        this.sortingDate = sortingDate;
-        this.daysInRange = daysInRange;
-        this.literalDate = createLiteralDate(sortingDate, daysInRange);
+        this(sortingDate, daysInRange, createLiteralDate(sortingDate, daysInRange));
     }
 
     public Date(@NotNull LocalDate sortingDate) {
@@ -55,23 +53,30 @@ public class Date {
 
     public Date(@NotNull DateAbstract ceiDate) {
 
-        if (ceiDate.isUndated()) {
-            String message = String.format("The provided date element, `%s`, is undated.", ceiDate);
-            throw new IllegalArgumentException(message);
-        }
-
         if (!ceiDate.isValid()) {
             String message = String.format("The date '%s' is invalid.", ceiDate);
             throw new MomcaException(message);
         }
 
-        if (ceiDate instanceof DateExact) {
-            initDateExact((DateExact) ceiDate);
-        } else {
-            initDateRange((DateRange) ceiDate);
-        }
+        if (ceiDate.isUndated()) {
 
-        this.literalDate = ceiDate.getLiteralDate();
+            this.literalDate = ceiDate.getLiteralDate();
+
+        } else {
+
+            if (ceiDate instanceof DateExact) {
+
+                initDateExact((DateExact) ceiDate);
+
+            } else {
+
+                initFromDateRange((DateRange) ceiDate);
+
+            }
+
+            this.literalDate = ceiDate.getLiteralDate();
+
+        }
 
     }
 
@@ -100,8 +105,8 @@ public class Date {
 
         Optional<LocalDate> offsetDate = Optional.empty();
 
-        if (daysInRange != 0) {
-            offsetDate = Optional.of(subtractDays(sortingDate, daysInRange));
+        if (sortingDate.isPresent() && daysInRange != 0) {
+            offsetDate = Optional.of(subtractDays(sortingDate.get(), daysInRange));
         }
 
         return offsetDate;
@@ -114,7 +119,7 @@ public class Date {
     }
 
     @NotNull
-    public LocalDate getSortingDate() {
+    public Optional<LocalDate> getSortingDate() {
         return sortingDate;
     }
 
@@ -126,31 +131,31 @@ public class Date {
 
         if (year.isPresent() && month.isPresent() && !day.isPresent()) {
 
-            sortingDate = LocalDate.of(year.get(), month.get(), 1).with(TemporalAdjusters.lastDayOfMonth());
-            daysInRange = this.sortingDate.getMonth().length(this.sortingDate.isLeapYear()) - 1;
+            sortingDate = Optional.of(LocalDate.of(year.get(), month.get(), 1).with(TemporalAdjusters.lastDayOfMonth()));
+            daysInRange = sortingDate.get().getMonth().length(sortingDate.get().isLeapYear()) - 1;
 
         } else if (year.isPresent() && !month.isPresent() && day.isPresent()) {
 
-            sortingDate = LocalDate.of(year.get(), Month.DECEMBER, day.get());
+            sortingDate = Optional.of(LocalDate.of(year.get(), Month.DECEMBER, day.get()));
             LocalDate firstDay = LocalDate.of(year.get(), Month.JANUARY, day.get());
-            daysInRange = calculateDaysInRange(firstDay, sortingDate);
+            daysInRange = calculateDaysInRange(firstDay, sortingDate.get());
 
         } else if (year.isPresent() && !month.isPresent() && !day.isPresent()) {
 
-            sortingDate = LocalDate.of(year.get(), Month.DECEMBER, 31);
+            sortingDate = Optional.of(LocalDate.of(year.get(), Month.DECEMBER, 31));
             LocalDate firstDay = LocalDate.of(year.get(), Month.JANUARY, 1);
-            daysInRange = calculateDaysInRange(firstDay, sortingDate);
+            daysInRange = calculateDaysInRange(firstDay, sortingDate.get());
 
         } else {
 
-            sortingDate = LocalDate.of(year.get(), month.get(), day.get());
+            sortingDate = Optional.of(LocalDate.of(year.get(), month.get(), day.get()));
             daysInRange = 0;
 
         }
 
     }
 
-    private void initDateRange(DateRange dateRange) {
+    private void initFromDateRange(DateRange dateRange) {
 
         if (!isUndated(dateRange.getFromDateValue()) && isUndated(dateRange.getToDateValue())) {
 
@@ -188,9 +193,9 @@ public class Date {
                 sortingDate = new Date(toDateExact).getSortingDate();
 
                 Date startDate = new Date(fromDateExact);
-                LocalDate earliestStartDate = startDate.getEarliestPossibleDate().orElse(startDate.getSortingDate());
+                LocalDate earliestStartDate = startDate.getEarliestPossibleDate().orElse(startDate.getSortingDate().get());
+                daysInRange = calculateDaysInRange(earliestStartDate, sortingDate.get());
 
-                daysInRange = calculateDaysInRange(earliestStartDate, sortingDate);
             }
         }
 
@@ -204,32 +209,40 @@ public class Date {
     @NotNull
     public DateAbstract toCeiDate() {
 
-        DateAbstract date;
 
-        if (daysInRange == 0) {
+        return sortingDate.map(date -> {
 
-            String value = String.valueOf(sortingDate.getYear()) +
-                    String.format("%02d", sortingDate.getMonth().getValue()) +
-                    String.format("%02d", sortingDate.getDayOfMonth());
-            date = new DateExact(value, literalDate);
+            DateAbstract dateAbstract;
 
-        } else {
+            if (daysInRange == 0) {
 
-            LocalDate offsetDate = getEarliestPossibleDate().get();
+                String value = String.valueOf(date.getYear()) +
+                        String.format("%02d", date.getMonth().getValue()) +
+                        String.format("%02d", date.getDayOfMonth());
+                dateAbstract = new DateExact(value, literalDate);
 
-            String valueFrom = String.valueOf(offsetDate.getYear()) +
-                    String.format("%02d", offsetDate.getMonth().getValue()) +
-                    String.format("%02d", offsetDate.getDayOfMonth());
+            } else {
 
-            String valueTo = String.valueOf(sortingDate.getYear()) +
-                    String.format("%02d", sortingDate.getMonth().getValue()) +
-                    String.format("%02d", sortingDate.getDayOfMonth());
+                LocalDate offsetDate = getEarliestPossibleDate().get();
 
-            date = new DateRange(valueFrom, valueTo, literalDate);
+                String valueFrom = String.valueOf(offsetDate.getYear()) +
+                        String.format("%02d", offsetDate.getMonth().getValue()) +
+                        String.format("%02d", offsetDate.getDayOfMonth());
 
-        }
+                String valueTo = String.valueOf(date.getYear()) +
+                        String.format("%02d", date.getMonth().getValue()) +
+                        String.format("%02d", date.getDayOfMonth());
 
-        return date;
+                dateAbstract = new DateRange(valueFrom, valueTo, literalDate);
+
+            }
+
+            return dateAbstract;
+
+        }).orElse(
+                new DateExact("99999999", "Sine dato")
+        );
+
 
     }
 

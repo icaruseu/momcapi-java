@@ -22,7 +22,8 @@ public class DateTest {
 
         Date date = new Date(dateExact);
 
-        assertEquals(date.getSortingDate(), LocalDate.of(1469, 2, 3));
+        assertTrue(date.getSortingDate().isPresent());
+        assertEquals(date.getSortingDate().get(), LocalDate.of(1469, 2, 3));
         assertFalse(date.getEarliestPossibleDate().isPresent());
         assertEquals(date.getDaysInRange(), 0);
 
@@ -35,9 +36,17 @@ public class DateTest {
 
         Date date = new Date(dateExact);
 
-        assertEquals(date.getSortingDate(), LocalDate.of(987, 2, 3));
+        assertTrue(date.getSortingDate().isPresent());
+        assertEquals(date.getSortingDate().get(), LocalDate.of(987, 2, 3));
         assertFalse(date.getEarliestPossibleDate().isPresent());
         assertEquals(date.getDaysInRange(), 0);
+
+    }
+
+    @Test(expectedExceptions = MomcaException.class)
+    public void testDateExactInvalidDate() throws Exception {
+        DateAbstract dateExact = new DateExact("", "unknown");
+        System.out.println(new Date(dateExact).toCeiDate().toXML());
 
     }
 
@@ -62,7 +71,8 @@ public class DateTest {
 
         Date date = new Date(dateExact);
 
-        assertEquals(date.getSortingDate(), LocalDate.of(1469, 2, 28));
+        assertTrue(date.getSortingDate().isPresent());
+        assertEquals(date.getSortingDate().get(), LocalDate.of(1469, 2, 28));
         assertTrue(date.getEarliestPossibleDate().isPresent());
         assertEquals(date.getEarliestPossibleDate().get(), LocalDate.of(1469, 2, 1));
         assertEquals(date.getDaysInRange(), 27);
@@ -76,7 +86,8 @@ public class DateTest {
 
         Date date = new Date(dateExact);
 
-        assertEquals(date.getSortingDate(), LocalDate.of(1468, 2, 29));
+        assertTrue(date.getSortingDate().isPresent());
+        assertEquals(date.getSortingDate().get(), LocalDate.of(1468, 2, 29));
         assertTrue(date.getEarliestPossibleDate().isPresent());
         assertEquals(date.getEarliestPossibleDate().get(), LocalDate.of(1468, 2, 1));
         assertEquals(date.getDaysInRange(), 28);
@@ -90,7 +101,8 @@ public class DateTest {
 
         Date date = new Date(dateExact);
 
-        assertEquals(date.getSortingDate(), LocalDate.of(1469, 12, 31));
+        assertTrue(date.getSortingDate().isPresent());
+        assertEquals(date.getSortingDate().get(), LocalDate.of(1469, 12, 31));
         assertTrue(date.getEarliestPossibleDate().isPresent());
         assertEquals(date.getEarliestPossibleDate().get(), LocalDate.of(1469, 1, 1));
         assertEquals(date.getDaysInRange(), 364);
@@ -104,7 +116,8 @@ public class DateTest {
 
         Date date = new Date(dateExact);
 
-        assertEquals(date.getSortingDate(), LocalDate.of(1468, 12, 31));
+        assertTrue(date.getSortingDate().isPresent());
+        assertEquals(date.getSortingDate().get(), LocalDate.of(1468, 12, 31));
         assertTrue(date.getEarliestPossibleDate().isPresent());
         assertEquals(date.getEarliestPossibleDate().get(), LocalDate.of(1468, 1, 1));
         assertEquals(date.getDaysInRange(), 365);
@@ -118,17 +131,24 @@ public class DateTest {
 
         Date date = new Date(dateExact);
 
-        assertEquals(date.getSortingDate(), LocalDate.of(1439, 12, 3));
+        assertTrue(date.getSortingDate().isPresent());
+        assertEquals(date.getSortingDate().get(), LocalDate.of(1439, 12, 3));
         assertTrue(date.getEarliestPossibleDate().isPresent());
         assertEquals(date.getEarliestPossibleDate().get(), LocalDate.of(1439, 1, 3));
         assertEquals(date.getDaysInRange(), 334);
 
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class)
+    @Test
     public void testDateExactUnknownYear() throws Exception {
+
         DateAbstract dateExact = new DateExact("99990203", "3rd February");
-        new Date(dateExact);
+
+        Date date = new Date(dateExact);
+
+        assertFalse(date.getSortingDate().isPresent());
+        assertEquals(date.getLiteralDate(), "3rd February");
+
     }
 
     @Test
@@ -138,14 +158,16 @@ public class DateTest {
 
         Date date = new Date(dateRange);
 
-        assertEquals(date.getSortingDate(), LocalDate.of(1217, 2, 28));
+        assertTrue(date.getSortingDate().isPresent());
+        assertEquals(date.getSortingDate().get(), LocalDate.of(1217, 2, 28));
         assertTrue(date.getEarliestPossibleDate().isPresent());
         assertEquals(date.getEarliestPossibleDate().get(), LocalDate.of(1217, 2, 1));
         assertEquals(date.getDaysInRange(), 27);
 
         date = new Date(LocalDate.of(1217, 2, 28), LocalDate.of(1217, 2, 1), "February 1217");
 
-        assertEquals(date.getSortingDate(), LocalDate.of(1217, 2, 28));
+        assertTrue(date.getSortingDate().isPresent());
+        assertEquals(date.getSortingDate().get(), LocalDate.of(1217, 2, 28));
         assertTrue(date.getEarliestPossibleDate().isPresent());
         assertEquals(date.getEarliestPossibleDate().get(), LocalDate.of(1217, 2, 1));
         assertEquals(date.getDaysInRange(), 27);
@@ -159,7 +181,8 @@ public class DateTest {
 
         Date date = new Date(dateRange);
 
-        assertEquals(date.getSortingDate(), LocalDate.of(1299, 12, 31));
+        assertTrue(date.getSortingDate().isPresent());
+        assertEquals(date.getSortingDate().get(), LocalDate.of(1299, 12, 31));
         assertTrue(date.getEarliestPossibleDate().isPresent());
         assertEquals(date.getEarliestPossibleDate().get(), LocalDate.of(1250, 1, 1));
         assertEquals(date.getDaysInRange(), 18261);
@@ -179,7 +202,8 @@ public class DateTest {
 
         Date date = new Date(dateRange);
 
-        assertEquals(date.getSortingDate(), LocalDate.of(1468, 2, 29));
+        assertTrue(date.getSortingDate().isPresent());
+        assertEquals(date.getSortingDate().get(), LocalDate.of(1468, 2, 29));
         assertTrue(date.getEarliestPossibleDate().isPresent());
         assertEquals(date.getEarliestPossibleDate().get(), LocalDate.of(1468, 2, 1));
         assertEquals(date.getDaysInRange(), 28);
@@ -207,7 +231,8 @@ public class DateTest {
 
         Date date = new Date(dateRange);
 
-        assertEquals(date.getSortingDate(), LocalDate.of(1217, 7, 31));
+        assertTrue(date.getSortingDate().isPresent());
+        assertEquals(date.getSortingDate().get(), LocalDate.of(1217, 7, 31));
         assertTrue(date.getEarliestPossibleDate().isPresent());
         assertEquals(date.getEarliestPossibleDate().get(), LocalDate.of(1217, 7, 1));
         assertEquals(date.getDaysInRange(), 30);
@@ -221,7 +246,8 @@ public class DateTest {
 
         Date date = new Date(dateRange);
 
-        assertEquals(date.getSortingDate(), LocalDate.of(1217, 2, 28));
+        assertTrue(date.getSortingDate().isPresent());
+        assertEquals(date.getSortingDate().get(), LocalDate.of(1217, 2, 28));
         assertTrue(date.getEarliestPossibleDate().isPresent());
         assertEquals(date.getEarliestPossibleDate().get(), LocalDate.of(1217, 1, 1));
         assertEquals(date.getDaysInRange(), 58);
@@ -235,7 +261,8 @@ public class DateTest {
 
         Date date = new Date(dateRange);
 
-        assertEquals(date.getSortingDate(), LocalDate.of(1217, 03, 31));
+        assertTrue(date.getSortingDate().isPresent());
+        assertEquals(date.getSortingDate().get(), LocalDate.of(1217, 3, 31));
         assertFalse(date.getEarliestPossibleDate().isPresent());
 
     }
@@ -247,7 +274,8 @@ public class DateTest {
 
         Date date = new Date(dateRange);
 
-        assertEquals(date.getSortingDate(), LocalDate.of(1217, 3, 31));
+        assertTrue(date.getSortingDate().isPresent());
+        assertEquals(date.getSortingDate().get(), LocalDate.of(1217, 3, 31));
         assertTrue(date.getEarliestPossibleDate().isPresent());
         assertEquals(date.getEarliestPossibleDate().get(), LocalDate.of(1217, 3, 5));
         assertEquals(date.getDaysInRange(), 26);
@@ -261,7 +289,8 @@ public class DateTest {
 
         Date date = new Date(dateRange);
 
-        assertEquals(date.getSortingDate(), LocalDate.of(1217, 12, 28));
+        assertTrue(date.getSortingDate().isPresent());
+        assertEquals(date.getSortingDate().get(), LocalDate.of(1217, 12, 28));
         assertTrue(date.getEarliestPossibleDate().isPresent());
         assertEquals(date.getEarliestPossibleDate().get(), LocalDate.of(1217, 10, 1));
         assertEquals(date.getDaysInRange(), 88);
@@ -275,7 +304,8 @@ public class DateTest {
 
         Date date = new Date(dateRange);
 
-        assertEquals(date.getSortingDate(), LocalDate.of(1217, 9, 30));
+        assertTrue(date.getSortingDate().isPresent());
+        assertEquals(date.getSortingDate().get(), LocalDate.of(1217, 9, 30));
         assertTrue(date.getEarliestPossibleDate().isPresent());
         assertEquals(date.getEarliestPossibleDate().get(), LocalDate.of(1217, 9, 1));
         assertEquals(date.getDaysInRange(), 29);
@@ -289,7 +319,8 @@ public class DateTest {
 
         Date date = new Date(dateRange);
 
-        assertEquals(date.getSortingDate(), LocalDate.of(1218, 1, 12));
+        assertTrue(date.getSortingDate().isPresent());
+        assertEquals(date.getSortingDate().get(), LocalDate.of(1218, 1, 12));
         assertFalse(date.getEarliestPossibleDate().isPresent());
         assertEquals(date.getDaysInRange(), 0);
 
@@ -302,7 +333,8 @@ public class DateTest {
 
         Date date = new Date(dateRange);
 
-        assertEquals(date.getSortingDate(), LocalDate.of(1217, 3, 22));
+        assertTrue(date.getSortingDate().isPresent());
+        assertEquals(date.getSortingDate().get(), LocalDate.of(1217, 3, 22));
         assertFalse(date.getEarliestPossibleDate().isPresent());
         assertEquals(date.getDaysInRange(), 0);
 
