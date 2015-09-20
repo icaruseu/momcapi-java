@@ -6,6 +6,7 @@ import eu.icarus.momca.momcapi.model.xml.cei.DateExact;
 import eu.icarus.momca.momcapi.model.xml.cei.DateRange;
 import eu.icarus.momca.momcapi.model.xml.cei.DateValue;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -17,13 +18,20 @@ import java.util.Optional;
 /**
  * Created by djell on 12/09/2015.
  */
-public class Date {
+public class Date implements Comparable<Date> {
 
-    private long daysInRange;
+    private long daysInRange = 0;
     @NotNull
-    private String literalDate;
+    private String literalDate = "Sine dato";
     @NotNull
     private Optional<LocalDate> sortingDate = Optional.empty();
+
+    public Date() {
+    }
+
+    public Date(@NotNull String literalDate) {
+        this.literalDate = literalDate;
+    }
 
     public Date(@NotNull LocalDate sortingDate, long daysInRange, @NotNull String literalDate) {
         this.sortingDate = Optional.of(sortingDate);
@@ -96,6 +104,43 @@ public class Date {
         return date.minusDays(daysToSubtract);
     }
 
+    @Override
+    public int compareTo(@NotNull Date otherDate) {
+
+        final int BEFORE = -1;
+        final int EQUAL = 0;
+        final int AFTER = 1;
+
+        if (!sortingDate.isPresent() && !otherDate.getSortingDate().isPresent()) {
+            return EQUAL;
+        }
+
+        if (sortingDate.isPresent() && !otherDate.getSortingDate().isPresent()) {
+            return BEFORE;
+        }
+
+        if (!sortingDate.isPresent() && otherDate.getSortingDate().isPresent()) {
+            return AFTER;
+        }
+
+        return sortingDate.get().compareTo(otherDate.getSortingDate().get());
+
+    }
+
+    @Override
+    public boolean equals(@Nullable Object o) {
+
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Date date = (Date) o;
+
+        if (daysInRange != date.daysInRange) return false;
+        if (!literalDate.equals(date.literalDate)) return false;
+        return sortingDate.equals(date.sortingDate);
+
+    }
+
     public long getDaysInRange() {
         return daysInRange;
     }
@@ -121,6 +166,14 @@ public class Date {
     @NotNull
     public Optional<LocalDate> getSortingDate() {
         return sortingDate;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) (daysInRange ^ (daysInRange >>> 32));
+        result = 31 * result + literalDate.hashCode();
+        result = 31 * result + sortingDate.hashCode();
+        return result;
     }
 
     private void initDateExact(DateExact dateExact) {
@@ -240,11 +293,10 @@ public class Date {
             return dateAbstract;
 
         }).orElse(
-                new DateExact("99999999", "Sine dato")
+                new DateExact("99999999", literalDate)
         );
 
 
     }
-
 
 }

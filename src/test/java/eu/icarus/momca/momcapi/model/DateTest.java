@@ -16,6 +16,22 @@ import static org.testng.Assert.*;
 public class DateTest {
 
     @Test
+    public void testCompareTo() throws Exception {
+
+        Date empty = new Date();
+        Date before = new Date(LocalDate.of(987, 2, 3));
+        Date after = new Date(LocalDate.of(989, 2, 6));
+
+        assertTrue(empty.compareTo(empty) == 0);
+        assertTrue(empty.compareTo(before) >= 1);
+        assertTrue(before.compareTo(empty) <= -1);
+        assertTrue(before.compareTo(before) == 0);
+        assertTrue(before.compareTo(after) <= -1);
+        assertTrue(after.compareTo(before) >= 1);
+
+    }
+
+    @Test
     public void testDateExact() throws Exception {
 
         DateAbstract dateExact = new DateExact("14690203", "3rd February 1469");
@@ -341,6 +357,25 @@ public class DateTest {
     }
 
     @Test
+    public void testEquals() throws Exception {
+
+        Date date1 = new Date(LocalDate.of(1217, 10, 31), 30);
+        Date date2 = new Date(LocalDate.of(1217, 10, 31), 30);
+        Date date3 = new Date(LocalDate.of(1217, 10, 31), 28);
+        Date date4 = new Date(LocalDate.of(1217, 10, 31), 30, "October 1217");
+        Date date5 = new Date(new DateRange("12171001", "12171031", "October 1217"));
+        Date date6 = new Date(new DateRange("12171001", "99999999", "1st October 1217"));
+        Date date7 = new Date(LocalDate.of(1217, 10, 1), "1st October 1217");
+
+        assertTrue(date1.equals(date2));
+        assertFalse(date1.equals(date3));
+        assertFalse(date1.equals(date4));
+        assertTrue(date4.equals(date5));
+        assertTrue(date6.equals(date7));
+
+    }
+
+    @Test
     public void testGetLiteralDate1() throws Exception {
         Date date = new Date(LocalDate.of(1217, 10, 12), "12th January 1217");
         assertEquals(date.getLiteralDate(), "12th January 1217");
@@ -352,5 +387,4 @@ public class DateTest {
         Date date = new Date(LocalDate.of(1217, 10, 31), 30);
         assertEquals(date.getLiteralDate(), "1217-10-01 - 1217-10-31");
     }
-
 }

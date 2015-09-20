@@ -42,7 +42,6 @@ public class CharterTest {
     @NotNull
     private Charter createCharter(String identifier) throws ParsingException, IOException {
         ExistResource resource = getExistResource(identifier);
-
         return new Charter(resource);
     }
 
