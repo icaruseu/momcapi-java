@@ -22,7 +22,7 @@ public class Date implements Comparable<Date> {
 
     private long daysInRange = 0;
     @NotNull
-    private String literalDate = "Sine dato";
+    private String literalDate = "";
     @NotNull
     private Optional<LocalDate> sortingDate = Optional.empty();
 

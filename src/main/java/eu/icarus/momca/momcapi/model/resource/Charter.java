@@ -1,18 +1,20 @@
 package eu.icarus.momca.momcapi.model.resource;
 
 
+import eu.icarus.momca.momcapi.Util;
+import eu.icarus.momca.momcapi.exception.MomcaException;
 import eu.icarus.momca.momcapi.model.CharterStatus;
 import eu.icarus.momca.momcapi.model.Date;
 import eu.icarus.momca.momcapi.model.id.IdCharter;
+import eu.icarus.momca.momcapi.model.id.IdCollection;
+import eu.icarus.momca.momcapi.model.id.IdFond;
 import eu.icarus.momca.momcapi.model.id.IdUser;
 import eu.icarus.momca.momcapi.model.xml.Namespace;
 import eu.icarus.momca.momcapi.model.xml.XmlValidationProblem;
-import eu.icarus.momca.momcapi.model.xml.cei.Idno;
+import eu.icarus.momca.momcapi.model.xml.atom.AtomEntry;
+import eu.icarus.momca.momcapi.model.xml.cei.*;
 import eu.icarus.momca.momcapi.query.XpathQuery;
-import nu.xom.Builder;
-import nu.xom.Element;
-import nu.xom.Nodes;
-import nu.xom.ParsingException;
+import nu.xom.*;
 import org.jetbrains.annotations.NotNull;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
@@ -35,6 +37,7 @@ import java.util.Optional;
  */
 public class Charter extends AtomResource {
 
+    public static final String CEI_URI = Namespace.CEI.getUri();
     @NotNull
     private final List<XmlValidationProblem> validationProblems = new ArrayList<>(0);
     @NotNull
@@ -43,6 +46,8 @@ public class Charter extends AtomResource {
     private Date date;
     @NotNull
     private Idno idno;
+    @NotNull
+    private Optional<SourceDesc> sourceDesc = Optional.empty();
 
     public Charter(@NotNull IdCharter id, @NotNull CharterStatus charterStatus, @NotNull User author, @NotNull Date date) {
 
@@ -66,7 +71,12 @@ public class Charter extends AtomResource {
             throw new IllegalArgumentException("Failed to validate the resource.", e);
         }
 
+        Element xml = toDocument().getRootElement();
+
+        this.creator = readCreatorFromXml(xml);
         this.charterStatus = readCharterStatus();
+        this.idno = readIdnoFromXml(xml);
+        this.date = readDateFromXml(xml);
 
     }
 
@@ -111,10 +121,19 @@ public class Charter extends AtomResource {
 
         String resourceName;
 
-        if (charterStatus == CharterStatus.SAVED) {
-            resourceName = id.getContentXml().getText().replace("/", "#") + ".xml";
-        } else {
-            resourceName = String.format("%s%s", id.getIdentifier(), ResourceType.CHARTER.getNameSuffix());
+        switch (charterStatus) {
+
+            case SAVED:
+                resourceName = id.getContentXml().getText().replace("/", "#") + ".xml";
+                break;
+            case PRIVATE:
+                resourceName = String.format("%s.%s", id.getIdentifier(), "charter.xml");
+                break;
+            case PUBLIC:
+            case IMPORTED:
+            default:
+                resourceName = String.format("%s.%s", id.getIdentifier(), "cei.xml");
+
         }
 
         return resourceName;
@@ -164,8 +183,42 @@ public class Charter extends AtomResource {
     }
 
     @NotNull
+    public Optional<SourceDesc> getSourceDesc() {
+        return sourceDesc;
+    }
+
+    @NotNull
     public List<XmlValidationProblem> getValidationProblems() {
         return validationProblems;
+    }
+
+    private Element initBackXml() {
+
+        Element back = new Element("cei:back", CEI_URI);
+
+        return back;
+
+    }
+
+    private Element initBodyXml() {
+
+        Element body = new Element("cei:body", CEI_URI);
+
+        body.appendChild(idno);
+
+        Element chDesc = new Element("cei:chDesc", CEI_URI);
+        body.appendChild(chDesc);
+
+        return body;
+
+    }
+
+    private Element initFrontXml() {
+
+        Element front = new Element("cei:front", CEI_URI);
+
+        return front;
+
     }
 
     public boolean isValidCei() {
@@ -190,6 +243,74 @@ public class Charter extends AtomResource {
 
     }
 
+    private Date readDateFromXml(Element xml) {
+
+        DateAbstract dateCei;
+
+        Nodes dateNodes = Util.queryXmlToNodes(xml, XpathQuery.QUERY_CEI_ISSUED_DATE);
+        Nodes dateRangeNodes = Util.queryXmlToNodes(xml, XpathQuery.QUERY_CEI_ISSUED_DATE_RANGE);
+
+        if ((dateNodes.size() == 1 && dateRangeNodes.size() == 0) || (dateNodes.size() == 0 && dateRangeNodes.size() == 1)) {
+
+            if (dateNodes.size() == 1) {
+
+                Element dateElement = (Element) dateNodes.get(0);
+                String value = dateElement.getAttributeValue("value");
+                String text = dateElement.getValue();
+
+                if (value == null || value.isEmpty()) {
+                    throw new IllegalArgumentException("No value attribute present in date element '" + dateElement.toXML() + "'");
+                }
+
+                dateCei = new DateExact(value, text);
+
+            } else {
+
+                Element dateRangeElement = (Element) dateRangeNodes.get(0);
+                String from = dateRangeElement.getAttributeValue("from");
+                String to = dateRangeElement.getAttributeValue("to");
+                String text = dateRangeElement.getValue();
+
+                if ((from == null || from.isEmpty()) || (to == null || to.isEmpty())) {
+                    throw new MomcaException(
+                            "At least either 'to' or 'from' element must be present in the 'dateRange' Element `"
+                                    + dateRangeElement.toXML() + "`");
+                }
+
+                dateCei = new DateRange(from, to, text);
+
+            }
+
+        } else {
+            throw new MomcaException("No date present in provided xml!");
+        }
+
+        return new Date(dateCei);
+    }
+
+    private Idno readIdnoFromXml(Element xml) {
+
+        String idnoId = Util.queryXmlToString(xml, XpathQuery.QUERY_CEI_BODY_IDNO_ID);
+        String idnoText = Util.queryXmlToString(xml, XpathQuery.QUERY_CEI_BODY_IDNO_TEXT);
+
+        if (idnoId.isEmpty() || idnoText.isEmpty()) {
+            throw new MomcaException("There is no idno content in the provided xml!");
+        }
+
+        String idnoOld = Util.queryXmlToString(xml, XpathQuery.QUERY_CEI_BODY_IDNO_OLD);
+
+        Idno idno;
+
+        if (idnoOld.isEmpty()) {
+            idno = new Idno(idnoId, idnoText);
+        } else {
+            idno = new Idno(idnoId, idnoText, idnoOld);
+        }
+
+        return idno;
+
+    }
+
     public void setCharterStatus(@NotNull CharterStatus charterStatus) {
         this.charterStatus = charterStatus;
         setParentUri(createParentUri(getId(), charterStatus, creator.get()));
@@ -199,12 +320,45 @@ public class Charter extends AtomResource {
     @Override
     public void setIdentifier(@NotNull String identifier) {
 
+        if (identifier.isEmpty()) {
+            throw new IllegalArgumentException("The identifier is not allowed to be an empty string");
+        }
+
+        if (getId().isInFond()) {
+            IdFond idFond = getId().getIdFond().get();
+            id = new IdCharter(idFond.getIdArchive().getIdentifier(), idFond.getIdentifier(), identifier);
+        } else {
+            IdCollection idCollection = getId().getIdCollection().get();
+            id = new IdCharter(idCollection.getIdentifier(), identifier);
+        }
+
+        setParentUri(createParentUri(getId(), charterStatus, getCreator().get()));
+        setResourceName(createResourceName(getId(), charterStatus));
+
+        updateXmlContent();
+
+    }
+
+    public void setSourceDesc(@NotNull Optional<SourceDesc> sourceDesc) {
+        this.sourceDesc = sourceDesc;
         updateXmlContent();
     }
 
     @Override
     void updateXmlContent() {
 
+        Element cei = new Element("cei:text", CEI_URI);
+        cei.addAttribute(new Attribute("type", "charter"));
+
+        Element front = initFrontXml();
+        Element body = initBodyXml();
+        Element back = initBackXml();
+
+        cei.appendChild(front);
+        cei.appendChild(body);
+        cei.appendChild(back);
+
+        setXmlContent(new Document(new AtomEntry(id.getContentXml(), createAtomAuthor(), AtomResource.localTime(), cei)));
 
         try {
             validateCei(this);
@@ -239,7 +393,7 @@ public class Charter extends AtomResource {
         Element ceiTextElement = (Element) ceiTextNodes.get(0);
 
         Builder builder = new Builder(reader);
-        builder.build(ceiTextElement.toXML(), Namespace.CEI.getUri());
+        builder.build(ceiTextElement.toXML(), CEI_URI);
 
     }
 

@@ -4,8 +4,6 @@ import eu.icarus.momca.momcapi.TestUtils;
 import eu.icarus.momca.momcapi.model.CharterStatus;
 import eu.icarus.momca.momcapi.model.Date;
 import eu.icarus.momca.momcapi.model.id.IdCharter;
-import eu.icarus.momca.momcapi.model.xml.atom.AtomAuthor;
-import eu.icarus.momca.momcapi.model.xml.atom.AtomEntry;
 import eu.icarus.momca.momcapi.model.xml.cei.DateExact;
 import nu.xom.Element;
 import nu.xom.ParsingException;
@@ -22,26 +20,15 @@ import static org.testng.Assert.*;
 public class CharterTest {
 
     @NotNull
-    private static ExistResource getExistResource(String identifier) throws ParsingException, IOException {
-
-        Element ceiElement = (Element) TestUtils.getXmlFromResource(identifier + ".xml").getRootElement().copy();
-
-        IdCharter id = new IdCharter("collection", identifier);
-
-        String time = "2015-09-17T16:53:22.343+02:00";
-        AtomAuthor author = new AtomAuthor("author");
-
-        AtomEntry entry = new AtomEntry(id.getContentXml(), author, time, ceiElement);
-
-        String resourceName = identifier + "cei.xml";
-        String uri = "/db/mom-data/metadata.charter.public/collection/" + identifier;
-        return new ExistResource(resourceName, uri, entry.toXML());
-
+    private static ExistResource getExistResource(String fileName) throws ParsingException, IOException {
+        Element element = (Element) TestUtils.getXmlFromResource(fileName).getRootElement().copy();
+        String uri = "/db/mom-data/metadata.charter.public/collection";
+        return new ExistResource(fileName, uri, element.toXML());
     }
 
     @NotNull
-    private Charter createCharter(String identifier) throws ParsingException, IOException {
-        ExistResource resource = getExistResource(identifier);
+    private Charter createCharter(String fileName) throws ParsingException, IOException {
+        ExistResource resource = getExistResource(fileName);
         return new Charter(resource);
     }
 
@@ -56,7 +43,7 @@ public class CharterTest {
 
         assertEquals(charter.getCharterStatus(), CharterStatus.PUBLIC);
         assertEquals(charter.getParentUri(), "/db/mom-data/metadata.charter.public/collection");
-        assertEquals(charter.getResourceName(), "charter1.charter.xml");
+        assertEquals(charter.getResourceName(), "charter1.cei.xml");
 
         assertEquals(charter.getId(), id);
         assertTrue(charter.getCreator().isPresent());
@@ -73,28 +60,43 @@ public class CharterTest {
     @Test
     public void testConstructor2WithEmptyCharter() throws Exception {
 
-        Charter charter = createCharter("empty_charter");
+        Date date = new Date();
+        User user = new User("guest", "moderator");
+
+        Charter charter = createCharter("empty_charter.xml");
+
+        assertEquals(charter.getCharterStatus(), CharterStatus.PUBLIC);
+        assertEquals(charter.getParentUri(), "/db/mom-data/metadata.charter.public/collection");
+        assertEquals(charter.getResourceName(), "empty_charter.xml");
+
+        assertEquals(charter.getId(), new IdCharter("collection", "empty_charter"));
+        assertTrue(charter.getCreator().isPresent());
+        assertEquals(charter.getCreator().get(), user.getId());
+        assertEquals(charter.getIdno().getId(), "empty_charter");
+        assertEquals(charter.getIdno().getText(), "New Charter\n" +
+                "                ");
+        assertEquals(charter.getDate(), date);
 
     }
 
     @Test
     public void testGetId() throws Exception {
-        Charter charter = createCharter("empty_charter");
+        Charter charter = createCharter("empty_charter.xml");
         assertEquals(charter.getId(), new IdCharter("collection", "empty_charter"));
     }
 
     @Test
     public void testGetIdentifier() throws Exception {
-        Charter charter = createCharter("empty_charter");
+        Charter charter = createCharter("empty_charter.xml");
         assertEquals(charter.getIdentifier(), "empty_charter");
     }
 
     @Test
     public void testGetValidationProblems() throws Exception {
 
-        String validationErrorMessage = "cvc-complex-type.2.4.a: Invalid content was found starting with element 'cei:dateRange'. One of '{\"http://www.monasterium.net/NS/cei\":traditioForm, \"http://www.monasterium.net/NS/cei\":archIdentifier, \"http://www.monasterium.net/NS/cei\":msIdentifier, \"http://www.monasterium.net/NS/cei\":auth, \"http://www.monasterium.net/NS/cei\":physicalDesc, \"http://www.monasterium.net/NS/cei\":nota, \"http://www.monasterium.net/NS/cei\":figure}' is expected.";
+        String validationErrorMessage = "cvc-complex-type.2.4.a: Invalid content was found starting with element 'cei:idno'. One of '{\"http://www.monasterium.net/NS/cei\":persName, \"http://www.monasterium.net/NS/cei\":placeName, \"http://www.monasterium.net/NS/cei\":geogName, \"http://www.monasterium.net/NS/cei\":index, \"http://www.monasterium.net/NS/cei\":testis, \"http://www.monasterium.net/NS/cei\":date, \"http://www.monasterium.net/NS/cei\":dateRange, \"http://www.monasterium.net/NS/cei\":num, \"http://www.monasterium.net/NS/cei\":measure, \"http://www.monasterium.net/NS/cei\":quote, \"http://www.monasterium.net/NS/cei\":cit, \"http://www.monasterium.net/NS/cei\":foreign, \"http://www.monasterium.net/NS/cei\":anchor, \"http://www.monasterium.net/NS/cei\":ref, \"http://www.monasterium.net/NS/cei\":hi, \"http://www.monasterium.net/NS/cei\":lb, \"http://www.monasterium.net/NS/cei\":pb, \"http://www.monasterium.net/NS/cei\":sup, \"http://www.monasterium.net/NS/cei\":c, \"http://www.monasterium.net/NS/cei\":recipient, \"http://www.monasterium.net/NS/cei\":issuer}' is expected.";
 
-        Charter charter = createCharter("invalid_charter");
+        Charter charter = createCharter("invalid_charter.xml");
 
         assertEquals(charter.getValidationProblems().size(), 1);
         assertEquals(charter.getValidationProblems().get(0).getMessage(), validationErrorMessage);
@@ -103,7 +105,7 @@ public class CharterTest {
 
     @Test
     public void testIsValidCei() throws Exception {
-        Charter charter = createCharter("invalid_charter");
+        Charter charter = createCharter("invalid_charter.xml");
         assertFalse(charter.isValidCei());
     }
 
@@ -119,7 +121,7 @@ public class CharterTest {
         charter.setCharterStatus(CharterStatus.IMPORTED);
         assertEquals(charter.getCharterStatus(), CharterStatus.IMPORTED);
         assertEquals(charter.getParentUri(), "/db/mom-data/metadata.charter.import/collection");
-        assertEquals(charter.getResourceName(), "charter1.charter.xml");
+        assertEquals(charter.getResourceName(), "charter1.cei.xml");
 
         charter.setCharterStatus(CharterStatus.PRIVATE);
         assertEquals(charter.getCharterStatus(), CharterStatus.PRIVATE);
@@ -136,7 +138,7 @@ public class CharterTest {
     @Test
     public void testSetIdentifier() throws Exception {
 
-        Charter charter = createCharter("empty_charter");
+        Charter charter = createCharter("empty_charter.xml");
         String new_identifier = "new_identifier";
         charter.setIdentifier(new_identifier);
 

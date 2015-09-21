@@ -24,7 +24,9 @@ public abstract class DateAbstract extends Element {
     DateAbstract(@NotNull Element element, @NotNull String literalDate) {
         super(element);
         this.literalDate = literalDate;
-        this.appendChild(literalDate);
+        if (!literalDate.isEmpty()) {
+            this.appendChild(literalDate);
+        }
     }
 
     /**

@@ -25,6 +25,18 @@ public class IdAtomId extends IdAbstract {
         return Util.decode(idParts[idParts.length - 1]);
     }
 
+    @Override
+    public boolean equals(Object o) {
+
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        IdAtomId otherId = (IdAtomId) o;
+
+        return getContentXml().getText().equals(otherId.getContentXml().getText());
+
+    }
+
     @NotNull
     @Override
     public final AtomId getContentXml() {
@@ -33,6 +45,16 @@ public class IdAtomId extends IdAbstract {
 
     public final ResourceType getType() {
         return getContentXml().getType();
+    }
+
+    @Override
+    public int hashCode() {
+        return getContentXml().getText().hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "IdAtomId{" + getContentXml().getText() + "}";
     }
 
 }

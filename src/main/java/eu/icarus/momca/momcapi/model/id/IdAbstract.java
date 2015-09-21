@@ -25,16 +25,7 @@ public abstract class IdAbstract {
     }
 
     @Override
-    public boolean equals(Object o) {
-
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        IdAbstract that = (IdAbstract) o;
-
-        return identifier.equals(that.identifier);
-
-    }
+    public abstract boolean equals(Object o);
 
     @NotNull
     public abstract Element getContentXml();
@@ -45,7 +36,12 @@ public abstract class IdAbstract {
     }
 
     @Override
-    public int hashCode() {
-        return identifier.hashCode();
+    public abstract int hashCode();
+
+    @Override
+    public String toString() {
+        return "IdAbstract{" +
+                "identifier='" + identifier + '\'' +
+                '}';
     }
 }

@@ -31,12 +31,29 @@ public class IdUser extends IdAbstract {
         return atomAuthor.getEmail();
     }
 
+    @Override
+    public boolean equals(Object o) {
+
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        IdUser otherUser = (IdUser) o;
+
+        return getIdentifier().equals(otherUser.getIdentifier());
+
+    }
+
     @NotNull
     @Override
     public AtomAuthor getContentXml() {
         AtomAuthor author = (AtomAuthor) contentXml;
         author.detach();
         return author;
+    }
+
+    @Override
+    public int hashCode() {
+        return getIdentifier().hashCode();
     }
 
 }
