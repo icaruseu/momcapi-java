@@ -132,7 +132,15 @@ public class Util {
         List<String> results = new LinkedList<>();
 
         for (int i = 0; i < nodes.size(); i++) {
-            results.add(nodes.get(i).getValue());
+
+            Node node = nodes.get(i);
+
+            if (node instanceof Element) {
+                results.add(node.toXML());
+            } else {
+                results.add(node.getValue());
+            }
+
         }
 
         return results;

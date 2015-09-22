@@ -13,6 +13,8 @@ import eu.icarus.momca.momcapi.model.xml.Namespace;
 import eu.icarus.momca.momcapi.model.xml.XmlValidationProblem;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomEntry;
 import eu.icarus.momca.momcapi.model.xml.cei.*;
+import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.Bibl;
+import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.Tenor;
 import eu.icarus.momca.momcapi.query.XpathQuery;
 import nu.xom.*;
 import org.jetbrains.annotations.NotNull;
@@ -47,9 +49,11 @@ public class Charter extends AtomResource {
     @NotNull
     private Idno idno;
     @NotNull
-    private SourceDesc sourceDesc = new SourceDesc();
+    private Optional<SourceDesc> sourceDesc = Optional.empty();
     @NotNull
-    private List<Element> unusedFrontElements = new ArrayList<>(0);
+    private Optional<Tenor> tenor = Optional.empty();
+    @NotNull
+    private List<Node> unusedFrontNodes = new ArrayList<>(0);
 
     public Charter(@NotNull IdCharter id, @NotNull CharterStatus charterStatus, @NotNull User author, @NotNull Date date) {
 
@@ -80,6 +84,8 @@ public class Charter extends AtomResource {
         this.idno = readIdnoFromXml(xml);
         this.date = readDateFromXml(xml);
         this.sourceDesc = readSourceDescFromXml(xml);
+        this.tenor = readTenorFromXml(xml);
+        unusedFrontNodes = readUnusedFrontElements(xml);
 
     }
 
@@ -186,8 +192,13 @@ public class Charter extends AtomResource {
     }
 
     @NotNull
-    public SourceDesc getSourceDesc() {
+    public Optional<SourceDesc> getSourceDesc() {
         return sourceDesc;
+    }
+
+    @NotNull
+    public Optional<Tenor> getTenor() {
+        return tenor;
     }
 
     @NotNull
@@ -212,6 +223,9 @@ public class Charter extends AtomResource {
         Element chDesc = new Element("cei:chDesc", CEI_URI);
         body.appendChild(chDesc);
 
+        Tenor currentTenor = tenor.orElse(new Tenor(""));
+        body.appendChild(currentTenor.copy());
+
         return body;
 
     }
@@ -220,9 +234,10 @@ public class Charter extends AtomResource {
 
         Element front = new Element("cei:front", CEI_URI);
 
-        front.appendChild(sourceDesc);
 
-        unusedFrontElements.forEach(front::appendChild);
+        front.appendChild(sourceDesc.orElse(new SourceDesc()));
+
+        unusedFrontNodes.forEach(element -> front.appendChild(element.copy()));
 
         return front;
 
@@ -315,6 +330,7 @@ public class Charter extends AtomResource {
         }
 
         return new Date(dateCei);
+
     }
 
     private Idno readIdnoFromXml(Element xml) {
@@ -340,9 +356,9 @@ public class Charter extends AtomResource {
 
     }
 
-    private SourceDesc readSourceDescFromXml(Element xml) {
+    private Optional<SourceDesc> readSourceDescFromXml(Element xml) {
 
-        SourceDesc sourceDesc = new SourceDesc();
+        Optional<SourceDesc> result = Optional.empty();
 
         Nodes sourceDescNodes = Util.queryXmlToNodes(xml, XpathQuery.QUERY_CEI_SOURCE_DESC);
 
@@ -351,11 +367,42 @@ public class Charter extends AtomResource {
             Element sourceDescElement = (Element) sourceDescNodes.get(0);
             List<String> abstractBiblEntries = readBiblEntries(sourceDescElement, "sourceDescRegest");
             List<String> tenorBiblEntries = readBiblEntries(sourceDescElement, "sourceDescVolltext");
-            sourceDesc = new SourceDesc(abstractBiblEntries, tenorBiblEntries);
+
+            if (!abstractBiblEntries.get(0).isEmpty() || !tenorBiblEntries.get(0).isEmpty()) {
+                result = Optional.of(new SourceDesc(abstractBiblEntries, tenorBiblEntries));
+            }
+
 
         }
 
-        return sourceDesc;
+        return result;
+
+    }
+
+    private Optional<Tenor> readTenorFromXml(Element xml) {
+
+
+        String tenorString = Util.queryXmlToString(xml, XpathQuery.QUERY_CEI_TENOR);
+
+        Tenor tenor = new Tenor(tenorString);
+
+        return tenor.getValue().isEmpty() ? Optional.empty() : Optional.of(tenor);
+
+    }
+
+    private List<Node> readUnusedFrontElements(Element xml) {
+
+        List<Node> results = new ArrayList<>(0);
+
+        Nodes nodes = Util.queryXmlToNodes(xml, XpathQuery.QUERY_CEI_FRONT);
+        for (int i = 0; i < nodes.size(); i++) {
+            Node node = nodes.get(i);
+            if (node instanceof Element && ((Element) node).getLocalName().equals("sourceDesc")) {
+                results.add(node);
+            }
+        }
+
+        return results;
 
     }
 
@@ -388,8 +435,35 @@ public class Charter extends AtomResource {
     }
 
     public void setSourceDesc(@NotNull SourceDesc sourceDesc) {
-        this.sourceDesc = sourceDesc;
+
+        List<Bibl> abstractBibl = sourceDesc.getBibliographyAbstract().getEntries();
+        List<Bibl> tenorBibl = sourceDesc.getBibliographyTenor().getEntries();
+
+        if ((abstractBibl.isEmpty() || abstractBibl.get(0).getContent().isEmpty()) && (tenorBibl.isEmpty() ||
+                tenorBibl.get(0).getContent().isEmpty())) {
+
+            this.sourceDesc = Optional.empty();
+
+        } else {
+
+            this.sourceDesc = Optional.of(sourceDesc);
+
+        }
+
         updateXmlContent();
+
+    }
+
+    public void setTenor(@NotNull Tenor tenor) {
+
+        if (tenor.getContent().isEmpty()) {
+            this.tenor = Optional.empty();
+        } else {
+            this.tenor = Optional.of(tenor);
+        }
+
+        updateXmlContent();
+
     }
 
     @Override

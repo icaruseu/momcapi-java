@@ -6,6 +6,7 @@ import eu.icarus.momca.momcapi.model.Date;
 import eu.icarus.momca.momcapi.model.id.IdCharter;
 import eu.icarus.momca.momcapi.model.xml.cei.DateExact;
 import eu.icarus.momca.momcapi.model.xml.cei.SourceDesc;
+import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.Tenor;
 import nu.xom.Element;
 import nu.xom.ParsingException;
 import org.jetbrains.annotations.NotNull;
@@ -81,14 +82,16 @@ public class CharterTest {
                 "                ");
         assertEquals(charter.getDate(), date);
 
-        assertEquals(charter.getSourceDesc().toXML(), "<cei:sourceDesc xmlns:cei=\"http://www.monasterium.net/NS/cei\"><cei:sourceDescRegest><cei:bibl /></cei:sourceDescRegest><cei:sourceDescVolltext><cei:bibl /></cei:sourceDescVolltext></cei:sourceDesc>");
+        assertFalse(charter.getSourceDesc().isPresent());
+
+        assertFalse(charter.getTenor().isPresent());
 
     }
 
     @Test
     public void testConstructor2WithTestCharter1() throws Exception {
 
-        Date date = new Date(LocalDate.of(947, 10, 27), "0947-10-27\n                        ");
+        Date date = new Date(LocalDate.of(947, 10, 27), "0947-10-27");
         List<String> biblRegest = new ArrayList<>(1);
         biblRegest.add("QW I/1, Nr. 28");
         SourceDesc sourceDesc = new SourceDesc(biblRegest, new ArrayList<>(0));
@@ -102,12 +105,16 @@ public class CharterTest {
         assertEquals(charter.getId(), new IdCharter("collection", "KAE_Urkunde_Nr_1"));
         assertFalse(charter.getCreator().isPresent());
         assertEquals(charter.getIdno().getId(), "KAE_Urkunde_Nr_1");
-        assertEquals(charter.getIdno().getText(), "KAE, Urkunde Nr. 1\n                ");
+        assertEquals(charter.getIdno().getText(), "KAE, Urkunde Nr. 1");
         assertTrue(charter.getIdno().getOld().isPresent());
         assertEquals(charter.getIdno().getOld().get(), "1");
         assertEquals(charter.getDate(), date);
 
-        assertEquals(charter.getSourceDesc().toXML(), sourceDesc.toXML());
+        assertTrue(charter.getSourceDesc().isPresent());
+        assertEquals(charter.getSourceDesc().get().toXML(), sourceDesc.toXML());
+
+        assertTrue(charter.getTenor().isPresent());
+        assertEquals(charter.getTenor().get().getContent(), "This is the <cei:hi>Winter</cei:hi> of our discontempt.");
 
     }
 
@@ -154,16 +161,19 @@ public class CharterTest {
         assertEquals(charter.getCharterStatus(), CharterStatus.IMPORTED);
         assertEquals(charter.getParentUri(), "/db/mom-data/metadata.charter.import/collection");
         assertEquals(charter.getResourceName(), "charter1.cei.xml");
+        assertTrue(charter.isValidCei());
 
         charter.setCharterStatus(CharterStatus.PRIVATE);
         assertEquals(charter.getCharterStatus(), CharterStatus.PRIVATE);
         assertEquals(charter.getParentUri(), "/db/mom-data/xrx.user/user/metadata.charter/collection");
         assertEquals(charter.getResourceName(), "charter1.charter.xml");
+        assertTrue(charter.isValidCei());
 
         charter.setCharterStatus(CharterStatus.SAVED);
         assertEquals(charter.getCharterStatus(), CharterStatus.SAVED);
         assertEquals(charter.getParentUri(), "/db/mom-data/metadata.charter.saved");
         assertEquals(charter.getResourceName(), "tag%3Awww.monasterium.net%2C2011%3A%23charter%23collection%23charter1.xml");
+        assertTrue(charter.isValidCei());
 
     }
 
@@ -176,6 +186,7 @@ public class CharterTest {
 
         assertEquals(charter.getIdentifier(), new_identifier);
         assertEquals(charter.getId(), new IdCharter("collection", new_identifier));
+        assertTrue(charter.isValidCei());
 
     }
 
@@ -188,13 +199,44 @@ public class CharterTest {
 
         Charter charter = new Charter(id, CharterStatus.PUBLIC, user, date);
 
+        assertFalse(charter.getSourceDesc().isPresent());
+
         List<String> biblRegest = new ArrayList<>(1);
         biblRegest.add("QW I/1, Nr. 28");
         SourceDesc sourceDesc = new SourceDesc(biblRegest, new ArrayList<>(0));
 
         charter.setSourceDesc(sourceDesc);
 
-        assertEquals(charter.getSourceDesc(), sourceDesc);
+        assertTrue(charter.getSourceDesc().isPresent());
+        assertEquals(charter.getSourceDesc().get(), sourceDesc);
+        assertTrue(charter.isValidCei());
+
+        charter.setSourceDesc(new SourceDesc());
+
+        assertFalse(charter.getSourceDesc().isPresent());
+
+    }
+
+    @Test
+    public void testSetTenor() throws Exception {
+
+        IdCharter id = new IdCharter("collection", "charter1");
+        Date date = new Date(new DateExact("14180201", "February 1st, 1418"));
+        User user = new User("user", "moderator");
+
+        Charter charter = new Charter(id, CharterStatus.PUBLIC, user, date);
+
+        assertFalse(charter.getTenor().isPresent());
+
+        Tenor tenor = new Tenor("This is the winter of <cei:lb/> our <cei:hi>discontempt</cei:hi>!");
+
+        charter.setTenor(tenor);
+
+        assertEquals(charter.getTenor().get().getContent(), "This is the winter of <cei:lb/> our <cei:hi>discontempt</cei:hi>!");
+        assertTrue(charter.isValidCei());
+
+        charter.setTenor(new Tenor(""));
+        assertFalse(charter.getTenor().isPresent());
 
     }
 }

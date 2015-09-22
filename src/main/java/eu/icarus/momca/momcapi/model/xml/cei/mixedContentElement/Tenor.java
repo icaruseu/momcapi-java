@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class Tenor extends AbstractMixedContentElement {
 
-    Tenor(@NotNull String content) {
+    public Tenor(@NotNull String content) {
         super(content, "tenor");
     }
 

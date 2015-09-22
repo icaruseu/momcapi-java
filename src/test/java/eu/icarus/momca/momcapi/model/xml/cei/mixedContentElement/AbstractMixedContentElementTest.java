@@ -25,9 +25,4 @@ public class AbstractMixedContentElementTest {
 
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testConstructorEmptyContent() throws Exception {
-        new Abstract("");
-    }
-
 }

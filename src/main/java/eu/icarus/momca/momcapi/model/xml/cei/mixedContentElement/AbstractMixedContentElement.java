@@ -21,26 +21,40 @@ abstract class AbstractMixedContentElement extends Element {
 
         super(createXmlContent(content, localName));
 
-        this.content = content;
+        this.content = initContent(content, localName);
 
     }
 
     @NotNull
-    private static Element createXmlContent(@NotNull String content, @NotNull String localizedRootElementName) {
+    private static Element createXmlContent(@NotNull String content, @NotNull String localName) {
 
-        if (localizedRootElementName.isEmpty()) {
-            throw new IllegalArgumentException("LocalizedRootElementName are not allowed to be an empty string");
+        if (localName.isEmpty()) {
+            throw new IllegalArgumentException("LocalName is not allowed to be an empty string");
         }
 
-        if (localizedRootElementName.contains(":")) {
+        if (localName.contains(":")) {
             throw new IllegalArgumentException("Localized content is not supposed to include ':'");
         }
 
+        String stringToParse;
 
-        String stringToParse = String.format("<cei:%s xmlns:cei='http://www.monasterium.net/NS/cei'>%s</cei:%s>",
-                localizedRootElementName,
-                content,
-                localizedRootElementName);
+        if (content.startsWith("<" + localName) || content.startsWith("<cei:" + localName)) {
+
+            stringToParse = content;
+            stringToParse = stringToParse.replace("<cei:" + localName, "<cei:" + localName + " xmlns:cei='http://www.monasterium.net/NS/cei'");
+            stringToParse = stringToParse.replace("</" + localName, "</cei:" + localName);
+            stringToParse = stringToParse.replace("<" + localName + " xmlns='http://www.monasterium.net/NS/cei'", "<cei:" + localName + " xmlns:cei='http://www.monasterium.net/NS/cei'");
+            stringToParse = stringToParse.replace("<" + localName, "<cei:" + localName + " xmlns:cei='http://www.monasterium.net/NS/cei'");
+
+
+        } else {
+
+            stringToParse = String.format("<cei:%s xmlns:cei='http://www.monasterium.net/NS/cei'>%s</cei:%s>",
+                    localName,
+                    content,
+                    localName);
+
+        }
 
         Element xml = Util.parseToElement(stringToParse);
 
@@ -63,6 +77,20 @@ abstract class AbstractMixedContentElement extends Element {
     @NotNull
     public String getContent() {
         return content;
+    }
+
+    protected String initContent(String content, String localName) {
+
+        String result = content;
+
+        if ((content.startsWith("<" + localName) || content.startsWith("<cei:" + localName)) && content.endsWith(localName + ">")) {
+
+            result = result.substring(result.indexOf(">") + 1, result.lastIndexOf("<"));
+
+        }
+
+        return result;
+
     }
 
 }
