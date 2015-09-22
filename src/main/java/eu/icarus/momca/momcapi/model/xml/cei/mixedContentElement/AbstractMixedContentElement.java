@@ -11,11 +11,15 @@ import org.jetbrains.annotations.NotNull;
 abstract class AbstractMixedContentElement extends Element {
 
     @NotNull
-    private String content;
+    private String content = "";
 
-    AbstractMixedContentElement(@NotNull String content, @NotNull String localizedRootElementName) {
+    AbstractMixedContentElement(@NotNull String localName) {
+        super("cei:" + localName, Namespace.CEI.getUri());
+    }
 
-        super(createXmlContent(content, localizedRootElementName));
+    AbstractMixedContentElement(@NotNull String content, @NotNull String localName) {
+
+        super(createXmlContent(content, localName));
 
         this.content = content;
 
@@ -24,28 +28,21 @@ abstract class AbstractMixedContentElement extends Element {
     @NotNull
     private static Element createXmlContent(@NotNull String content, @NotNull String localizedRootElementName) {
 
-        if (content.isEmpty() || localizedRootElementName.isEmpty()) {
-            throw new IllegalArgumentException("Content and localizedRootElementName are not allowed to be an empty string");
+        if (localizedRootElementName.isEmpty()) {
+            throw new IllegalArgumentException("LocalizedRootElementName are not allowed to be an empty string");
         }
 
         if (localizedRootElementName.contains(":")) {
             throw new IllegalArgumentException("Localized content is not supposed to include ':'");
         }
 
-//        String stringToParse = content;
 
-//        if (!content.startsWith("<" + localizedRootElementName) && !content.endsWith(localizedRootElementName + ">")) {
         String stringToParse = String.format("<cei:%s xmlns:cei='http://www.monasterium.net/NS/cei'>%s</cei:%s>",
                 localizedRootElementName,
                 content,
                 localizedRootElementName);
-//        }
 
         Element xml = Util.parseToElement(stringToParse);
-
-//        if (!xml.getNamespaceURI().equals(Namespace.CEI.getUri())) {
-//            xml = getXmlWithCorrectedNamespace(xml);
-//        }
 
         return xml;
 

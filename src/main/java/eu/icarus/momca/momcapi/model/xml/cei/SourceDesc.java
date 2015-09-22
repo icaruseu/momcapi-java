@@ -6,8 +6,8 @@ import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -16,47 +16,50 @@ import java.util.stream.Collectors;
 public class SourceDesc extends Element {
 
     public static final String CEI_URI = Namespace.CEI.getUri();
+    public static final String SOURCE_DESC_REGEST = "sourceDescRegest";
+    public static final String SOURCE_DESC_VOLLTEXT = "sourceDescVolltext";
     @NotNull
-    private Optional<Bibliography> bibliographyAbstract = Optional.empty();
+    private Bibliography bibliographyAbstract;
     @NotNull
-    private Optional<Bibliography> bibliographyTenor = Optional.empty();
+    private Bibliography bibliographyTenor;
 
     public SourceDesc() {
-        super("cei:sourceDesc", CEI_URI);
+        this(new ArrayList<>(0), new ArrayList<>(0));
     }
 
-    public SourceDesc(@Nullable List<String> abstractBiblEntries, @Nullable List<String> tenorBiblEntries) {
+    public SourceDesc(@NotNull List<String> abstractBiblEntries, @NotNull List<String> tenorBiblEntries) {
 
-        this();
+        super("cei:sourceDesc", CEI_URI);
 
-        if (abstractBiblEntries != null && !abstractBiblEntries.isEmpty()) {
-            bibliographyAbstract = initBibliography("sourceDescRegest", abstractBiblEntries);
-            appendChild(bibliographyAbstract.get());
-        }
+        bibliographyAbstract = initBibliography(SOURCE_DESC_REGEST, abstractBiblEntries);
+        bibliographyTenor = initBibliography(SOURCE_DESC_VOLLTEXT, tenorBiblEntries);
 
-        if (tenorBiblEntries != null && !tenorBiblEntries.isEmpty()) {
-            bibliographyTenor = initBibliography("sourceDescVolltext", tenorBiblEntries);
-            appendChild(bibliographyTenor.get());
-        }
+        appendChild(bibliographyAbstract);
+        appendChild(bibliographyTenor);
 
     }
 
     @NotNull
-    public Optional<Bibliography> getBibliographyAbstract() {
+    public Bibliography getBibliographyAbstract() {
         return bibliographyAbstract;
     }
 
     @NotNull
-    public Optional<Bibliography> getBibliographyTenor() {
+    public Bibliography getBibliographyTenor() {
         return bibliographyTenor;
     }
 
-    private Optional<Bibliography> initBibliography(@NotNull String bibliographyName, @NotNull List<String> entries) {
+    private Bibliography initBibliography(@NotNull String bibliographyName, @Nullable List<String> entries) {
 
-        List<Bibl> list = entries.stream().map(Bibl::new).collect(Collectors.toList());
-        Bibliography bibliography = new Bibliography(bibliographyName, list);
+        List<Bibl> list;
+        if (entries == null || entries.isEmpty()) {
+            list = new ArrayList<>(1);
+            list.add(new Bibl());
+        } else {
+            list = entries.stream().map(Bibl::new).collect(Collectors.toList());
+        }
 
-        return Optional.of(bibliography);
+        return new Bibliography(bibliographyName, list);
 
     }
 

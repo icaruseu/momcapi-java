@@ -296,7 +296,14 @@ public class Date implements Comparable<Date> {
                 new DateExact("99999999", literalDate)
         );
 
-
     }
 
+    @Override
+    public String toString() {
+        return "Date{" +
+                "daysInRange=" + daysInRange +
+                ", literalDate='" + literalDate + '\'' +
+                ", sortingDate=" + sortingDate +
+                '}';
+    }
 }

@@ -13,18 +13,22 @@ import java.util.List;
  */
 public class Bibliography extends Element {
 
-    List<Bibl> entries = new ArrayList<>(0);
+    @NotNull
+    private List<Bibl> entries = new ArrayList<>(0);
 
-    public Bibliography(@NotNull String localName, @NotNull List<Bibl> entries) {
-
+    public Bibliography(@NotNull String localName) {
         super("cei:" + localName, Namespace.CEI.getUri());
-
-        entries.forEach(this::appendChild);
-
-        this.entries.addAll(entries);
-
+        this.entries.add(new Bibl());
+        this.entries.forEach(this::appendChild);
     }
 
+    public Bibliography(@NotNull String localName, @NotNull List<Bibl> entries) {
+        super("cei:" + localName, Namespace.CEI.getUri());
+        this.entries.addAll(entries);
+        this.entries.forEach(this::appendChild);
+    }
+
+    @NotNull
     public List<Bibl> getEntries() {
         return entries;
     }

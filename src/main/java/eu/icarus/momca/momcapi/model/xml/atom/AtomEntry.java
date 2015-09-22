@@ -20,7 +20,7 @@ public class AtomEntry extends Element {
         String atomUri = Namespace.ATOM.getUri();
         String appUri = Namespace.APP.getUri();
 
-        appendChild(atomId);
+        appendChild(atomId.copy());
 
         appendChild(new Element("atom:title", atomUri));
 

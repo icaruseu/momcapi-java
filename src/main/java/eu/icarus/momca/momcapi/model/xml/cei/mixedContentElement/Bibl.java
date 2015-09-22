@@ -14,4 +14,8 @@ public class Bibl extends AbstractMixedContentElement {
 
     }
 
+    public Bibl() {
+        super("bibl");
+    }
+
 }

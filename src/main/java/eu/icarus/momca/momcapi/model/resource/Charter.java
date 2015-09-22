@@ -47,7 +47,9 @@ public class Charter extends AtomResource {
     @NotNull
     private Idno idno;
     @NotNull
-    private Optional<SourceDesc> sourceDesc = Optional.empty();
+    private SourceDesc sourceDesc = new SourceDesc();
+    @NotNull
+    private List<Element> unusedFrontElements = new ArrayList<>(0);
 
     public Charter(@NotNull IdCharter id, @NotNull CharterStatus charterStatus, @NotNull User author, @NotNull Date date) {
 
@@ -77,6 +79,7 @@ public class Charter extends AtomResource {
         this.charterStatus = readCharterStatus();
         this.idno = readIdnoFromXml(xml);
         this.date = readDateFromXml(xml);
+        this.sourceDesc = readSourceDescFromXml(xml);
 
     }
 
@@ -183,7 +186,7 @@ public class Charter extends AtomResource {
     }
 
     @NotNull
-    public Optional<SourceDesc> getSourceDesc() {
+    public SourceDesc getSourceDesc() {
         return sourceDesc;
     }
 
@@ -204,7 +207,7 @@ public class Charter extends AtomResource {
 
         Element body = new Element("cei:body", CEI_URI);
 
-        body.appendChild(idno);
+        body.appendChild(idno.copy());
 
         Element chDesc = new Element("cei:chDesc", CEI_URI);
         body.appendChild(chDesc);
@@ -217,12 +220,38 @@ public class Charter extends AtomResource {
 
         Element front = new Element("cei:front", CEI_URI);
 
+        front.appendChild(sourceDesc);
+
+        unusedFrontElements.forEach(front::appendChild);
+
         return front;
 
     }
 
     public boolean isValidCei() {
         return validationProblems.isEmpty();
+    }
+
+    @NotNull
+    private List<String> readBiblEntries(Element parentElement, String bibliographyName) {
+
+        List<String> abstractBiblEntries = new ArrayList<>(0);
+
+        Element sourceDescRegestElement = parentElement.getFirstChildElement(bibliographyName, CEI_URI);
+
+        if (sourceDescRegestElement != null) {
+
+            Elements sourceDescRegestBibl = sourceDescRegestElement.getChildElements();
+
+            for (int i = 0; i < sourceDescRegestBibl.size(); i++) {
+                Element bibl = sourceDescRegestBibl.get(i);
+                abstractBiblEntries.add(bibl.getValue());
+            }
+
+        }
+
+        return abstractBiblEntries;
+
     }
 
     private CharterStatus readCharterStatus() {
@@ -311,6 +340,25 @@ public class Charter extends AtomResource {
 
     }
 
+    private SourceDesc readSourceDescFromXml(Element xml) {
+
+        SourceDesc sourceDesc = new SourceDesc();
+
+        Nodes sourceDescNodes = Util.queryXmlToNodes(xml, XpathQuery.QUERY_CEI_SOURCE_DESC);
+
+        if (sourceDescNodes.size() != 0) {
+
+            Element sourceDescElement = (Element) sourceDescNodes.get(0);
+            List<String> abstractBiblEntries = readBiblEntries(sourceDescElement, "sourceDescRegest");
+            List<String> tenorBiblEntries = readBiblEntries(sourceDescElement, "sourceDescVolltext");
+            sourceDesc = new SourceDesc(abstractBiblEntries, tenorBiblEntries);
+
+        }
+
+        return sourceDesc;
+
+    }
+
     public void setCharterStatus(@NotNull CharterStatus charterStatus) {
         this.charterStatus = charterStatus;
         setParentUri(createParentUri(getId(), charterStatus, creator.get()));
@@ -339,7 +387,7 @@ public class Charter extends AtomResource {
 
     }
 
-    public void setSourceDesc(@NotNull Optional<SourceDesc> sourceDesc) {
+    public void setSourceDesc(@NotNull SourceDesc sourceDesc) {
         this.sourceDesc = sourceDesc;
         updateXmlContent();
     }

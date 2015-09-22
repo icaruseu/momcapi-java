@@ -5,12 +5,16 @@ import eu.icarus.momca.momcapi.model.CharterStatus;
 import eu.icarus.momca.momcapi.model.Date;
 import eu.icarus.momca.momcapi.model.id.IdCharter;
 import eu.icarus.momca.momcapi.model.xml.cei.DateExact;
+import eu.icarus.momca.momcapi.model.xml.cei.SourceDesc;
 import nu.xom.Element;
 import nu.xom.ParsingException;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.testng.Assert.*;
 
@@ -76,6 +80,34 @@ public class CharterTest {
         assertEquals(charter.getIdno().getText(), "New Charter\n" +
                 "                ");
         assertEquals(charter.getDate(), date);
+
+        assertEquals(charter.getSourceDesc().toXML(), "<cei:sourceDesc xmlns:cei=\"http://www.monasterium.net/NS/cei\"><cei:sourceDescRegest><cei:bibl /></cei:sourceDescRegest><cei:sourceDescVolltext><cei:bibl /></cei:sourceDescVolltext></cei:sourceDesc>");
+
+    }
+
+    @Test
+    public void testConstructor2WithTestCharter1() throws Exception {
+
+        Date date = new Date(LocalDate.of(947, 10, 27), "0947-10-27\n                        ");
+        List<String> biblRegest = new ArrayList<>(1);
+        biblRegest.add("QW I/1, Nr. 28");
+        SourceDesc sourceDesc = new SourceDesc(biblRegest, new ArrayList<>(0));
+
+        Charter charter = createCharter("testcharter1.xml");
+
+        assertEquals(charter.getCharterStatus(), CharterStatus.PUBLIC);
+        assertEquals(charter.getParentUri(), "/db/mom-data/metadata.charter.public/collection");
+        assertEquals(charter.getResourceName(), "testcharter1.xml");
+
+        assertEquals(charter.getId(), new IdCharter("collection", "KAE_Urkunde_Nr_1"));
+        assertFalse(charter.getCreator().isPresent());
+        assertEquals(charter.getIdno().getId(), "KAE_Urkunde_Nr_1");
+        assertEquals(charter.getIdno().getText(), "KAE, Urkunde Nr. 1\n                ");
+        assertTrue(charter.getIdno().getOld().isPresent());
+        assertEquals(charter.getIdno().getOld().get(), "1");
+        assertEquals(charter.getDate(), date);
+
+        assertEquals(charter.getSourceDesc().toXML(), sourceDesc.toXML());
 
     }
 
@@ -144,6 +176,25 @@ public class CharterTest {
 
         assertEquals(charter.getIdentifier(), new_identifier);
         assertEquals(charter.getId(), new IdCharter("collection", new_identifier));
+
+    }
+
+    @Test
+    public void testSetSourceDesc() throws Exception {
+
+        IdCharter id = new IdCharter("collection", "charter1");
+        Date date = new Date(new DateExact("14180201", "February 1st, 1418"));
+        User user = new User("user", "moderator");
+
+        Charter charter = new Charter(id, CharterStatus.PUBLIC, user, date);
+
+        List<String> biblRegest = new ArrayList<>(1);
+        biblRegest.add("QW I/1, Nr. 28");
+        SourceDesc sourceDesc = new SourceDesc(biblRegest, new ArrayList<>(0));
+
+        charter.setSourceDesc(sourceDesc);
+
+        assertEquals(charter.getSourceDesc(), sourceDesc);
 
     }
 }
