@@ -231,10 +231,13 @@ public class Charter extends AtomResource {
 
         Element chDesc = new Element("cei:chDesc", CEI_URI);
         body.appendChild(chDesc);
-        chDesc.appendChild(charterAbstract.orElse(new Abstract("")));
 
-        Tenor currentTenor = tenor.orElse(new Tenor(""));
-        body.appendChild(currentTenor.copy());
+        Element issued = new Element("cei:issued", CEI_URI);
+        chDesc.appendChild(issued);
+        issued.appendChild(date.toCeiDate());
+
+        charterAbstract.ifPresent(chDesc::appendChild);
+        tenor.ifPresent(body::appendChild);
 
         return body;
 
@@ -244,9 +247,7 @@ public class Charter extends AtomResource {
 
         Element front = new Element("cei:front", CEI_URI);
 
-
-        front.appendChild(sourceDesc.orElse(new SourceDesc()));
-
+        sourceDesc.ifPresent(front::appendChild);
         unusedFrontNodes.forEach(element -> front.appendChild(element.copy()));
 
         return front;
@@ -435,6 +436,11 @@ public class Charter extends AtomResource {
         setResourceName(createResourceName(getId(), charterStatus));
     }
 
+    public void setDate(@NotNull Date date) {
+        this.date = date;
+        updateXmlContent();
+    }
+
     @Override
     public void setIdentifier(@NotNull String identifier) {
 
@@ -455,6 +461,11 @@ public class Charter extends AtomResource {
 
         updateXmlContent();
 
+    }
+
+    public void setIdno(@NotNull Idno idno) {
+        this.idno = idno;
+        updateXmlContent();
     }
 
     public void setSourceDesc(@NotNull SourceDesc sourceDesc) {
@@ -487,6 +498,13 @@ public class Charter extends AtomResource {
 
         updateXmlContent();
 
+    }
+
+    @NotNull
+    public Element toCei() {
+        Element xml = (Element) toDocument().getRootElement().copy();
+        Element atomContent = xml.getFirstChildElement("content", Namespace.ATOM.getUri());
+        return atomContent.getFirstChildElement("text", CEI_URI);
     }
 
     @Override

@@ -21,7 +21,7 @@ public class AbstractMixedContentElementTest {
         String correctXml = "<cei:abstract xmlns:cei=\"http://www.monasterium.net/NS/cei\">" + xmlString + "</cei:abstract>";
 
         assertEquals(element1.toXML(), correctXml);
-        assertEquals(element2.toXML(), "<cei:abstract xmlns:cei=\"http://www.monasterium.net/NS/cei\"><abstract>Ludwig der Fromme bestätigt der Kirche von Salzburg auf Bitten Erzbischof Arns laut der vorgelegten Urkunde seines Vaters, Kaiser Karls, Immunität mit Königsschutz und ihre Besitzungen. <issuer>Ludwig der Fromme</issuer></abstract></cei:abstract>");
+        assertEquals(element2.toXML(), "<cei:abstract xmlns:cei=\"http://www.monasterium.net/NS/cei\">Ludwig der Fromme bestätigt der Kirche von Salzburg auf Bitten Erzbischof Arns laut der vorgelegten Urkunde seines Vaters, Kaiser Karls, Immunität mit Königsschutz und ihre Besitzungen. <issuer>Ludwig der Fromme</issuer></cei:abstract>");
 
     }
 

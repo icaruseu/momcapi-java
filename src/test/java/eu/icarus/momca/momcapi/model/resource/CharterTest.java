@@ -5,6 +5,7 @@ import eu.icarus.momca.momcapi.model.CharterStatus;
 import eu.icarus.momca.momcapi.model.Date;
 import eu.icarus.momca.momcapi.model.id.IdCharter;
 import eu.icarus.momca.momcapi.model.xml.cei.DateExact;
+import eu.icarus.momca.momcapi.model.xml.cei.Idno;
 import eu.icarus.momca.momcapi.model.xml.cei.SourceDesc;
 import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.Abstract;
 import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.Tenor;
@@ -58,8 +59,10 @@ public class CharterTest {
         assertEquals(charter.getIdno().getText(), "charter1");
         assertEquals(charter.getDate(), date);
 
-        String correctXml = "";
-        assertEquals(charter.toXML(), correctXml);
+        assertTrue(charter.isValidCei());
+
+        String correctXml = "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued></cei:chDesc></cei:body><cei:back /></cei:text>";
+        assertEquals(charter.toCei().toXML(), correctXml);
 
     }
 
@@ -204,6 +207,25 @@ public class CharterTest {
     }
 
     @Test
+    public void testSetDate() throws Exception {
+
+        IdCharter id = new IdCharter("collection", "charter1");
+        Date date = new Date(new DateExact("14180201", "February 1st, 1418"));
+        User user = new User("user", "moderator");
+
+        Charter charter = new Charter(id, CharterStatus.PUBLIC, user, date);
+
+        Date newDate = new Date(LocalDate.of(1218, 6, 19), "19th June, 1218");
+
+        charter.setDate(newDate);
+
+        assertEquals(charter.getDate(), newDate);
+        assertTrue(charter.isValidCei());
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"12180619\">19th June, 1218</cei:date></cei:issued></cei:chDesc></cei:body><cei:back /></cei:text>");
+
+    }
+
+    @Test
     public void testSetIdentifier() throws Exception {
 
         Charter charter = createCharter("empty_charter.xml");
@@ -213,6 +235,26 @@ public class CharterTest {
         assertEquals(charter.getIdentifier(), new_identifier);
         assertEquals(charter.getId(), new IdCharter("collection", new_identifier));
         assertTrue(charter.isValidCei());
+
+    }
+
+    @Test
+    public void testSetIdno() throws Exception {
+
+        IdCharter id = new IdCharter("collection", "charter1");
+        Date date = new Date(new DateExact("14180201", "February 1st, 1418"));
+        User user = new User("user", "moderator");
+
+        Charter charter = new Charter(id, CharterStatus.PUBLIC, user, date);
+
+        assertEquals(charter.getIdno().getId(), id.getIdentifier());
+
+        Idno newId = new Idno("newId", "New Idno Text");
+        charter.setIdno(newId);
+
+        assertEquals(charter.getIdno(), newId);
+        assertTrue(charter.isValidCei());
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"newId\">New Idno Text</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued></cei:chDesc></cei:body><cei:back /></cei:text>");
 
     }
 
@@ -236,6 +278,7 @@ public class CharterTest {
         assertTrue(charter.getSourceDesc().isPresent());
         assertEquals(charter.getSourceDesc().get(), sourceDesc);
         assertTrue(charter.isValidCei());
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front><cei:sourceDesc><cei:sourceDescRegest><cei:bibl>QW I/1, Nr. 28</cei:bibl></cei:sourceDescRegest><cei:sourceDescVolltext><cei:bibl /></cei:sourceDescVolltext></cei:sourceDesc></cei:front><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued></cei:chDesc></cei:body><cei:back /></cei:text>");
 
         charter.setSourceDesc(new SourceDesc());
 
@@ -260,9 +303,11 @@ public class CharterTest {
 
         assertEquals(charter.getTenor().get().getContent(), "This is the winter of <cei:lb/> our <cei:hi>discontempt</cei:hi>!");
         assertTrue(charter.isValidCei());
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued></cei:chDesc><cei:tenor>This is the winter of <cei:lb /> our <cei:hi>discontempt</cei:hi>!</cei:tenor></cei:body><cei:back /></cei:text>");
 
         charter.setTenor(new Tenor(""));
         assertFalse(charter.getTenor().isPresent());
 
     }
+
 }
