@@ -28,8 +28,7 @@
             </cei:front>
             <cei:body>
                 <cei:idno
-                        id="empty_charter">New Charter
-                </cei:idno>
+                        id="empty_charter">New Charter</cei:idno>
                 <cei:chDesc>
                     <cei:class/>
                     <cei:abstract/>

@@ -78,8 +78,7 @@ public class CharterTest {
         assertTrue(charter.getCreator().isPresent());
         assertEquals(charter.getCreator().get(), user.getId());
         assertEquals(charter.getIdno().getId(), "empty_charter");
-        assertEquals(charter.getIdno().getText(), "New Charter\n" +
-                "                ");
+        assertEquals(charter.getIdno().getText(), "New Charter");
         assertEquals(charter.getDate(), date);
 
         assertFalse(charter.getSourceDesc().isPresent());
