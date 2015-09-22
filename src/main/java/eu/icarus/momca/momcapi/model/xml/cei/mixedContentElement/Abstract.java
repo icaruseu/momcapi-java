@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class Abstract extends AbstractMixedContentElement {
 
-    Abstract(@NotNull String content) {
+    public Abstract(@NotNull String content) {
         super(content, "abstract");
     }
 

@@ -18,7 +18,7 @@ public enum XpathQuery {
 
     QUERY_ATOM_EMAIL("//atom:email/text()", Namespace.ATOM),
     QUERY_ATOM_ID("//atom:id/text()", Namespace.ATOM),
-    QUERY_CEI_WITNESS_ORIG_FIGURE("//cei:witnessOrig/cei:figure", Namespace.CEI),
+    QUERY_CEI_ABSTRACT("//cei:abstract", Namespace.CEI),
     QUERY_CEI_BODY_IDNO_ID("//cei:body/cei:idno/@id", Namespace.CEI),
     QUERY_CEI_BODY_IDNO_TEXT("//cei:body/cei:idno/text()", Namespace.CEI),
     QUERY_CEI_BODY_IDNO_OLD("//cei:body/cei:idno/@old", Namespace.CEI),
@@ -37,6 +37,7 @@ public enum XpathQuery {
     QUERY_CEI_SOURCE_DESC("//cei:sourceDesc", Namespace.CEI),
     QUERY_CEI_TENOR("//cei:tenor", Namespace.CEI),
     QUERY_CEI_TEXT("//cei:text", Namespace.CEI),
+    QUERY_CEI_WITNESS_ORIG_FIGURE("//cei:witnessOrig/cei:figure", Namespace.CEI),
     QUERY_EAD_BIBLIOGRAPHY("//ead:bibliography", Namespace.EAD),
     QUERY_EAD_BIOGHIST("//ead:bioghist", Namespace.EAD),
     QUERY_EAD_CUSTODHIST("//ead:custodhist", Namespace.EAD),

@@ -13,6 +13,7 @@ import eu.icarus.momca.momcapi.model.xml.Namespace;
 import eu.icarus.momca.momcapi.model.xml.XmlValidationProblem;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomEntry;
 import eu.icarus.momca.momcapi.model.xml.cei.*;
+import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.Abstract;
 import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.Bibl;
 import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.Tenor;
 import eu.icarus.momca.momcapi.query.XpathQuery;
@@ -42,6 +43,8 @@ public class Charter extends AtomResource {
     public static final String CEI_URI = Namespace.CEI.getUri();
     @NotNull
     private final List<XmlValidationProblem> validationProblems = new ArrayList<>(0);
+    @NotNull
+    private Optional<Abstract> charterAbstract = Optional.empty();
     @NotNull
     private CharterStatus charterStatus;
     @NotNull
@@ -79,13 +82,14 @@ public class Charter extends AtomResource {
 
         Element xml = toDocument().getRootElement();
 
-        this.creator = readCreatorFromXml(xml);
-        this.charterStatus = readCharterStatus();
-        this.idno = readIdnoFromXml(xml);
-        this.date = readDateFromXml(xml);
-        this.sourceDesc = readSourceDescFromXml(xml);
-        this.tenor = readTenorFromXml(xml);
-        unusedFrontNodes = readUnusedFrontElements(xml);
+        creator = readCreatorFromXml(xml);
+        charterStatus = readCharterStatus();
+        idno = readIdnoFromXml(xml);
+        date = readDateFromXml(xml);
+        sourceDesc = readSourceDescFromXml(xml);
+        tenor = readTenorFromXml(xml);
+        unusedFrontNodes = readUnusedFrontElementsFromXml(xml);
+        charterAbstract = readCharterAbstractFromXml(xml);
 
     }
 
@@ -171,6 +175,11 @@ public class Charter extends AtomResource {
     }
 
     @NotNull
+    public Optional<Abstract> getAbstract() {
+        return charterAbstract;
+    }
+
+    @NotNull
     public CharterStatus getCharterStatus() {
         return charterStatus;
     }
@@ -222,6 +231,7 @@ public class Charter extends AtomResource {
 
         Element chDesc = new Element("cei:chDesc", CEI_URI);
         body.appendChild(chDesc);
+        chDesc.appendChild(charterAbstract.orElse(new Abstract("")));
 
         Tenor currentTenor = tenor.orElse(new Tenor(""));
         body.appendChild(currentTenor.copy());
@@ -267,6 +277,12 @@ public class Charter extends AtomResource {
 
         return abstractBiblEntries;
 
+    }
+
+    private Optional<Abstract> readCharterAbstractFromXml(Element xml) {
+        String abstractString = Util.queryXmlToString(xml, XpathQuery.QUERY_CEI_ABSTRACT);
+        Abstract charterAbstract = new Abstract(abstractString);
+        return charterAbstract.getValue().isEmpty() ? Optional.empty() : Optional.of(charterAbstract);
     }
 
     private CharterStatus readCharterStatus() {
@@ -380,17 +396,12 @@ public class Charter extends AtomResource {
     }
 
     private Optional<Tenor> readTenorFromXml(Element xml) {
-
-
         String tenorString = Util.queryXmlToString(xml, XpathQuery.QUERY_CEI_TENOR);
-
         Tenor tenor = new Tenor(tenorString);
-
         return tenor.getValue().isEmpty() ? Optional.empty() : Optional.of(tenor);
-
     }
 
-    private List<Node> readUnusedFrontElements(Element xml) {
+    private List<Node> readUnusedFrontElementsFromXml(Element xml) {
 
         List<Node> results = new ArrayList<>(0);
 
@@ -403,6 +414,18 @@ public class Charter extends AtomResource {
         }
 
         return results;
+
+    }
+
+    public void setAbstract(@NotNull Abstract charterAbstract) {
+
+        if (charterAbstract.getContent().isEmpty()) {
+            this.charterAbstract = Optional.empty();
+        } else {
+            this.charterAbstract = Optional.of(charterAbstract);
+        }
+
+        updateXmlContent();
 
     }
 

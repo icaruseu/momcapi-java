@@ -6,6 +6,7 @@ import eu.icarus.momca.momcapi.model.Date;
 import eu.icarus.momca.momcapi.model.id.IdCharter;
 import eu.icarus.momca.momcapi.model.xml.cei.DateExact;
 import eu.icarus.momca.momcapi.model.xml.cei.SourceDesc;
+import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.Abstract;
 import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.Tenor;
 import nu.xom.Element;
 import nu.xom.ParsingException;
@@ -82,8 +83,8 @@ public class CharterTest {
         assertEquals(charter.getDate(), date);
 
         assertFalse(charter.getSourceDesc().isPresent());
-
         assertFalse(charter.getTenor().isPresent());
+        assertFalse(charter.getAbstract().isPresent());
 
     }
 
@@ -115,6 +116,9 @@ public class CharterTest {
         assertTrue(charter.getTenor().isPresent());
         assertEquals(charter.getTenor().get().getContent(), "This is the <cei:hi>Winter</cei:hi> of our discontempt.");
 
+        assertTrue(charter.getAbstract().isPresent());
+        assertEquals(charter.getAbstract().get().getContent(), "König Otto I. verleiht auf Bitte Herzog Hermanns dem Kloster Meinradszell (Einsiedeln), das samt einer Kirche vom jetzigen <cei:persName>Abt Eberhard</cei:persName> auf Boden, der dem Herzog von einigen Getreuen zu eigen gegeben worden war, mit dessen Unterstützung errichtet worden ist, das Recht freier Wahl des Abtes nach dem Tode Eberhards und Immunität.");
+
     }
 
     @Test
@@ -145,6 +149,29 @@ public class CharterTest {
     public void testIsValidCei() throws Exception {
         Charter charter = createCharter("invalid_charter.xml");
         assertFalse(charter.isValidCei());
+    }
+
+    @Test
+    public void testSetAbstract() throws Exception {
+
+        IdCharter id = new IdCharter("collection", "charter1");
+        Date date = new Date(new DateExact("14180201", "February 1st, 1418"));
+        User user = new User("user", "moderator");
+
+        Charter charter = new Charter(id, CharterStatus.PUBLIC, user, date);
+
+        assertFalse(charter.getAbstract().isPresent());
+
+        Abstract charterAbstract = new Abstract("An <cei:hi>Abstract</cei:hi>");
+        charter.setAbstract(charterAbstract);
+
+        assertTrue(charter.getAbstract().isPresent());
+        assertEquals(charter.getAbstract().get().getContent(), "An <cei:hi>Abstract</cei:hi>");
+
+        charter.setAbstract(new Abstract(""));
+
+        assertFalse(charter.getAbstract().isPresent());
+
     }
 
     @Test
