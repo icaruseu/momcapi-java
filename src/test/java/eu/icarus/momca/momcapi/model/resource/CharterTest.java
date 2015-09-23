@@ -7,10 +7,7 @@ import eu.icarus.momca.momcapi.model.id.IdCharter;
 import eu.icarus.momca.momcapi.model.xml.cei.DateExact;
 import eu.icarus.momca.momcapi.model.xml.cei.Idno;
 import eu.icarus.momca.momcapi.model.xml.cei.SourceDesc;
-import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.Abstract;
-import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.PersName;
-import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.PlaceName;
-import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.Tenor;
+import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.*;
 import nu.xom.Element;
 import nu.xom.ParsingException;
 import org.jetbrains.annotations.NotNull;
@@ -153,6 +150,9 @@ public class CharterTest {
         assertEquals(charter.getBackPlaceNames().size(), 2);
         assertEquals(charter.getBackPlaceNames().get(1).getContent(), "Kloster <cei:hi>Einsiedeln</cei:hi> in der Schweiz");
 
+        assertEquals(charter.getBackIndexes().size(), 1);
+        assertEquals(charter.getBackIndexes().get(0).getContent(), "Schwert");
+
         charter.setAbstract(new Abstract("New Abstract"));
 
         assertTrue(charter.isValidCei());
@@ -174,7 +174,7 @@ public class CharterTest {
                 "                            <cei:bibl>Sickel, Kaiserurkunden, S. 70, 72-77.</cei:bibl>\n" +
                 "                            <cei:bibl>MGH Ergänzungen, Nr. O.I.094.</cei:bibl>\n" +
                 "                        </cei:listBiblErw>\n" +
-                "                    </cei:diplomaticAnalysis><cei:lang_MOM>Latein</cei:lang_MOM></cei:chDesc><cei:tenor>This is the <cei:hi>Winter</cei:hi> of our discontempt.</cei:tenor></cei:body><cei:back><cei:persName reg=\"Karl der Große\" type=\"Kaiser\">Carolus <cei:hi>Magnus</cei:hi></cei:persName><cei:persName reg=\"Einhard\">Eginhardus</cei:persName><cei:placeName>Frankfurt</cei:placeName><cei:placeName reg=\"Einsiedeln\">Kloster <cei:hi>Einsiedeln</cei:hi> in der Schweiz</cei:placeName></cei:back></cei:text>");
+                "                    </cei:diplomaticAnalysis><cei:lang_MOM>Latein</cei:lang_MOM></cei:chDesc><cei:tenor>This is the <cei:hi>Winter</cei:hi> of our discontempt.</cei:tenor></cei:body><cei:back><cei:persName reg=\"Karl der Große\" type=\"Kaiser\">Carolus <cei:hi>Magnus</cei:hi></cei:persName><cei:persName reg=\"Einhard\">Eginhardus</cei:persName><cei:placeName>Frankfurt</cei:placeName><cei:placeName reg=\"Einsiedeln\">Kloster <cei:hi>Einsiedeln</cei:hi> in der Schweiz</cei:placeName><cei:index indexName=\"Waffen\">Schwert</cei:index></cei:back></cei:text>");
 
     }
 
@@ -223,6 +223,31 @@ public class CharterTest {
         assertTrue(charter.isValidCei());
         assertFalse(charter.getAbstract().isPresent());
 
+    }
+
+    @Test
+    public void testSetBackIndexes() throws Exception {
+
+        assertEquals(charter.getBackIndexes().size(), 0);
+
+        Index index1 = new Index("Schwert", "Waffen", "", "");
+        Index index2 = new Index("Axt", "Waffen", "", "");
+        List<Index> indexes = new ArrayList<>(2);
+        indexes.add(index1);
+        indexes.add(index2);
+
+        charter.setBackIndexes(indexes);
+
+        assertTrue(charter.isValidCei());
+        assertEquals(charter.getBackIndexes().size(), 2);
+        assertEquals(charter.getBackIndexes().get(1).getContent(), index2.getContent());
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back><cei:index indexName=\"Waffen\">Schwert</cei:index><cei:index indexName=\"Waffen\">Axt</cei:index></cei:back></cei:text>");
+
+        charter.setBackIndexes(new ArrayList<>(0));
+
+        assertTrue(charter.isValidCei());
+        assertEquals(charter.getBackIndexes().size(), 0);
+        
     }
 
     @Test

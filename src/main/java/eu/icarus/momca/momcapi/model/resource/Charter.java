@@ -42,6 +42,8 @@ public class Charter extends AtomResource {
     @NotNull
     private final List<XmlValidationProblem> validationProblems = new ArrayList<>(0);
     @NotNull
+    private List<Index> backIndexes = new ArrayList<>(0);
+    @NotNull
     private List<PersName> backPersNames = new ArrayList<>(0);
     @NotNull
     private List<PlaceName> backPlaceNames = new ArrayList<>(0);
@@ -108,6 +110,7 @@ public class Charter extends AtomResource {
         issuedPlace = readIssuedPlace(xml);
         backPlaceNames = readBackPlaceNames(xml);
         backPersNames = readBackPersNames(xml);
+        backIndexes = readBackIndexes(xml);
 
     }
 
@@ -198,6 +201,7 @@ public class Charter extends AtomResource {
 
         backPersNames.forEach(persName -> back.appendChild(persName.copy()));
         backPlaceNames.forEach(placeName -> back.appendChild(placeName.copy()));
+        backIndexes.forEach(index -> back.appendChild(index.copy()));
 
         return back;
 
@@ -247,6 +251,36 @@ public class Charter extends AtomResource {
         unusedFrontNodes.forEach(element -> front.appendChild(element.copy()));
 
         return front;
+
+    }
+
+    private Optional<Index> createIndexInstance(Element indexElement) {
+
+        Optional<Index> index = Optional.empty();
+
+        StringBuilder contentBuilder = new StringBuilder();
+        for (int i = 0; i < indexElement.getChildCount(); i++) {
+            contentBuilder.append(indexElement.getChild(i).toXML());
+        }
+        String contentString = contentBuilder.toString();
+
+        if (!contentString.isEmpty()) {
+
+            String indexName = indexElement.getAttributeValue("indexName");
+            String lemma = indexElement.getAttributeValue("lemma");
+            String sublemma = indexElement.getAttributeValue("sublemma");
+
+            index = Optional.of(
+                    new Index(
+                            contentString,
+                            indexName == null ? "" : indexName,
+                            lemma == null ? "" : lemma,
+                            sublemma == null ? "" : sublemma
+                    ));
+
+        }
+
+        return index;
 
     }
 
@@ -316,6 +350,11 @@ public class Charter extends AtomResource {
     }
 
     @NotNull
+    public List<Index> getBackIndexes() {
+        return backIndexes;
+    }
+
+    @NotNull
     public List<PersName> getBackPersNames() {
         return backPersNames;
     }
@@ -378,6 +417,22 @@ public class Charter extends AtomResource {
 
     public boolean isValidCei() {
         return validationProblems.isEmpty();
+    }
+
+    private List<Index> readBackIndexes(Element xml) {
+
+        List<Index> results = new ArrayList<>(0);
+
+        Nodes nodes = Util.queryXmlToNodes(xml, XpathQuery.QUERY_CEI_BACK_INDEX);
+
+        for (int i = 0; i < nodes.size(); i++) {
+
+            Element indexElement = (Element) nodes.get(i);
+            createIndexInstance(indexElement).ifPresent(results::add);
+
+        }
+
+        return results;
     }
 
     private List<PersName> readBackPersNames(Element xml) {
@@ -601,6 +656,11 @@ public class Charter extends AtomResource {
 
         updateXmlContent();
 
+    }
+
+    public void setBackIndexes(@NotNull List<Index> backIndexes) {
+        this.backIndexes = backIndexes;
+        updateXmlContent();
     }
 
     public void setBackPersNames(@NotNull List<PersName> backPersNames) {

@@ -17,7 +17,7 @@ public class Index extends AbstractMixedContentElement {
     @NotNull
     private Optional<String> sublemma = Optional.empty();
 
-    Index(@NotNull String content, @NotNull String indexName, @NotNull String lemma, @NotNull String sublemma) {
+    public Index(@NotNull String content, @NotNull String indexName, @NotNull String lemma, @NotNull String sublemma) {
 
         super(content, "index");
 
@@ -38,7 +38,7 @@ public class Index extends AbstractMixedContentElement {
 
     }
 
-    Index(@NotNull String content) {
+    public Index(@NotNull String content) {
         this(content, "", "", "");
     }
 
