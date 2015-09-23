@@ -13,10 +13,7 @@ import eu.icarus.momca.momcapi.model.xml.Namespace;
 import eu.icarus.momca.momcapi.model.xml.XmlValidationProblem;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomEntry;
 import eu.icarus.momca.momcapi.model.xml.cei.*;
-import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.Abstract;
-import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.Bibl;
-import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.PlaceName;
-import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.Tenor;
+import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.*;
 import eu.icarus.momca.momcapi.query.XpathQuery;
 import nu.xom.*;
 import org.jetbrains.annotations.NotNull;
@@ -44,6 +41,8 @@ public class Charter extends AtomResource {
     public static final String CEI_URI = Namespace.CEI.getUri();
     @NotNull
     private final List<XmlValidationProblem> validationProblems = new ArrayList<>(0);
+    @NotNull
+    private List<PersName> backPersNames = new ArrayList<>(0);
     @NotNull
     private List<PlaceName> backPlaceNames = new ArrayList<>(0);
     @NotNull
@@ -108,6 +107,7 @@ public class Charter extends AtomResource {
         charterClass = Util.queryXmlToOptional(xml, XpathQuery.QUERY_CEI_CLASS);
         issuedPlace = readIssuedPlace(xml);
         backPlaceNames = readBackPlaceNames(xml);
+        backPersNames = readBackPersNames(xml);
 
     }
 
@@ -196,6 +196,7 @@ public class Charter extends AtomResource {
 
         Element back = new Element("cei:back", CEI_URI);
 
+        backPersNames.forEach(persName -> back.appendChild(persName.copy()));
         backPlaceNames.forEach(placeName -> back.appendChild(placeName.copy()));
 
         return back;
@@ -249,6 +250,36 @@ public class Charter extends AtomResource {
 
     }
 
+    private Optional<PersName> createPersNameInstance(Element persNameElement) {
+
+        Optional<PersName> persName = Optional.empty();
+
+        StringBuilder contentBuilder = new StringBuilder();
+        for (int i = 0; i < persNameElement.getChildCount(); i++) {
+            contentBuilder.append(persNameElement.getChild(i).toXML());
+        }
+        String contentString = contentBuilder.toString();
+
+        if (!contentString.isEmpty()) {
+
+            String certainty = persNameElement.getAttributeValue("certainty");
+            String reg = persNameElement.getAttributeValue("reg");
+            String type = persNameElement.getAttributeValue("type");
+
+            persName = Optional.of(
+                    new PersName(
+                            contentString,
+                            certainty == null ? "" : certainty,
+                            reg == null ? "" : reg,
+                            type == null ? "" : type
+                    ));
+
+        }
+
+        return persName;
+
+    }
+
     private Optional<PlaceName> createPlaceNameInstance(Element placeNameElement) {
 
         Optional<PlaceName> place = Optional.empty();
@@ -282,6 +313,11 @@ public class Charter extends AtomResource {
     @NotNull
     public Optional<Abstract> getAbstract() {
         return charterAbstract;
+    }
+
+    @NotNull
+    public List<PersName> getBackPersNames() {
+        return backPersNames;
     }
 
     @NotNull
@@ -342,6 +378,23 @@ public class Charter extends AtomResource {
 
     public boolean isValidCei() {
         return validationProblems.isEmpty();
+    }
+
+    private List<PersName> readBackPersNames(Element xml) {
+
+        List<PersName> results = new ArrayList<>(0);
+
+        Nodes nodes = Util.queryXmlToNodes(xml, XpathQuery.QUERY_CEI_BACK_PERS_NAME);
+
+        for (int i = 0; i < nodes.size(); i++) {
+
+            Element persNameElement = (Element) nodes.get(i);
+            createPersNameInstance(persNameElement).ifPresent(results::add);
+
+        }
+
+        return results;
+
     }
 
     private List<PlaceName> readBackPlaceNames(Element xml) {
@@ -548,6 +601,11 @@ public class Charter extends AtomResource {
 
         updateXmlContent();
 
+    }
+
+    public void setBackPersNames(@NotNull List<PersName> backPersNames) {
+        this.backPersNames = backPersNames;
+        updateXmlContent();
     }
 
     public void setBackPlaceNames(@NotNull List<PlaceName> backPlaceNames) {

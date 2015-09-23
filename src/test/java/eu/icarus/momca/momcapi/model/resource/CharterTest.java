@@ -8,6 +8,7 @@ import eu.icarus.momca.momcapi.model.xml.cei.DateExact;
 import eu.icarus.momca.momcapi.model.xml.cei.Idno;
 import eu.icarus.momca.momcapi.model.xml.cei.SourceDesc;
 import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.Abstract;
+import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.PersName;
 import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.PlaceName;
 import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.Tenor;
 import nu.xom.Element;
@@ -173,7 +174,7 @@ public class CharterTest {
                 "                            <cei:bibl>Sickel, Kaiserurkunden, S. 70, 72-77.</cei:bibl>\n" +
                 "                            <cei:bibl>MGH Ergänzungen, Nr. O.I.094.</cei:bibl>\n" +
                 "                        </cei:listBiblErw>\n" +
-                "                    </cei:diplomaticAnalysis><cei:lang_MOM>Latein</cei:lang_MOM></cei:chDesc><cei:tenor>This is the <cei:hi>Winter</cei:hi> of our discontempt.</cei:tenor></cei:body><cei:back><cei:placeName>Frankfurt</cei:placeName><cei:placeName reg=\"Einsiedeln\">Kloster <cei:hi>Einsiedeln</cei:hi> in der Schweiz</cei:placeName></cei:back></cei:text>");
+                "                    </cei:diplomaticAnalysis><cei:lang_MOM>Latein</cei:lang_MOM></cei:chDesc><cei:tenor>This is the <cei:hi>Winter</cei:hi> of our discontempt.</cei:tenor></cei:body><cei:back><cei:persName reg=\"Karl der Große\" type=\"Kaiser\">Carolus <cei:hi>Magnus</cei:hi></cei:persName><cei:persName reg=\"Einhard\">Eginhardus</cei:persName><cei:placeName>Frankfurt</cei:placeName><cei:placeName reg=\"Einsiedeln\">Kloster <cei:hi>Einsiedeln</cei:hi> in der Schweiz</cei:placeName></cei:back></cei:text>");
 
     }
 
@@ -219,7 +220,35 @@ public class CharterTest {
 
         charter.setAbstract(new Abstract(""));
 
+        assertTrue(charter.isValidCei());
         assertFalse(charter.getAbstract().isPresent());
+
+    }
+
+    @Test
+    public void testSetBackPersNames() throws Exception {
+
+        PersName name1 = new PersName("Carolus <cei:hi>Magnus</cei:hi>", "", "Karl der Große", "Kaiser");
+        PersName name2 = new PersName("Einhard");
+        List<PersName> names = new ArrayList<>(0);
+        names.add(name1);
+        names.add(name2);
+
+        assertEquals(charter.getBackPersNames().size(), 0);
+
+        charter.setBackPersNames(names);
+
+        assertTrue(charter.isValidCei());
+        assertEquals(charter.getBackPersNames().size(), 2);
+        assertEquals(charter.getBackPersNames(), names);
+        assertEquals(charter.getBackPersNames().get(1).getContent(), "Einhard");
+
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back><cei:persName reg=\"Karl der Große\" type=\"Kaiser\">Carolus <cei:hi>Magnus</cei:hi></cei:persName><cei:persName>Einhard</cei:persName></cei:back></cei:text>");
+
+        charter.setBackPersNames(new ArrayList<>(0));
+
+        assertTrue(charter.isValidCei());
+        assertEquals(charter.getBackPersNames().size(), 0);
 
     }
 
@@ -386,5 +415,4 @@ public class CharterTest {
         assertFalse(charter.getTenor().isPresent());
 
     }
-
 }
