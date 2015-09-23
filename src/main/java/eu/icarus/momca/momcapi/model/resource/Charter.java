@@ -15,6 +15,7 @@ import eu.icarus.momca.momcapi.model.xml.atom.AtomEntry;
 import eu.icarus.momca.momcapi.model.xml.cei.*;
 import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.Abstract;
 import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.Bibl;
+import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.PlaceName;
 import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.Tenor;
 import eu.icarus.momca.momcapi.query.XpathQuery;
 import nu.xom.*;
@@ -55,6 +56,8 @@ public class Charter extends AtomResource {
     private Element diplomaticAnalysis = new Element("cei:diplomaticAnalysis", CEI_URI);
     @NotNull
     private Idno idno;
+    @NotNull
+    private Optional<PlaceName> issuedPlace = Optional.empty();
     @NotNull
     private Optional<String> langMom = Optional.empty();
     @NotNull
@@ -101,7 +104,7 @@ public class Charter extends AtomResource {
         charterAbstract = readMixedContentElement(xml, XpathQuery.QUERY_CEI_ABSTRACT).map(Abstract::new);
         langMom = Util.queryXmlToOptional(xml, XpathQuery.QUERY_CEI_LANG_MOM);
         charterClass = Util.queryXmlToOptional(xml, XpathQuery.QUERY_CEI_CLASS);
-
+        issuedPlace = readIssuedPlace(xml);
 
     }
 
@@ -205,6 +208,7 @@ public class Charter extends AtomResource {
 
         Element issued = new Element("cei:issued", CEI_URI);
         chDesc.appendChild(issued);
+        issuedPlace.ifPresent(issued::appendChild);
         issued.appendChild(date.toCeiDate());
 
         charterAbstract.ifPresent(chDesc::appendChild);
@@ -269,6 +273,11 @@ public class Charter extends AtomResource {
     @NotNull
     public Idno getIdno() {
         return idno;
+    }
+
+    @NotNull
+    public Optional<PlaceName> getIssuedPlace() {
+        return issuedPlace;
     }
 
     @NotNull
@@ -409,6 +418,44 @@ public class Charter extends AtomResource {
 
     }
 
+    private Optional<PlaceName> readIssuedPlace(Element xml) {
+
+        Nodes nodes = Util.queryXmlToNodes(xml, XpathQuery.QUERY_CEI_ISSUED_PLACE_NAME);
+
+        Optional<PlaceName> place = Optional.empty();
+
+        if (nodes.size() != 0) {
+
+            Element issuedElement = (Element) nodes.get(0);
+
+            StringBuilder contentBuilder = new StringBuilder();
+            for (int i = 0; i < issuedElement.getChildCount(); i++) {
+                contentBuilder.append(issuedElement.getChild(i).toXML());
+            }
+            String contentString = contentBuilder.toString();
+
+            if (!contentString.isEmpty()) {
+
+                String certainty = issuedElement.getAttributeValue("certainty");
+                String reg = issuedElement.getAttributeValue("reg");
+                String type = issuedElement.getAttributeValue("type");
+
+                place = Optional.of(
+                        new PlaceName(
+                                contentString,
+                                certainty == null ? "" : certainty,
+                                reg == null ? "" : reg,
+                                type == null ? "" : type
+                        ));
+
+            }
+
+        }
+
+        return place;
+
+    }
+
     private Optional<String> readMixedContentElement(Element xml, XpathQuery query) {
         String queryResult = Util.queryXmlToString(xml, query);
         return queryResult.isEmpty() ? Optional.empty() : Optional.of(queryResult);
@@ -513,6 +560,19 @@ public class Charter extends AtomResource {
     public void setIdno(@NotNull Idno idno) {
         this.idno = idno;
         updateXmlContent();
+    }
+
+    public void setIssuedPlace(@NotNull PlaceName issuedPlace) {
+
+        if (issuedPlace.getContent().isEmpty()) {
+            this.issuedPlace = Optional.empty();
+        } else {
+
+            this.issuedPlace = Optional.of(issuedPlace);
+        }
+
+        updateXmlContent();
+
     }
 
     public void setLangMom(@NotNull String langMom) {

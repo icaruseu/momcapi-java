@@ -17,7 +17,7 @@ public class PlaceName extends AbstractMixedContentElement {
     @NotNull
     private Optional<String> type = Optional.empty();
 
-    PlaceName(@NotNull String content, @NotNull String certainty, @NotNull String reg, @NotNull String type) {
+    public PlaceName(@NotNull String content, @NotNull String certainty, @NotNull String reg, @NotNull String type) {
 
         super(content, "placeName");
 
@@ -38,7 +38,7 @@ public class PlaceName extends AbstractMixedContentElement {
 
     }
 
-    PlaceName(@NotNull String content) {
+    public PlaceName(@NotNull String content) {
         this(content, "", "", "");
     }
 
@@ -55,6 +55,15 @@ public class PlaceName extends AbstractMixedContentElement {
     @NotNull
     public Optional<String> getType() {
         return type;
+    }
+
+    @Override
+    public String toString() {
+        return "PlaceName{" +
+                "certainty=" + certainty +
+                ", reg=" + reg +
+                ", type=" + type +
+                "} " + super.toString();
     }
 
 }

@@ -37,7 +37,7 @@
                     <cei:class>Urkunde</cei:class>
                     <cei:abstract>König Otto I. verleiht auf Bitte Herzog Hermanns dem Kloster Meinradszell (Einsiedeln), das samt einer Kirche vom jetzigen <cei:persName>Abt Eberhard</cei:persName> auf Boden, der dem Herzog von einigen Getreuen zu eigen gegeben worden war, mit dessen Unterstützung errichtet worden ist, das Recht freier Wahl des Abtes nach dem Tode Eberhards und Immunität.</cei:abstract>
                     <cei:issued>
-                        <cei:placeName>Frankfurt</cei:placeName>
+                        <cei:placeName type="City">Frankfurt <cei:hi>am Main</cei:hi></cei:placeName>
                         <cei:date value="9471027">0947-10-27</cei:date>
                     </cei:issued>
                     <cei:witnessOrig

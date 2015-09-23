@@ -8,6 +8,7 @@ import eu.icarus.momca.momcapi.model.xml.cei.DateExact;
 import eu.icarus.momca.momcapi.model.xml.cei.Idno;
 import eu.icarus.momca.momcapi.model.xml.cei.SourceDesc;
 import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.Abstract;
+import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.PlaceName;
 import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.Tenor;
 import nu.xom.Element;
 import nu.xom.ParsingException;
@@ -147,10 +148,13 @@ public class CharterTest {
         assertTrue(charter.getCharterClass().isPresent());
         assertEquals(charter.getCharterClass().get(), "Urkunde");
 
+        assertTrue(charter.getIssuedPlace().isPresent());
+        assertEquals(charter.getIssuedPlace().get().getContent(), new PlaceName("Frankfurt <cei:hi>am Main</cei:hi>", "", "", "City").getContent());
+
         charter.setAbstract(new Abstract("New Abstract"));
 
         assertTrue(charter.isValidCei());
-        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front><cei:sourceDesc><cei:sourceDescRegest><cei:bibl>QW I/1, Nr. 28</cei:bibl></cei:sourceDescRegest><cei:sourceDescVolltext><cei:bibl /></cei:sourceDescVolltext></cei:sourceDesc></cei:front><cei:body><cei:idno id=\"KAE_Urkunde_Nr_1\" old=\"1\">KAE, Urkunde Nr. 1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"9471027\">0947-10-27</cei:date></cei:issued><cei:abstract>New Abstract</cei:abstract><cei:class>Urkunde</cei:class><cei:diplomaticAnalysis>\n" +
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front><cei:sourceDesc><cei:sourceDescRegest><cei:bibl>QW I/1, Nr. 28</cei:bibl></cei:sourceDescRegest><cei:sourceDescVolltext><cei:bibl /></cei:sourceDescVolltext></cei:sourceDesc></cei:front><cei:body><cei:idno id=\"KAE_Urkunde_Nr_1\" old=\"1\">KAE, Urkunde Nr. 1</cei:idno><cei:chDesc><cei:issued><cei:placeName type=\"City\">Frankfurt <cei:hi>am Main</cei:hi></cei:placeName><cei:date value=\"9471027\">0947-10-27</cei:date></cei:issued><cei:abstract>New Abstract</cei:abstract><cei:class>Urkunde</cei:class><cei:diplomaticAnalysis>\n" +
                 "                        <cei:listBiblRegest>\n" +
                 "                            <cei:bibl>Morel, Nr. 1.</cei:bibl>\n" +
                 "                            <cei:bibl>Regesta imperii II/1, 1, Nr. 157.</cei:bibl>\n" +
@@ -290,6 +294,25 @@ public class CharterTest {
     }
 
     @Test
+    public void testSetIssuedPlace() throws Exception {
+
+        assertFalse(charter.getIssuedPlace().isPresent());
+
+        PlaceName placeName = new PlaceName("Iuvavum", "", "Salzburg", "City");
+        charter.setIssuedPlace(placeName);
+
+        assertTrue(charter.getIssuedPlace().isPresent());
+        assertTrue(charter.isValidCei());
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:placeName reg=\"Salzburg\" type=\"City\">Iuvavum</cei:placeName><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
+
+        charter.setIssuedPlace(new PlaceName(""));
+
+        assertFalse(charter.getIssuedPlace().isPresent());
+        assertTrue(charter.isValidCei());
+
+    }
+
+    @Test
     public void testSetLangMom() throws Exception {
 
         assertFalse(charter.getLangMom().isPresent());
@@ -346,5 +369,4 @@ public class CharterTest {
         assertFalse(charter.getTenor().isPresent());
 
     }
-
 }

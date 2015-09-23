@@ -93,4 +93,11 @@ public abstract class AbstractMixedContentElement extends Element {
 
     }
 
+    @Override
+    public String toString() {
+        return "AbstractMixedContentElement{" +
+                "content='" + content + '\'' +
+                "} " + super.toString();
+    }
+
 }

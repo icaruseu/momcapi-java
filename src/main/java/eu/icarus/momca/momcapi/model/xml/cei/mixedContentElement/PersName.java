@@ -17,7 +17,7 @@ public class PersName extends AbstractMixedContentElement {
     @NotNull
     private Optional<String> type = Optional.empty();
 
-    PersName(@NotNull String content, @NotNull String certainty, @NotNull String reg, @NotNull String type) {
+    public PersName(@NotNull String content, @NotNull String certainty, @NotNull String reg, @NotNull String type) {
 
         super(content, "persName");
 
@@ -38,7 +38,7 @@ public class PersName extends AbstractMixedContentElement {
 
     }
 
-    PersName(@NotNull String content) {
+    public PersName(@NotNull String content) {
         this(content, "", "", "");
     }
 
