@@ -12,6 +12,7 @@ import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.Tenor;
 import nu.xom.Element;
 import nu.xom.ParsingException;
 import org.jetbrains.annotations.NotNull;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -26,6 +27,8 @@ import static org.testng.Assert.*;
  */
 public class CharterTest {
 
+    private Charter charter;
+
     @NotNull
     private static ExistResource getExistResource(String fileName) throws ParsingException, IOException {
         Element element = (Element) TestUtils.getXmlFromResource(fileName).getRootElement().copy();
@@ -39,6 +42,17 @@ public class CharterTest {
         return new Charter(resource);
     }
 
+    @BeforeMethod
+    public void setUp() throws Exception {
+
+        IdCharter id = new IdCharter("collection", "charter1");
+        Date date = new Date(new DateExact("14180201", "February 1st, 1418"));
+        User user = new User("user", "moderator");
+
+        charter = new Charter(id, CharterStatus.PUBLIC, user, date);
+
+    }
+
     @Test
     public void testConstructor1() throws Exception {
 
@@ -46,7 +60,7 @@ public class CharterTest {
         Date date = new Date(new DateExact("14180201", "February 1st, 1418"));
         User user = new User("user", "moderator");
 
-        Charter charter = new Charter(id, CharterStatus.PUBLIC, user, date);
+        charter = new Charter(id, CharterStatus.PUBLIC, user, date);
 
         assertEquals(charter.getCharterStatus(), CharterStatus.PUBLIC);
         assertEquals(charter.getParentUri(), "/db/mom-data/metadata.charter.public/collection");
@@ -72,7 +86,7 @@ public class CharterTest {
         Date date = new Date();
         User user = new User("guest", "moderator");
 
-        Charter charter = createCharter("empty_charter.xml");
+        charter = createCharter("empty_charter.xml");
 
         assertEquals(charter.getCharterStatus(), CharterStatus.PUBLIC);
         assertEquals(charter.getParentUri(), "/db/mom-data/metadata.charter.public/collection");
@@ -104,7 +118,7 @@ public class CharterTest {
         biblRegest.add("QW I/1, Nr. 28");
         SourceDesc sourceDesc = new SourceDesc(biblRegest, new ArrayList<>(0));
 
-        Charter charter = createCharter("testcharter1.xml");
+        charter = createCharter("testcharter1.xml");
 
         assertEquals(charter.getCharterStatus(), CharterStatus.PUBLIC);
         assertEquals(charter.getParentUri(), "/db/mom-data/metadata.charter.public/collection");
@@ -130,10 +144,13 @@ public class CharterTest {
         assertTrue(charter.getLangMom().isPresent());
         assertEquals(charter.getLangMom().get(), "Latein");
 
+        assertTrue(charter.getCharterClass().isPresent());
+        assertEquals(charter.getCharterClass().get(), "Urkunde");
+
         charter.setAbstract(new Abstract("New Abstract"));
 
         assertTrue(charter.isValidCei());
-        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front><cei:sourceDesc><cei:sourceDescRegest><cei:bibl>QW I/1, Nr. 28</cei:bibl></cei:sourceDescRegest><cei:sourceDescVolltext><cei:bibl /></cei:sourceDescVolltext></cei:sourceDesc></cei:front><cei:body><cei:idno id=\"KAE_Urkunde_Nr_1\" old=\"1\">KAE, Urkunde Nr. 1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"9471027\">0947-10-27</cei:date></cei:issued><cei:abstract>New Abstract</cei:abstract><cei:diplomaticAnalysis>\n" +
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front><cei:sourceDesc><cei:sourceDescRegest><cei:bibl>QW I/1, Nr. 28</cei:bibl></cei:sourceDescRegest><cei:sourceDescVolltext><cei:bibl /></cei:sourceDescVolltext></cei:sourceDesc></cei:front><cei:body><cei:idno id=\"KAE_Urkunde_Nr_1\" old=\"1\">KAE, Urkunde Nr. 1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"9471027\">0947-10-27</cei:date></cei:issued><cei:abstract>New Abstract</cei:abstract><cei:class>Urkunde</cei:class><cei:diplomaticAnalysis>\n" +
                 "                        <cei:listBiblRegest>\n" +
                 "                            <cei:bibl>Morel, Nr. 1.</cei:bibl>\n" +
                 "                            <cei:bibl>Regesta imperii II/1, 1, Nr. 157.</cei:bibl>\n" +
@@ -157,13 +174,13 @@ public class CharterTest {
 
     @Test
     public void testGetId() throws Exception {
-        Charter charter = createCharter("empty_charter.xml");
+        charter = createCharter("empty_charter.xml");
         assertEquals(charter.getId(), new IdCharter("collection", "empty_charter"));
     }
 
     @Test
     public void testGetIdentifier() throws Exception {
-        Charter charter = createCharter("empty_charter.xml");
+        charter = createCharter("empty_charter.xml");
         assertEquals(charter.getIdentifier(), "empty_charter");
     }
 
@@ -172,7 +189,7 @@ public class CharterTest {
 
         String validationErrorMessage = "cvc-complex-type.2.4.a: Invalid content was found starting with element 'cei:idno'. One of '{\"http://www.monasterium.net/NS/cei\":persName, \"http://www.monasterium.net/NS/cei\":placeName, \"http://www.monasterium.net/NS/cei\":geogName, \"http://www.monasterium.net/NS/cei\":index, \"http://www.monasterium.net/NS/cei\":testis, \"http://www.monasterium.net/NS/cei\":date, \"http://www.monasterium.net/NS/cei\":dateRange, \"http://www.monasterium.net/NS/cei\":num, \"http://www.monasterium.net/NS/cei\":measure, \"http://www.monasterium.net/NS/cei\":quote, \"http://www.monasterium.net/NS/cei\":cit, \"http://www.monasterium.net/NS/cei\":foreign, \"http://www.monasterium.net/NS/cei\":anchor, \"http://www.monasterium.net/NS/cei\":ref, \"http://www.monasterium.net/NS/cei\":hi, \"http://www.monasterium.net/NS/cei\":lb, \"http://www.monasterium.net/NS/cei\":pb, \"http://www.monasterium.net/NS/cei\":sup, \"http://www.monasterium.net/NS/cei\":c, \"http://www.monasterium.net/NS/cei\":recipient, \"http://www.monasterium.net/NS/cei\":issuer}' is expected.";
 
-        Charter charter = createCharter("invalid_charter.xml");
+        charter = createCharter("invalid_charter.xml");
 
         assertEquals(charter.getValidationProblems().size(), 1);
         assertEquals(charter.getValidationProblems().get(0).getMessage(), validationErrorMessage);
@@ -187,12 +204,6 @@ public class CharterTest {
 
     @Test
     public void testSetAbstract() throws Exception {
-
-        IdCharter id = new IdCharter("collection", "charter1");
-        Date date = new Date(new DateExact("14180201", "February 1st, 1418"));
-        User user = new User("user", "moderator");
-
-        Charter charter = new Charter(id, CharterStatus.PUBLIC, user, date);
 
         assertFalse(charter.getAbstract().isPresent());
 
@@ -210,13 +221,13 @@ public class CharterTest {
     }
 
     @Test
+    public void testSetCharterClass() throws Exception {
+
+
+    }
+
+    @Test
     public void testSetCharterStatus() throws Exception {
-
-        IdCharter id = new IdCharter("collection", "charter1");
-        Date date = new Date(new DateExact("14180201", "February 1st, 1418"));
-        User user = new User("user", "moderator");
-
-        Charter charter = new Charter(id, CharterStatus.PUBLIC, user, date);
 
         charter.setCharterStatus(CharterStatus.IMPORTED);
         assertEquals(charter.getCharterStatus(), CharterStatus.IMPORTED);
@@ -241,12 +252,6 @@ public class CharterTest {
     @Test
     public void testSetDate() throws Exception {
 
-        IdCharter id = new IdCharter("collection", "charter1");
-        Date date = new Date(new DateExact("14180201", "February 1st, 1418"));
-        User user = new User("user", "moderator");
-
-        Charter charter = new Charter(id, CharterStatus.PUBLIC, user, date);
-
         Date newDate = new Date(LocalDate.of(1218, 6, 19), "19th June, 1218");
 
         charter.setDate(newDate);
@@ -260,7 +265,7 @@ public class CharterTest {
     @Test
     public void testSetIdentifier() throws Exception {
 
-        Charter charter = createCharter("empty_charter.xml");
+        charter = createCharter("empty_charter.xml");
         String new_identifier = "new_identifier";
         charter.setIdentifier(new_identifier);
 
@@ -273,13 +278,7 @@ public class CharterTest {
     @Test
     public void testSetIdno() throws Exception {
 
-        IdCharter id = new IdCharter("collection", "charter1");
-        Date date = new Date(new DateExact("14180201", "February 1st, 1418"));
-        User user = new User("user", "moderator");
-
-        Charter charter = new Charter(id, CharterStatus.PUBLIC, user, date);
-
-        assertEquals(charter.getIdno().getId(), id.getIdentifier());
+        assertEquals(charter.getIdno().getId(), "charter1");
 
         Idno newId = new Idno("newId", "New Idno Text");
         charter.setIdno(newId);
@@ -293,12 +292,6 @@ public class CharterTest {
     @Test
     public void testSetLangMom() throws Exception {
 
-        IdCharter id = new IdCharter("collection", "charter1");
-        Date date = new Date(new DateExact("14180201", "February 1st, 1418"));
-        User user = new User("user", "moderator");
-
-        Charter charter = new Charter(id, CharterStatus.PUBLIC, user, date);
-
         assertFalse(charter.getLangMom().isPresent());
 
         charter.setLangMom("Deutsch");
@@ -308,16 +301,14 @@ public class CharterTest {
         assertTrue(charter.isValidCei());
         assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /><cei:lang_MOM>Deutsch</cei:lang_MOM></cei:chDesc></cei:body><cei:back /></cei:text>");
 
+        charter.setLangMom("");
+        assertFalse(charter.getLangMom().isPresent());
+        assertTrue(charter.isValidCei());
+
     }
 
     @Test
     public void testSetSourceDesc() throws Exception {
-
-        IdCharter id = new IdCharter("collection", "charter1");
-        Date date = new Date(new DateExact("14180201", "February 1st, 1418"));
-        User user = new User("user", "moderator");
-
-        Charter charter = new Charter(id, CharterStatus.PUBLIC, user, date);
 
         assertFalse(charter.getSourceDesc().isPresent());
 
@@ -341,12 +332,6 @@ public class CharterTest {
     @Test
     public void testSetTenor() throws Exception {
 
-        IdCharter id = new IdCharter("collection", "charter1");
-        Date date = new Date(new DateExact("14180201", "February 1st, 1418"));
-        User user = new User("user", "moderator");
-
-        Charter charter = new Charter(id, CharterStatus.PUBLIC, user, date);
-
         assertFalse(charter.getTenor().isPresent());
 
         Tenor tenor = new Tenor("This is the winter of <cei:lb/> our <cei:hi>discontempt</cei:hi>!");
@@ -361,4 +346,5 @@ public class CharterTest {
         assertFalse(charter.getTenor().isPresent());
 
     }
+
 }

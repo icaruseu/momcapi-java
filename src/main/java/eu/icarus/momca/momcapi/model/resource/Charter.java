@@ -46,6 +46,8 @@ public class Charter extends AtomResource {
     @NotNull
     private Optional<Abstract> charterAbstract = Optional.empty();
     @NotNull
+    private Optional<String> charterClass = Optional.empty();
+    @NotNull
     private CharterStatus charterStatus;
     @NotNull
     private Date date;
@@ -98,6 +100,7 @@ public class Charter extends AtomResource {
         tenor = readMixedContentElement(xml, XpathQuery.QUERY_CEI_TENOR).map(Tenor::new);
         charterAbstract = readMixedContentElement(xml, XpathQuery.QUERY_CEI_ABSTRACT).map(Abstract::new);
         langMom = Util.queryXmlToOptional(xml, XpathQuery.QUERY_CEI_LANG_MOM);
+        charterClass = Util.queryXmlToOptional(xml, XpathQuery.QUERY_CEI_CLASS);
 
 
     }
@@ -206,6 +209,12 @@ public class Charter extends AtomResource {
 
         charterAbstract.ifPresent(chDesc::appendChild);
 
+        charterClass.ifPresent(s -> {
+            Element e = new Element("cei:class", CEI_URI);
+            e.appendChild(s);
+            chDesc.appendChild(e);
+        });
+
         chDesc.appendChild(diplomaticAnalysis.copy());
 
         langMom.ifPresent(s -> {
@@ -234,6 +243,11 @@ public class Charter extends AtomResource {
     @NotNull
     public Optional<Abstract> getAbstract() {
         return charterAbstract;
+    }
+
+    @NotNull
+    public Optional<String> getCharterClass() {
+        return charterClass;
     }
 
     @NotNull
@@ -445,6 +459,18 @@ public class Charter extends AtomResource {
             this.charterAbstract = Optional.empty();
         } else {
             this.charterAbstract = Optional.of(charterAbstract);
+        }
+
+        updateXmlContent();
+
+    }
+
+    public void setCharterClass(@NotNull String charterClass) {
+
+        if (charterClass.isEmpty()) {
+            this.charterClass = Optional.empty();
+        } else {
+            this.charterClass = Optional.of(charterClass);
         }
 
         updateXmlContent();
