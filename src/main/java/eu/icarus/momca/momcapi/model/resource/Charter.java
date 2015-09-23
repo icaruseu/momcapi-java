@@ -84,12 +84,13 @@ public class Charter extends AtomResource {
 
         creator = readCreatorFromXml(xml);
         charterStatus = readCharterStatus();
-        idno = readIdnoFromXml(xml);
-        date = readDateFromXml(xml);
-        sourceDesc = readSourceDescFromXml(xml);
-        tenor = readTenorFromXml(xml);
-        unusedFrontNodes = readUnusedFrontElementsFromXml(xml);
-        charterAbstract = readCharterAbstractFromXml(xml);
+        idno = readIdno(xml);
+        date = readDate(xml);
+
+        sourceDesc = readSourceDesc(xml);
+        unusedFrontNodes = readUnusedFrontElements(xml);
+        tenor = readMixedContentElement(xml, XpathQuery.QUERY_CEI_TENOR).map(Tenor::new);
+        charterAbstract = readMixedContentElement(xml, XpathQuery.QUERY_CEI_ABSTRACT).map(Abstract::new);
 
     }
 
@@ -280,12 +281,6 @@ public class Charter extends AtomResource {
 
     }
 
-    private Optional<Abstract> readCharterAbstractFromXml(Element xml) {
-        String abstractString = Util.queryXmlToString(xml, XpathQuery.QUERY_CEI_ABSTRACT);
-        Abstract charterAbstract = new Abstract(abstractString);
-        return charterAbstract.getValue().isEmpty() ? Optional.empty() : Optional.of(charterAbstract);
-    }
-
     private CharterStatus readCharterStatus() {
 
         CharterStatus status;
@@ -304,7 +299,7 @@ public class Charter extends AtomResource {
 
     }
 
-    private Date readDateFromXml(Element xml) {
+    private Date readDate(Element xml) {
 
         DateAbstract dateCei;
 
@@ -350,7 +345,7 @@ public class Charter extends AtomResource {
 
     }
 
-    private Idno readIdnoFromXml(Element xml) {
+    private Idno readIdno(Element xml) {
 
         String idnoId = Util.queryXmlToString(xml, XpathQuery.QUERY_CEI_BODY_IDNO_ID);
         String idnoText = Util.queryXmlToString(xml, XpathQuery.QUERY_CEI_BODY_IDNO_TEXT);
@@ -373,7 +368,12 @@ public class Charter extends AtomResource {
 
     }
 
-    private Optional<SourceDesc> readSourceDescFromXml(Element xml) {
+    private Optional<String> readMixedContentElement(Element xml, XpathQuery query) {
+        String queryResult = Util.queryXmlToString(xml, query);
+        return queryResult.isEmpty() ? Optional.empty() : Optional.of(queryResult);
+    }
+
+    private Optional<SourceDesc> readSourceDesc(Element xml) {
 
         Optional<SourceDesc> result = Optional.empty();
 
@@ -396,13 +396,7 @@ public class Charter extends AtomResource {
 
     }
 
-    private Optional<Tenor> readTenorFromXml(Element xml) {
-        String tenorString = Util.queryXmlToString(xml, XpathQuery.QUERY_CEI_TENOR);
-        Tenor tenor = new Tenor(tenorString);
-        return tenor.getValue().isEmpty() ? Optional.empty() : Optional.of(tenor);
-    }
-
-    private List<Node> readUnusedFrontElementsFromXml(Element xml) {
+    private List<Node> readUnusedFrontElements(Element xml) {
 
         List<Node> results = new ArrayList<>(0);
 

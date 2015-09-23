@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by djell on 12/09/2015.
  */
-abstract class AbstractMixedContentElement extends Element {
+public abstract class AbstractMixedContentElement extends Element {
 
     @NotNull
     private String content = "";
