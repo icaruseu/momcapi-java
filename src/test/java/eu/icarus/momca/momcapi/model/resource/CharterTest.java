@@ -170,6 +170,7 @@ public class CharterTest {
 
         assertTrue(charter.getAbstract().isPresent());
         assertEquals(charter.getAbstract().get().getContent(), "An abstract with an <cei:issuer>issuer</cei:issuer>");
+        assertTrue(charter.isValidCei());
 
         charter.setAbstract(new Abstract(""));
 
