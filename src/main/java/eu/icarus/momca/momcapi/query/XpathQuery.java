@@ -31,6 +31,7 @@ public enum XpathQuery {
     QUERY_CEI_IMAGE_SERVER_ADDRESS("//cei:image_server_address/text()", Namespace.CEI),
     QUERY_CEI_IMAGE_SERVER_FOLDER("//cei:image_server_folder/text()", Namespace.CEI),
     QUERY_CEI_ISSUED("//cei:issued", Namespace.CEI),
+    QUERY_CEI_LANG_MOM("//cei:lang_MOM/text()", Namespace.CEI),
     QUERY_CEI_PROVENANCE_TEXT("//cei:provenance/text()", Namespace.CEI),
     QUERY_CEI_PROVENANCE_ABBR("//cei:provenance/@abbr", Namespace.CEI),
     QUERY_CEI_REGION_TEXT("//cei:region/text()", Namespace.CEI),

@@ -92,6 +92,7 @@
                             <cei:bibl>MGH Ergänzungen, Nr. O.I.094.</cei:bibl>
                         </cei:listBiblErw>
                     </cei:diplomaticAnalysis>
+                    <cei:lang_MOM>Latein</cei:lang_MOM>
                 </cei:chDesc>
                 <cei:tenor>This is the <cei:hi>Winter</cei:hi> of our discontempt.</cei:tenor>
             </cei:body>

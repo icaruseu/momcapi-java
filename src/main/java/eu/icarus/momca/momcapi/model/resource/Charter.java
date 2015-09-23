@@ -54,6 +54,8 @@ public class Charter extends AtomResource {
     @NotNull
     private Idno idno;
     @NotNull
+    private Optional<String> langMom = Optional.empty();
+    @NotNull
     private Optional<SourceDesc> sourceDesc = Optional.empty();
     @NotNull
     private Optional<Tenor> tenor = Optional.empty();
@@ -89,12 +91,14 @@ public class Charter extends AtomResource {
         idno = readIdno(xml);
         date = readDate(xml);
 
-        sourceDesc = readSourceDesc(xml);
         unusedFrontNodes = readUnusedFrontElements(xml);
+        diplomaticAnalysis = readDiplomaticAnalysis(xml);
+
+        sourceDesc = readSourceDesc(xml);
         tenor = readMixedContentElement(xml, XpathQuery.QUERY_CEI_TENOR).map(Tenor::new);
         charterAbstract = readMixedContentElement(xml, XpathQuery.QUERY_CEI_ABSTRACT).map(Abstract::new);
+        langMom = Util.queryXmlToOptional(xml, XpathQuery.QUERY_CEI_LANG_MOM);
 
-        diplomaticAnalysis = readDiplomaticAnalysis(xml);
 
     }
 
@@ -179,6 +183,54 @@ public class Charter extends AtomResource {
 
     }
 
+    private Element createBackXml() {
+
+        Element back = new Element("cei:back", CEI_URI);
+
+        return back;
+
+    }
+
+    private Element createBodyXml() {
+
+        Element body = new Element("cei:body", CEI_URI);
+
+        body.appendChild(idno.copy());
+
+        Element chDesc = new Element("cei:chDesc", CEI_URI);
+        body.appendChild(chDesc);
+
+        Element issued = new Element("cei:issued", CEI_URI);
+        chDesc.appendChild(issued);
+        issued.appendChild(date.toCeiDate());
+
+        charterAbstract.ifPresent(chDesc::appendChild);
+
+        chDesc.appendChild(diplomaticAnalysis.copy());
+
+        langMom.ifPresent(s -> {
+            Element e = new Element("cei:lang_MOM", CEI_URI);
+            e.appendChild(s);
+            chDesc.appendChild(e);
+        });
+
+        tenor.ifPresent(body::appendChild);
+
+        return body;
+
+    }
+
+    private Element createFrontXml() {
+
+        Element front = new Element("cei:front", CEI_URI);
+
+        sourceDesc.ifPresent(front::appendChild);
+        unusedFrontNodes.forEach(element -> front.appendChild(element.copy()));
+
+        return front;
+
+    }
+
     @NotNull
     public Optional<Abstract> getAbstract() {
         return charterAbstract;
@@ -206,6 +258,11 @@ public class Charter extends AtomResource {
     }
 
     @NotNull
+    public Optional<String> getLangMom() {
+        return langMom;
+    }
+
+    @NotNull
     public Optional<SourceDesc> getSourceDesc() {
         return sourceDesc;
     }
@@ -218,48 +275,6 @@ public class Charter extends AtomResource {
     @NotNull
     public List<XmlValidationProblem> getValidationProblems() {
         return validationProblems;
-    }
-
-    private Element initBackXml() {
-
-        Element back = new Element("cei:back", CEI_URI);
-
-        return back;
-
-    }
-
-    private Element initBodyXml() {
-
-        Element body = new Element("cei:body", CEI_URI);
-
-        body.appendChild(idno.copy());
-
-        Element chDesc = new Element("cei:chDesc", CEI_URI);
-        body.appendChild(chDesc);
-
-        Element issued = new Element("cei:issued", CEI_URI);
-        chDesc.appendChild(issued);
-        issued.appendChild(date.toCeiDate());
-
-        charterAbstract.ifPresent(chDesc::appendChild);
-
-        chDesc.appendChild(diplomaticAnalysis.copy());
-
-        tenor.ifPresent(body::appendChild);
-
-        return body;
-
-    }
-
-    private Element initFrontXml() {
-
-        Element front = new Element("cei:front", CEI_URI);
-
-        sourceDesc.ifPresent(front::appendChild);
-        unusedFrontNodes.forEach(element -> front.appendChild(element.copy()));
-
-        return front;
-
     }
 
     public boolean isValidCei() {
@@ -474,6 +489,18 @@ public class Charter extends AtomResource {
         updateXmlContent();
     }
 
+    public void setLangMom(@NotNull String langMom) {
+
+        if (langMom.isEmpty()) {
+            this.langMom = Optional.empty();
+        } else {
+            this.langMom = Optional.of(langMom);
+        }
+
+        updateXmlContent();
+
+    }
+
     public void setSourceDesc(@NotNull SourceDesc sourceDesc) {
 
         List<Bibl> abstractBibl = sourceDesc.getBibliographyAbstract().getEntries();
@@ -519,9 +546,9 @@ public class Charter extends AtomResource {
         Element cei = new Element("cei:text", CEI_URI);
         cei.addAttribute(new Attribute("type", "charter"));
 
-        Element front = initFrontXml();
-        Element body = initBodyXml();
-        Element back = initBackXml();
+        Element front = createFrontXml();
+        Element body = createBodyXml();
+        Element back = createBackXml();
 
         cei.appendChild(front);
         cei.appendChild(body);

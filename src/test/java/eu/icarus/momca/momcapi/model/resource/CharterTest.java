@@ -127,6 +127,9 @@ public class CharterTest {
         assertTrue(charter.getAbstract().isPresent());
         assertEquals(charter.getAbstract().get().getContent(), "König Otto I. verleiht auf Bitte Herzog Hermanns dem Kloster Meinradszell (Einsiedeln), das samt einer Kirche vom jetzigen <cei:persName>Abt Eberhard</cei:persName> auf Boden, der dem Herzog von einigen Getreuen zu eigen gegeben worden war, mit dessen Unterstützung errichtet worden ist, das Recht freier Wahl des Abtes nach dem Tode Eberhards und Immunität.");
 
+        assertTrue(charter.getLangMom().isPresent());
+        assertEquals(charter.getLangMom().get(), "Latein");
+
         charter.setAbstract(new Abstract("New Abstract"));
 
         assertTrue(charter.isValidCei());
@@ -148,7 +151,7 @@ public class CharterTest {
                 "                            <cei:bibl>Sickel, Kaiserurkunden, S. 70, 72-77.</cei:bibl>\n" +
                 "                            <cei:bibl>MGH Ergänzungen, Nr. O.I.094.</cei:bibl>\n" +
                 "                        </cei:listBiblErw>\n" +
-                "                    </cei:diplomaticAnalysis></cei:chDesc><cei:tenor>This is the <cei:hi>Winter</cei:hi> of our discontempt.</cei:tenor></cei:body><cei:back /></cei:text>");
+                "                    </cei:diplomaticAnalysis><cei:lang_MOM>Latein</cei:lang_MOM></cei:chDesc><cei:tenor>This is the <cei:hi>Winter</cei:hi> of our discontempt.</cei:tenor></cei:body><cei:back /></cei:text>");
 
     }
 
@@ -288,6 +291,26 @@ public class CharterTest {
     }
 
     @Test
+    public void testSetLangMom() throws Exception {
+
+        IdCharter id = new IdCharter("collection", "charter1");
+        Date date = new Date(new DateExact("14180201", "February 1st, 1418"));
+        User user = new User("user", "moderator");
+
+        Charter charter = new Charter(id, CharterStatus.PUBLIC, user, date);
+
+        assertFalse(charter.getLangMom().isPresent());
+
+        charter.setLangMom("Deutsch");
+
+        assertTrue(charter.getLangMom().isPresent());
+        assertEquals(charter.getLangMom().get(), "Deutsch");
+        assertTrue(charter.isValidCei());
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /><cei:lang_MOM>Deutsch</cei:lang_MOM></cei:chDesc></cei:body><cei:back /></cei:text>");
+
+    }
+
+    @Test
     public void testSetSourceDesc() throws Exception {
 
         IdCharter id = new IdCharter("collection", "charter1");
@@ -338,5 +361,4 @@ public class CharterTest {
         assertFalse(charter.getTenor().isPresent());
 
     }
-
 }
