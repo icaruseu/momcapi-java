@@ -50,6 +50,8 @@ public class Charter extends AtomResource {
     @NotNull
     private Date date;
     @NotNull
+    private Element diplomaticAnalysis = new Element("cei:diplomaticAnalysis", CEI_URI);
+    @NotNull
     private Idno idno;
     @NotNull
     private Optional<SourceDesc> sourceDesc = Optional.empty();
@@ -91,6 +93,8 @@ public class Charter extends AtomResource {
         unusedFrontNodes = readUnusedFrontElements(xml);
         tenor = readMixedContentElement(xml, XpathQuery.QUERY_CEI_TENOR).map(Tenor::new);
         charterAbstract = readMixedContentElement(xml, XpathQuery.QUERY_CEI_ABSTRACT).map(Abstract::new);
+
+        diplomaticAnalysis = readDiplomaticAnalysis(xml);
 
     }
 
@@ -238,6 +242,9 @@ public class Charter extends AtomResource {
         issued.appendChild(date.toCeiDate());
 
         charterAbstract.ifPresent(chDesc::appendChild);
+
+        chDesc.appendChild(diplomaticAnalysis.copy());
+
         tenor.ifPresent(body::appendChild);
 
         return body;
@@ -343,6 +350,11 @@ public class Charter extends AtomResource {
 
         return new Date(dateCei);
 
+    }
+
+    private Element readDiplomaticAnalysis(Element xml) {
+        Nodes queryResult = Util.queryXmlToNodes(xml, XpathQuery.QUERY_CEI_DIPLOMATIC_ANALYSIS);
+        return queryResult.size() == 0 ? new Element("cei:diplomaticAnalysis", CEI_URI) : (Element) queryResult.get(0);
     }
 
     private Idno readIdno(Element xml) {

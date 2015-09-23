@@ -24,6 +24,7 @@ public enum XpathQuery {
     QUERY_CEI_BODY_IDNO_OLD("//cei:body/cei:idno/@old", Namespace.CEI),
     QUERY_CEI_COUNTRY_TEXT("//cei:country/text()", Namespace.CEI),
     QUERY_CEI_COUNTRY_ID("//cei:country/@id", Namespace.CEI),
+    QUERY_CEI_DIPLOMATIC_ANALYSIS("//cei:diplomaticAnalysis", Namespace.CEI),
     QUERY_CEI_FRONT("//cei:country/@id", Namespace.CEI),
     QUERY_CEI_ISSUED_DATE("//cei:issued/cei:date", Namespace.CEI),
     QUERY_CEI_ISSUED_DATE_RANGE("//cei:issued/cei:dateRange", Namespace.CEI),
