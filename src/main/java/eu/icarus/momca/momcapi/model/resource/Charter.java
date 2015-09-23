@@ -45,6 +45,8 @@ public class Charter extends AtomResource {
     @NotNull
     private final List<XmlValidationProblem> validationProblems = new ArrayList<>(0);
     @NotNull
+    private List<PlaceName> backPlaceNames = new ArrayList<>(0);
+    @NotNull
     private Optional<Abstract> charterAbstract = Optional.empty();
     @NotNull
     private Optional<String> charterClass = Optional.empty();
@@ -105,6 +107,7 @@ public class Charter extends AtomResource {
         langMom = Util.queryXmlToOptional(xml, XpathQuery.QUERY_CEI_LANG_MOM);
         charterClass = Util.queryXmlToOptional(xml, XpathQuery.QUERY_CEI_CLASS);
         issuedPlace = readIssuedPlace(xml);
+        backPlaceNames = readBackPlaceNames(xml);
 
     }
 
@@ -193,6 +196,8 @@ public class Charter extends AtomResource {
 
         Element back = new Element("cei:back", CEI_URI);
 
+        backPlaceNames.forEach(placeName -> back.appendChild(placeName.copy()));
+
         return back;
 
     }
@@ -208,10 +213,10 @@ public class Charter extends AtomResource {
 
         Element issued = new Element("cei:issued", CEI_URI);
         chDesc.appendChild(issued);
-        issuedPlace.ifPresent(issued::appendChild);
+        issuedPlace.ifPresent(p -> issued.appendChild(p.copy()));
         issued.appendChild(date.toCeiDate());
 
-        charterAbstract.ifPresent(chDesc::appendChild);
+        charterAbstract.ifPresent(a -> chDesc.appendChild(a.copy()));
 
         charterClass.ifPresent(s -> {
             Element e = new Element("cei:class", CEI_URI);
@@ -227,7 +232,7 @@ public class Charter extends AtomResource {
             chDesc.appendChild(e);
         });
 
-        tenor.ifPresent(body::appendChild);
+        tenor.ifPresent(t -> body.appendChild(t.copy()));
 
         return body;
 
@@ -244,9 +249,44 @@ public class Charter extends AtomResource {
 
     }
 
+    private Optional<PlaceName> createPlaceNameInstance(Element placeNameElement) {
+
+        Optional<PlaceName> place = Optional.empty();
+
+        StringBuilder contentBuilder = new StringBuilder();
+        for (int i = 0; i < placeNameElement.getChildCount(); i++) {
+            contentBuilder.append(placeNameElement.getChild(i).toXML());
+        }
+        String contentString = contentBuilder.toString();
+
+        if (!contentString.isEmpty()) {
+
+            String certainty = placeNameElement.getAttributeValue("certainty");
+            String reg = placeNameElement.getAttributeValue("reg");
+            String type = placeNameElement.getAttributeValue("type");
+
+            place = Optional.of(
+                    new PlaceName(
+                            contentString,
+                            certainty == null ? "" : certainty,
+                            reg == null ? "" : reg,
+                            type == null ? "" : type
+                    ));
+
+        }
+
+        return place;
+
+    }
+
     @NotNull
     public Optional<Abstract> getAbstract() {
         return charterAbstract;
+    }
+
+    @NotNull
+    public List<PlaceName> getBackPlaceNames() {
+        return backPlaceNames;
     }
 
     @NotNull
@@ -302,6 +342,24 @@ public class Charter extends AtomResource {
 
     public boolean isValidCei() {
         return validationProblems.isEmpty();
+    }
+
+    private List<PlaceName> readBackPlaceNames(Element xml) {
+
+        List<PlaceName> results = new ArrayList<>(0);
+
+        Nodes nodes = Util.queryXmlToNodes(xml, XpathQuery.QUERY_CEI_BACK_PLACE_NAME);
+
+        for (int i = 0; i < nodes.size(); i++) {
+
+            Element placeNameElement = (Element) nodes.get(i);
+            createPlaceNameInstance(placeNameElement).ifPresent(results::add);
+
+        }
+
+
+        return results;
+
     }
 
     @NotNull
@@ -428,27 +486,7 @@ public class Charter extends AtomResource {
 
             Element issuedElement = (Element) nodes.get(0);
 
-            StringBuilder contentBuilder = new StringBuilder();
-            for (int i = 0; i < issuedElement.getChildCount(); i++) {
-                contentBuilder.append(issuedElement.getChild(i).toXML());
-            }
-            String contentString = contentBuilder.toString();
-
-            if (!contentString.isEmpty()) {
-
-                String certainty = issuedElement.getAttributeValue("certainty");
-                String reg = issuedElement.getAttributeValue("reg");
-                String type = issuedElement.getAttributeValue("type");
-
-                place = Optional.of(
-                        new PlaceName(
-                                contentString,
-                                certainty == null ? "" : certainty,
-                                reg == null ? "" : reg,
-                                type == null ? "" : type
-                        ));
-
-            }
+            place = createPlaceNameInstance(issuedElement);
 
         }
 
@@ -510,6 +548,11 @@ public class Charter extends AtomResource {
 
         updateXmlContent();
 
+    }
+
+    public void setBackPlaceNames(@NotNull List<PlaceName> backPlaceNames) {
+        this.backPlaceNames = backPlaceNames;
+        updateXmlContent();
     }
 
     public void setCharterClass(@NotNull String charterClass) {

@@ -75,9 +75,7 @@ public class CharterTest {
         assertEquals(charter.getDate(), date);
 
         assertTrue(charter.isValidCei());
-
-        String correctXml = "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>";
-        assertEquals(charter.toCei().toXML(), correctXml);
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
 
     }
 
@@ -151,6 +149,9 @@ public class CharterTest {
         assertTrue(charter.getIssuedPlace().isPresent());
         assertEquals(charter.getIssuedPlace().get().getContent(), new PlaceName("Frankfurt <cei:hi>am Main</cei:hi>", "", "", "City").getContent());
 
+        assertEquals(charter.getBackPlaceNames().size(), 2);
+        assertEquals(charter.getBackPlaceNames().get(1).getContent(), "Kloster <cei:hi>Einsiedeln</cei:hi> in der Schweiz");
+
         charter.setAbstract(new Abstract("New Abstract"));
 
         assertTrue(charter.isValidCei());
@@ -172,7 +173,7 @@ public class CharterTest {
                 "                            <cei:bibl>Sickel, Kaiserurkunden, S. 70, 72-77.</cei:bibl>\n" +
                 "                            <cei:bibl>MGH Ergänzungen, Nr. O.I.094.</cei:bibl>\n" +
                 "                        </cei:listBiblErw>\n" +
-                "                    </cei:diplomaticAnalysis><cei:lang_MOM>Latein</cei:lang_MOM></cei:chDesc><cei:tenor>This is the <cei:hi>Winter</cei:hi> of our discontempt.</cei:tenor></cei:body><cei:back /></cei:text>");
+                "                    </cei:diplomaticAnalysis><cei:lang_MOM>Latein</cei:lang_MOM></cei:chDesc><cei:tenor>This is the <cei:hi>Winter</cei:hi> of our discontempt.</cei:tenor></cei:body><cei:back><cei:placeName>Frankfurt</cei:placeName><cei:placeName reg=\"Einsiedeln\">Kloster <cei:hi>Einsiedeln</cei:hi> in der Schweiz</cei:placeName></cei:back></cei:text>");
 
     }
 
@@ -191,12 +192,10 @@ public class CharterTest {
     @Test
     public void testGetValidationProblems() throws Exception {
 
-        String validationErrorMessage = "cvc-complex-type.2.4.a: Invalid content was found starting with element 'cei:idno'. One of '{\"http://www.monasterium.net/NS/cei\":persName, \"http://www.monasterium.net/NS/cei\":placeName, \"http://www.monasterium.net/NS/cei\":geogName, \"http://www.monasterium.net/NS/cei\":index, \"http://www.monasterium.net/NS/cei\":testis, \"http://www.monasterium.net/NS/cei\":date, \"http://www.monasterium.net/NS/cei\":dateRange, \"http://www.monasterium.net/NS/cei\":num, \"http://www.monasterium.net/NS/cei\":measure, \"http://www.monasterium.net/NS/cei\":quote, \"http://www.monasterium.net/NS/cei\":cit, \"http://www.monasterium.net/NS/cei\":foreign, \"http://www.monasterium.net/NS/cei\":anchor, \"http://www.monasterium.net/NS/cei\":ref, \"http://www.monasterium.net/NS/cei\":hi, \"http://www.monasterium.net/NS/cei\":lb, \"http://www.monasterium.net/NS/cei\":pb, \"http://www.monasterium.net/NS/cei\":sup, \"http://www.monasterium.net/NS/cei\":c, \"http://www.monasterium.net/NS/cei\":recipient, \"http://www.monasterium.net/NS/cei\":issuer}' is expected.";
-
         charter = createCharter("invalid_charter.xml");
 
         assertEquals(charter.getValidationProblems().size(), 1);
-        assertEquals(charter.getValidationProblems().get(0).getMessage(), validationErrorMessage);
+        assertEquals(charter.getValidationProblems().get(0).getMessage(), "cvc-complex-type.2.4.a: Invalid content was found starting with element 'cei:idno'. One of '{\"http://www.monasterium.net/NS/cei\":persName, \"http://www.monasterium.net/NS/cei\":placeName, \"http://www.monasterium.net/NS/cei\":geogName, \"http://www.monasterium.net/NS/cei\":index, \"http://www.monasterium.net/NS/cei\":testis, \"http://www.monasterium.net/NS/cei\":date, \"http://www.monasterium.net/NS/cei\":dateRange, \"http://www.monasterium.net/NS/cei\":num, \"http://www.monasterium.net/NS/cei\":measure, \"http://www.monasterium.net/NS/cei\":quote, \"http://www.monasterium.net/NS/cei\":cit, \"http://www.monasterium.net/NS/cei\":foreign, \"http://www.monasterium.net/NS/cei\":anchor, \"http://www.monasterium.net/NS/cei\":ref, \"http://www.monasterium.net/NS/cei\":hi, \"http://www.monasterium.net/NS/cei\":lb, \"http://www.monasterium.net/NS/cei\":pb, \"http://www.monasterium.net/NS/cei\":sup, \"http://www.monasterium.net/NS/cei\":c, \"http://www.monasterium.net/NS/cei\":recipient, \"http://www.monasterium.net/NS/cei\":issuer}' is expected.");
 
     }
 
@@ -221,6 +220,24 @@ public class CharterTest {
         charter.setAbstract(new Abstract(""));
 
         assertFalse(charter.getAbstract().isPresent());
+
+    }
+
+    @Test
+    public void testSetBackPlaceNames() throws Exception {
+
+        PlaceName place1 = new PlaceName("Frankfurt");
+        PlaceName place2 = new PlaceName("Iuvavum", "", "Salzburg", "City");
+
+        List<PlaceName> placeNames = new ArrayList<>(0);
+        placeNames.add(place1);
+        placeNames.add(place2);
+
+        charter.setBackPlaceNames(placeNames);
+
+        assertTrue(charter.isValidCei());
+        assertEquals(charter.getBackPlaceNames(), placeNames);
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back><cei:placeName>Frankfurt</cei:placeName><cei:placeName reg=\"Salzburg\" type=\"City\">Iuvavum</cei:placeName></cei:back></cei:text>");
 
     }
 
@@ -369,4 +386,5 @@ public class CharterTest {
         assertFalse(charter.getTenor().isPresent());
 
     }
+
 }
