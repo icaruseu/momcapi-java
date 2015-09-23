@@ -165,11 +165,11 @@ public class CharterTest {
 
         assertFalse(charter.getAbstract().isPresent());
 
-        Abstract charterAbstract = new Abstract("An <cei:hi>Abstract</cei:hi>");
+        Abstract charterAbstract = new Abstract("An abstract with an <cei:issuer>issuer</cei:issuer>");
         charter.setAbstract(charterAbstract);
 
         assertTrue(charter.getAbstract().isPresent());
-        assertEquals(charter.getAbstract().get().getContent(), "An <cei:hi>Abstract</cei:hi>");
+        assertEquals(charter.getAbstract().get().getContent(), "An abstract with an <cei:issuer>issuer</cei:issuer>");
 
         charter.setAbstract(new Abstract(""));
 
