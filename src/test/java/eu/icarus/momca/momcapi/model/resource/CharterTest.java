@@ -152,6 +152,14 @@ public class CharterTest {
 
         assertEquals(charter.getBackIndexes().size(), 1);
         assertEquals(charter.getBackIndexes().get(0).getContent(), "Schwert");
+        assertEquals(charter.getBackIndexes().get(0).getType().get(), "type");
+        assertEquals(charter.getBackIndexes().get(0).getId().get(), "id");
+        assertEquals(charter.getBackIndexes().get(0).getN().get(), "n");
+        assertEquals(charter.getBackIndexes().get(0).getLemma().get(), "lemma");
+        assertEquals(charter.getBackIndexes().get(0).getSublemma().get(), "sublemma");
+        assertEquals(charter.getBackIndexes().get(0).getLang().get(), "lang");
+        assertEquals(charter.getBackIndexes().get(0).getIndexName().get(), "indexName");
+        assertEquals(charter.getBackIndexes().get(0).getFacs().get(), "facs");
 
         assertEquals(charter.getBackDivNotes().size(), 1);
         assertEquals(charter.getBackDivNotes().get(0).getPlace().get(), "§1");
@@ -229,7 +237,7 @@ public class CharterTest {
         assertTrue(charter.isValidCei());
         assertEquals(charter.getBackDivNotes().size(), 2);
         assertEquals(charter.getBackDivNotes().get(1).toXML(), note2.toXML());
-        assertEquals(charter.toCei().toXML(), "");
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back><cei:divNotes><cei:note place=\"Somewhere\" id=\"id\" n=\"n\">Note1</cei:note><cei:note place=\"Over\">Note2</cei:note></cei:divNotes></cei:back></cei:text>");
 
         charter.setBackDivNotes(new ArrayList<>(0));
 
@@ -243,8 +251,8 @@ public class CharterTest {
 
         assertEquals(charter.getBackIndexes().size(), 0);
 
-        Index index1 = new Index("Schwert", "Waffen", "", "");
-        Index index2 = new Index("Axt", "Waffen", "", "");
+        Index index1 = new Index("Schwert", "Waffen", "", "", "");
+        Index index2 = new Index("Axt", "Waffen", "a", "b", "c", "d", "e", "f", "g");
         List<Index> indexes = new ArrayList<>(2);
         indexes.add(index1);
         indexes.add(index2);
@@ -254,7 +262,7 @@ public class CharterTest {
         assertTrue(charter.isValidCei());
         assertEquals(charter.getBackIndexes().size(), 2);
         assertEquals(charter.getBackIndexes().get(1).getContent(), index2.getContent());
-        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back><cei:index indexName=\"Waffen\">Schwert</cei:index><cei:index indexName=\"Waffen\">Axt</cei:index></cei:back></cei:text>");
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back><cei:index indexName=\"Waffen\">Schwert</cei:index><cei:index indexName=\"Waffen\" lemma=\"a\" sublemma=\"b\" type=\"c\" id=\"d\" facs=\"e\" lang=\"f\" n=\"g\">Axt</cei:index></cei:back></cei:text>");
 
         charter.setBackIndexes(new ArrayList<>(0));
 

@@ -102,7 +102,8 @@
                 <cei:placeName reg="Einsiedeln">Kloster <cei:hi>Einsiedeln</cei:hi> in der Schweiz</cei:placeName>
                 <cei:persName reg="Karl der Große" type="Kaiser">Carolus <cei:hi>Magnus</cei:hi></cei:persName>
                 <cei:persName reg="Einhard">Eginhardus</cei:persName>
-                <cei:index indexName="Waffen">Schwert</cei:index>
+                <cei:index indexName="indexName" id="id" facs="facs" lang="lang" lemma="lemma" n="n" sublemma="sublemma"
+                           type="type">Schwert</cei:index>
                 <cei:divNotes>
                     <cei:note place="§1" n="n" id="id">Unbekannt</cei:note>
                 </cei:divNotes>

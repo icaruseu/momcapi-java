@@ -196,13 +196,23 @@ public class Charter extends AtomResource {
             String indexName = indexElement.getAttributeValue("indexName");
             String lemma = indexElement.getAttributeValue("lemma");
             String sublemma = indexElement.getAttributeValue("sublemma");
+            String type = indexElement.getAttributeValue("type");
+            String id = indexElement.getAttributeValue("id");
+            String facs = indexElement.getAttributeValue("facs");
+            String lang = indexElement.getAttributeValue("lang");
+            String n = indexElement.getAttributeValue("n");
 
             index = Optional.of(
                     new Index(
                             contentString,
                             indexName == null ? "" : indexName,
                             lemma == null ? "" : lemma,
-                            sublemma == null ? "" : sublemma
+                            sublemma == null ? "" : sublemma,
+                            type == null ? "" : type,
+                            id == null ? "" : id,
+                            facs == null ? "" : facs,
+                            lang == null ? "" : lang,
+                            n == null ? "" : n
                     ));
 
         }
