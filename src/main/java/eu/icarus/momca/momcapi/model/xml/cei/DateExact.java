@@ -28,9 +28,22 @@ public class DateExact extends DateAbstract {
      * @param literalDate The literal date value, e.g. {@code 11th March 1297}.
      */
     public DateExact(@NotNull String numericDate, @NotNull String literalDate) {
+
         super(new Element("cei:date", Namespace.CEI.getUri()), literalDate);
+
         addAttribute(new Attribute("value", numericDate));
-        this.dateValue = new DateValue(numericDate);
+        dateValue = new DateValue(numericDate);
+
+    }
+
+    public DateExact(@NotNull String numericDate, @NotNull String literalDate, @NotNull String certainty,
+                     @NotNull String lang, @NotNull String facs, @NotNull String id, @NotNull String n) {
+
+        super(new Element("cei:date", Namespace.CEI.getUri()), literalDate, certainty, lang, facs, id, n);
+
+        addAttribute(new Attribute("value", numericDate));
+        dateValue = new DateValue(numericDate);
+
     }
 
     @Override

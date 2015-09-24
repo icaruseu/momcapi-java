@@ -43,6 +43,21 @@ public class DateRange extends DateAbstract {
 
     }
 
+    public DateRange(@NotNull String fromDateValue, @NotNull String toDateValue, @NotNull String literalDate,
+                     @NotNull String certainty, @NotNull String lang, @NotNull String facs, @NotNull String id,
+                     @NotNull String n) {
+
+        super(new Element("cei:dateRange", Namespace.CEI.getUri()), literalDate, certainty, lang, facs, id, n);
+
+        addAttribute(new Attribute("from", fromDateValue));
+        addAttribute(new Attribute("to", toDateValue));
+
+        this.fromDateValue = new DateValue(fromDateValue);
+        this.toDateValue = new DateValue(toDateValue);
+
+    }
+
+
     @Override
     public boolean couldBeOtherDateType() {
         return fromDateValue.equals(toDateValue);

@@ -651,7 +651,20 @@ public class Charter extends AtomResource {
                     throw new IllegalArgumentException("No value attribute present in date element '" + dateElement.toXML() + "'");
                 }
 
-                dateCei = new DateExact(value, text);
+                String certainty = dateElement.getAttributeValue("certainty");
+                String facs = dateElement.getAttributeValue("facs");
+                String id = dateElement.getAttributeValue("id");
+                String lang = dateElement.getAttributeValue("lang");
+                String n = dateElement.getAttributeValue("n");
+
+                dateCei = new DateExact(
+                        value,
+                        text,
+                        certainty == null ? "" : certainty,
+                        lang == null ? "" : lang,
+                        facs == null ? "" : facs,
+                        id == null ? "" : id,
+                        n == null ? "" : n);
 
             } else {
 
@@ -666,7 +679,21 @@ public class Charter extends AtomResource {
                                     + dateRangeElement.toXML() + "`");
                 }
 
-                dateCei = new DateRange(from, to, text);
+                String certainty = dateRangeElement.getAttributeValue("certainty");
+                String facs = dateRangeElement.getAttributeValue("facs");
+                String id = dateRangeElement.getAttributeValue("id");
+                String lang = dateRangeElement.getAttributeValue("lang");
+                String n = dateRangeElement.getAttributeValue("n");
+
+                dateCei = new DateRange(
+                        from,
+                        to,
+                        text,
+                        certainty == null ? "" : certainty,
+                        lang == null ? "" : lang,
+                        facs == null ? "" : facs,
+                        id == null ? "" : id,
+                        n == null ? "" : n);
 
             }
 

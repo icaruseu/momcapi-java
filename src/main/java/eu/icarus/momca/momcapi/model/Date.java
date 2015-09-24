@@ -20,9 +20,19 @@ import java.util.Optional;
  */
 public class Date implements Comparable<Date> {
 
+    @NotNull
+    private Optional<String> certainty = Optional.empty();
     private long daysInRange = 0;
     @NotNull
+    private Optional<String> facs = Optional.empty();
+    @NotNull
+    private Optional<String> id = Optional.empty();
+    @NotNull
+    private Optional<String> lang = Optional.empty();
+    @NotNull
     private String literalDate = "";
+    @NotNull
+    private Optional<String> n = Optional.empty();
     @NotNull
     private Optional<LocalDate> sortingDate = Optional.empty();
 
@@ -39,6 +49,36 @@ public class Date implements Comparable<Date> {
         this.literalDate = literalDate;
     }
 
+    public Date(@NotNull LocalDate sortingDate, long daysInRange, @NotNull String literalDate,
+                @NotNull String certainty, @NotNull String lang, @NotNull String facs, @NotNull String id,
+                @NotNull String n) {
+
+        this.sortingDate = Optional.of(sortingDate);
+        this.daysInRange = daysInRange;
+        this.literalDate = literalDate;
+
+        if (!certainty.isEmpty()) {
+            this.certainty = Optional.of(certainty);
+        }
+
+        if (!lang.isEmpty()) {
+            this.lang = Optional.of(lang);
+        }
+
+        if (!facs.isEmpty()) {
+            this.facs = Optional.of(facs);
+        }
+
+        if (!id.isEmpty()) {
+            this.id = Optional.of(id);
+        }
+
+        if (!n.isEmpty()) {
+            this.n = Optional.of(n);
+        }
+
+    }
+
     public Date(@NotNull LocalDate sortingDate, long daysInRange) {
         this(sortingDate, daysInRange, createLiteralDate(sortingDate, daysInRange));
     }
@@ -53,6 +93,13 @@ public class Date implements Comparable<Date> {
 
     public Date(@NotNull LocalDate sortingDate, @NotNull LocalDate earliestPossibleDate, @NotNull String literalDate) {
         this(sortingDate, calculateDaysInRange(earliestPossibleDate, sortingDate), literalDate);
+    }
+
+    public Date(@NotNull LocalDate sortingDate, @NotNull LocalDate earliestPossibleDate, @NotNull String literalDate,
+                @NotNull String certainty, @NotNull String lang, @NotNull String facs, @NotNull String id,
+                @NotNull String n) {
+        this(sortingDate, calculateDaysInRange(earliestPossibleDate, sortingDate),
+                literalDate, certainty, lang, facs, id, n);
     }
 
     public Date(@NotNull LocalDate sortingDate, @NotNull LocalDate earliestPossibleDate) {
@@ -83,6 +130,11 @@ public class Date implements Comparable<Date> {
             }
 
             this.literalDate = ceiDate.getLiteralDate();
+            this.certainty = ceiDate.getCertainty();
+            this.facs = ceiDate.getFacs();
+            this.lang = ceiDate.getLang();
+            this.id = ceiDate.getId();
+            this.n = ceiDate.getN();
 
         }
 
@@ -137,6 +189,11 @@ public class Date implements Comparable<Date> {
 
     }
 
+    @NotNull
+    public Optional<String> getCertainty() {
+        return certainty;
+    }
+
     public long getDaysInRange() {
         return daysInRange;
     }
@@ -155,8 +212,28 @@ public class Date implements Comparable<Date> {
     }
 
     @NotNull
+    public Optional<String> getFacs() {
+        return facs;
+    }
+
+    @NotNull
+    public Optional<String> getId() {
+        return id;
+    }
+
+    @NotNull
+    public Optional<String> getLang() {
+        return lang;
+    }
+
+    @NotNull
     public String getLiteralDate() {
         return literalDate;
+    }
+
+    @NotNull
+    public Optional<String> getN() {
+        return n;
     }
 
     @NotNull
@@ -272,7 +349,8 @@ public class Date implements Comparable<Date> {
                 String value = String.valueOf(date.getYear()) +
                         String.format("%02d", date.getMonth().getValue()) +
                         String.format("%02d", date.getDayOfMonth());
-                dateAbstract = new DateExact(value, literalDate);
+                dateAbstract = new DateExact(value, literalDate,
+                        certainty.orElse(""), lang.orElse(""), facs.orElse(""), id.orElse(""), n.orElse(""));
 
             } else {
 
@@ -286,7 +364,8 @@ public class Date implements Comparable<Date> {
                         String.format("%02d", date.getMonth().getValue()) +
                         String.format("%02d", date.getDayOfMonth());
 
-                dateAbstract = new DateRange(valueFrom, valueTo, literalDate);
+                dateAbstract = new DateRange(valueFrom, valueTo, literalDate,
+                        certainty.orElse(""), lang.orElse(""), facs.orElse(""), id.orElse(""), n.orElse(""));
 
             }
 

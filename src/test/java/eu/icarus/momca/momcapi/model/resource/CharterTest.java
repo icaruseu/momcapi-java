@@ -130,6 +130,12 @@ public class CharterTest {
         assertTrue(charter.getIdno().getOld().isPresent());
         assertEquals(charter.getIdno().getOld().get(), "1");
         assertEquals(charter.getDate(), date);
+        assertEquals(charter.getDate().getLiteralDate(), "0947-10-27");
+        assertEquals(charter.getDate().getCertainty().get(), "certainty");
+        assertEquals(charter.getDate().getLang().get(), "lang");
+        assertEquals(charter.getDate().getFacs().get(), "facs");
+        assertEquals(charter.getDate().getId().get(), "id");
+        assertEquals(charter.getDate().getN().get(), "n");
 
         assertTrue(charter.getSourceDesc().isPresent());
         assertEquals(charter.getSourceDesc().get().toXML(), sourceDesc.toXML());
@@ -376,13 +382,13 @@ public class CharterTest {
     @Test
     public void testSetDate() throws Exception {
 
-        Date newDate = new Date(LocalDate.of(1218, 6, 19), "19th June, 1218");
+        Date newDate = new Date(LocalDate.of(1218, 6, 19), 0, "19th June, 1218", "certainty", "lang", "facs", "id", "n");
 
         charter.setDate(newDate);
 
         assertEquals(charter.getDate(), newDate);
         assertTrue(charter.isValidCei());
-        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"12180619\">19th June, 1218</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date certainty=\"certainty\" lang=\"lang\" facs=\"facs\" id=\"id\" n=\"n\" value=\"12180619\">19th June, 1218</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
 
     }
 
