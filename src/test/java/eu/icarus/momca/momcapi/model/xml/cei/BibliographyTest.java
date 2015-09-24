@@ -14,13 +14,6 @@ import static org.testng.Assert.assertEquals;
 public class BibliographyTest {
 
     @Test
-    public void test1() throws Exception {
-        Bibliography bibliography = new Bibliography("sourceDescVolltext");
-        assertEquals(bibliography.toXML(), "<cei:sourceDescVolltext xmlns:cei=\"http://www.monasterium.net/NS/cei\"><cei:bibl /></cei:sourceDescVolltext>");
-        assertEquals(bibliography.getEntries().size(), 1);
-    }
-
-    @Test
     public void test2() throws Exception {
 
         List<Bibl> bibl = new ArrayList<>(2);

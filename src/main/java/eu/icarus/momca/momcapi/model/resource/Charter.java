@@ -40,8 +40,6 @@ public class Charter extends AtomResource {
 
     public static final String CEI_URI = Namespace.CEI.getUri();
     @NotNull
-    private final List<XmlValidationProblem> validationProblems = new ArrayList<>(0);
-    @NotNull
     private List<Note> backDivNotes = new ArrayList<>(0);
     @NotNull
     private List<Index> backIndexes = new ArrayList<>(0);
@@ -66,11 +64,15 @@ public class Charter extends AtomResource {
     @NotNull
     private Optional<String> langMom = Optional.empty();
     @NotNull
-    private Optional<SourceDesc> sourceDesc = Optional.empty();
+    private Optional<Bibliography> sourceDescAbstractBibliography = Optional.empty();
+    @NotNull
+    private Optional<Bibliography> sourceDescTenorBibliography = Optional.empty();
     @NotNull
     private Optional<Tenor> tenor = Optional.empty();
     @NotNull
     private List<Node> unusedFrontNodes = new ArrayList<>(0);
+    @NotNull
+    private List<XmlValidationProblem> validationProblems = new ArrayList<>(0);
 
     public Charter(@NotNull IdCharter id, @NotNull CharterStatus charterStatus, @NotNull User author, @NotNull Date date) {
 
@@ -104,7 +106,8 @@ public class Charter extends AtomResource {
         unusedFrontNodes = readUnusedFrontElements(xml);
         diplomaticAnalysis = readDiplomaticAnalysis(xml);
 
-        sourceDesc = readSourceDesc(xml);
+        sourceDescAbstractBibliography = readSourceDescAbstractBibliography(xml);
+        sourceDescTenorBibliography = readSourceDescTenorBibliography(xml);
         tenor = readMixedContentElement(xml, XpathQuery.QUERY_CEI_TENOR).map(Tenor::new);
         charterAbstract = readAbstract(xml);
         langMom = Util.queryXmlToOptional(xml, XpathQuery.QUERY_CEI_LANG_MOM);
@@ -174,7 +177,16 @@ public class Charter extends AtomResource {
 
         Element front = new Element("cei:front", CEI_URI);
 
-        sourceDesc.ifPresent(front::appendChild);
+        if (sourceDescAbstractBibliography.isPresent() || sourceDescTenorBibliography.isPresent()) {
+
+            Element sourceDesc = new Element("cei:sourceDesc", CEI_URI);
+            front.appendChild(sourceDesc);
+
+            sourceDescAbstractBibliography.ifPresent(sourceDesc::appendChild);
+            sourceDescTenorBibliography.ifPresent(sourceDesc::appendChild);
+
+        }
+
         unusedFrontNodes.forEach(element -> front.appendChild(element.copy()));
 
         return front;
@@ -477,8 +489,13 @@ public class Charter extends AtomResource {
     }
 
     @NotNull
-    public Optional<SourceDesc> getSourceDesc() {
-        return sourceDesc;
+    public Optional<Bibliography> getSourceDescAbstractBibliography() {
+        return sourceDescAbstractBibliography;
+    }
+
+    @NotNull
+    public Optional<Bibliography> getSourceDescTenorBibliography() {
+        return sourceDescTenorBibliography;
     }
 
     @NotNull
@@ -593,19 +610,18 @@ public class Charter extends AtomResource {
     }
 
     @NotNull
-    private List<String> readBiblEntries(Element parentElement, String bibliographyName) {
+    private List<Element> readBiblEntries(Element parentElement, String bibliographyName) {
 
-        List<String> abstractBiblEntries = new ArrayList<>(0);
+        List<Element> abstractBiblEntries = new ArrayList<>(0);
 
-        Element sourceDescRegestElement = parentElement.getFirstChildElement(bibliographyName, CEI_URI);
+        Element sourceDescElement = parentElement.getFirstChildElement(bibliographyName, CEI_URI);
 
-        if (sourceDescRegestElement != null) {
+        if (sourceDescElement != null) {
 
-            Elements sourceDescRegestBibl = sourceDescRegestElement.getChildElements();
+            Elements sourceDescRegestBibl = sourceDescElement.getChildElements();
 
             for (int i = 0; i < sourceDescRegestBibl.size(); i++) {
-                Element bibl = sourceDescRegestBibl.get(i);
-                abstractBiblEntries.add(bibl.getValue());
+                abstractBiblEntries.add(sourceDescRegestBibl.get(i));
             }
 
         }
@@ -765,22 +781,89 @@ public class Charter extends AtomResource {
         return queryResult.isEmpty() ? Optional.empty() : Optional.of(queryResult);
     }
 
-    private Optional<SourceDesc> readSourceDesc(Element xml) {
+    private Optional<Bibliography> readSourceDescAbstractBibliography(Element xml) {
 
-        Optional<SourceDesc> result = Optional.empty();
+        Optional<Bibliography> result = Optional.empty();
 
-        Nodes sourceDescNodes = Util.queryXmlToNodes(xml, XpathQuery.QUERY_CEI_SOURCE_DESC);
+        Nodes nodes = Util.queryXmlToNodes(xml, XpathQuery.QUERY_CEI_SOURCE_DESC_REGEST_BIBL);
 
-        if (sourceDescNodes.size() != 0) {
+        if (nodes.size() != 0) {
 
-            Element sourceDescElement = (Element) sourceDescNodes.get(0);
-            List<String> abstractBiblEntries = readBiblEntries(sourceDescElement, "sourceDescRegest");
-            List<String> tenorBiblEntries = readBiblEntries(sourceDescElement, "sourceDescVolltext");
+            List<Bibl> list = new ArrayList<>(0);
 
-            if (!abstractBiblEntries.get(0).isEmpty() || !tenorBiblEntries.get(0).isEmpty()) {
-                result = Optional.of(new SourceDesc(abstractBiblEntries, tenorBiblEntries));
+            for (int i = 0; i < nodes.size(); i++) {
+
+                Element element = (Element) nodes.get(i);
+
+                String content = Util.joinChildNodes(element);
+
+                if (!content.isEmpty()) {
+
+                    String key = element.getAttributeValue("key");
+                    String facs = element.getAttributeValue("facs");
+                    String id = element.getAttributeValue("id");
+                    String lang = element.getAttributeValue("lang");
+                    String n = element.getAttributeValue("n");
+
+                    list.add(new Bibl(
+                            content,
+                            key == null ? "" : key,
+                            facs == null ? "" : facs,
+                            id == null ? "" : id,
+                            lang == null ? "" : lang,
+                            n == null ? "" : n
+                    ));
+
+                }
+
             }
 
+            result = Optional.of(new Bibliography("sourceDescRegest", list));
+
+        }
+
+        return result;
+
+    }
+
+    private Optional<Bibliography> readSourceDescTenorBibliography(Element xml) {
+
+        Optional<Bibliography> result = Optional.empty();
+
+        Nodes nodes = Util.queryXmlToNodes(xml, XpathQuery.QUERY_CEI_SOURCE_DESC_VOLLTEXT_BIBL);
+
+        if (nodes.size() != 0) {
+
+            List<Bibl> list = new ArrayList<>(0);
+
+            for (int i = 0; i < nodes.size(); i++) {
+
+                Element element = (Element) nodes.get(i);
+
+                String content = Util.joinChildNodes(element);
+
+                if (!content.isEmpty()) {
+
+                    String key = element.getAttributeValue("key");
+                    String facs = element.getAttributeValue("facs");
+                    String id = element.getAttributeValue("id");
+                    String lang = element.getAttributeValue("lang");
+                    String n = element.getAttributeValue("n");
+
+                    list.add(new Bibl(
+                            content,
+                            key == null ? "" : key,
+                            facs == null ? "" : facs,
+                            id == null ? "" : id,
+                            lang == null ? "" : lang,
+                            n == null ? "" : n
+                    ));
+
+                }
+
+            }
+
+            result = Optional.of(new Bibliography("sourceDescVolltext", list));
 
         }
 
@@ -911,20 +994,24 @@ public class Charter extends AtomResource {
 
     }
 
-    public void setSourceDesc(@NotNull SourceDesc sourceDesc) {
+    public void setSourceDescAbstractBibliography(@NotNull List<Bibl> bibliographyItems) {
 
-        List<Bibl> abstractBibl = sourceDesc.getBibliographyAbstract().getEntries();
-        List<Bibl> tenorBibl = sourceDesc.getBibliographyTenor().getEntries();
-
-        if ((abstractBibl.isEmpty() || abstractBibl.get(0).getContent().isEmpty()) && (tenorBibl.isEmpty() ||
-                tenorBibl.get(0).getContent().isEmpty())) {
-
-            this.sourceDesc = Optional.empty();
-
+        if (bibliographyItems.isEmpty()) {
+            this.sourceDescAbstractBibliography = Optional.empty();
         } else {
+            this.sourceDescAbstractBibliography = Optional.of(new Bibliography("sourceDescRegest", bibliographyItems));
+        }
 
-            this.sourceDesc = Optional.of(sourceDesc);
+        updateXmlContent();
 
+    }
+
+    public void setSourceDescTenorBibliography(@NotNull List<Bibl> bibliographyItems) {
+
+        if (bibliographyItems.isEmpty()) {
+            this.sourceDescTenorBibliography = Optional.empty();
+        } else {
+            this.sourceDescTenorBibliography = Optional.of(new Bibliography("sourceDescVolltext", bibliographyItems));
         }
 
         updateXmlContent();

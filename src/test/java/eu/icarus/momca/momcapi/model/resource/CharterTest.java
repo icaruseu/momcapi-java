@@ -6,7 +6,6 @@ import eu.icarus.momca.momcapi.model.Date;
 import eu.icarus.momca.momcapi.model.id.IdCharter;
 import eu.icarus.momca.momcapi.model.xml.cei.DateExact;
 import eu.icarus.momca.momcapi.model.xml.cei.Idno;
-import eu.icarus.momca.momcapi.model.xml.cei.SourceDesc;
 import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.*;
 import nu.xom.Element;
 import nu.xom.ParsingException;
@@ -96,7 +95,6 @@ public class CharterTest {
         assertEquals(charter.getIdno().getText(), "New Charter");
         assertEquals(charter.getDate(), date);
 
-        assertFalse(charter.getSourceDesc().isPresent());
         assertFalse(charter.getTenor().isPresent());
         assertFalse(charter.getAbstract().isPresent());
 
@@ -111,9 +109,6 @@ public class CharterTest {
     public void testConstructor2WithTestCharter1() throws Exception {
 
         Date date = new Date(LocalDate.of(947, 10, 27), "0947-10-27");
-        List<String> biblRegest = new ArrayList<>(1);
-        biblRegest.add("QW I/1, Nr. 28");
-        SourceDesc sourceDesc = new SourceDesc(biblRegest, new ArrayList<>(0));
 
         charter = createCharter("testcharter1.xml");
 
@@ -137,8 +132,18 @@ public class CharterTest {
         assertEquals(charter.getDate().getId().get(), "id");
         assertEquals(charter.getDate().getN().get(), "n");
 
-        assertTrue(charter.getSourceDesc().isPresent());
-        assertEquals(charter.getSourceDesc().get().toXML(), sourceDesc.toXML());
+        assertTrue(charter.getSourceDescAbstractBibliography().isPresent());
+        assertEquals(charter.getSourceDescAbstractBibliography().get().getEntries().size(), 1);
+        assertEquals(charter.getSourceDescAbstractBibliography().get().getEntries().get(0).getContent(), "QW I/1, Nr. 28");
+        assertEquals(charter.getSourceDescAbstractBibliography().get().getEntries().get(0).getFacs().get(), "facs");
+        assertEquals(charter.getSourceDescAbstractBibliography().get().getEntries().get(0).getLang().get(), "lang");
+        assertEquals(charter.getSourceDescAbstractBibliography().get().getEntries().get(0).getId().get(), "id");
+        assertEquals(charter.getSourceDescAbstractBibliography().get().getEntries().get(0).getN().get(), "n");
+        assertEquals(charter.getSourceDescAbstractBibliography().get().getEntries().get(0).getKey().get(), "key");
+        assertTrue(charter.getSourceDescTenorBibliography().isPresent());
+        assertEquals(charter.getSourceDescTenorBibliography().get().getEntries().size(), 1);
+        assertEquals(charter.getSourceDescTenorBibliography().get().getEntries().get(0).getContent(), "Volltext");
+        assertFalse(charter.getSourceDescTenorBibliography().get().getEntries().get(0).getFacs().isPresent());
 
         assertTrue(charter.getTenor().isPresent());
         assertEquals(charter.getTenor().get().getContent(), "This is the <cei:hi>Winter</cei:hi> of our discontempt.");
@@ -457,24 +462,52 @@ public class CharterTest {
     }
 
     @Test
-    public void testSetSourceDesc() throws Exception {
+    public void testSetSourceDescAbstractBibliography() throws Exception {
 
-        assertFalse(charter.getSourceDesc().isPresent());
+        assertFalse(charter.getSourceDescAbstractBibliography().isPresent());
 
-        List<String> biblRegest = new ArrayList<>(1);
-        biblRegest.add("QW I/1, Nr. 28");
-        SourceDesc sourceDesc = new SourceDesc(biblRegest, new ArrayList<>(0));
+        Bibl bibl1 = new Bibl("bibl1", "key", "facs", "id", "lang", "n");
+        Bibl bibl2 = new Bibl("bibl2");
+        List<Bibl> bibl = new ArrayList<>(2);
+        bibl.add(bibl1);
+        bibl.add(bibl2);
 
-        charter.setSourceDesc(sourceDesc);
+        charter.setSourceDescAbstractBibliography(bibl);
 
-        assertTrue(charter.getSourceDesc().isPresent());
-        assertEquals(charter.getSourceDesc().get(), sourceDesc);
         assertTrue(charter.isValidCei());
-        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front><cei:sourceDesc><cei:sourceDescRegest><cei:bibl>QW I/1, Nr. 28</cei:bibl></cei:sourceDescRegest><cei:sourceDescVolltext><cei:bibl /></cei:sourceDescVolltext></cei:sourceDesc></cei:front><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
+        assertTrue(charter.getSourceDescAbstractBibliography().isPresent());
+        assertEquals(charter.getSourceDescAbstractBibliography().get().getEntries().size(), 2);
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front><cei:sourceDesc><cei:sourceDescRegest><cei:bibl key=\"key\" facs=\"facs\" id=\"id\" lang=\"lang\" n=\"n\">bibl1</cei:bibl><cei:bibl>bibl2</cei:bibl></cei:sourceDescRegest></cei:sourceDesc></cei:front><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
 
-        charter.setSourceDesc(new SourceDesc());
+        charter.setSourceDescAbstractBibliography(new ArrayList<>(0));
 
-        assertFalse(charter.getSourceDesc().isPresent());
+        assertTrue(charter.isValidCei());
+        assertFalse(charter.getSourceDescAbstractBibliography().isPresent());
+
+    }
+
+    @Test
+    public void testSetSourceDescTenorBibliography() throws Exception {
+
+        assertFalse(charter.getSourceDescTenorBibliography().isPresent());
+
+        Bibl bibl1 = new Bibl("bibl1", "key", "facs", "id", "lang", "n");
+        Bibl bibl2 = new Bibl("bibl2");
+        List<Bibl> bibl = new ArrayList<>(2);
+        bibl.add(bibl1);
+        bibl.add(bibl2);
+
+        charter.setSourceDescTenorBibliography(bibl);
+
+        assertTrue(charter.isValidCei());
+        assertTrue(charter.getSourceDescTenorBibliography().isPresent());
+        assertEquals(charter.getSourceDescTenorBibliography().get().getEntries().size(), 2);
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front><cei:sourceDesc><cei:sourceDescVolltext><cei:bibl key=\"key\" facs=\"facs\" id=\"id\" lang=\"lang\" n=\"n\">bibl1</cei:bibl><cei:bibl>bibl2</cei:bibl></cei:sourceDescVolltext></cei:sourceDesc></cei:front><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
+
+        charter.setSourceDescTenorBibliography(new ArrayList<>(0));
+
+        assertTrue(charter.isValidCei());
+        assertFalse(charter.getSourceDescTenorBibliography().isPresent());
 
     }
 

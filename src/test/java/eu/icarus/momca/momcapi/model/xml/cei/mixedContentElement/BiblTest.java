@@ -10,15 +10,6 @@ import static org.testng.Assert.assertEquals;
 public class BiblTest {
 
     @Test
-    public void test1() throws Exception {
-
-        Bibl bibl = new Bibl();
-        assertEquals(bibl.toXML(), "<cei:bibl xmlns:cei=\"http://www.monasterium.net/NS/cei\" />");
-        assertEquals(bibl.getContent(), "");
-
-    }
-
-    @Test
     public void test2() throws Exception {
 
         Bibl bibl = new Bibl("bibl");

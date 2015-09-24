@@ -5,7 +5,6 @@ import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.Bibl;
 import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,17 +13,11 @@ import java.util.List;
 public class Bibliography extends Element {
 
     @NotNull
-    private List<Bibl> entries = new ArrayList<>(0);
-
-    public Bibliography(@NotNull String localName) {
-        super("cei:" + localName, Namespace.CEI.getUri());
-        this.entries.add(new Bibl());
-        this.entries.forEach(this::appendChild);
-    }
+    private List<Bibl> entries;
 
     public Bibliography(@NotNull String localName, @NotNull List<Bibl> entries) {
         super("cei:" + localName, Namespace.CEI.getUri());
-        this.entries.addAll(entries);
+        this.entries = entries;
         this.entries.forEach(this::appendChild);
     }
 

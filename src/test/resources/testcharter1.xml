@@ -21,9 +21,9 @@
                 xmlns="http://www.monasterium.net/NS/cei">
             <cei:front>
                 <cei:sourceDesc>
-                    <cei:sourceDescRegest>
-                        <cei:bibl>QW I/1, Nr. 28</cei:bibl>
-                    </cei:sourceDescRegest>
+                    <cei:sourceDescRegest><cei:bibl lang="lang" facs="facs" id="id" key="key"
+                                                    n="n">QW I/1, Nr. 28</cei:bibl></cei:sourceDescRegest>
+                    <cei:sourceDescVolltext><cei:bibl>Volltext</cei:bibl></cei:sourceDescVolltext>
                 </cei:sourceDesc>
                 <cei:publicationStmt>
                     <p>Published 2013</p>
@@ -35,7 +35,7 @@
                     <cei:class>Urkunde</cei:class>
                     <cei:abstract lang="lang" n="n" id="id" facs="facs">König Otto I. verleiht auf Bitte Herzog Hermanns dem Kloster Meinradszell (Einsiedeln), das samt einer Kirche vom jetzigen <cei:persName>Abt Eberhard</cei:persName> auf Boden, der dem Herzog von einigen Getreuen zu eigen gegeben worden war, mit dessen Unterstützung errichtet worden ist, das Recht freier Wahl des Abtes nach dem Tode Eberhards und Immunität.</cei:abstract>
                     <cei:issued>
-                        <cei:placeName type="City">Frankfurt <cei:hi>am Main</cei:hi></cei:placeName>
+                        <cei:placeName type="City" lang="lang">Frankfurt <cei:hi>am Main</cei:hi></cei:placeName>
                         <cei:date value="9471027" facs="facs" n="n" lang="lang" id="id"
                                   certainty="certainty">0947-10-27</cei:date>
                     </cei:issued>
