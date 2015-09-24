@@ -108,7 +108,7 @@ public class Charter extends AtomResource {
 
         sourceDescAbstractBibliography = readSourceDescAbstractBibliography(xml);
         sourceDescTenorBibliography = readSourceDescTenorBibliography(xml);
-        tenor = readMixedContentElement(xml, XpathQuery.QUERY_CEI_TENOR).map(Tenor::new);
+        tenor = readTenor(xml);
         charterAbstract = readAbstract(xml);
         langMom = Util.queryXmlToOptional(xml, XpathQuery.QUERY_CEI_LANG_MOM);
         charterClass = Util.queryXmlToOptional(xml, XpathQuery.QUERY_CEI_CLASS);
@@ -542,7 +542,6 @@ public class Charter extends AtomResource {
 
             }
 
-
         }
 
         return result;
@@ -606,27 +605,6 @@ public class Charter extends AtomResource {
 
 
         return results;
-
-    }
-
-    @NotNull
-    private List<Element> readBiblEntries(Element parentElement, String bibliographyName) {
-
-        List<Element> abstractBiblEntries = new ArrayList<>(0);
-
-        Element sourceDescElement = parentElement.getFirstChildElement(bibliographyName, CEI_URI);
-
-        if (sourceDescElement != null) {
-
-            Elements sourceDescRegestBibl = sourceDescElement.getChildElements();
-
-            for (int i = 0; i < sourceDescRegestBibl.size(); i++) {
-                abstractBiblEntries.add(sourceDescRegestBibl.get(i));
-            }
-
-        }
-
-        return abstractBiblEntries;
 
     }
 
@@ -864,6 +842,40 @@ public class Charter extends AtomResource {
             }
 
             result = Optional.of(new Bibliography("sourceDescVolltext", list));
+
+        }
+
+        return result;
+
+    }
+
+    private Optional<Tenor> readTenor(Element xml) {
+
+        Optional<Tenor> result = Optional.empty();
+
+        Nodes nodes = Util.queryXmlToNodes(xml, XpathQuery.QUERY_CEI_TENOR);
+
+        if (nodes.size() != 0) {
+
+            Element element = (Element) nodes.get(0);
+
+            String content = Util.joinChildNodes(element);
+
+            if (!content.isEmpty()) {
+
+                String facs = element.getAttributeValue("facs");
+                String id = element.getAttributeValue("id");
+                String n = element.getAttributeValue("n");
+
+                result = Optional.of(
+                        new Tenor(
+                                content,
+                                facs == null ? "" : facs,
+                                id == null ? "" : id,
+                                n == null ? "" : n
+                        ));
+
+            }
 
         }
 

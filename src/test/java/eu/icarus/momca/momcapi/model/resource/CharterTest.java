@@ -147,6 +147,9 @@ public class CharterTest {
 
         assertTrue(charter.getTenor().isPresent());
         assertEquals(charter.getTenor().get().getContent(), "This is the <cei:hi>Winter</cei:hi> of our discontempt.");
+        assertEquals(charter.getTenor().get().getFacs().get(), "facs");
+        assertEquals(charter.getTenor().get().getId().get(), "id");
+        assertEquals(charter.getTenor().get().getN().get(), "n");
 
         assertTrue(charter.getAbstract().isPresent());
         assertEquals(charter.getAbstract().get().getContent(), "König Otto I. verleiht auf Bitte Herzog Hermanns dem Kloster Meinradszell (Einsiedeln), das samt einer Kirche vom jetzigen <cei:persName>Abt Eberhard</cei:persName> auf Boden, der dem Herzog von einigen Getreuen zu eigen gegeben worden war, mit dessen Unterstützung errichtet worden ist, das Recht freier Wahl des Abtes nach dem Tode Eberhards und Immunität.");
@@ -516,13 +519,13 @@ public class CharterTest {
 
         assertFalse(charter.getTenor().isPresent());
 
-        Tenor tenor = new Tenor("This is the winter of <cei:lb/> our <cei:hi>discontempt</cei:hi>!");
+        Tenor tenor = new Tenor("This is the winter of <cei:lb/> our <cei:hi>discontempt</cei:hi>!", "facs", "id", "n");
 
         charter.setTenor(tenor);
 
         assertEquals(charter.getTenor().get().getContent(), "This is the winter of <cei:lb/> our <cei:hi>discontempt</cei:hi>!");
         assertTrue(charter.isValidCei());
-        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc><cei:tenor>This is the winter of <cei:lb /> our <cei:hi>discontempt</cei:hi>!</cei:tenor></cei:body><cei:back /></cei:text>");
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc><cei:tenor facs=\"facs\" id=\"id\" n=\"n\">This is the winter of <cei:lb /> our <cei:hi>discontempt</cei:hi>!</cei:tenor></cei:body><cei:back /></cei:text>");
 
         charter.setTenor(new Tenor(""));
         assertFalse(charter.getTenor().isPresent());
