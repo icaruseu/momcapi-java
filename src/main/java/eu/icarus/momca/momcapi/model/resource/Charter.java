@@ -42,6 +42,8 @@ public class Charter extends AtomResource {
     @NotNull
     private List<Note> backDivNotes = new ArrayList<>(0);
     @NotNull
+    private List<GeogName> backGeogNames = new ArrayList<>(0);
+    @NotNull
     private List<Index> backIndexes = new ArrayList<>(0);
     @NotNull
     private List<PersName> backPersNames = new ArrayList<>(0);
@@ -114,6 +116,7 @@ public class Charter extends AtomResource {
         charterClass = Util.queryXmlToOptional(xml, XpathQuery.QUERY_CEI_CLASS);
         issuedPlace = readIssuedPlace(xml);
         backPlaceNames = readBackPlaceNames(xml);
+        backGeogNames = readBackGeogNames(xml);
         backPersNames = readBackPersNames(xml);
         backIndexes = readBackIndexes(xml);
         backDivNotes = readBackDivNotes(xml);
@@ -126,6 +129,7 @@ public class Charter extends AtomResource {
 
         backPersNames.forEach(persName -> back.appendChild(persName.copy()));
         backPlaceNames.forEach(placeName -> back.appendChild(placeName.copy()));
+        backGeogNames.forEach(geogName -> back.appendChild(geogName.copy()));
         backIndexes.forEach(index -> back.appendChild(index.copy()));
         if (!backDivNotes.isEmpty()) {
             Element divNotes = new Element("cei:divNotes", CEI_URI);
@@ -190,6 +194,49 @@ public class Charter extends AtomResource {
         unusedFrontNodes.forEach(element -> front.appendChild(element.copy()));
 
         return front;
+
+    }
+
+    private Optional<GeogName> createGeogNameInstance(Element geogNameElement) {
+
+        Optional<GeogName> geogName = Optional.empty();
+
+        StringBuilder contentBuilder = new StringBuilder();
+        for (int i = 0; i < geogNameElement.getChildCount(); i++) {
+            contentBuilder.append(geogNameElement.getChild(i).toXML());
+        }
+        String contentString = contentBuilder.toString();
+
+        if (!contentString.isEmpty()) {
+
+            String certainty = geogNameElement.getAttributeValue("certainty");
+            String existent = geogNameElement.getAttributeValue("existent");
+            String facs = geogNameElement.getAttributeValue("facs");
+            String id = geogNameElement.getAttributeValue("id");
+            String key = geogNameElement.getAttributeValue("key");
+            String lang = geogNameElement.getAttributeValue("lang");
+            String n = geogNameElement.getAttributeValue("n");
+            String reg = geogNameElement.getAttributeValue("reg");
+            String type = geogNameElement.getAttributeValue("type");
+
+
+            geogName = Optional.of(
+                    new GeogName(
+                            contentString,
+                            certainty == null ? "" : certainty,
+                            reg == null ? "" : reg,
+                            type == null ? "" : type,
+                            existent == null ? "" : existent,
+                            key == null ? "" : key,
+                            facs == null ? "" : facs,
+                            id == null ? "" : id,
+                            lang == null ? "" : lang,
+                            n == null ? "" : n
+                    ));
+
+        }
+
+        return geogName;
 
     }
 
@@ -417,6 +464,11 @@ public class Charter extends AtomResource {
     }
 
     @NotNull
+    public List<GeogName> getBackGeogNames() {
+        return backGeogNames;
+    }
+
+    @NotNull
     public List<Index> getBackIndexes() {
         return backIndexes;
     }
@@ -558,6 +610,22 @@ public class Charter extends AtomResource {
             Element noteElement = (Element) nodes.get(i);
             createNoteInstance(noteElement).ifPresent(results::add);
         }
+
+        return results;
+
+    }
+
+    private List<GeogName> readBackGeogNames(Element xml) {
+
+        List<GeogName> results = new ArrayList<>(0);
+
+        Nodes nodes = Util.queryXmlToNodes(xml, XpathQuery.QUERY_CEI_BACK_GEOG_NAME);
+
+        for (int i = 0; i < nodes.size(); i++) {
+            Element geogNameElement = (Element) nodes.get(i);
+            createGeogNameInstance(geogNameElement).ifPresent(results::add);
+        }
+
 
         return results;
 
@@ -913,6 +981,11 @@ public class Charter extends AtomResource {
 
     public void setBackDivNotes(@NotNull List<Note> backDivNotes) {
         this.backDivNotes = backDivNotes;
+        updateXmlContent();
+    }
+
+    public void setBackGeogNames(@NotNull List<GeogName> backGeogNames) {
+        this.backGeogNames = backGeogNames;
         updateXmlContent();
     }
 

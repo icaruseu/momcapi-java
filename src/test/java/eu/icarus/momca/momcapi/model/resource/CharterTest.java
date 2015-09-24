@@ -180,6 +180,18 @@ public class CharterTest {
         assertEquals(charter.getBackPlaceNames().get(0).getReg().get(), "reg");
         assertEquals(charter.getBackPlaceNames().get(0).getType().get(), "type");
 
+        assertEquals(charter.getBackGeogNames().size(), 2);
+        assertEquals(charter.getBackGeogNames().get(0).getContent(), "Ein Berg");
+        assertEquals(charter.getBackGeogNames().get(0).getCertainty().get(), "certainty");
+        assertEquals(charter.getBackGeogNames().get(0).getExistent().get(), "existent");
+        assertEquals(charter.getBackGeogNames().get(0).getFacs().get(), "facs");
+        assertEquals(charter.getBackGeogNames().get(0).getId().get(), "id");
+        assertEquals(charter.getBackGeogNames().get(0).getKey().get(), "key");
+        assertEquals(charter.getBackGeogNames().get(0).getLang().get(), "lang");
+        assertEquals(charter.getBackGeogNames().get(0).getN().get(), "n");
+        assertEquals(charter.getBackGeogNames().get(0).getReg().get(), "reg");
+        assertEquals(charter.getBackGeogNames().get(0).getType().get(), "type");
+
         assertEquals(charter.getBackPersNames().size(), 2);
         assertEquals(charter.getBackPersNames().get(1).getContent(), "Eginhardus");
         assertEquals(charter.getBackPersNames().get(1).getCertainty().get(), "certainty");
@@ -289,6 +301,29 @@ public class CharterTest {
     }
 
     @Test
+    public void testSetBackGeogNames() throws Exception {
+
+        GeogName place1 = new GeogName("Ein Berg", "certainty", "reg", "type", "existent", "key", "facs", "id", "lang", "n");
+        GeogName place2 = new GeogName("Ein Hügel", "", "Hügel", "Ding", "", "");
+
+        List<GeogName> geogNames = new ArrayList<>(0);
+        geogNames.add(place1);
+        geogNames.add(place2);
+
+        charter.setBackGeogNames(geogNames);
+
+        assertTrue(charter.isValidCei());
+        assertEquals(charter.getBackGeogNames(), geogNames);
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back><cei:geogName certainty=\"certainty\" reg=\"reg\" type=\"type\" existent=\"existent\" key=\"key\" facs=\"facs\" id=\"id\" lang=\"lang\" n=\"n\">Ein Berg</cei:geogName><cei:geogName reg=\"Hügel\" type=\"Ding\">Ein Hügel</cei:geogName></cei:back></cei:text>");
+
+        charter.setBackGeogNames(new ArrayList<>(0));
+
+        assertTrue(charter.isValidCei());
+        assertEquals(charter.getBackGeogNames().size(), 0);
+
+    }
+
+    @Test
     public void testSetBackIndexes() throws Exception {
 
         assertEquals(charter.getBackIndexes().size(), 0);
@@ -355,6 +390,11 @@ public class CharterTest {
         assertTrue(charter.isValidCei());
         assertEquals(charter.getBackPlaceNames(), placeNames);
         assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back><cei:placeName certainty=\"certainty\" reg=\"reg\" type=\"type\" existent=\"existent\" key=\"key\" facs=\"facs\" id=\"id\" lang=\"lang\" n=\"n\">Frankfurt</cei:placeName><cei:placeName reg=\"Salzburg\" type=\"City\">Iuvavum</cei:placeName></cei:back></cei:text>");
+
+        charter.setBackPlaceNames(new ArrayList<>(0));
+
+        assertTrue(charter.isValidCei());
+        assertEquals(charter.getBackPlaceNames().size(), 0);
 
     }
 
@@ -531,4 +571,5 @@ public class CharterTest {
         assertFalse(charter.getTenor().isPresent());
 
     }
+
 }

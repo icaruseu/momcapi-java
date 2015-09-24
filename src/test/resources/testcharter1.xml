@@ -75,7 +75,7 @@
                     </cei:witListPar>
                     <cei:diplomaticAnalysis>
                         <cei:listBiblRegest>
-                            <cei:bibl>Morel, Nr. 1.</cei:bibl>
+                            <cei:bibl facs="1">Morel, Nr. 1.</cei:bibl>
                             <cei:bibl>Regesta imperii II/1, 1, Nr. 157.</cei:bibl>
                             <cei:bibl>Helbok, Regesten Vorarlberg, Nr. 132.</cei:bibl>
                             <cei:bibl>UB Südl. St. Gallen, Band I, Nr. 67.</cei:bibl>
@@ -103,6 +103,9 @@
                 <cei:persName reg="Karl der Große" type="Kaiser">Carolus <cei:hi>Magnus</cei:hi></cei:persName>
                 <cei:persName reg="reg" type="type" lang="lang" n="n" facs="facs" id="id" certainty="certainty"
                               key="key">Eginhardus</cei:persName>
+                <cei:geogName certainty="certainty" existent="existent" facs="facs" id="id" key="key" lang="lang" n="n"
+                              reg="reg" type="type">Ein Berg</cei:geogName>
+                <cei:geogName>Der <cei:hi>Grabeshügel</cei:hi></cei:geogName>
                 <cei:index indexName="indexName" id="id" facs="facs" lang="lang" lemma="lemma" n="n" sublemma="sublemma"
                            type="type">Schwert</cei:index>
                 <cei:divNotes>
