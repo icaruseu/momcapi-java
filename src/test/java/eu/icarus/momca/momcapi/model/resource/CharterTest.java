@@ -155,30 +155,14 @@ public class CharterTest {
 
         assertEquals(charter.getBackDivNotes().size(), 1);
         assertEquals(charter.getBackDivNotes().get(0).getPlace().get(), "§1");
+        assertEquals(charter.getBackDivNotes().get(0).getId().get(), "id");
+        assertEquals(charter.getBackDivNotes().get(0).getN().get(), "n");
         assertEquals(charter.getBackDivNotes().get(0).getContent(), "Unbekannt");
 
         charter.setAbstract(new Abstract("New Abstract"));
 
         assertTrue(charter.isValidCei());
-        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front><cei:sourceDesc><cei:sourceDescRegest><cei:bibl>QW I/1, Nr. 28</cei:bibl></cei:sourceDescRegest><cei:sourceDescVolltext><cei:bibl /></cei:sourceDescVolltext></cei:sourceDesc></cei:front><cei:body><cei:idno id=\"KAE_Urkunde_Nr_1\" old=\"1\">KAE, Urkunde Nr. 1</cei:idno><cei:chDesc><cei:issued><cei:placeName type=\"City\">Frankfurt <cei:hi>am Main</cei:hi></cei:placeName><cei:date value=\"9471027\">0947-10-27</cei:date></cei:issued><cei:abstract>New Abstract</cei:abstract><cei:class>Urkunde</cei:class><cei:diplomaticAnalysis>\n" +
-                "                        <cei:listBiblRegest>\n" +
-                "                            <cei:bibl>Morel, Nr. 1.</cei:bibl>\n" +
-                "                            <cei:bibl>Regesta imperii II/1, 1, Nr. 157.</cei:bibl>\n" +
-                "                            <cei:bibl>Helbok, Regesten Vorarlberg, Nr. 132.</cei:bibl>\n" +
-                "                            <cei:bibl>UB Südl. St. Gallen, Band I, Nr. 67.</cei:bibl>\n" +
-                "                            <cei:bibl>Hidber, Urkundenregister, Band I, Nr. 1025.</cei:bibl>\n" +
-                "                        </cei:listBiblRegest>\n" +
-                "                        <cei:listBiblEdition>\n" +
-                "                            <cei:bibl>MGH DO I, Nr. 94.</cei:bibl>\n" +
-                "                            <cei:bibl>DAE, Band G, Nr. 25, S. 25.</cei:bibl>\n" +
-                "                            <cei:bibl>QW I/1, Nr. 28.</cei:bibl>\n" +
-                "                            <cei:bibl>Gfr, Band 43, 1888, S. 322f..</cei:bibl>\n" +
-                "                        </cei:listBiblEdition>\n" +
-                "                        <cei:listBiblErw>\n" +
-                "                            <cei:bibl>Sickel, Kaiserurkunden, S. 70, 72-77.</cei:bibl>\n" +
-                "                            <cei:bibl>MGH Ergänzungen, Nr. O.I.094.</cei:bibl>\n" +
-                "                        </cei:listBiblErw>\n" +
-                "                    </cei:diplomaticAnalysis><cei:lang_MOM>Latein</cei:lang_MOM></cei:chDesc><cei:tenor>This is the <cei:hi>Winter</cei:hi> of our discontempt.</cei:tenor></cei:body><cei:back><cei:persName reg=\"Karl der Große\" type=\"Kaiser\">Carolus <cei:hi>Magnus</cei:hi></cei:persName><cei:persName reg=\"Einhard\">Eginhardus</cei:persName><cei:placeName>Frankfurt</cei:placeName><cei:placeName reg=\"Einsiedeln\">Kloster <cei:hi>Einsiedeln</cei:hi> in der Schweiz</cei:placeName><cei:index indexName=\"Waffen\">Schwert</cei:index><cei:divNotes><cei:note place=\"§1\">Unbekannt</cei:note></cei:divNotes></cei:back></cei:text>");
+        assertEquals(charter.toCei().toXML(), "");
 
     }
 
@@ -234,7 +218,7 @@ public class CharterTest {
 
         assertEquals(charter.getBackDivNotes().size(), 0);
 
-        Note note1 = new Note("Note1", "Somewhere");
+        Note note1 = new Note("Note1", "Somewhere", "id", "n");
         Note note2 = new Note("Note2", "Over");
         List<Note> notes = new ArrayList<>(2);
         notes.add(note1);
@@ -245,7 +229,7 @@ public class CharterTest {
         assertTrue(charter.isValidCei());
         assertEquals(charter.getBackDivNotes().size(), 2);
         assertEquals(charter.getBackDivNotes().get(1).toXML(), note2.toXML());
-        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back><cei:divNotes><cei:note place=\"Somewhere\">Note1</cei:note><cei:note place=\"Over\">Note2</cei:note></cei:divNotes></cei:back></cei:text>");
+        assertEquals(charter.toCei().toXML(), "");
 
         charter.setBackDivNotes(new ArrayList<>(0));
 

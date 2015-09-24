@@ -11,20 +11,51 @@ import java.util.Optional;
 public class Note extends AbstractMixedContentElement {
 
     @NotNull
+    private Optional<String> id = Optional.empty();
+    @NotNull
+    private Optional<String> n = Optional.empty();
+    @NotNull
     private Optional<String> place = Optional.empty();
 
     public Note(@NotNull String content) {
-        this(content, "");
+        super(content, "note");
     }
 
     public Note(@NotNull String content, @NotNull String place) {
-        super(content, "note");
+
+        this(content);
 
         if (!place.isEmpty()) {
             addAttribute(new Attribute("place", place));
             this.place = Optional.of(place);
         }
 
+    }
+
+    public Note(@NotNull String content, @NotNull String place, @NotNull String id, @NotNull String n) {
+
+        this(content, place);
+
+        if (!id.isEmpty()) {
+            addAttribute(new Attribute("id", id));
+            this.id = Optional.of(id);
+        }
+
+        if (!n.isEmpty()) {
+            addAttribute(new Attribute("n", n));
+            this.n = Optional.of(n);
+        }
+
+    }
+
+    @NotNull
+    public Optional<String> getId() {
+        return id;
+    }
+
+    @NotNull
+    public Optional<String> getN() {
+        return n;
     }
 
     @NotNull

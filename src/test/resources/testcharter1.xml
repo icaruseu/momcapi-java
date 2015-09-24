@@ -104,7 +104,7 @@
                 <cei:persName reg="Einhard">Eginhardus</cei:persName>
                 <cei:index indexName="Waffen">Schwert</cei:index>
                 <cei:divNotes>
-                    <cei:note place="§1">Unbekannt</cei:note>
+                    <cei:note place="§1" n="n" id="id">Unbekannt</cei:note>
                 </cei:divNotes>
             </cei:back>
         </cei:text>

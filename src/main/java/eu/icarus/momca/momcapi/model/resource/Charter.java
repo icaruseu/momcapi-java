@@ -224,11 +224,15 @@ public class Charter extends AtomResource {
         if (!contentString.isEmpty()) {
 
             String placeAttribute = noteElement.getAttributeValue("place");
+            String idAttribute = noteElement.getAttributeValue("id");
+            String nAttribute = noteElement.getAttributeValue("n");
 
             place = Optional.of(
                     new Note(
                             contentString,
-                            placeAttribute == null ? "" : placeAttribute
+                            placeAttribute == null ? "" : placeAttribute,
+                            idAttribute == null ? "" : idAttribute,
+                            nAttribute == null ? "" : nAttribute
                     ));
 
         }
