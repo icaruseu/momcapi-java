@@ -98,6 +98,21 @@ public class Util {
     }
 
     @NotNull
+    public static String joinChildNodes(@NotNull Element xml) {
+
+        int childCount = xml.getChildCount();
+
+        StringBuilder result = new StringBuilder("");
+
+        for (int i = 0; i < childCount; i++) {
+            result.append(xml.getChild(i).toXML());
+        }
+
+        return result.toString();
+
+    }
+
+    @NotNull
     public static Document parseToDocument(@NotNull String xml) {
 
         Builder builder = new Builder();

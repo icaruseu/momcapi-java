@@ -137,6 +137,10 @@ public class CharterTest {
 
         assertTrue(charter.getAbstract().isPresent());
         assertEquals(charter.getAbstract().get().getContent(), "König Otto I. verleiht auf Bitte Herzog Hermanns dem Kloster Meinradszell (Einsiedeln), das samt einer Kirche vom jetzigen <cei:persName>Abt Eberhard</cei:persName> auf Boden, der dem Herzog von einigen Getreuen zu eigen gegeben worden war, mit dessen Unterstützung errichtet worden ist, das Recht freier Wahl des Abtes nach dem Tode Eberhards und Immunität.");
+        assertEquals(charter.getAbstract().get().getFacs().get(), "facs");
+        assertEquals(charter.getAbstract().get().getId().get(), "id");
+        assertEquals(charter.getAbstract().get().getLang().get(), "lang");
+        assertEquals(charter.getAbstract().get().getN().get(), "n");
 
         assertTrue(charter.getLangMom().isPresent());
         assertEquals(charter.getLangMom().get(), "Latein");
@@ -228,12 +232,13 @@ public class CharterTest {
 
         assertFalse(charter.getAbstract().isPresent());
 
-        Abstract charterAbstract = new Abstract("An abstract with an <cei:issuer>issuer</cei:issuer>");
+        Abstract charterAbstract = new Abstract("An abstract with an <cei:issuer>issuer</cei:issuer>", "facs", "id", "lang", "n");
         charter.setAbstract(charterAbstract);
 
         assertTrue(charter.getAbstract().isPresent());
         assertEquals(charter.getAbstract().get().getContent(), "An abstract with an <cei:issuer>issuer</cei:issuer>");
         assertTrue(charter.isValidCei());
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:abstract facs=\"facs\" id=\"id\" lang=\"lang\" n=\"n\">An abstract with an <cei:issuer>issuer</cei:issuer></cei:abstract><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
 
         charter.setAbstract(new Abstract(""));
 

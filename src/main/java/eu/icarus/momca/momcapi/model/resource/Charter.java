@@ -106,7 +106,7 @@ public class Charter extends AtomResource {
 
         sourceDesc = readSourceDesc(xml);
         tenor = readMixedContentElement(xml, XpathQuery.QUERY_CEI_TENOR).map(Tenor::new);
-        charterAbstract = readMixedContentElement(xml, XpathQuery.QUERY_CEI_ABSTRACT).map(Abstract::new);
+        charterAbstract = readAbstract(xml);
         langMom = Util.queryXmlToOptional(xml, XpathQuery.QUERY_CEI_LANG_MOM);
         charterClass = Util.queryXmlToOptional(xml, XpathQuery.QUERY_CEI_CLASS);
         issuedPlace = readIssuedPlace(xml);
@@ -493,6 +493,43 @@ public class Charter extends AtomResource {
 
     public boolean isValidCei() {
         return validationProblems.isEmpty();
+    }
+
+    private Optional<Abstract> readAbstract(Element xml) {
+
+        Optional<Abstract> result = Optional.empty();
+
+        Nodes nodes = Util.queryXmlToNodes(xml, XpathQuery.QUERY_CEI_ABSTRACT);
+
+        if (nodes.size() != 0) {
+
+            Element element = (Element) nodes.get(0);
+
+            String content = Util.joinChildNodes(element);
+
+            if (!content.isEmpty()) {
+
+                String facs = element.getAttributeValue("facs");
+                String id = element.getAttributeValue("id");
+                String lang = element.getAttributeValue("lang");
+                String n = element.getAttributeValue("n");
+
+                result = Optional.of(
+                        new Abstract(
+                                content,
+                                facs == null ? "" : facs,
+                                id == null ? "" : id,
+                                lang == null ? "" : lang,
+                                n == null ? "" : n
+                        ));
+                
+            }
+
+
+        }
+
+        return result;
+
     }
 
     private List<Note> readBackDivNotes(Element xml) {
