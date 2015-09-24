@@ -22,7 +22,7 @@ public class PlaceNameTest {
         String correctXml = "<cei:placeName xmlns:cei=\"http://www.monasterium.net/NS/cei\">Aachen</cei:placeName>";
         assertEquals(placeName.toXML(), correctXml);
 
-        placeName = new PlaceName("Iuuauensis", "", "Salzburg", "");
+        placeName = new PlaceName("Iuuauensis", "", "Salzburg", "", "", "");
 
         assertEquals(placeName.getContent(), "Iuuauensis");
         assertTrue(placeName.getReg().isPresent());

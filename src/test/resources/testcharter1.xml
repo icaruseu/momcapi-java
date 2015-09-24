@@ -98,7 +98,8 @@
                 <cei:tenor>This is the <cei:hi>Winter</cei:hi> of our discontempt.</cei:tenor>
             </cei:body>
             <cei:back>
-                <cei:placeName>Frankfurt</cei:placeName>
+                <cei:placeName certainty="certainty" existent="existent" facs="facs" id="id" key="key" lang="lang" n="n"
+                               reg="reg" type="type">Frankfurt</cei:placeName>
                 <cei:placeName reg="Einsiedeln">Kloster <cei:hi>Einsiedeln</cei:hi> in der Schweiz</cei:placeName>
                 <cei:persName reg="Karl der Große" type="Kaiser">Carolus <cei:hi>Magnus</cei:hi></cei:persName>
                 <cei:persName reg="reg" type="type" lang="lang" n="n" facs="facs" id="id" certainty="certainty"

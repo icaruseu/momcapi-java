@@ -340,15 +340,28 @@ public class Charter extends AtomResource {
         if (!contentString.isEmpty()) {
 
             String certainty = placeNameElement.getAttributeValue("certainty");
+            String existent = placeNameElement.getAttributeValue("existent");
+            String facs = placeNameElement.getAttributeValue("facs");
+            String id = placeNameElement.getAttributeValue("id");
+            String key = placeNameElement.getAttributeValue("key");
+            String lang = placeNameElement.getAttributeValue("lang");
+            String n = placeNameElement.getAttributeValue("n");
             String reg = placeNameElement.getAttributeValue("reg");
             String type = placeNameElement.getAttributeValue("type");
+
 
             place = Optional.of(
                     new PlaceName(
                             contentString,
                             certainty == null ? "" : certainty,
                             reg == null ? "" : reg,
-                            type == null ? "" : type
+                            type == null ? "" : type,
+                            existent == null ? "" : existent,
+                            key == null ? "" : key,
+                            facs == null ? "" : facs,
+                            id == null ? "" : id,
+                            lang == null ? "" : lang,
+                            n == null ? "" : n
                     ));
 
         }
