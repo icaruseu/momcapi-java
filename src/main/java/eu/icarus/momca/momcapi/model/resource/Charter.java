@@ -522,7 +522,7 @@ public class Charter extends AtomResource {
                                 lang == null ? "" : lang,
                                 n == null ? "" : n
                         ));
-                
+
             }
 
 
@@ -685,24 +685,33 @@ public class Charter extends AtomResource {
 
     private Idno readIdno(Element xml) {
 
-        String idnoId = Util.queryXmlToString(xml, XpathQuery.QUERY_CEI_BODY_IDNO_ID);
-        String idnoText = Util.queryXmlToString(xml, XpathQuery.QUERY_CEI_BODY_IDNO_TEXT);
+        Nodes nodes = Util.queryXmlToNodes(xml, XpathQuery.QUERY_CEI_BODY_IDNO);
 
-        if (idnoId.isEmpty() || idnoText.isEmpty()) {
-            throw new MomcaException("There is no idno content in the provided xml!");
+        if (nodes.size() == 0) {
+            throw new MomcaException("There is no idno element in the provided xml!");
         }
 
-        String idnoOld = Util.queryXmlToString(xml, XpathQuery.QUERY_CEI_BODY_IDNO_OLD);
+        Element element = (Element) nodes.get(0);
 
-        Idno idno;
+        String content = element.getValue();
 
-        if (idnoOld.isEmpty()) {
-            idno = new Idno(idnoId, idnoText);
-        } else {
-            idno = new Idno(idnoId, idnoText, idnoOld);
+        String facs = element.getAttributeValue("facs");
+        String id = element.getAttributeValue("id");
+        String n = element.getAttributeValue("n");
+        String old = element.getAttributeValue("old");
+
+        if (content.isEmpty() || id.isEmpty()) {
+            throw new MomcaException("There is no text and id content in the provided idno element!");
         }
 
-        return idno;
+
+        return new Idno(
+                id,
+                content,
+                old == null ? "" : old,
+                facs == null ? "" : facs,
+                n == null ? "" : n
+        );
 
     }
 

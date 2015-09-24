@@ -23,6 +23,7 @@ public enum XpathQuery {
     QUERY_CEI_BACK_NOTE("//cei:back//cei:note", Namespace.CEI),
     QUERY_CEI_BACK_PERS_NAME("//cei:back/cei:persName", Namespace.CEI),
     QUERY_CEI_BACK_PLACE_NAME("//cei:back/cei:placeName", Namespace.CEI),
+    QUERY_CEI_BODY_IDNO("//cei:body/cei:idno", Namespace.CEI),
     QUERY_CEI_BODY_IDNO_ID("//cei:body/cei:idno/@id", Namespace.CEI),
     QUERY_CEI_BODY_IDNO_TEXT("//cei:body/cei:idno/text()", Namespace.CEI),
     QUERY_CEI_BODY_IDNO_OLD("//cei:body/cei:idno/@old", Namespace.CEI),

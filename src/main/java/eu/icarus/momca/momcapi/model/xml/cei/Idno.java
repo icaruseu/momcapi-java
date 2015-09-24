@@ -21,15 +21,26 @@ import java.util.Optional;
 public class Idno extends Element {
 
     @NotNull
-    private final String id;
+    private Optional<String> facs = Optional.empty();
     @NotNull
-    private final Optional<String> old;
+    private String id;
     @NotNull
-    private final String text;
-
+    private Optional<String> n = Optional.empty();
+    @NotNull
+    private Optional<String> old = Optional.empty();
+    @NotNull
+    private String text;
 
     public Idno(@NotNull String id, @NotNull String text) {
-        this(id, text, "");
+
+        super("cei:idno", Namespace.CEI.getUri());
+
+        this.text = text;
+        this.id = id;
+
+        appendChild(text);
+        addAttribute(new Attribute("id", id));
+
     }
 
     /**
@@ -38,23 +49,31 @@ public class Idno extends Element {
      * @param id   The {@code cei:idno/@id}-attribute.
      * @param text The text content.
      */
-    public Idno(@NotNull String id, @NotNull String text, @NotNull String old) {
+    public Idno(@NotNull String id, @NotNull String text, @NotNull String old, @NotNull String facs, @NotNull String n) {
 
-        super("cei:idno", Namespace.CEI.getUri());
-
-        addAttribute(new Attribute("id", id));
-        appendChild(text);
-
-        this.text = text;
-        this.id = id;
+        this(id, text);
 
         if (!old.isEmpty()) {
             addAttribute(new Attribute("old", old));
             this.old = Optional.of(old);
-        } else {
-            this.old = Optional.empty();
         }
 
+        if (!facs.isEmpty()) {
+            addAttribute(new Attribute("facs", facs));
+            this.facs = Optional.of(facs);
+        }
+
+        if (!n.isEmpty()) {
+            addAttribute(new Attribute("n", n));
+            this.n = Optional.of(n);
+        }
+
+
+    }
+
+    @NotNull
+    public Optional<String> getFacs() {
+        return facs;
     }
 
     /**
@@ -63,6 +82,11 @@ public class Idno extends Element {
     @NotNull
     public String getId() {
         return id;
+    }
+
+    @NotNull
+    public Optional<String> getN() {
+        return n;
     }
 
     @NotNull

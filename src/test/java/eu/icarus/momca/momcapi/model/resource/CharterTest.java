@@ -125,6 +125,8 @@ public class CharterTest {
         assertFalse(charter.getCreator().isPresent());
         assertEquals(charter.getIdno().getId(), "KAE_Urkunde_Nr_1");
         assertEquals(charter.getIdno().getText(), "KAE, Urkunde Nr. 1");
+        assertEquals(charter.getIdno().getFacs().get(), "facs");
+        assertEquals(charter.getIdno().getN().get(), "n");
         assertTrue(charter.getIdno().getOld().isPresent());
         assertEquals(charter.getIdno().getOld().get(), "1");
         assertEquals(charter.getDate(), date);
@@ -402,12 +404,12 @@ public class CharterTest {
 
         assertEquals(charter.getIdno().getId(), "charter1");
 
-        Idno newId = new Idno("newId", "New Idno Text");
+        Idno newId = new Idno("newId", "New Idno Text", "old", "facs", "n");
         charter.setIdno(newId);
 
         assertEquals(charter.getIdno(), newId);
         assertTrue(charter.isValidCei());
-        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"newId\">New Idno Text</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"newId\" old=\"old\" facs=\"facs\" n=\"n\">New Idno Text</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
 
     }
 

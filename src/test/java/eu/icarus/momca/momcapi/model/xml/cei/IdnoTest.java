@@ -10,7 +10,7 @@ import static org.testng.Assert.*;
 public class IdnoTest {
 
     public static final Idno CEI_IDNO_WITHOUT_OLD = new Idno("id", "text");
-    private static final Idno CEI_IDNO_WITH_OLD = new Idno("id", "text", "old");
+    private static final Idno CEI_IDNO_WITH_OLD = new Idno("id", "text", "old", "facs", "n");
 
     @Test
     public void testGetId() throws Exception {
@@ -25,7 +25,7 @@ public class IdnoTest {
     @Test
     public void testToXML() throws Exception {
         assertEquals(CEI_IDNO_WITHOUT_OLD.toXML(), "<cei:idno xmlns:cei=\"http://www.monasterium.net/NS/cei\" id=\"id\">text</cei:idno>");
-        assertEquals(CEI_IDNO_WITH_OLD.toXML(), "<cei:idno xmlns:cei=\"http://www.monasterium.net/NS/cei\" id=\"id\" old=\"old\">text</cei:idno>");
+        assertEquals(CEI_IDNO_WITH_OLD.toXML(), "<cei:idno xmlns:cei=\"http://www.monasterium.net/NS/cei\" id=\"id\" old=\"old\" facs=\"facs\" n=\"n\">text</cei:idno>");
     }
 
     @Test
