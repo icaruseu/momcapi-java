@@ -113,6 +113,7 @@ public class Charter extends AtomResource {
         backPlaceNames = readBackPlaceNames(xml);
         backPersNames = readBackPersNames(xml);
         backIndexes = readBackIndexes(xml);
+        backDivNotes = readBackDivNotes(xml);
 
     }
 
@@ -123,6 +124,11 @@ public class Charter extends AtomResource {
         backPersNames.forEach(persName -> back.appendChild(persName.copy()));
         backPlaceNames.forEach(placeName -> back.appendChild(placeName.copy()));
         backIndexes.forEach(index -> back.appendChild(index.copy()));
+        if (!backDivNotes.isEmpty()) {
+            Element divNotes = new Element("cei:divNotes", CEI_URI);
+            backDivNotes.forEach(note -> divNotes.appendChild(note.copy()));
+            back.appendChild(divNotes);
+        }
 
         return back;
 
@@ -202,6 +208,32 @@ public class Charter extends AtomResource {
         }
 
         return index;
+
+    }
+
+    private Optional<Note> createNoteInstance(Element noteElement) {
+
+        Optional<Note> place = Optional.empty();
+
+        StringBuilder contentBuilder = new StringBuilder();
+        for (int i = 0; i < noteElement.getChildCount(); i++) {
+            contentBuilder.append(noteElement.getChild(i).toXML());
+        }
+        String contentString = contentBuilder.toString();
+
+        if (!contentString.isEmpty()) {
+
+            String placeAttribute = noteElement.getAttributeValue("place");
+
+            place = Optional.of(
+                    new Note(
+                            contentString,
+                            placeAttribute == null ? "" : placeAttribute
+                    ));
+
+        }
+
+        return place;
 
     }
 
@@ -426,6 +458,21 @@ public class Charter extends AtomResource {
         return validationProblems.isEmpty();
     }
 
+    private List<Note> readBackDivNotes(Element xml) {
+
+        List<Note> results = new ArrayList<>(0);
+
+        Nodes nodes = Util.queryXmlToNodes(xml, XpathQuery.QUERY_CEI_BACK_NOTE);
+
+        for (int i = 0; i < nodes.size(); i++) {
+            Element noteElement = (Element) nodes.get(i);
+            createNoteInstance(noteElement).ifPresent(results::add);
+        }
+
+        return results;
+
+    }
+
     private List<Index> readBackIndexes(Element xml) {
 
         List<Index> results = new ArrayList<>(0);
@@ -433,10 +480,8 @@ public class Charter extends AtomResource {
         Nodes nodes = Util.queryXmlToNodes(xml, XpathQuery.QUERY_CEI_BACK_INDEX);
 
         for (int i = 0; i < nodes.size(); i++) {
-
             Element indexElement = (Element) nodes.get(i);
             createIndexInstance(indexElement).ifPresent(results::add);
-
         }
 
         return results;
@@ -449,10 +494,8 @@ public class Charter extends AtomResource {
         Nodes nodes = Util.queryXmlToNodes(xml, XpathQuery.QUERY_CEI_BACK_PERS_NAME);
 
         for (int i = 0; i < nodes.size(); i++) {
-
             Element persNameElement = (Element) nodes.get(i);
             createPersNameInstance(persNameElement).ifPresent(results::add);
-
         }
 
         return results;
@@ -466,10 +509,8 @@ public class Charter extends AtomResource {
         Nodes nodes = Util.queryXmlToNodes(xml, XpathQuery.QUERY_CEI_BACK_PLACE_NAME);
 
         for (int i = 0; i < nodes.size(); i++) {
-
             Element placeNameElement = (Element) nodes.get(i);
             createPlaceNameInstance(placeNameElement).ifPresent(results::add);
-
         }
 
 

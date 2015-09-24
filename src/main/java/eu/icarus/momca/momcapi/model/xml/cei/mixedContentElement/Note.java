@@ -13,11 +13,11 @@ public class Note extends AbstractMixedContentElement {
     @NotNull
     private Optional<String> place = Optional.empty();
 
-    Note(@NotNull String content) {
+    public Note(@NotNull String content) {
         this(content, "");
     }
 
-    Note(@NotNull String content, @NotNull String place) {
+    public Note(@NotNull String content, @NotNull String place) {
         super(content, "note");
 
         if (!place.isEmpty()) {
