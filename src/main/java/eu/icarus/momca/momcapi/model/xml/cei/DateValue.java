@@ -31,15 +31,6 @@ public class DateValue {
         this.isValid = validateNumericDate(dateValue);
     }
 
-    /**
-     * @param numericDate The numeric date to validate.
-     * @return {@code True}, if the numeric date is a valid date as specified by the
-     * <a href="https://github.com/icaruseu/mom-ca/blob/master/my/XRX/src/mom/app/cei/xsd/cei.xsd#L5207">CEI-Schema</a>.
-     */
-    public static boolean validateNumericDate(@NotNull String numericDate) {
-        return numericDate.matches("-?[129]?[0-9][0-9][0-9][019][0-9][01239][0-9]");
-    }
-
     @Override
     public boolean equals(@Nullable Object o) {
         if (this == o) return true;
@@ -134,6 +125,15 @@ public class DateValue {
         return "DateValue{" +
                 "value='" + value + '\'' +
                 '}';
+    }
+
+    /**
+     * @param numericDate The numeric date to validate.
+     * @return {@code True}, if the numeric date is a valid date as specified by the
+     * <a href="https://github.com/icaruseu/mom-ca/blob/master/my/XRX/src/mom/app/cei/xsd/cei.xsd#L5207">CEI-Schema</a>.
+     */
+    public static boolean validateNumericDate(@NotNull String numericDate) {
+        return numericDate.matches("-?[129]?[0-9][0-9][0-9][019][0-9][01239][0-9]");
     }
 
 }

@@ -33,25 +33,6 @@ public class IdFond extends IdAtomId {
         idArchive = new IdArchive(archiveIdentifier);
     }
 
-    private static AtomId initAtomId(@NotNull String archiveIdentifier, @NotNull String fondIdentifier) {
-
-        if (archiveIdentifier.isEmpty() || fondIdentifier.isEmpty()) {
-            throw new IllegalArgumentException("The identifiers are not allowed to be empty strings.");
-        }
-
-        if (archiveIdentifier.contains("/") || fondIdentifier.contains("/")) {
-            throw new IllegalArgumentException("One of the identifiers contains '/'" +
-                    " which is forbidden. Maybe the string is an atom:id text and not just an identifier?");
-        }
-
-        return new AtomId(String.join("/",
-                AtomId.DEFAULT_PREFIX,
-                ResourceType.FOND.getNameInId(),
-                archiveIdentifier,
-                fondIdentifier));
-
-    }
-
     @Override
     public boolean equals(Object o) {
 
@@ -81,6 +62,25 @@ public class IdFond extends IdAtomId {
         int result = super.hashCode();
         result = 31 * result + idArchive.hashCode();
         return result;
+    }
+
+    private static AtomId initAtomId(@NotNull String archiveIdentifier, @NotNull String fondIdentifier) {
+
+        if (archiveIdentifier.isEmpty() || fondIdentifier.isEmpty()) {
+            throw new IllegalArgumentException("The identifiers are not allowed to be empty strings.");
+        }
+
+        if (archiveIdentifier.contains("/") || fondIdentifier.contains("/")) {
+            throw new IllegalArgumentException("One of the identifiers contains '/'" +
+                    " which is forbidden. Maybe the string is an atom:id text and not just an identifier?");
+        }
+
+        return new AtomId(String.join("/",
+                AtomId.DEFAULT_PREFIX,
+                ResourceType.FOND.getNameInId(),
+                archiveIdentifier,
+                fondIdentifier));
+
     }
 
 }

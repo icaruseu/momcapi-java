@@ -103,6 +103,9 @@
                 <cei:persName reg="Karl der Große" type="Kaiser">Carolus <cei:hi>Magnus</cei:hi></cei:persName>
                 <cei:persName reg="Einhard">Eginhardus</cei:persName>
                 <cei:index indexName="Waffen">Schwert</cei:index>
+                <cei:divNotes>
+                    <cei:note place="§1">Unbekannt</cei:note>
+                </cei:divNotes>
             </cei:back>
         </cei:text>
     </atom:content>

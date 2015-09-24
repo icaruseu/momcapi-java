@@ -42,6 +42,8 @@ public class Charter extends AtomResource {
     @NotNull
     private final List<XmlValidationProblem> validationProblems = new ArrayList<>(0);
     @NotNull
+    private List<Note> backDivNotes = new ArrayList<>(0);
+    @NotNull
     private List<Index> backIndexes = new ArrayList<>(0);
     @NotNull
     private List<PersName> backPersNames = new ArrayList<>(0);
@@ -111,87 +113,6 @@ public class Charter extends AtomResource {
         backPlaceNames = readBackPlaceNames(xml);
         backPersNames = readBackPersNames(xml);
         backIndexes = readBackIndexes(xml);
-
-    }
-
-    private static String createParentUri(@NotNull IdCharter idCharter, @NotNull CharterStatus charterStatus, @NotNull IdUser creator) {
-
-        String parentUri = "";
-
-        switch (charterStatus) {
-
-            case PRIVATE:
-                parentUri = String.format("%s/%s/%s/%s",
-                        ResourceRoot.USER_DATA.getUri(),
-                        creator.getIdentifier(),
-                        "metadata.charter",
-                        idCharter.getIdCollection().get().getIdentifier());
-                break;
-
-            case IMPORTED:
-                parentUri = String.format("%s/%s",
-                        ResourceRoot.IMPORTED_ARCHIVAL_CHARTERS.getUri(),
-                        getHierarchicalUriPart(idCharter));
-                break;
-
-            case PUBLIC:
-                parentUri = String.format("%s/%s",
-                        ResourceRoot.PUBLIC_CHARTERS.getUri(),
-                        getHierarchicalUriPart(idCharter));
-                break;
-
-            case SAVED:
-                parentUri = ResourceRoot.ARCHIVAL_CHARTERS_BEING_EDITED.getUri();
-                break;
-
-        }
-
-        return parentUri;
-
-    }
-
-    @NotNull
-    private static String createResourceName(@NotNull IdCharter id, @NotNull CharterStatus charterStatus) {
-
-        String resourceName;
-
-        switch (charterStatus) {
-
-            case SAVED:
-                resourceName = id.getContentXml().getText().replace("/", "#") + ".xml";
-                break;
-            case PRIVATE:
-                resourceName = String.format("%s.%s", id.getIdentifier(), "charter.xml");
-                break;
-            case PUBLIC:
-            case IMPORTED:
-            default:
-                resourceName = String.format("%s.%s", id.getIdentifier(), "cei.xml");
-
-        }
-
-        return resourceName;
-
-    }
-
-    @NotNull
-    private static String getHierarchicalUriPart(@NotNull IdCharter idCharter) {
-
-        String idPart;
-
-        if (idCharter.isInFond()) {
-
-            String archiveIdentifier = idCharter.getIdFond().get().getIdArchive().getIdentifier();
-            String fondIdentifier = idCharter.getIdFond().get().getIdentifier();
-            idPart = archiveIdentifier + "/" + fondIdentifier;
-
-        } else {
-
-            idPart = idCharter.getIdCollection().get().getIdentifier();
-
-        }
-
-        return idPart;
 
     }
 
@@ -284,6 +205,42 @@ public class Charter extends AtomResource {
 
     }
 
+    private static String createParentUri(@NotNull IdCharter idCharter, @NotNull CharterStatus charterStatus, @NotNull IdUser creator) {
+
+        String parentUri = "";
+
+        switch (charterStatus) {
+
+            case PRIVATE:
+                parentUri = String.format("%s/%s/%s/%s",
+                        ResourceRoot.USER_DATA.getUri(),
+                        creator.getIdentifier(),
+                        "metadata.charter",
+                        idCharter.getIdCollection().get().getIdentifier());
+                break;
+
+            case IMPORTED:
+                parentUri = String.format("%s/%s",
+                        ResourceRoot.IMPORTED_ARCHIVAL_CHARTERS.getUri(),
+                        getHierarchicalUriPart(idCharter));
+                break;
+
+            case PUBLIC:
+                parentUri = String.format("%s/%s",
+                        ResourceRoot.PUBLIC_CHARTERS.getUri(),
+                        getHierarchicalUriPart(idCharter));
+                break;
+
+            case SAVED:
+                parentUri = ResourceRoot.ARCHIVAL_CHARTERS_BEING_EDITED.getUri();
+                break;
+
+        }
+
+        return parentUri;
+
+    }
+
     private Optional<PersName> createPersNameInstance(Element persNameElement) {
 
         Optional<PersName> persName = Optional.empty();
@@ -345,8 +302,37 @@ public class Charter extends AtomResource {
     }
 
     @NotNull
+    private static String createResourceName(@NotNull IdCharter id, @NotNull CharterStatus charterStatus) {
+
+        String resourceName;
+
+        switch (charterStatus) {
+
+            case SAVED:
+                resourceName = id.getContentXml().getText().replace("/", "#") + ".xml";
+                break;
+            case PRIVATE:
+                resourceName = String.format("%s.%s", id.getIdentifier(), "charter.xml");
+                break;
+            case PUBLIC:
+            case IMPORTED:
+            default:
+                resourceName = String.format("%s.%s", id.getIdentifier(), "cei.xml");
+
+        }
+
+        return resourceName;
+
+    }
+
+    @NotNull
     public Optional<Abstract> getAbstract() {
         return charterAbstract;
+    }
+
+    @NotNull
+    public List<Note> getBackDivNotes() {
+        return backDivNotes;
     }
 
     @NotNull
@@ -377,6 +363,27 @@ public class Charter extends AtomResource {
     @NotNull
     public Date getDate() {
         return date;
+    }
+
+    @NotNull
+    private static String getHierarchicalUriPart(@NotNull IdCharter idCharter) {
+
+        String idPart;
+
+        if (idCharter.isInFond()) {
+
+            String archiveIdentifier = idCharter.getIdFond().get().getIdArchive().getIdentifier();
+            String fondIdentifier = idCharter.getIdFond().get().getIdentifier();
+            idPart = archiveIdentifier + "/" + fondIdentifier;
+
+        } else {
+
+            idPart = idCharter.getIdCollection().get().getIdentifier();
+
+        }
+
+        return idPart;
+
     }
 
     @NotNull
@@ -656,6 +663,11 @@ public class Charter extends AtomResource {
 
         updateXmlContent();
 
+    }
+
+    public void setBackDivNotes(@NotNull List<Note> backDivNotes) {
+        this.backDivNotes = backDivNotes;
+        updateXmlContent();
     }
 
     public void setBackIndexes(@NotNull List<Index> backIndexes) {

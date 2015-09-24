@@ -68,7 +68,7 @@ public class User extends ExistResource {
         updateXmlContent();
 
     }
-    
+
     public User(@NotNull ExistResource existResource) {
 
         super(existResource);

@@ -17,16 +17,6 @@ public class CountryCode {
         this.code = code;
     }
 
-    @NotNull
-    public String getCode() {
-        return code;
-    }
-
-    @Override
-    public int hashCode() {
-        return code.hashCode();
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -36,6 +26,16 @@ public class CountryCode {
 
         return code.equals(that.code);
 
+    }
+
+    @NotNull
+    public String getCode() {
+        return code;
+    }
+
+    @Override
+    public int hashCode() {
+        return code.hashCode();
     }
 
 }

@@ -44,11 +44,6 @@ public abstract class AtomResource extends ExistResource {
     }
 
     @NotNull
-    static String localTime() {
-        return ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-    }
-
-    @NotNull
     AtomAuthor createAtomAuthor() {
         return new AtomAuthor(getCreator().map(IdAbstract::getIdentifier).orElse(""));
     }
@@ -96,6 +91,11 @@ public abstract class AtomResource extends ExistResource {
     @NotNull
     public final String getIdentifier() {
         return id.getIdentifier();
+    }
+
+    @NotNull
+    static String localTime() {
+        return ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
     }
 
     @NotNull

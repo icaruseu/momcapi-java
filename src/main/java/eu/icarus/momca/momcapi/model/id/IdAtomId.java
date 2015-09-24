@@ -19,12 +19,6 @@ public class IdAtomId extends IdAbstract {
         super(atomIdXml, initIdentifier(atomIdXml));
     }
 
-    @NotNull
-    private static String initIdentifier(@NotNull AtomId atomId) {
-        String[] idParts = atomId.getText().split("/");
-        return Util.decode(idParts[idParts.length - 1]);
-    }
-
     @Override
     public boolean equals(Object o) {
 
@@ -50,6 +44,12 @@ public class IdAtomId extends IdAbstract {
     @Override
     public int hashCode() {
         return getContentXml().getText().hashCode();
+    }
+
+    @NotNull
+    private static String initIdentifier(@NotNull AtomId atomId) {
+        String[] idParts = atomId.getText().split("/");
+        return Util.decode(idParts[idParts.length - 1]);
     }
 
     @Override

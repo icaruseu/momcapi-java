@@ -24,9 +24,34 @@ public class Region {
         this(null, nativeName);
     }
 
+    @Override
+    public boolean equals(Object o) {
+
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Region region = (Region) o;
+
+        if (!code.equals(region.code)) return false;
+        return nativeName.equals(region.nativeName);
+
+    }
+
     @NotNull
     public Optional<String> getCode() {
         return code;
+    }
+
+    @NotNull
+    public String getNativeName() {
+        return nativeName;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = code.hashCode();
+        result = 31 * result + nativeName.hashCode();
+        return result;
     }
 
     public void setCode(@Nullable String code) {
@@ -39,37 +64,12 @@ public class Region {
 
     }
 
-    @NotNull
-    public String getNativeName() {
-        return nativeName;
-    }
-
     public void setNativeName(@NotNull String nativeName) {
 
         if (nativeName.isEmpty()) {
             throw new IllegalArgumentException("The native name is not allowed to be an empty string.");
         }
         this.nativeName = nativeName;
-
-    }
-
-    @Override
-    public int hashCode() {
-        int result = code.hashCode();
-        result = 31 * result + nativeName.hashCode();
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Region region = (Region) o;
-
-        if (!code.equals(region.code)) return false;
-        return nativeName.equals(region.nativeName);
 
     }
 }

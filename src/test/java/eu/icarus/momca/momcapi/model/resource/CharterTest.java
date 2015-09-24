@@ -29,16 +29,16 @@ public class CharterTest {
     private Charter charter;
 
     @NotNull
+    private Charter createCharter(String fileName) throws ParsingException, IOException {
+        ExistResource resource = getExistResource(fileName);
+        return new Charter(resource);
+    }
+
+    @NotNull
     private static ExistResource getExistResource(String fileName) throws ParsingException, IOException {
         Element element = (Element) TestUtils.getXmlFromResource(fileName).getRootElement().copy();
         String uri = "/db/mom-data/metadata.charter.public/collection";
         return new ExistResource(fileName, uri, element.toXML());
-    }
-
-    @NotNull
-    private Charter createCharter(String fileName) throws ParsingException, IOException {
-        ExistResource resource = getExistResource(fileName);
-        return new Charter(resource);
     }
 
     @BeforeMethod
@@ -247,7 +247,7 @@ public class CharterTest {
 
         assertTrue(charter.isValidCei());
         assertEquals(charter.getBackIndexes().size(), 0);
-        
+
     }
 
     @Test

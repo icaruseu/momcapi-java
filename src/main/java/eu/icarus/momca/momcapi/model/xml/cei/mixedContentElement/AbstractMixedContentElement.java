@@ -63,20 +63,15 @@ public abstract class AbstractMixedContentElement extends Element {
     }
 
     @NotNull
+    public String getContent() {
+        return content;
+    }
+
+    @NotNull
     private static Element getXmlWithCorrectedNamespace(Element xml) {
         xml.setNamespaceURI(Namespace.CEI.getUri());
         xml = Util.parseToElement(xml.toXML().replace("xmlns=\"\"", ""));
         return xml;
-    }
-
-    @NotNull
-    private static String removeNamespaceNames(String stringToParse) {
-        return stringToParse.replace("/cei:", "/").replace("<cei:", "<").replace(":cei=", "=");
-    }
-
-    @NotNull
-    public String getContent() {
-        return content;
     }
 
     protected String initContent(String content, String localName) {
@@ -91,6 +86,11 @@ public abstract class AbstractMixedContentElement extends Element {
 
         return result;
 
+    }
+
+    @NotNull
+    private static String removeNamespaceNames(String stringToParse) {
+        return stringToParse.replace("/cei:", "/").replace("<cei:", "<").replace(":cei=", "=");
     }
 
     @Override

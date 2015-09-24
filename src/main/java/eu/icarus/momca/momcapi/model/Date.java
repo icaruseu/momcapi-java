@@ -92,18 +92,6 @@ public class Date implements Comparable<Date> {
         return Duration.between(startDate.atStartOfDay(), endDate.atStartOfDay()).toDays();
     }
 
-    private static String createLiteralDate(@NotNull LocalDate sortingDate, long daysInRange) {
-        return daysInRange == 0 ?
-                sortingDate.format(DateTimeFormatter.ISO_DATE) :
-                String.format("%s - %s",
-                        subtractDays(sortingDate, daysInRange).format(DateTimeFormatter.ISO_DATE),
-                        sortingDate.format(DateTimeFormatter.ISO_DATE));
-    }
-
-    public static LocalDate subtractDays(@NotNull LocalDate date, long daysToSubtract) {
-        return date.minusDays(daysToSubtract);
-    }
-
     @Override
     public int compareTo(@NotNull Date otherDate) {
 
@@ -125,6 +113,14 @@ public class Date implements Comparable<Date> {
 
         return sortingDate.get().compareTo(otherDate.getSortingDate().get());
 
+    }
+
+    private static String createLiteralDate(@NotNull LocalDate sortingDate, long daysInRange) {
+        return daysInRange == 0 ?
+                sortingDate.format(DateTimeFormatter.ISO_DATE) :
+                String.format("%s - %s",
+                        subtractDays(sortingDate, daysInRange).format(DateTimeFormatter.ISO_DATE),
+                        sortingDate.format(DateTimeFormatter.ISO_DATE));
     }
 
     @Override
@@ -257,6 +253,10 @@ public class Date implements Comparable<Date> {
     private boolean isUndated(@NotNull DateValue value) {
         String valueString = value.getValue();
         return valueString.isEmpty() || valueString.equals("99999999");
+    }
+
+    public static LocalDate subtractDays(@NotNull LocalDate date, long daysToSubtract) {
+        return date.minusDays(daysToSubtract);
     }
 
     @NotNull

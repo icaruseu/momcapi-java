@@ -16,21 +16,6 @@ public class IdUser extends IdAbstract {
         super(atomAuthor, initIdentifier(atomAuthor));
     }
 
-    private static AtomAuthor initAtomAuthor(@NotNull String identifier) {
-
-        if (identifier.isEmpty()) {
-            throw new IllegalArgumentException("The user identifier is not allowed to be an empty string.");
-        }
-
-        return new AtomAuthor(identifier);
-
-    }
-
-    @NotNull
-    private static String initIdentifier(@NotNull AtomAuthor atomAuthor) {
-        return atomAuthor.getEmail();
-    }
-
     @Override
     public boolean equals(Object o) {
 
@@ -54,6 +39,21 @@ public class IdUser extends IdAbstract {
     @Override
     public int hashCode() {
         return getIdentifier().hashCode();
+    }
+
+    private static AtomAuthor initAtomAuthor(@NotNull String identifier) {
+
+        if (identifier.isEmpty()) {
+            throw new IllegalArgumentException("The user identifier is not allowed to be an empty string.");
+        }
+
+        return new AtomAuthor(identifier);
+
+    }
+
+    @NotNull
+    private static String initIdentifier(@NotNull AtomAuthor atomAuthor) {
+        return atomAuthor.getEmail();
     }
 
 }
