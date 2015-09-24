@@ -34,7 +34,7 @@ public class IndexTest {
         assertEquals(index.getType().get(), "Ratte");
 
 
-        correctXml = "<cei:index xmlns:cei=\"http://www.monasterium.net/NS/cei\" indexName=\"Tiere\" lemma=\"Hund\" sublemma=\"Dackel\">Waldi</cei:index>";
+        correctXml = "<cei:index xmlns:cei=\"http://www.monasterium.net/NS/cei\" indexName=\"Tiere\" lemma=\"Hund\" sublemma=\"Dackel\" type=\"Ratte\">Waldi</cei:index>";
         assertEquals(index.toXML(), correctXml);
 
     }
