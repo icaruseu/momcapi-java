@@ -302,13 +302,23 @@ public class Charter extends AtomResource {
             String certainty = persNameElement.getAttributeValue("certainty");
             String reg = persNameElement.getAttributeValue("reg");
             String type = persNameElement.getAttributeValue("type");
+            String key = persNameElement.getAttributeValue("key");
+            String facs = persNameElement.getAttributeValue("facs");
+            String id = persNameElement.getAttributeValue("id");
+            String lang = persNameElement.getAttributeValue("lang");
+            String n = persNameElement.getAttributeValue("n");
 
             persName = Optional.of(
                     new PersName(
                             contentString,
                             certainty == null ? "" : certainty,
                             reg == null ? "" : reg,
-                            type == null ? "" : type
+                            type == null ? "" : type,
+                            key == null ? "" : key,
+                            facs == null ? "" : facs,
+                            id == null ? "" : id,
+                            lang == null ? "" : lang,
+                            n == null ? "" : n
                     ));
 
         }

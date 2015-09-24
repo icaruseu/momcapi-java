@@ -22,7 +22,7 @@ public class PersNameTest {
         String correctXml = "<cei:persName xmlns:cei=\"http://www.monasterium.net/NS/cei\">Josef</cei:persName>";
         assertEquals(persName.toXML(), correctXml);
 
-        persName = new PersName("Carolus", "100%", "Karl", "König");
+        persName = new PersName("Carolus", "100%", "Karl", "König", "");
 
         assertEquals(persName.getContent(), "Carolus");
         assertTrue(persName.getCertainty().isPresent());

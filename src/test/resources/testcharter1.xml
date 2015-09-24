@@ -101,7 +101,8 @@
                 <cei:placeName>Frankfurt</cei:placeName>
                 <cei:placeName reg="Einsiedeln">Kloster <cei:hi>Einsiedeln</cei:hi> in der Schweiz</cei:placeName>
                 <cei:persName reg="Karl der Große" type="Kaiser">Carolus <cei:hi>Magnus</cei:hi></cei:persName>
-                <cei:persName reg="Einhard">Eginhardus</cei:persName>
+                <cei:persName reg="reg" type="type" lang="lang" n="n" facs="facs" id="id" certainty="certainty"
+                              key="key">Eginhardus</cei:persName>
                 <cei:index indexName="indexName" id="id" facs="facs" lang="lang" lemma="lemma" n="n" sublemma="sublemma"
                            type="type">Schwert</cei:index>
                 <cei:divNotes>

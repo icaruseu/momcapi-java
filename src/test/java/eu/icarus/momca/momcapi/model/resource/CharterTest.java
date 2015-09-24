@@ -150,6 +150,17 @@ public class CharterTest {
         assertEquals(charter.getBackPlaceNames().size(), 2);
         assertEquals(charter.getBackPlaceNames().get(1).getContent(), "Kloster <cei:hi>Einsiedeln</cei:hi> in der Schweiz");
 
+        assertEquals(charter.getBackPersNames().size(), 2);
+        assertEquals(charter.getBackPersNames().get(1).getContent(), "Eginhardus");
+        assertEquals(charter.getBackPersNames().get(1).getCertainty().get(), "certainty");
+        assertEquals(charter.getBackPersNames().get(1).getFacs().get(), "facs");
+        assertEquals(charter.getBackPersNames().get(1).getId().get(), "id");
+        assertEquals(charter.getBackPersNames().get(1).getKey().get(), "key");
+        assertEquals(charter.getBackPersNames().get(1).getLang().get(), "lang");
+        assertEquals(charter.getBackPersNames().get(1).getN().get(), "n");
+        assertEquals(charter.getBackPersNames().get(1).getReg().get(), "reg");
+        assertEquals(charter.getBackPersNames().get(1).getType().get(), "type");
+
         assertEquals(charter.getBackIndexes().size(), 1);
         assertEquals(charter.getBackIndexes().get(0).getContent(), "Schwert");
         assertEquals(charter.getBackIndexes().get(0).getType().get(), "type");
@@ -274,8 +285,8 @@ public class CharterTest {
     @Test
     public void testSetBackPersNames() throws Exception {
 
-        PersName name1 = new PersName("Carolus <cei:hi>Magnus</cei:hi>", "", "Karl der Große", "Kaiser");
-        PersName name2 = new PersName("Einhard");
+        PersName name1 = new PersName("Carolus <cei:hi>Magnus</cei:hi>", "", "Karl der Große", "Kaiser", "");
+        PersName name2 = new PersName("Einhard", "certainty", "reg", "type", "key", "facs", "id", "lang", "n");
         List<PersName> names = new ArrayList<>(0);
         names.add(name1);
         names.add(name2);
@@ -289,7 +300,7 @@ public class CharterTest {
         assertEquals(charter.getBackPersNames(), names);
         assertEquals(charter.getBackPersNames().get(1).getContent(), "Einhard");
 
-        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back><cei:persName reg=\"Karl der Große\" type=\"Kaiser\">Carolus <cei:hi>Magnus</cei:hi></cei:persName><cei:persName>Einhard</cei:persName></cei:back></cei:text>");
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back><cei:persName reg=\"Karl der Große\" type=\"Kaiser\">Carolus <cei:hi>Magnus</cei:hi></cei:persName><cei:persName certainty=\"certainty\" reg=\"reg\" type=\"type\" key=\"key\" facs=\"facs\" id=\"id\" lang=\"lang\" n=\"n\">Einhard</cei:persName></cei:back></cei:text>");
 
         charter.setBackPersNames(new ArrayList<>(0));
 
