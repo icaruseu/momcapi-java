@@ -21,7 +21,7 @@ public abstract class AbstractMixedContentElement extends Element {
 
         super(createXmlContent(content, localName));
 
-        this.content = initContent(content, localName);
+        this.content = Util.joinChildNodes(this);
 
     }
 
@@ -36,27 +36,16 @@ public abstract class AbstractMixedContentElement extends Element {
             throw new IllegalArgumentException("Localized content is not supposed to include ':'");
         }
 
-        String stringToParse;
+        Element xml;
 
-        if (content.startsWith("<" + localName) || content.startsWith("<cei:" + localName)) {
-
-            stringToParse = content;
-            stringToParse = stringToParse.replace("<cei:" + localName, "<cei:" + localName + " xmlns:cei='http://www.monasterium.net/NS/cei'");
-            stringToParse = stringToParse.replace("</" + localName, "</cei:" + localName);
-            stringToParse = stringToParse.replace("<" + localName + " xmlns='http://www.monasterium.net/NS/cei'", "<cei:" + localName + " xmlns:cei='http://www.monasterium.net/NS/cei'");
-            stringToParse = stringToParse.replace("<" + localName, "<cei:" + localName + " xmlns:cei='http://www.monasterium.net/NS/cei'");
-
-
+        if ((content.startsWith("<" + localName) || content.startsWith("<cei:" + localName)) && content.endsWith(localName + ">")) {
+            xml = Util.parseToElement(content);
         } else {
-
-            stringToParse = String.format("<cei:%s xmlns:cei='http://www.monasterium.net/NS/cei'>%s</cei:%s>",
-                    localName,
-                    content,
-                    localName);
-
+            String temp = String.format("<cei:%s xmlns:cei='http://www.monasterium.net/NS/cei' >%s</cei:%s>", localName, content, localName);
+            xml = Util.parseToElement(temp);
         }
 
-        Element xml = Util.parseToElement(stringToParse);
+        Util.changeNamespace(xml, Namespace.CEI);
 
         return xml;
 

@@ -84,7 +84,7 @@ public class Charter extends AtomResource {
         this.idno = new Idno(id.getIdentifier(), id.getIdentifier());
         this.date = date;
 
-        updateXmlContent();
+        regenerateXmlContent();
 
     }
 
@@ -967,163 +967,8 @@ public class Charter extends AtomResource {
 
     }
 
-    public void setAbstract(@NotNull Abstract charterAbstract) {
-
-        if (charterAbstract.getContent().isEmpty()) {
-            this.charterAbstract = Optional.empty();
-        } else {
-            this.charterAbstract = Optional.of(charterAbstract);
-        }
-
-        updateXmlContent();
-
-    }
-
-    public void setBackDivNotes(@NotNull List<Note> backDivNotes) {
-        this.backDivNotes = backDivNotes;
-        updateXmlContent();
-    }
-
-    public void setBackGeogNames(@NotNull List<GeogName> backGeogNames) {
-        this.backGeogNames = backGeogNames;
-        updateXmlContent();
-    }
-
-    public void setBackIndexes(@NotNull List<Index> backIndexes) {
-        this.backIndexes = backIndexes;
-        updateXmlContent();
-    }
-
-    public void setBackPersNames(@NotNull List<PersName> backPersNames) {
-        this.backPersNames = backPersNames;
-        updateXmlContent();
-    }
-
-    public void setBackPlaceNames(@NotNull List<PlaceName> backPlaceNames) {
-        this.backPlaceNames = backPlaceNames;
-        updateXmlContent();
-    }
-
-    public void setCharterClass(@NotNull String charterClass) {
-
-        if (charterClass.isEmpty()) {
-            this.charterClass = Optional.empty();
-        } else {
-            this.charterClass = Optional.of(charterClass);
-        }
-
-        updateXmlContent();
-
-    }
-
-    public void setCharterStatus(@NotNull CharterStatus charterStatus) {
-        this.charterStatus = charterStatus;
-        setParentUri(createParentUri(getId(), charterStatus, creator.get()));
-        setResourceName(createResourceName(getId(), charterStatus));
-    }
-
-    public void setDate(@NotNull Date date) {
-        this.date = date;
-        updateXmlContent();
-    }
-
     @Override
-    public void setIdentifier(@NotNull String identifier) {
-
-        if (identifier.isEmpty()) {
-            throw new IllegalArgumentException("The identifier is not allowed to be an empty string");
-        }
-
-        if (getId().isInFond()) {
-            IdFond idFond = getId().getIdFond().get();
-            id = new IdCharter(idFond.getIdArchive().getIdentifier(), idFond.getIdentifier(), identifier);
-        } else {
-            IdCollection idCollection = getId().getIdCollection().get();
-            id = new IdCharter(idCollection.getIdentifier(), identifier);
-        }
-
-        setParentUri(createParentUri(getId(), charterStatus, getCreator().get()));
-        setResourceName(createResourceName(getId(), charterStatus));
-
-        updateXmlContent();
-
-    }
-
-    public void setIdno(@NotNull Idno idno) {
-        this.idno = idno;
-        updateXmlContent();
-    }
-
-    public void setIssuedPlace(@NotNull PlaceName issuedPlace) {
-
-        if (issuedPlace.getContent().isEmpty()) {
-            this.issuedPlace = Optional.empty();
-        } else {
-
-            this.issuedPlace = Optional.of(issuedPlace);
-        }
-
-        updateXmlContent();
-
-    }
-
-    public void setLangMom(@NotNull String langMom) {
-
-        if (langMom.isEmpty()) {
-            this.langMom = Optional.empty();
-        } else {
-            this.langMom = Optional.of(langMom);
-        }
-
-        updateXmlContent();
-
-    }
-
-    public void setSourceDescAbstractBibliography(@NotNull List<Bibl> bibliographyItems) {
-
-        if (bibliographyItems.isEmpty()) {
-            this.sourceDescAbstractBibliography = Optional.empty();
-        } else {
-            this.sourceDescAbstractBibliography = Optional.of(new Bibliography("sourceDescRegest", bibliographyItems));
-        }
-
-        updateXmlContent();
-
-    }
-
-    public void setSourceDescTenorBibliography(@NotNull List<Bibl> bibliographyItems) {
-
-        if (bibliographyItems.isEmpty()) {
-            this.sourceDescTenorBibliography = Optional.empty();
-        } else {
-            this.sourceDescTenorBibliography = Optional.of(new Bibliography("sourceDescVolltext", bibliographyItems));
-        }
-
-        updateXmlContent();
-
-    }
-
-    public void setTenor(@NotNull Tenor tenor) {
-
-        if (tenor.getContent().isEmpty()) {
-            this.tenor = Optional.empty();
-        } else {
-            this.tenor = Optional.of(tenor);
-        }
-
-        updateXmlContent();
-
-    }
-
-    @NotNull
-    public Element toCei() {
-        Element xml = (Element) toDocument().getRootElement().copy();
-        Element atomContent = xml.getFirstChildElement("content", Namespace.ATOM.getUri());
-        return atomContent.getFirstChildElement("text", CEI_URI);
-    }
-
-    @Override
-    void updateXmlContent() {
+    public void regenerateXmlContent() {
 
         Element cei = new Element("cei:text", CEI_URI);
         cei.addAttribute(new Attribute("type", "charter"));
@@ -1144,6 +989,161 @@ public class Charter extends AtomResource {
             throw new IllegalArgumentException("Failed to validate the resource.", e);
         }
 
+    }
+
+    public void setAbstract(@NotNull Abstract charterAbstract) {
+
+        if (charterAbstract.getContent().isEmpty()) {
+            this.charterAbstract = Optional.empty();
+        } else {
+            this.charterAbstract = Optional.of(charterAbstract);
+        }
+
+        regenerateXmlContent();
+
+    }
+
+    public void setBackDivNotes(@NotNull List<Note> backDivNotes) {
+        this.backDivNotes = backDivNotes;
+        regenerateXmlContent();
+    }
+
+    public void setBackGeogNames(@NotNull List<GeogName> backGeogNames) {
+        this.backGeogNames = backGeogNames;
+        regenerateXmlContent();
+    }
+
+    public void setBackIndexes(@NotNull List<Index> backIndexes) {
+        this.backIndexes = backIndexes;
+        regenerateXmlContent();
+    }
+
+    public void setBackPersNames(@NotNull List<PersName> backPersNames) {
+        this.backPersNames = backPersNames;
+        regenerateXmlContent();
+    }
+
+    public void setBackPlaceNames(@NotNull List<PlaceName> backPlaceNames) {
+        this.backPlaceNames = backPlaceNames;
+        regenerateXmlContent();
+    }
+
+    public void setCharterClass(@NotNull String charterClass) {
+
+        if (charterClass.isEmpty()) {
+            this.charterClass = Optional.empty();
+        } else {
+            this.charterClass = Optional.of(charterClass);
+        }
+
+        regenerateXmlContent();
+
+    }
+
+    public void setCharterStatus(@NotNull CharterStatus charterStatus) {
+        this.charterStatus = charterStatus;
+        setParentUri(createParentUri(getId(), charterStatus, creator.get()));
+        setResourceName(createResourceName(getId(), charterStatus));
+    }
+
+    public void setDate(@NotNull Date date) {
+        this.date = date;
+        regenerateXmlContent();
+    }
+
+    @Override
+    public void setIdentifier(@NotNull String identifier) {
+
+        if (identifier.isEmpty()) {
+            throw new IllegalArgumentException("The identifier is not allowed to be an empty string");
+        }
+
+        if (getId().isInFond()) {
+            IdFond idFond = getId().getIdFond().get();
+            id = new IdCharter(idFond.getIdArchive().getIdentifier(), idFond.getIdentifier(), identifier);
+        } else {
+            IdCollection idCollection = getId().getIdCollection().get();
+            id = new IdCharter(idCollection.getIdentifier(), identifier);
+        }
+
+        setParentUri(createParentUri(getId(), charterStatus, getCreator().get()));
+        setResourceName(createResourceName(getId(), charterStatus));
+
+        regenerateXmlContent();
+
+    }
+
+    public void setIdno(@NotNull Idno idno) {
+        this.idno = idno;
+        regenerateXmlContent();
+    }
+
+    public void setIssuedPlace(@NotNull PlaceName issuedPlace) {
+
+        if (issuedPlace.getContent().isEmpty()) {
+            this.issuedPlace = Optional.empty();
+        } else {
+
+            this.issuedPlace = Optional.of(issuedPlace);
+        }
+
+        regenerateXmlContent();
+
+    }
+
+    public void setLangMom(@NotNull String langMom) {
+
+        if (langMom.isEmpty()) {
+            this.langMom = Optional.empty();
+        } else {
+            this.langMom = Optional.of(langMom);
+        }
+
+        regenerateXmlContent();
+
+    }
+
+    public void setSourceDescAbstractBibliography(@NotNull List<Bibl> bibliographyItems) {
+
+        if (bibliographyItems.isEmpty()) {
+            this.sourceDescAbstractBibliography = Optional.empty();
+        } else {
+            this.sourceDescAbstractBibliography = Optional.of(new Bibliography("sourceDescRegest", bibliographyItems));
+        }
+
+        regenerateXmlContent();
+
+    }
+
+    public void setSourceDescTenorBibliography(@NotNull List<Bibl> bibliographyItems) {
+
+        if (bibliographyItems.isEmpty()) {
+            this.sourceDescTenorBibliography = Optional.empty();
+        } else {
+            this.sourceDescTenorBibliography = Optional.of(new Bibliography("sourceDescVolltext", bibliographyItems));
+        }
+
+        regenerateXmlContent();
+
+    }
+
+    public void setTenor(@NotNull Tenor tenor) {
+
+        if (tenor.getContent().isEmpty()) {
+            this.tenor = Optional.empty();
+        } else {
+            this.tenor = Optional.of(tenor);
+        }
+
+        regenerateXmlContent();
+
+    }
+
+    @NotNull
+    public Element toCei() {
+        Element xml = (Element) toDocument().getRootElement().copy();
+        Element atomContent = xml.getFirstChildElement("content", Namespace.ATOM.getUri());
+        return atomContent.getFirstChildElement("text", CEI_URI);
     }
 
     private void validateCei(@NotNull ExistResource resource)

@@ -1,5 +1,7 @@
 package eu.icarus.momca.momcapi;
 
+import eu.icarus.momca.momcapi.model.xml.Namespace;
+import nu.xom.Element;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -8,6 +10,17 @@ import static org.testng.Assert.assertEquals;
  * Created by daniel on 03.07.2015.
  */
 public class UtilTest {
+
+    @Test
+    public void testChangeNamespace() throws Exception {
+
+        String xml = "<cei:archIdentifier xmlns:cei=\"http://www.monasterium.net/NS/cei\"><arch>Kincstári levéltárból (E)</arch><ref target=\"http://archives.hungaricana.hu/en/charters/164\" /></cei:archIdentifier>";
+        Element element = Util.parseToElement(xml);
+        Util.changeNamespace(element, Namespace.CEI);
+
+        System.out.println(element.toXML());
+
+    }
 
     @Test
     public void testDecode() throws Exception {

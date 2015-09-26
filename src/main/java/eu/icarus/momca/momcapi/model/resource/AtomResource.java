@@ -112,6 +112,8 @@ public abstract class AtomResource extends ExistResource {
 
     }
 
+    public abstract void regenerateXmlContent();
+
     public final void setCreator(@Nullable String creator) {
 
         if (creator == null || creator.isEmpty()) {
@@ -120,12 +122,10 @@ public abstract class AtomResource extends ExistResource {
             this.creator = Optional.of(new IdUser(creator));
         }
 
-        updateXmlContent();
+        regenerateXmlContent();
 
     }
 
     public abstract void setIdentifier(@NotNull String identifier);
-
-    abstract void updateXmlContent();
 
 }

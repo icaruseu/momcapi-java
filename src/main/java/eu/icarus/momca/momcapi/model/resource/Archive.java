@@ -51,7 +51,7 @@ public class Archive extends AtomResource {
         this.name = name;
         this.country = country;
 
-        updateXmlContent();
+        regenerateXmlContent();
 
     }
 
@@ -192,6 +192,22 @@ public class Archive extends AtomResource {
         return eagDesc.getSubdivisionName().isEmpty() ? Optional.empty() : Optional.of(eagDesc.getSubdivisionName());
     }
 
+    @Override
+    public void regenerateXmlContent() {
+
+        String regionNativeName = regionName.orElse("");
+        String logoUrlString = logoUrl.orElse("");
+        Address address = this.address.orElse(new Address("", "", ""));
+        ContactInformation contactInformation = this.contactInformation.orElse(new ContactInformation("", "", "", ""));
+
+        EagDesc eagDesc = new EagDesc(country.getNativeName(), regionNativeName, address, contactInformation, logoUrlString);
+        Element eag = createEagElement(id.getIdentifier(), getName(), country.getCountryCode().getCode(), eagDesc);
+        AtomId id = new AtomId(getId().getContentXml().getText());
+
+        setXmlContent(new Document(new AtomEntry(id, createAtomAuthor(), AtomResource.localTime(), eag)));
+
+    }
+
     public void setAddress(@Nullable Address address) {
 
         if (address == null || address.isEmpty()) {
@@ -200,7 +216,7 @@ public class Archive extends AtomResource {
             this.address = Optional.of(address);
         }
 
-        updateXmlContent();
+        regenerateXmlContent();
 
     }
 
@@ -212,13 +228,13 @@ public class Archive extends AtomResource {
             this.contactInformation = Optional.of(contactInformation);
         }
 
-        updateXmlContent();
+        regenerateXmlContent();
 
     }
 
     public void setCountry(@NotNull Country country) {
         this.country = country;
-        updateXmlContent();
+        regenerateXmlContent();
     }
 
     @Override
@@ -233,7 +249,7 @@ public class Archive extends AtomResource {
         setResourceName(identifier + ResourceType.ARCHIVE.getNameSuffix());
         setParentUri(String.format("%s/%s", ResourceRoot.ARCHIVES.getUri(), identifier));
 
-        updateXmlContent();
+        regenerateXmlContent();
 
     }
 
@@ -245,7 +261,7 @@ public class Archive extends AtomResource {
             this.logoUrl = Optional.of(logoUrl);
         }
 
-        updateXmlContent();
+        regenerateXmlContent();
 
     }
 
@@ -257,7 +273,7 @@ public class Archive extends AtomResource {
 
         this.name = name;
 
-        updateXmlContent();
+        regenerateXmlContent();
 
     }
 
@@ -269,23 +285,7 @@ public class Archive extends AtomResource {
             this.regionName = Optional.of(regionName);
         }
 
-        updateXmlContent();
-
-    }
-
-    @Override
-    void updateXmlContent() {
-
-        String regionNativeName = regionName.orElse("");
-        String logoUrlString = logoUrl.orElse("");
-        Address address = this.address.orElse(new Address("", "", ""));
-        ContactInformation contactInformation = this.contactInformation.orElse(new ContactInformation("", "", "", ""));
-
-        EagDesc eagDesc = new EagDesc(country.getNativeName(), regionNativeName, address, contactInformation, logoUrlString);
-        Element eag = createEagElement(id.getIdentifier(), getName(), country.getCountryCode().getCode(), eagDesc);
-        AtomId id = new AtomId(getId().getContentXml().getText());
-
-        setXmlContent(new Document(new AtomEntry(id, createAtomAuthor(), AtomResource.localTime(), eag)));
+        regenerateXmlContent();
 
     }
 

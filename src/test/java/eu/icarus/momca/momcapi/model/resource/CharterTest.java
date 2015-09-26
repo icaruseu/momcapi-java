@@ -563,7 +563,7 @@ public class CharterTest {
 
         charter.setTenor(tenor);
 
-        assertEquals(charter.getTenor().get().getContent(), "This is the winter of <cei:lb/> our <cei:hi>discontempt</cei:hi>!");
+        assertEquals(charter.getTenor().get().getContent(), "This is the winter of <cei:lb /> our <cei:hi>discontempt</cei:hi>!");
         assertTrue(charter.isValidCei());
         assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc><cei:tenor facs=\"facs\" id=\"id\" n=\"n\">This is the winter of <cei:lb /> our <cei:hi>discontempt</cei:hi>!</cei:tenor></cei:body><cei:back /></cei:text>");
 

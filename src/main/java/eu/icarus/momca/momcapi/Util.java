@@ -1,5 +1,6 @@
 package eu.icarus.momca.momcapi;
 
+import eu.icarus.momca.momcapi.model.xml.Namespace;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
 import eu.icarus.momca.momcapi.query.XpathQuery;
 import nu.xom.*;
@@ -21,6 +22,19 @@ import java.util.Optional;
  *         Created on 03.07.2015.
  */
 public class Util {
+
+    public static void changeNamespace(@NotNull Element xml, @NotNull Namespace namespace) {
+
+        xml.setNamespaceURI(namespace.getUri());
+        xml.setNamespacePrefix(namespace.getPrefix());
+
+        Elements childs = xml.getChildElements();
+
+        for (int i = 0; i < childs.size(); i++) {
+            changeNamespace(childs.get(i), namespace);
+        }
+
+    }
 
     /**
      * Decodes a string that is %-encoded, e.g. {@code user%40mail.com} gets decoded to {@code user@mail.com}.

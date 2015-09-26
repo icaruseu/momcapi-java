@@ -68,7 +68,7 @@ public class Fond extends AtomResource {
         this.name = name;
         resetOddList();
 
-        updateXmlContent();
+        regenerateXmlContent();
 
     }
 
@@ -351,6 +351,27 @@ public class Fond extends AtomResource {
         return paragraphs;
     }
 
+    @Override
+    public void regenerateXmlContent() {
+
+        Element ead = createEadElement();
+        List<String> validationErrors = new ArrayList<>(0);
+
+        try {
+            validationErrors.addAll(validateEad(ead));
+        } catch (SAXException | ParserConfigurationException | IOException | ParsingException e) {
+            throw new RuntimeException("Failed to validate EAD.", e);
+        }
+
+        if (!validationErrors.isEmpty()) {
+            throw new IllegalArgumentException("EAD is not valid. The following errors were reported:\n" + validationErrors.toString());
+        }
+
+        AtomId id = new AtomId(getId().getContentXml().getText());
+        setXmlContent(new Document(new AtomEntry(id, createAtomAuthor(), AtomResource.localTime(), ead)));
+
+    }
+
     private void resetOddList() {
         oddList.clear();
         oddList.add(new Odd());
@@ -361,7 +382,7 @@ public class Fond extends AtomResource {
         this.id = new IdFond(idArchive.getIdentifier(), getId().getIdentifier());
 
         updateParentUri();
-        updateXmlContent();
+        regenerateXmlContent();
         updatePreferencesResource();
 
     }
@@ -374,7 +395,7 @@ public class Fond extends AtomResource {
             this.bibliography = bibliography;
         }
 
-        updateXmlContent();
+        regenerateXmlContent();
 
     }
 
@@ -386,7 +407,7 @@ public class Fond extends AtomResource {
             this.biogHist = biogHist;
         }
 
-        updateXmlContent();
+        regenerateXmlContent();
 
     }
 
@@ -398,7 +419,7 @@ public class Fond extends AtomResource {
             this.custodHist = custodHist;
         }
 
-        updateXmlContent();
+        regenerateXmlContent();
 
     }
 
@@ -426,7 +447,7 @@ public class Fond extends AtomResource {
         setResourceName(identifier + ResourceType.FOND.getNameSuffix());
         updateParentUri();
 
-        updateXmlContent();
+        regenerateXmlContent();
         updatePreferencesResource();
 
     }
@@ -463,7 +484,7 @@ public class Fond extends AtomResource {
 
         this.name = name;
 
-        updateXmlContent();
+        regenerateXmlContent();
 
     }
 
@@ -476,7 +497,7 @@ public class Fond extends AtomResource {
             this.oddList.addAll(oddList);
         }
 
-        updateXmlContent();
+        regenerateXmlContent();
 
     }
 
@@ -518,27 +539,6 @@ public class Fond extends AtomResource {
             this.fondPreferences = Optional.empty();
 
         }
-
-    }
-
-    @Override
-    void updateXmlContent() {
-
-        Element ead = createEadElement();
-        List<String> validationErrors = new ArrayList<>(0);
-
-        try {
-            validationErrors.addAll(validateEad(ead));
-        } catch (SAXException | ParserConfigurationException | IOException | ParsingException e) {
-            throw new RuntimeException("Failed to validate EAD.", e);
-        }
-
-        if (!validationErrors.isEmpty()) {
-            throw new IllegalArgumentException("EAD is not valid. The following errors were reported:\n" + validationErrors.toString());
-        }
-
-        AtomId id = new AtomId(getId().getContentXml().getText());
-        setXmlContent(new Document(new AtomEntry(id, createAtomAuthor(), AtomResource.localTime(), ead)));
 
     }
 

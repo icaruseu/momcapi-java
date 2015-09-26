@@ -49,7 +49,7 @@ public class Collection extends AtomResource {
 
         this.name = name;
 
-        updateXmlContent();
+        regenerateXmlContent();
 
     }
 
@@ -200,10 +200,23 @@ public class Collection extends AtomResource {
 
     }
 
+    @Override
+    public void regenerateXmlContent() {
+
+        Optional<Element> keywords = createKeywordsElement();
+        Element cei = createCeiElement();
+
+        AtomId id = new AtomId(this.getId().getContentXml().getText());
+        Element resourceContent = new AtomEntry(id, createAtomAuthor(), AtomResource.localTime(), cei);
+        keywords.ifPresent(element -> resourceContent.insertChild(element, 6));
+
+        setXmlContent(new Document(resourceContent));
+
+    }
 
     public void setCountry(@NotNull Country country) {
         this.country = Optional.of(country);
-        updateXmlContent();
+        regenerateXmlContent();
     }
 
     @Override
@@ -218,7 +231,7 @@ public class Collection extends AtomResource {
         setResourceName(identifier + ResourceType.COLLECTION.getNameSuffix());
         setParentUri(String.format("%s/%s", ResourceRoot.ARCHIVAL_COLLECTIONS.getUri(), identifier));
 
-        updateXmlContent();
+        regenerateXmlContent();
 
     }
 
@@ -230,7 +243,7 @@ public class Collection extends AtomResource {
             this.imageFolderName = Optional.of(imageFolderName);
         }
 
-        updateXmlContent();
+        regenerateXmlContent();
 
     }
 
@@ -242,7 +255,7 @@ public class Collection extends AtomResource {
             this.imageServerAddress = Optional.of(imageServerAddress);
         }
 
-        updateXmlContent();
+        regenerateXmlContent();
 
     }
 
@@ -254,7 +267,7 @@ public class Collection extends AtomResource {
             this.keyword = Optional.of(keyword);
         }
 
-        updateXmlContent();
+        regenerateXmlContent();
 
     }
 
@@ -266,7 +279,7 @@ public class Collection extends AtomResource {
 
         this.name = name;
 
-        updateXmlContent();
+        regenerateXmlContent();
 
     }
 
@@ -278,21 +291,7 @@ public class Collection extends AtomResource {
             this.region = Optional.of(region);
         }
 
-        updateXmlContent();
-
-    }
-
-    @Override
-    void updateXmlContent() {
-
-        Optional<Element> keywords = createKeywordsElement();
-        Element cei = createCeiElement();
-
-        AtomId id = new AtomId(this.getId().getContentXml().getText());
-        Element resourceContent = new AtomEntry(id, createAtomAuthor(), AtomResource.localTime(), cei);
-        keywords.ifPresent(element -> resourceContent.insertChild(element, 6));
-
-        setXmlContent(new Document(resourceContent));
+        regenerateXmlContent();
 
     }
 
