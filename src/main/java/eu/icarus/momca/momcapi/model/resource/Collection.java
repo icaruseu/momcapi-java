@@ -68,14 +68,14 @@ public class Collection extends AtomResource {
 
         Element xml = toDocument().getRootElement();
 
-        this.name = Util.queryXmlToOptional(xml, XpathQuery.QUERY_CEI_PROVENANCE_TEXT)
+        this.name = Util.queryXmlForOptionalString(xml, XpathQuery.QUERY_CEI_PROVENANCE_TEXT)
                 .orElseThrow(IllegalArgumentException::new).replaceAll("\\s+", " ");
         this.creator = readCreatorFromXml(xml);
         this.country = readCountryFromXml(xml);
         this.region = readRegionFromXml(xml);
-        this.imageFolderName = Util.queryXmlToOptional(xml, XpathQuery.QUERY_CEI_IMAGE_SERVER_FOLDER);
-        this.imageServerAddress = Util.queryXmlToOptional(xml, XpathQuery.QUERY_CEI_IMAGE_SERVER_ADDRESS);
-        this.keyword = Util.queryXmlToOptional(xml, XpathQuery.QUERY_XRX_KEYWORD);
+        this.imageFolderName = Util.queryXmlForOptionalString(xml, XpathQuery.QUERY_CEI_IMAGE_SERVER_FOLDER);
+        this.imageServerAddress = Util.queryXmlForOptionalString(xml, XpathQuery.QUERY_CEI_IMAGE_SERVER_ADDRESS);
+        this.keyword = Util.queryXmlForOptionalString(xml, XpathQuery.QUERY_XRX_KEYWORD);
 
     }
 
@@ -162,14 +162,14 @@ public class Collection extends AtomResource {
     private Optional<Country> readCountryFromXml(@NotNull Element xml) {
 
         Optional<CountryCode> code = Optional.empty();
-        List<String> codeResults = Util.queryXmlToList(xml, XpathQuery.QUERY_CEI_COUNTRY_ID);
+        List<String> codeResults = Util.queryXmlForList(xml, XpathQuery.QUERY_CEI_COUNTRY_ID);
 
         if (codeResults.size() == 1 && !codeResults.get(0).isEmpty()) {
             code = Optional.of(new CountryCode(codeResults.get(0)));
         }
 
         Optional<String> name = Optional.empty();
-        List<String> nameResults = Util.queryXmlToList(xml, XpathQuery.QUERY_CEI_COUNTRY_TEXT);
+        List<String> nameResults = Util.queryXmlForList(xml, XpathQuery.QUERY_CEI_COUNTRY_TEXT);
 
         if (nameResults.size() == 1 && !nameResults.get(0).isEmpty()) {
             name = Optional.of(nameResults.get(0));
@@ -189,8 +189,8 @@ public class Collection extends AtomResource {
 
         Optional<Region> region = Optional.empty();
 
-        String regionName = Util.queryXmlToString(xml, XpathQuery.QUERY_CEI_REGION_TEXT);
-        String regionCode = Util.queryXmlToString(xml, XpathQuery.QUERY_CEI_REGION_ID);
+        String regionName = Util.queryXmlForString(xml, XpathQuery.QUERY_CEI_REGION_TEXT);
+        String regionCode = Util.queryXmlForString(xml, XpathQuery.QUERY_CEI_REGION_ID);
 
         if (!regionName.isEmpty()) {
             region = Optional.of(new Region(regionCode, regionName));

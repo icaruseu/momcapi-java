@@ -32,7 +32,7 @@ public abstract class AtomResource extends ExistResource {
 
         super(existResource);
 
-        String atomIdString = Util.queryXmlToString(existResource.toDocument().getRootElement(), XpathQuery.QUERY_ATOM_ID);
+        String atomIdString = Util.queryXmlForString(existResource.toDocument().getRootElement(), XpathQuery.QUERY_ATOM_ID);
 
         if (atomIdString.isEmpty()) {
             throw new IllegalArgumentException("The provided atom resource content does not contain an atom:id: "
@@ -102,7 +102,7 @@ public abstract class AtomResource extends ExistResource {
     Optional<IdUser> readCreatorFromXml(@NotNull Element xml) {
 
         Optional<IdUser> result = Optional.empty();
-        String queryResult = Util.queryXmlToString(xml, XpathQuery.QUERY_ATOM_EMAIL);
+        String queryResult = Util.queryXmlForString(xml, XpathQuery.QUERY_ATOM_EMAIL);
 
         if (!queryResult.isEmpty()) {
             result = Optional.of(new IdUser(queryResult));

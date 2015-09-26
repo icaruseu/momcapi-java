@@ -155,14 +155,12 @@ public class Util {
      * @return A list of the results as strings.
      */
     @NotNull
-    public static List<String> queryXmlToList(@NotNull Element xml, @NotNull XpathQuery query) {
+    public static List<String> queryXmlForList(@NotNull Element xml, @NotNull XpathQuery query) {
 
-        Nodes nodes = queryXmlToNodes(xml, query);
+        List<Node> nodes = queryXmlForNodes(xml, query);
         List<String> results = new LinkedList<>();
 
-        for (int i = 0; i < nodes.size(); i++) {
-
-            Node node = nodes.get(i);
+        for (Node node : nodes) {
 
             if (node instanceof Element) {
                 results.add(node.toXML());
@@ -183,19 +181,42 @@ public class Util {
      * @return The nodes containing the results.
      */
     @NotNull
-    public static Nodes queryXmlToNodes(@NotNull Element xml, @NotNull XpathQuery query) {
+    public static List<Node> queryXmlForNodes(@NotNull Element xml, @NotNull XpathQuery query) {
 
         String queryString = query.asString();
         XPathContext context = getxPathContext(xml, query);
 
-        return xml.query(queryString, context);
+        Nodes nodes = xml.query(queryString, context);
+
+        List<Node> nodeList = new ArrayList<>();
+
+        for (int i = 0; i < nodes.size(); i++) {
+            nodeList.add(nodes.get(i));
+        }
+
+        return nodeList;
 
     }
 
     @NotNull
-    public static Optional<String> queryXmlToOptional(@NotNull Element xml, @NotNull XpathQuery query) {
+    public static Optional<Element> queryXmlForOptionalElement(@NotNull Element xml, @NotNull XpathQuery query) {
 
-        String queryResult = queryXmlToString(xml, query);
+        Optional<Element> result = Optional.empty();
+
+        List<Node> nodes = Util.queryXmlForNodes(xml, query);
+
+        if (nodes.size() != 0) {
+            result = Optional.of((Element) nodes.get(0));
+        }
+
+        return result;
+
+    }
+
+    @NotNull
+    public static Optional<String> queryXmlForOptionalString(@NotNull Element xml, @NotNull XpathQuery query) {
+
+        String queryResult = queryXmlForString(xml, query);
         Optional<String> result = Optional.empty();
 
         if (!queryResult.isEmpty()) {
@@ -207,9 +228,9 @@ public class Util {
     }
 
     @NotNull
-    public static String queryXmlToString(@NotNull Element xml, @NotNull XpathQuery query) {
+    public static String queryXmlForString(@NotNull Element xml, @NotNull XpathQuery query) {
 
-        List<String> queryResults = queryXmlToList(xml, query);
+        List<String> queryResults = queryXmlForList(xml, query);
 
         String result;
 

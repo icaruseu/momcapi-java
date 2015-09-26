@@ -1,7 +1,9 @@
 package eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement;
 
 import nu.xom.Attribute;
+import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -10,6 +12,7 @@ import java.util.Optional;
  */
 public class Note extends AbstractMixedContentElement {
 
+    public static final String LOCAL_NAME = "note";
     @NotNull
     private Optional<String> id = Optional.empty();
     @NotNull
@@ -18,33 +21,28 @@ public class Note extends AbstractMixedContentElement {
     private Optional<String> place = Optional.empty();
 
     public Note(@NotNull String content) {
-        super(content, "note");
+        super(content, LOCAL_NAME);
     }
 
     public Note(@NotNull String content, @NotNull String place) {
-
         this(content);
-
-        if (!place.isEmpty()) {
-            addAttribute(new Attribute("place", place));
-            this.place = Optional.of(place);
-        }
-
+        initAttributes(place, "", "");
     }
 
     public Note(@NotNull String content, @NotNull String place, @NotNull String id, @NotNull String n) {
+        this(content);
+        initAttributes(place, id, n);
+    }
 
-        this(content, place);
+    public Note(@NotNull Element noteElement) {
 
-        if (!id.isEmpty()) {
-            addAttribute(new Attribute("id", id));
-            this.id = Optional.of(id);
-        }
+        this(initContent(noteElement, LOCAL_NAME));
 
-        if (!n.isEmpty()) {
-            addAttribute(new Attribute("n", n));
-            this.n = Optional.of(n);
-        }
+        String place = noteElement.getAttributeValue("place");
+        String id = noteElement.getAttributeValue("id");
+        String n = noteElement.getAttributeValue("n");
+
+        initAttributes(place, id, n);
 
     }
 
@@ -61,6 +59,25 @@ public class Note extends AbstractMixedContentElement {
     @NotNull
     public Optional<String> getPlace() {
         return place;
+    }
+
+    private void initAttributes(@Nullable String place, @Nullable String id, @Nullable String n) {
+
+        if (place != null && !place.isEmpty()) {
+            addAttribute(new Attribute("place", place));
+            this.place = Optional.of(place);
+        }
+
+        if (id != null && !id.isEmpty()) {
+            addAttribute(new Attribute("id", id));
+            this.id = Optional.of(id);
+        }
+
+        if (n != null && !n.isEmpty()) {
+            addAttribute(new Attribute("n", n));
+            this.n = Optional.of(n);
+        }
+
     }
 
 }

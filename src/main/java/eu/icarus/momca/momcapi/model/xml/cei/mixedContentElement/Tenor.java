@@ -10,7 +10,6 @@ import java.util.Optional;
  */
 public class Tenor extends AbstractMixedContentElement {
 
-
     @NotNull
     private Optional<String> facs = Optional.empty();
     @NotNull

@@ -1,7 +1,9 @@
 package eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement;
 
 import nu.xom.Attribute;
+import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -10,6 +12,7 @@ import java.util.Optional;
  */
 public class Abstract extends AbstractMixedContentElement {
 
+    public static final String LOCAL_NAME = "abstract";
     @NotNull
     private Optional<String> facs = Optional.empty();
     @NotNull
@@ -20,33 +23,25 @@ public class Abstract extends AbstractMixedContentElement {
     private Optional<String> n = Optional.empty();
 
     public Abstract(@NotNull String content) {
-        super(content, "abstract");
+        super(content, LOCAL_NAME);
+    }
+
+    public Abstract(@NotNull Element abstractElement) {
+
+        super(initContent(abstractElement, LOCAL_NAME), LOCAL_NAME);
+
+        String facs = abstractElement.getAttributeValue("facs");
+        String id = abstractElement.getAttributeValue("id");
+        String lang = abstractElement.getAttributeValue("lang");
+        String n = abstractElement.getAttributeValue("n");
+
+        initAttributes(facs, id, lang, n);
+
     }
 
     public Abstract(@NotNull String content, @NotNull String facs, @NotNull String id, @NotNull String lang, @NotNull String n) {
-
         this(content);
-
-        if (!facs.isEmpty()) {
-            addAttribute(new Attribute("facs", facs));
-            this.facs = Optional.of(facs);
-        }
-
-        if (!id.isEmpty()) {
-            addAttribute(new Attribute("id", id));
-            this.id = Optional.of(id);
-        }
-
-        if (!lang.isEmpty()) {
-            addAttribute(new Attribute("lang", lang));
-            this.lang = Optional.of(lang);
-        }
-
-        if (!n.isEmpty()) {
-            addAttribute(new Attribute("n", n));
-            this.n = Optional.of(n);
-        }
-
+        initAttributes(facs, id, lang, n);
     }
 
     @NotNull
@@ -67,6 +62,30 @@ public class Abstract extends AbstractMixedContentElement {
     @NotNull
     public Optional<String> getN() {
         return n;
+    }
+
+    private void initAttributes(@Nullable String facs, @Nullable String id, @Nullable String lang, @Nullable String n) {
+
+        if (facs != null && !facs.isEmpty()) {
+            addAttribute(new Attribute("facs", facs));
+            this.facs = Optional.of(facs);
+        }
+
+        if (id != null && !id.isEmpty()) {
+            addAttribute(new Attribute("id", id));
+            this.id = Optional.of(id);
+        }
+
+        if (lang != null && !lang.isEmpty()) {
+            addAttribute(new Attribute("lang", lang));
+            this.lang = Optional.of(lang);
+        }
+
+        if (n != null && !n.isEmpty()) {
+            addAttribute(new Attribute("n", n));
+            this.n = Optional.of(n);
+        }
+
     }
 
 }

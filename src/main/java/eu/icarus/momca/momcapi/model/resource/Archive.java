@@ -14,10 +14,11 @@ import eu.icarus.momca.momcapi.query.XpathQuery;
 import nu.xom.Attribute;
 import nu.xom.Document;
 import nu.xom.Element;
-import nu.xom.Nodes;
+import nu.xom.Node;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -69,7 +70,7 @@ public class Archive extends AtomResource {
         super(existResource);
 
         Element xml = toDocument().getRootElement();
-        Nodes descNodes = Util.queryXmlToNodes(xml, XpathQuery.QUERY_EAG_DESC);
+        List<Node> descNodes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_EAG_DESC);
         EagDesc eagDesc = new EagDesc((Element) descNodes.get(0));
 
         if (descNodes.size() != 1) {
@@ -77,7 +78,7 @@ public class Archive extends AtomResource {
                     + existResource.toDocument().toXML());
         }
 
-        this.name = Util.queryXmlToOptional(xml, XpathQuery.QUERY_EAG_AUTFORM)
+        this.name = Util.queryXmlForOptionalString(xml, XpathQuery.QUERY_EAG_AUTFORM)
                 .orElseThrow(IllegalArgumentException::new);
         this.country = readCountryFromXml(xml, eagDesc).orElseThrow(IllegalArgumentException::new);
         this.regionName = readRegionNameFromXml(eagDesc);
@@ -168,7 +169,7 @@ public class Archive extends AtomResource {
     @NotNull
     private Optional<Country> readCountryFromXml(@NotNull Element xml, @NotNull EagDesc eagDesc) {
 
-        String countryCode = Util.queryXmlToString(xml, XpathQuery.QUERY_EAG_COUNTRYCODE);
+        String countryCode = Util.queryXmlForString(xml, XpathQuery.QUERY_EAG_COUNTRYCODE);
         String countryName = eagDesc.getCountryName();
 
         Optional<Country> country = Optional.empty();

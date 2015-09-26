@@ -56,30 +56,17 @@ public abstract class AbstractMixedContentElement extends Element {
         return content;
     }
 
-    @NotNull
-    private static Element getXmlWithCorrectedNamespace(Element xml) {
-        xml.setNamespaceURI(Namespace.CEI.getUri());
-        xml = Util.parseToElement(xml.toXML().replace("xmlns=\"\"", ""));
-        return xml;
-    }
+    static String initContent(@NotNull Element element, @NotNull String localName) {
 
-    protected String initContent(String content, String localName) {
-
-        String result = content;
-
-        if ((content.startsWith("<" + localName) || content.startsWith("<cei:" + localName)) && content.endsWith(localName + ">")) {
-
-            result = result.substring(result.indexOf(">") + 1, result.lastIndexOf("<"));
-
+        if (!element.getLocalName().equals(localName)) {
+            String message = String.format(
+                    "The provided element doesn't have the correct root element, 'cei:%s' but '%s'.",
+                    localName, element.getQualifiedName());
+            throw new IllegalArgumentException(message);
         }
 
-        return result;
+        return Util.joinChildNodes(element);
 
-    }
-
-    @NotNull
-    private static String removeNamespaceNames(String stringToParse) {
-        return stringToParse.replace("/cei:", "/").replace("<cei:", "<").replace(":cei=", "=");
     }
 
     @Override

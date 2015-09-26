@@ -211,7 +211,7 @@ public class Fond extends AtomResource {
 
     private Bibliography readBibliography(Element xml) {
 
-        Nodes bibliographyElements = Util.queryXmlToNodes(xml, XpathQuery.QUERY_EAD_BIBLIOGRAPHY);
+        List<Node> bibliographyElements = Util.queryXmlForNodes(xml, XpathQuery.QUERY_EAD_BIBLIOGRAPHY);
 
         if (bibliographyElements.size() != 1) {
             throw new MomcaException("The EAD XML needs to include exactly one 'ead:bibliography' element.");
@@ -237,7 +237,7 @@ public class Fond extends AtomResource {
     @NotNull
     private BiogHist readBiogHist(@NotNull Element xml) {
 
-        Nodes queryResult = Util.queryXmlToNodes(xml, XpathQuery.QUERY_EAD_BIOGHIST);
+        List<Node> queryResult = Util.queryXmlForNodes(xml, XpathQuery.QUERY_EAD_BIOGHIST);
 
         if (queryResult.size() != 1) {
             throw new MomcaException("The EAD XML needs to contain exactly one 'ead:bioghist' Element.");
@@ -254,7 +254,7 @@ public class Fond extends AtomResource {
 
     private CustodHist readCustodHist(Element xml) {
 
-        Nodes queryResult = Util.queryXmlToNodes(xml, XpathQuery.QUERY_EAD_CUSTODHIST);
+        List<Node> queryResult = Util.queryXmlForNodes(xml, XpathQuery.QUERY_EAD_CUSTODHIST);
 
         if (queryResult.size() != 1) {
             throw new MomcaException("The EAD XML needs to contain exactly one 'ead:custodhist' Element.");
@@ -270,7 +270,7 @@ public class Fond extends AtomResource {
     }
 
     private Optional<URL> readDummyImageUrl(@NotNull Element xml) {
-        String urlString = Util.queryXmlToString(xml, XpathQuery.QUERY_XRX_DUMMY_IMAGE_URL);
+        String urlString = Util.queryXmlForString(xml, XpathQuery.QUERY_XRX_DUMMY_IMAGE_URL);
         return createUrl(urlString);
     }
 
@@ -287,7 +287,7 @@ public class Fond extends AtomResource {
     @NotNull
     private IdFond readId(@NotNull Element xml) {
 
-        String idString = Util.queryXmlToString(xml, XpathQuery.QUERY_ATOM_ID);
+        String idString = Util.queryXmlForString(xml, XpathQuery.QUERY_ATOM_ID);
 
         if (idString.isEmpty()) {
             String errorMessage = String.format("No atom:id in xml content: '%s'", toDocument().toXML());
@@ -299,18 +299,18 @@ public class Fond extends AtomResource {
     }
 
     private Optional<ImageAccess> readImageAccess(Element xml) {
-        String imageAccessString = Util.queryXmlToString(xml, XpathQuery.QUERY_XRX_IMAGE_ACCESS);
+        String imageAccessString = Util.queryXmlForString(xml, XpathQuery.QUERY_XRX_IMAGE_ACCESS);
         return Optional.of(ImageAccess.fromText(imageAccessString));
     }
 
     private Optional<URL> readImagesUrl(@NotNull Element xml) {
-        String urlString = Util.queryXmlToString(xml, XpathQuery.QUERY_XRX_IMAGE_SERVER_BASE_URL);
+        String urlString = Util.queryXmlForString(xml, XpathQuery.QUERY_XRX_IMAGE_SERVER_BASE_URL);
         return createUrl(urlString);
     }
 
     @NotNull
     private String readName(Element xml) {
-        return Util.queryXmlToString(xml, XpathQuery.QUERY_EAD_UNITTITLE);
+        return Util.queryXmlForString(xml, XpathQuery.QUERY_EAD_UNITTITLE);
     }
 
     @NotNull
@@ -318,7 +318,7 @@ public class Fond extends AtomResource {
 
         List<Odd> results = new ArrayList<>();
 
-        Nodes queryResults = Util.queryXmlToNodes(xml, XpathQuery.QUERY_EAD_ODD);
+        List<Node> queryResults = Util.queryXmlForNodes(xml, XpathQuery.QUERY_EAD_ODD);
 
         if (queryResults.size() == 0) {
             throw new MomcaException("The EAD XML must include at least one 'ead:odd' Element.");

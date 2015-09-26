@@ -314,7 +314,7 @@ public class CharterTest {
 
         assertTrue(charter.isValidCei());
         assertEquals(charter.getBackGeogNames(), geogNames);
-        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back><cei:geogName certainty=\"certainty\" reg=\"reg\" type=\"type\" existent=\"existent\" key=\"key\" facs=\"facs\" id=\"id\" lang=\"lang\" n=\"n\">Ein Berg</cei:geogName><cei:geogName reg=\"Hügel\" type=\"Ding\">Ein Hügel</cei:geogName></cei:back></cei:text>");
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back><cei:geogName certainty=\"certainty\" existent=\"existent\" facs=\"facs\" id=\"id\" key=\"key\" lang=\"lang\" n=\"n\" reg=\"reg\" type=\"type\">Ein Berg</cei:geogName><cei:geogName reg=\"Hügel\" type=\"Ding\">Ein Hügel</cei:geogName></cei:back></cei:text>");
 
         charter.setBackGeogNames(new ArrayList<>(0));
 

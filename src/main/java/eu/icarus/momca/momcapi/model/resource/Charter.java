@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Created by daniel on 25.06.2015.
@@ -111,15 +112,23 @@ public class Charter extends AtomResource {
         sourceDescAbstractBibliography = readSourceDescAbstractBibliography(xml);
         sourceDescTenorBibliography = readSourceDescTenorBibliography(xml);
         tenor = readTenor(xml);
-        charterAbstract = readAbstract(xml);
-        langMom = Util.queryXmlToOptional(xml, XpathQuery.QUERY_CEI_LANG_MOM);
-        charterClass = Util.queryXmlToOptional(xml, XpathQuery.QUERY_CEI_CLASS);
+        charterAbstract = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_ABSTRACT)
+                .map(Abstract::new)
+                .filter(a -> !a.getContent().isEmpty());
+        langMom = Util.queryXmlForOptionalString(xml, XpathQuery.QUERY_CEI_LANG_MOM);
+        charterClass = Util.queryXmlForOptionalString(xml, XpathQuery.QUERY_CEI_CLASS);
         issuedPlace = readIssuedPlace(xml);
         backPlaceNames = readBackPlaceNames(xml);
-        backGeogNames = readBackGeogNames(xml);
+        backGeogNames = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_BACK_GEOG_NAME)
+                .stream()
+                .map(node -> new GeogName((Element) node))
+                .filter(geogName -> !geogName.getContent().isEmpty()).collect(Collectors.toList());
         backPersNames = readBackPersNames(xml);
         backIndexes = readBackIndexes(xml);
-        backDivNotes = readBackDivNotes(xml);
+        backDivNotes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_BACK_NOTE)
+                .stream()
+                .map(node -> new Note((Element) node))
+                .filter(note -> !note.getContent().isEmpty()).collect(Collectors.toList());
 
     }
 
@@ -197,49 +206,6 @@ public class Charter extends AtomResource {
 
     }
 
-    private Optional<GeogName> createGeogNameInstance(Element geogNameElement) {
-
-        Optional<GeogName> geogName = Optional.empty();
-
-        StringBuilder contentBuilder = new StringBuilder();
-        for (int i = 0; i < geogNameElement.getChildCount(); i++) {
-            contentBuilder.append(geogNameElement.getChild(i).toXML());
-        }
-        String contentString = contentBuilder.toString();
-
-        if (!contentString.isEmpty()) {
-
-            String certainty = geogNameElement.getAttributeValue("certainty");
-            String existent = geogNameElement.getAttributeValue("existent");
-            String facs = geogNameElement.getAttributeValue("facs");
-            String id = geogNameElement.getAttributeValue("id");
-            String key = geogNameElement.getAttributeValue("key");
-            String lang = geogNameElement.getAttributeValue("lang");
-            String n = geogNameElement.getAttributeValue("n");
-            String reg = geogNameElement.getAttributeValue("reg");
-            String type = geogNameElement.getAttributeValue("type");
-
-
-            geogName = Optional.of(
-                    new GeogName(
-                            contentString,
-                            certainty == null ? "" : certainty,
-                            reg == null ? "" : reg,
-                            type == null ? "" : type,
-                            existent == null ? "" : existent,
-                            key == null ? "" : key,
-                            facs == null ? "" : facs,
-                            id == null ? "" : id,
-                            lang == null ? "" : lang,
-                            n == null ? "" : n
-                    ));
-
-        }
-
-        return geogName;
-
-    }
-
     private Optional<Index> createIndexInstance(Element indexElement) {
 
         Optional<Index> index = Optional.empty();
@@ -277,36 +243,6 @@ public class Charter extends AtomResource {
         }
 
         return index;
-
-    }
-
-    private Optional<Note> createNoteInstance(Element noteElement) {
-
-        Optional<Note> place = Optional.empty();
-
-        StringBuilder contentBuilder = new StringBuilder();
-        for (int i = 0; i < noteElement.getChildCount(); i++) {
-            contentBuilder.append(noteElement.getChild(i).toXML());
-        }
-        String contentString = contentBuilder.toString();
-
-        if (!contentString.isEmpty()) {
-
-            String placeAttribute = noteElement.getAttributeValue("place");
-            String idAttribute = noteElement.getAttributeValue("id");
-            String nAttribute = noteElement.getAttributeValue("n");
-
-            place = Optional.of(
-                    new Note(
-                            contentString,
-                            placeAttribute == null ? "" : placeAttribute,
-                            idAttribute == null ? "" : idAttribute,
-                            nAttribute == null ? "" : nAttribute
-                    ));
-
-        }
-
-        return place;
 
     }
 
@@ -498,6 +434,7 @@ public class Charter extends AtomResource {
         return date;
     }
 
+
     @NotNull
     private static String getHierarchicalUriPart(@NotNull IdCharter idCharter) {
 
@@ -564,78 +501,11 @@ public class Charter extends AtomResource {
         return validationProblems.isEmpty();
     }
 
-    private Optional<Abstract> readAbstract(Element xml) {
-
-        Optional<Abstract> result = Optional.empty();
-
-        Nodes nodes = Util.queryXmlToNodes(xml, XpathQuery.QUERY_CEI_ABSTRACT);
-
-        if (nodes.size() != 0) {
-
-            Element element = (Element) nodes.get(0);
-
-            String content = Util.joinChildNodes(element);
-
-            if (!content.isEmpty()) {
-
-                String facs = element.getAttributeValue("facs");
-                String id = element.getAttributeValue("id");
-                String lang = element.getAttributeValue("lang");
-                String n = element.getAttributeValue("n");
-
-                result = Optional.of(
-                        new Abstract(
-                                content,
-                                facs == null ? "" : facs,
-                                id == null ? "" : id,
-                                lang == null ? "" : lang,
-                                n == null ? "" : n
-                        ));
-
-            }
-
-        }
-
-        return result;
-
-    }
-
-    private List<Note> readBackDivNotes(Element xml) {
-
-        List<Note> results = new ArrayList<>(0);
-
-        Nodes nodes = Util.queryXmlToNodes(xml, XpathQuery.QUERY_CEI_BACK_NOTE);
-
-        for (int i = 0; i < nodes.size(); i++) {
-            Element noteElement = (Element) nodes.get(i);
-            createNoteInstance(noteElement).ifPresent(results::add);
-        }
-
-        return results;
-
-    }
-
-    private List<GeogName> readBackGeogNames(Element xml) {
-
-        List<GeogName> results = new ArrayList<>(0);
-
-        Nodes nodes = Util.queryXmlToNodes(xml, XpathQuery.QUERY_CEI_BACK_GEOG_NAME);
-
-        for (int i = 0; i < nodes.size(); i++) {
-            Element geogNameElement = (Element) nodes.get(i);
-            createGeogNameInstance(geogNameElement).ifPresent(results::add);
-        }
-
-
-        return results;
-
-    }
-
     private List<Index> readBackIndexes(Element xml) {
 
         List<Index> results = new ArrayList<>(0);
 
-        Nodes nodes = Util.queryXmlToNodes(xml, XpathQuery.QUERY_CEI_BACK_INDEX);
+        List<Node> nodes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_BACK_INDEX);
 
         for (int i = 0; i < nodes.size(); i++) {
             Element indexElement = (Element) nodes.get(i);
@@ -649,10 +519,10 @@ public class Charter extends AtomResource {
 
         List<PersName> results = new ArrayList<>(0);
 
-        Nodes nodes = Util.queryXmlToNodes(xml, XpathQuery.QUERY_CEI_BACK_PERS_NAME);
+        List<Node> nodes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_BACK_PERS_NAME);
 
-        for (int i = 0; i < nodes.size(); i++) {
-            Element persNameElement = (Element) nodes.get(i);
+        for (Node node : nodes) {
+            Element persNameElement = (Element) node;
             createPersNameInstance(persNameElement).ifPresent(results::add);
         }
 
@@ -664,7 +534,7 @@ public class Charter extends AtomResource {
 
         List<PlaceName> results = new ArrayList<>(0);
 
-        Nodes nodes = Util.queryXmlToNodes(xml, XpathQuery.QUERY_CEI_BACK_PLACE_NAME);
+        List<Node> nodes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_BACK_PLACE_NAME);
 
         for (int i = 0; i < nodes.size(); i++) {
             Element placeNameElement = (Element) nodes.get(i);
@@ -698,8 +568,8 @@ public class Charter extends AtomResource {
 
         DateAbstract dateCei;
 
-        Nodes dateNodes = Util.queryXmlToNodes(xml, XpathQuery.QUERY_CEI_ISSUED_DATE);
-        Nodes dateRangeNodes = Util.queryXmlToNodes(xml, XpathQuery.QUERY_CEI_ISSUED_DATE_RANGE);
+        List<Node> dateNodes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_ISSUED_DATE);
+        List<Node> dateRangeNodes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_ISSUED_DATE_RANGE);
 
         if ((dateNodes.size() == 1 && dateRangeNodes.size() == 0) || (dateNodes.size() == 0 && dateRangeNodes.size() == 1)) {
 
@@ -768,13 +638,13 @@ public class Charter extends AtomResource {
     }
 
     private Element readDiplomaticAnalysis(Element xml) {
-        Nodes queryResult = Util.queryXmlToNodes(xml, XpathQuery.QUERY_CEI_DIPLOMATIC_ANALYSIS);
+        List<Node> queryResult = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_DIPLOMATIC_ANALYSIS);
         return queryResult.size() == 0 ? new Element("cei:diplomaticAnalysis", CEI_URI) : (Element) queryResult.get(0);
     }
 
     private Idno readIdno(Element xml) {
 
-        Nodes nodes = Util.queryXmlToNodes(xml, XpathQuery.QUERY_CEI_BODY_IDNO);
+        List<Node> nodes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_BODY_IDNO);
 
         if (nodes.size() == 0) {
             throw new MomcaException("There is no idno element in the provided xml!");
@@ -806,7 +676,7 @@ public class Charter extends AtomResource {
 
     private Optional<PlaceName> readIssuedPlace(Element xml) {
 
-        Nodes nodes = Util.queryXmlToNodes(xml, XpathQuery.QUERY_CEI_ISSUED_PLACE_NAME);
+        List<Node> nodes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_ISSUED_PLACE_NAME);
 
         Optional<PlaceName> place = Optional.empty();
 
@@ -823,7 +693,7 @@ public class Charter extends AtomResource {
     }
 
     private Optional<String> readMixedContentElement(Element xml, XpathQuery query) {
-        String queryResult = Util.queryXmlToString(xml, query);
+        String queryResult = Util.queryXmlForString(xml, query);
         return queryResult.isEmpty() ? Optional.empty() : Optional.of(queryResult);
     }
 
@@ -831,7 +701,7 @@ public class Charter extends AtomResource {
 
         Optional<Bibliography> result = Optional.empty();
 
-        Nodes nodes = Util.queryXmlToNodes(xml, XpathQuery.QUERY_CEI_SOURCE_DESC_REGEST_BIBL);
+        List<Node> nodes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_SOURCE_DESC_REGEST_BIBL);
 
         if (nodes.size() != 0) {
 
@@ -876,7 +746,7 @@ public class Charter extends AtomResource {
 
         Optional<Bibliography> result = Optional.empty();
 
-        Nodes nodes = Util.queryXmlToNodes(xml, XpathQuery.QUERY_CEI_SOURCE_DESC_VOLLTEXT_BIBL);
+        List<Node> nodes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_SOURCE_DESC_VOLLTEXT_BIBL);
 
         if (nodes.size() != 0) {
 
@@ -921,7 +791,7 @@ public class Charter extends AtomResource {
 
         Optional<Tenor> result = Optional.empty();
 
-        Nodes nodes = Util.queryXmlToNodes(xml, XpathQuery.QUERY_CEI_TENOR);
+        List<Node> nodes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_TENOR);
 
         if (nodes.size() != 0) {
 
@@ -955,7 +825,7 @@ public class Charter extends AtomResource {
 
         List<Node> results = new ArrayList<>(0);
 
-        Nodes nodes = Util.queryXmlToNodes(xml, XpathQuery.QUERY_CEI_FRONT);
+        List<Node> nodes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_FRONT);
         for (int i = 0; i < nodes.size(); i++) {
             Node node = nodes.get(i);
             if (node instanceof Element && ((Element) node).getLocalName().equals("sourceDesc")) {
@@ -1141,9 +1011,18 @@ public class Charter extends AtomResource {
 
     @NotNull
     public Element toCei() {
+
         Element xml = (Element) toDocument().getRootElement().copy();
         Element atomContent = xml.getFirstChildElement("content", Namespace.ATOM.getUri());
-        return atomContent.getFirstChildElement("text", CEI_URI);
+
+        Element cei = atomContent.getFirstChildElement("text", CEI_URI);
+
+        if (cei == null) {
+            throw new MomcaException("The charter doesn't have a 'cei:text' element");
+        }
+
+        return cei;
+
     }
 
     private void validateCei(@NotNull ExistResource resource)
@@ -1161,17 +1040,8 @@ public class Charter extends AtomResource {
         XMLReader reader = parser.getXMLReader();
         reader.setErrorHandler(new SimpleErrorHandler());
 
-        Nodes ceiTextNodes = resource.queryContentAsNodes(XpathQuery.QUERY_CEI_TEXT);
-
-        if (ceiTextNodes.size() != 1) {
-            throw new IllegalArgumentException("XML content has no 'cei:text' element therefor it is probably not" +
-                    " a mom-ca charter.");
-        }
-
-        Element ceiTextElement = (Element) ceiTextNodes.get(0);
-
         Builder builder = new Builder(reader);
-        builder.build(ceiTextElement.toXML(), CEI_URI);
+        builder.build(toCei().toXML(), CEI_URI);
 
     }
 
