@@ -137,7 +137,11 @@ public class Charter extends AtomResource {
                 .map(node -> new PersName((Element) node))
                 .filter(persName -> !persName.getContent().isEmpty()).collect(Collectors.toList());
 
-        backIndexes = readBackIndexes(xml);
+        backIndexes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_BACK_INDEX)
+                .stream()
+                .map(node -> new Index((Element) node))
+                .filter(index -> !index.getContent().isEmpty()).collect(Collectors.toList());
+
         backDivNotes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_BACK_NOTE)
                 .stream()
                 .map(node -> new Note((Element) node))

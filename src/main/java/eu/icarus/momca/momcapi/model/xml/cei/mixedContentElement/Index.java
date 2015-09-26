@@ -1,7 +1,9 @@
 package eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement;
 
 import nu.xom.Attribute;
+import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -10,6 +12,7 @@ import java.util.Optional;
  */
 public class Index extends AbstractMixedContentElement {
 
+    public static final String LOCAL_NAME = "index";
     @NotNull
     private Optional<String> facs = Optional.empty();
     @NotNull
@@ -29,61 +32,36 @@ public class Index extends AbstractMixedContentElement {
 
     public Index(@NotNull String content, @NotNull String indexName, @NotNull String lemma,
                  @NotNull String sublemma, @NotNull String type) {
-
         this(content);
-
-        if (!indexName.isEmpty()) {
-            addAttribute(new Attribute("indexName", indexName));
-            this.indexName = Optional.of(indexName);
-        }
-
-        if (!lemma.isEmpty()) {
-            addAttribute(new Attribute("lemma", lemma));
-            this.lemma = Optional.of(lemma);
-        }
-
-        if (!sublemma.isEmpty()) {
-            addAttribute(new Attribute("sublemma", sublemma));
-            this.sublemma = Optional.of(sublemma);
-        }
-
-        if (!type.isEmpty()) {
-            addAttribute(new Attribute("type", type));
-            this.type = Optional.of(type);
-        }
-
+        initAttributes("", "", indexName, "", lemma, "", sublemma, type);
     }
 
     public Index(@NotNull String content, @NotNull String indexName, @NotNull String lemma,
                  @NotNull String sublemma, @NotNull String type, @NotNull String id, @NotNull String facs,
                  @NotNull String lang, @NotNull String n) {
-
         this(content, indexName, lemma, sublemma, type);
+        initAttributes(facs, id, indexName, lang, lemma, n, sublemma, type);
+    }
 
-        if (!id.isEmpty()) {
-            addAttribute(new Attribute("id", id));
-            this.id = Optional.of(id);
-        }
+    public Index(@NotNull Element indexElement) {
 
-        if (!facs.isEmpty()) {
-            addAttribute(new Attribute("facs", facs));
-            this.facs = Optional.of(facs);
-        }
+        this(initContent(indexElement, LOCAL_NAME));
 
-        if (!lang.isEmpty()) {
-            addAttribute(new Attribute("lang", lang));
-            this.lang = Optional.of(lang);
-        }
+        String facs = indexElement.getAttributeValue("facs");
+        String id = indexElement.getAttributeValue("id");
+        String indexName = indexElement.getAttributeValue("indexName");
+        String lang = indexElement.getAttributeValue("lang");
+        String lemma = indexElement.getAttributeValue("lemma");
+        String n = indexElement.getAttributeValue("n");
+        String sublemma = indexElement.getAttributeValue("sublemma");
+        String type = indexElement.getAttributeValue("type");
 
-        if (!n.isEmpty()) {
-            addAttribute(new Attribute("n", n));
-            this.n = Optional.of(n);
-        }
+        initAttributes(facs, id, indexName, lang, lemma, n, sublemma, type);
 
     }
 
     public Index(@NotNull String content) {
-        super(content, "index");
+        super(content, LOCAL_NAME);
     }
 
     @NotNull
@@ -124,6 +102,52 @@ public class Index extends AbstractMixedContentElement {
     @NotNull
     public Optional<String> getType() {
         return type;
+    }
+
+    private void initAttributes(@Nullable String facs, @Nullable String id, @Nullable String indexName,
+                                @Nullable String lang, @Nullable String lemma, @Nullable String n,
+                                @Nullable String sublemma, @Nullable String type) {
+
+        if (facs != null && !facs.isEmpty()) {
+            addAttribute(new Attribute("facs", facs));
+            this.facs = Optional.of(facs);
+        }
+
+        if (id != null && !id.isEmpty()) {
+            addAttribute(new Attribute("id", id));
+            this.id = Optional.of(id);
+        }
+
+        if (indexName != null && !indexName.isEmpty()) {
+            addAttribute(new Attribute("indexName", indexName));
+            this.indexName = Optional.of(indexName);
+        }
+
+        if (lang != null && !lang.isEmpty()) {
+            addAttribute(new Attribute("lang", lang));
+            this.lang = Optional.of(lang);
+        }
+
+        if (lemma != null && !lemma.isEmpty()) {
+            addAttribute(new Attribute("lemma", lemma));
+            this.lemma = Optional.of(lemma);
+        }
+
+        if (n != null && !n.isEmpty()) {
+            addAttribute(new Attribute("n", n));
+            this.n = Optional.of(n);
+        }
+
+        if (sublemma != null && !sublemma.isEmpty()) {
+            addAttribute(new Attribute("sublemma", sublemma));
+            this.sublemma = Optional.of(sublemma);
+        }
+
+        if (type != null && !type.isEmpty()) {
+            addAttribute(new Attribute("type", type));
+            this.type = Optional.of(type);
+        }
+
     }
 
 }
