@@ -117,8 +117,13 @@ public class Charter extends AtomResource {
                 .filter(a -> !a.getContent().isEmpty());
         langMom = Util.queryXmlForOptionalString(xml, XpathQuery.QUERY_CEI_LANG_MOM);
         charterClass = Util.queryXmlForOptionalString(xml, XpathQuery.QUERY_CEI_CLASS);
-        issuedPlace = readIssuedPlace(xml);
-        backPlaceNames = readBackPlaceNames(xml);
+        issuedPlace = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_ISSUED_PLACE_NAME)
+                .map(PlaceName::new)
+                .filter(placeName -> !placeName.getContent().isEmpty());
+        backPlaceNames = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_BACK_PLACE_NAME)
+                .stream()
+                .map(node -> new PlaceName((Element) node))
+                .filter(placeName -> !placeName.getContent().isEmpty()).collect(Collectors.toList());
         backGeogNames = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_BACK_GEOG_NAME)
                 .stream()
                 .map(node -> new GeogName((Element) node))
@@ -322,49 +327,6 @@ public class Charter extends AtomResource {
 
     }
 
-    private Optional<PlaceName> createPlaceNameInstance(Element placeNameElement) {
-
-        Optional<PlaceName> place = Optional.empty();
-
-        StringBuilder contentBuilder = new StringBuilder();
-        for (int i = 0; i < placeNameElement.getChildCount(); i++) {
-            contentBuilder.append(placeNameElement.getChild(i).toXML());
-        }
-        String contentString = contentBuilder.toString();
-
-        if (!contentString.isEmpty()) {
-
-            String certainty = placeNameElement.getAttributeValue("certainty");
-            String existent = placeNameElement.getAttributeValue("existent");
-            String facs = placeNameElement.getAttributeValue("facs");
-            String id = placeNameElement.getAttributeValue("id");
-            String key = placeNameElement.getAttributeValue("key");
-            String lang = placeNameElement.getAttributeValue("lang");
-            String n = placeNameElement.getAttributeValue("n");
-            String reg = placeNameElement.getAttributeValue("reg");
-            String type = placeNameElement.getAttributeValue("type");
-
-
-            place = Optional.of(
-                    new PlaceName(
-                            contentString,
-                            certainty == null ? "" : certainty,
-                            reg == null ? "" : reg,
-                            type == null ? "" : type,
-                            existent == null ? "" : existent,
-                            key == null ? "" : key,
-                            facs == null ? "" : facs,
-                            id == null ? "" : id,
-                            lang == null ? "" : lang,
-                            n == null ? "" : n
-                    ));
-
-        }
-
-        return place;
-
-    }
-
     @NotNull
     private static String createResourceName(@NotNull IdCharter id, @NotNull CharterStatus charterStatus) {
 
@@ -530,22 +492,6 @@ public class Charter extends AtomResource {
 
     }
 
-    private List<PlaceName> readBackPlaceNames(Element xml) {
-
-        List<PlaceName> results = new ArrayList<>(0);
-
-        List<Node> nodes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_BACK_PLACE_NAME);
-
-        for (int i = 0; i < nodes.size(); i++) {
-            Element placeNameElement = (Element) nodes.get(i);
-            createPlaceNameInstance(placeNameElement).ifPresent(results::add);
-        }
-
-
-        return results;
-
-    }
-
     private CharterStatus readCharterStatus() {
 
         CharterStatus status;
@@ -671,24 +617,6 @@ public class Charter extends AtomResource {
                 facs == null ? "" : facs,
                 n == null ? "" : n
         );
-
-    }
-
-    private Optional<PlaceName> readIssuedPlace(Element xml) {
-
-        List<Node> nodes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_ISSUED_PLACE_NAME);
-
-        Optional<PlaceName> place = Optional.empty();
-
-        if (nodes.size() != 0) {
-
-            Element issuedElement = (Element) nodes.get(0);
-
-            place = createPlaceNameInstance(issuedElement);
-
-        }
-
-        return place;
 
     }
 

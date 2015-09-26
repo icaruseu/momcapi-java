@@ -71,6 +71,11 @@ public class CharterTest {
         assertEquals(charter.getIdno().getText(), "charter1");
         assertEquals(charter.getDate(), date);
 
+        assertEquals(charter.getBackDivNotes().size(), 0);
+        assertEquals(charter.getBackPersNames().size(), 0);
+        assertEquals(charter.getBackGeogNames().size(), 0);
+        assertEquals(charter.getBackIndexes().size(), 0);
+
         assertTrue(charter.isValidCei());
         assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
 
@@ -389,7 +394,7 @@ public class CharterTest {
 
         assertTrue(charter.isValidCei());
         assertEquals(charter.getBackPlaceNames(), placeNames);
-        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back><cei:placeName certainty=\"certainty\" reg=\"reg\" type=\"type\" existent=\"existent\" key=\"key\" facs=\"facs\" id=\"id\" lang=\"lang\" n=\"n\">Frankfurt</cei:placeName><cei:placeName reg=\"Salzburg\" type=\"City\">Iuvavum</cei:placeName></cei:back></cei:text>");
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back><cei:placeName certainty=\"certainty\" existent=\"existent\" facs=\"facs\" id=\"id\" key=\"key\" lang=\"lang\" n=\"n\" reg=\"reg\" type=\"type\">Frankfurt</cei:placeName><cei:placeName reg=\"Salzburg\" type=\"City\">Iuvavum</cei:placeName></cei:back></cei:text>");
 
         charter.setBackPlaceNames(new ArrayList<>(0));
 
