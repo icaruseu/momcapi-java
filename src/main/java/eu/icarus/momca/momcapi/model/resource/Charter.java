@@ -117,18 +117,26 @@ public class Charter extends AtomResource {
                 .filter(a -> !a.getContent().isEmpty());
         langMom = Util.queryXmlForOptionalString(xml, XpathQuery.QUERY_CEI_LANG_MOM);
         charterClass = Util.queryXmlForOptionalString(xml, XpathQuery.QUERY_CEI_CLASS);
+
         issuedPlace = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_ISSUED_PLACE_NAME)
                 .map(PlaceName::new)
                 .filter(placeName -> !placeName.getContent().isEmpty());
+
         backPlaceNames = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_BACK_PLACE_NAME)
                 .stream()
                 .map(node -> new PlaceName((Element) node))
                 .filter(placeName -> !placeName.getContent().isEmpty()).collect(Collectors.toList());
+
         backGeogNames = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_BACK_GEOG_NAME)
                 .stream()
                 .map(node -> new GeogName((Element) node))
                 .filter(geogName -> !geogName.getContent().isEmpty()).collect(Collectors.toList());
-        backPersNames = readBackPersNames(xml);
+
+        backPersNames = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_BACK_PERS_NAME)
+                .stream()
+                .map(node -> new PersName((Element) node))
+                .filter(persName -> !persName.getContent().isEmpty()).collect(Collectors.toList());
+
         backIndexes = readBackIndexes(xml);
         backDivNotes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_BACK_NOTE)
                 .stream()
@@ -287,46 +295,6 @@ public class Charter extends AtomResource {
 
     }
 
-    private Optional<PersName> createPersNameInstance(Element persNameElement) {
-
-        Optional<PersName> persName = Optional.empty();
-
-        StringBuilder contentBuilder = new StringBuilder();
-        for (int i = 0; i < persNameElement.getChildCount(); i++) {
-            contentBuilder.append(persNameElement.getChild(i).toXML());
-        }
-        String contentString = contentBuilder.toString();
-
-        if (!contentString.isEmpty()) {
-
-            String certainty = persNameElement.getAttributeValue("certainty");
-            String reg = persNameElement.getAttributeValue("reg");
-            String type = persNameElement.getAttributeValue("type");
-            String key = persNameElement.getAttributeValue("key");
-            String facs = persNameElement.getAttributeValue("facs");
-            String id = persNameElement.getAttributeValue("id");
-            String lang = persNameElement.getAttributeValue("lang");
-            String n = persNameElement.getAttributeValue("n");
-
-            persName = Optional.of(
-                    new PersName(
-                            contentString,
-                            certainty == null ? "" : certainty,
-                            reg == null ? "" : reg,
-                            type == null ? "" : type,
-                            key == null ? "" : key,
-                            facs == null ? "" : facs,
-                            id == null ? "" : id,
-                            lang == null ? "" : lang,
-                            n == null ? "" : n
-                    ));
-
-        }
-
-        return persName;
-
-    }
-
     @NotNull
     private static String createResourceName(@NotNull IdCharter id, @NotNull CharterStatus charterStatus) {
 
@@ -475,21 +443,6 @@ public class Charter extends AtomResource {
         }
 
         return results;
-    }
-
-    private List<PersName> readBackPersNames(Element xml) {
-
-        List<PersName> results = new ArrayList<>(0);
-
-        List<Node> nodes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_BACK_PERS_NAME);
-
-        for (Node node : nodes) {
-            Element persNameElement = (Element) node;
-            createPersNameInstance(persNameElement).ifPresent(results::add);
-        }
-
-        return results;
-
     }
 
     private CharterStatus readCharterStatus() {

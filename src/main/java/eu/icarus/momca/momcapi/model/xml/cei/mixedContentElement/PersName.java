@@ -1,7 +1,9 @@
 package eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement;
 
 import nu.xom.Attribute;
+import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -10,6 +12,7 @@ import java.util.Optional;
  */
 public class PersName extends AbstractMixedContentElement {
 
+    public static final String LOCAL_NAME = "persName";
     @NotNull
     private Optional<String> certainty = Optional.empty();
     @NotNull
@@ -27,63 +30,38 @@ public class PersName extends AbstractMixedContentElement {
     @NotNull
     private Optional<String> type = Optional.empty();
 
-    public PersName(@NotNull String content, @NotNull String certainty, @NotNull String reg,
-                    @NotNull String type, @NotNull String key) {
-
+    public PersName(@NotNull String content, @NotNull String certainty, @NotNull String key, @NotNull String reg,
+                    @NotNull String type) {
         this(content);
-
-        if (!certainty.isEmpty()) {
-            addAttribute(new Attribute("certainty", certainty));
-            this.certainty = Optional.of(certainty);
-        }
-
-        if (!reg.isEmpty()) {
-            addAttribute(new Attribute("reg", reg));
-            this.reg = Optional.of(reg);
-        }
-
-        if (!type.isEmpty()) {
-            addAttribute(new Attribute("type", type));
-            this.type = Optional.of(type);
-        }
-
-        if (!key.isEmpty()) {
-            addAttribute(new Attribute("key", key));
-            this.key = Optional.of(key);
-        }
-
+        initAttributes(certainty, "", "", key, "", "", reg, type);
     }
 
-    public PersName(@NotNull String content, @NotNull String certainty, @NotNull String reg, @NotNull String type,
-                    @NotNull String key, @NotNull String facs, @NotNull String id, @NotNull String lang,
-                    @NotNull String n) {
+    public PersName(@NotNull String content, @NotNull String certainty, @NotNull String facs, @NotNull String id,
+                    @NotNull String key, @NotNull String lang, @NotNull String n, @NotNull String reg,
+                    @NotNull String type) {
+        this(content);
+        initAttributes(certainty, facs, id, key, lang, n, reg, type);
+    }
 
-        this(content, certainty, reg, type, key);
+    public PersName(@NotNull Element persNameElement) {
 
-        if (!facs.isEmpty()) {
-            addAttribute(new Attribute("facs", facs));
-            this.facs = Optional.of(facs);
-        }
+        this(initContent(persNameElement, LOCAL_NAME));
 
-        if (!id.isEmpty()) {
-            addAttribute(new Attribute("id", id));
-            this.id = Optional.of(id);
-        }
+        String certainty = persNameElement.getAttributeValue("certainty");
+        String facs = persNameElement.getAttributeValue("facs");
+        String id = persNameElement.getAttributeValue("id");
+        String key = persNameElement.getAttributeValue("key");
+        String lang = persNameElement.getAttributeValue("lang");
+        String n = persNameElement.getAttributeValue("n");
+        String reg = persNameElement.getAttributeValue("reg");
+        String type = persNameElement.getAttributeValue("type");
 
-        if (!lang.isEmpty()) {
-            addAttribute(new Attribute("lang", lang));
-            this.lang = Optional.of(lang);
-        }
-
-        if (!n.isEmpty()) {
-            addAttribute(new Attribute("n", n));
-            this.n = Optional.of(n);
-        }
+        initAttributes(certainty, facs, id, key, lang, n, reg, type);
 
     }
 
     public PersName(@NotNull String content) {
-        super(content, "persName");
+        super(content, LOCAL_NAME);
     }
 
     @NotNull
@@ -124,6 +102,52 @@ public class PersName extends AbstractMixedContentElement {
     @NotNull
     public Optional<String> getType() {
         return type;
+    }
+
+    private void initAttributes(@Nullable String certainty, @Nullable String facs, @Nullable String id,
+                                @Nullable String key, @Nullable String lang, @Nullable String n, @Nullable String reg,
+                                @Nullable String type) {
+
+        if (certainty != null && !certainty.isEmpty()) {
+            addAttribute(new Attribute("certainty", certainty));
+            this.certainty = Optional.of(certainty);
+        }
+
+        if (facs != null && !facs.isEmpty()) {
+            addAttribute(new Attribute("facs", facs));
+            this.facs = Optional.of(facs);
+        }
+
+        if (id != null && !id.isEmpty()) {
+            addAttribute(new Attribute("id", id));
+            this.id = Optional.of(id);
+        }
+
+        if (key != null && !key.isEmpty()) {
+            addAttribute(new Attribute("key", key));
+            this.key = Optional.of(key);
+        }
+
+        if (lang != null && !lang.isEmpty()) {
+            addAttribute(new Attribute("lang", lang));
+            this.lang = Optional.of(lang);
+        }
+
+        if (n != null && !n.isEmpty()) {
+            addAttribute(new Attribute("n", n));
+            this.n = Optional.of(n);
+        }
+
+        if (reg != null && !reg.isEmpty()) {
+            addAttribute(new Attribute("reg", reg));
+            this.reg = Optional.of(reg);
+        }
+
+        if (type != null && !type.isEmpty()) {
+            addAttribute(new Attribute("type", type));
+            this.type = Optional.of(type);
+        }
+
     }
 
 }
