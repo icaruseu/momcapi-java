@@ -463,12 +463,12 @@ public class CharterTest {
 
         assertEquals(charter.getIdno().getId(), "charter1");
 
-        Idno newId = new Idno("newId", "New Idno Text", "old", "facs", "n");
+        Idno newId = new Idno("New Idno Text", "facs", "newId", "n", "old");
         charter.setIdno(newId);
 
         assertEquals(charter.getIdno(), newId);
         assertTrue(charter.isValidCei());
-        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"newId\" old=\"old\" facs=\"facs\" n=\"n\">New Idno Text</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno facs=\"facs\" id=\"newId\" n=\"n\" old=\"old\">New Idno Text</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
 
     }
 

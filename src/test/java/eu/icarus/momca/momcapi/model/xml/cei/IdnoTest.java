@@ -10,7 +10,7 @@ import static org.testng.Assert.*;
 public class IdnoTest {
 
     public static final Idno CEI_IDNO_WITHOUT_OLD = new Idno("id", "text");
-    private static final Idno CEI_IDNO_WITH_OLD = new Idno("id", "text", "old", "facs", "n");
+    private static final Idno CEI_IDNO_WITH_OLD = new Idno("text", "facs", "id", "n", "old");
 
     @Test
     public void testGetId() throws Exception {

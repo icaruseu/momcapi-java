@@ -103,19 +103,28 @@ public class Charter extends AtomResource {
 
         creator = readCreatorFromXml(xml);
         charterStatus = readCharterStatus();
-        idno = readIdno(xml);
+
+        idno = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_BODY_IDNO)
+                .map(Idno::new)
+                .orElseThrow(MomcaException::new);
+
         date = readDate(xml);
 
         unusedFrontNodes = readUnusedFrontElements(xml);
-        diplomaticAnalysis = readDiplomaticAnalysis(xml);
+
+        diplomaticAnalysis = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_DIPLOMATIC_ANALYSIS)
+                .orElse(new Element("cei:diplomaticAnalysis", CEI_URI));
 
         sourceDescAbstractBibliography = readSourceDescAbstractBibliography(xml);
         sourceDescTenorBibliography = readSourceDescTenorBibliography(xml);
         tenor = readTenor(xml);
+
         charterAbstract = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_ABSTRACT)
                 .map(Abstract::new)
                 .filter(a -> !a.getContent().isEmpty());
+
         langMom = Util.queryXmlForOptionalString(xml, XpathQuery.QUERY_CEI_LANG_MOM);
+
         charterClass = Util.queryXmlForOptionalString(xml, XpathQuery.QUERY_CEI_CLASS);
 
         issuedPlace = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_ISSUED_PLACE_NAME)
@@ -223,46 +232,6 @@ public class Charter extends AtomResource {
 
     }
 
-    private Optional<Index> createIndexInstance(Element indexElement) {
-
-        Optional<Index> index = Optional.empty();
-
-        StringBuilder contentBuilder = new StringBuilder();
-        for (int i = 0; i < indexElement.getChildCount(); i++) {
-            contentBuilder.append(indexElement.getChild(i).toXML());
-        }
-        String contentString = contentBuilder.toString();
-
-        if (!contentString.isEmpty()) {
-
-            String indexName = indexElement.getAttributeValue("indexName");
-            String lemma = indexElement.getAttributeValue("lemma");
-            String sublemma = indexElement.getAttributeValue("sublemma");
-            String type = indexElement.getAttributeValue("type");
-            String id = indexElement.getAttributeValue("id");
-            String facs = indexElement.getAttributeValue("facs");
-            String lang = indexElement.getAttributeValue("lang");
-            String n = indexElement.getAttributeValue("n");
-
-            index = Optional.of(
-                    new Index(
-                            contentString,
-                            indexName == null ? "" : indexName,
-                            lemma == null ? "" : lemma,
-                            sublemma == null ? "" : sublemma,
-                            type == null ? "" : type,
-                            id == null ? "" : id,
-                            facs == null ? "" : facs,
-                            lang == null ? "" : lang,
-                            n == null ? "" : n
-                    ));
-
-        }
-
-        return index;
-
-    }
-
     private static String createParentUri(@NotNull IdCharter idCharter, @NotNull CharterStatus charterStatus, @NotNull IdUser creator) {
 
         String parentUri = "";
@@ -280,13 +249,13 @@ public class Charter extends AtomResource {
             case IMPORTED:
                 parentUri = String.format("%s/%s",
                         ResourceRoot.IMPORTED_ARCHIVAL_CHARTERS.getUri(),
-                        getHierarchicalUriPart(idCharter));
+                        extractHierarchicalUriPart(idCharter));
                 break;
 
             case PUBLIC:
                 parentUri = String.format("%s/%s",
                         ResourceRoot.PUBLIC_CHARTERS.getUri(),
-                        getHierarchicalUriPart(idCharter));
+                        extractHierarchicalUriPart(idCharter));
                 break;
 
             case SAVED:
@@ -320,6 +289,27 @@ public class Charter extends AtomResource {
         }
 
         return resourceName;
+
+    }
+
+    @NotNull
+    private static String extractHierarchicalUriPart(@NotNull IdCharter idCharter) {
+
+        String idPart;
+
+        if (idCharter.isInFond()) {
+
+            String archiveIdentifier = idCharter.getIdFond().get().getIdArchive().getIdentifier();
+            String fondIdentifier = idCharter.getIdFond().get().getIdentifier();
+            idPart = archiveIdentifier + "/" + fondIdentifier;
+
+        } else {
+
+            idPart = idCharter.getIdCollection().get().getIdentifier();
+
+        }
+
+        return idPart;
 
     }
 
@@ -368,28 +358,6 @@ public class Charter extends AtomResource {
         return date;
     }
 
-
-    @NotNull
-    private static String getHierarchicalUriPart(@NotNull IdCharter idCharter) {
-
-        String idPart;
-
-        if (idCharter.isInFond()) {
-
-            String archiveIdentifier = idCharter.getIdFond().get().getIdArchive().getIdentifier();
-            String fondIdentifier = idCharter.getIdFond().get().getIdentifier();
-            idPart = archiveIdentifier + "/" + fondIdentifier;
-
-        } else {
-
-            idPart = idCharter.getIdCollection().get().getIdentifier();
-
-        }
-
-        return idPart;
-
-    }
-
     @NotNull
     @Override
     public IdCharter getId() {
@@ -433,20 +401,6 @@ public class Charter extends AtomResource {
 
     public boolean isValidCei() {
         return validationProblems.isEmpty();
-    }
-
-    private List<Index> readBackIndexes(Element xml) {
-
-        List<Index> results = new ArrayList<>(0);
-
-        List<Node> nodes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_BACK_INDEX);
-
-        for (int i = 0; i < nodes.size(); i++) {
-            Element indexElement = (Element) nodes.get(i);
-            createIndexInstance(indexElement).ifPresent(results::add);
-        }
-
-        return results;
     }
 
     private CharterStatus readCharterStatus() {
@@ -538,48 +492,6 @@ public class Charter extends AtomResource {
 
         return new Date(dateCei);
 
-    }
-
-    private Element readDiplomaticAnalysis(Element xml) {
-        List<Node> queryResult = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_DIPLOMATIC_ANALYSIS);
-        return queryResult.size() == 0 ? new Element("cei:diplomaticAnalysis", CEI_URI) : (Element) queryResult.get(0);
-    }
-
-    private Idno readIdno(Element xml) {
-
-        List<Node> nodes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_BODY_IDNO);
-
-        if (nodes.size() == 0) {
-            throw new MomcaException("There is no idno element in the provided xml!");
-        }
-
-        Element element = (Element) nodes.get(0);
-
-        String content = element.getValue();
-
-        String facs = element.getAttributeValue("facs");
-        String id = element.getAttributeValue("id");
-        String n = element.getAttributeValue("n");
-        String old = element.getAttributeValue("old");
-
-        if (content.isEmpty() || id.isEmpty()) {
-            throw new MomcaException("There is no text and id content in the provided idno element!");
-        }
-
-
-        return new Idno(
-                id,
-                content,
-                old == null ? "" : old,
-                facs == null ? "" : facs,
-                n == null ? "" : n
-        );
-
-    }
-
-    private Optional<String> readMixedContentElement(Element xml, XpathQuery query) {
-        String queryResult = Util.queryXmlForString(xml, query);
-        return queryResult.isEmpty() ? Optional.empty() : Optional.of(queryResult);
     }
 
     private Optional<Bibliography> readSourceDescAbstractBibliography(Element xml) {

@@ -4,6 +4,7 @@ import eu.icarus.momca.momcapi.model.xml.Namespace;
 import nu.xom.Attribute;
 import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -31,43 +32,48 @@ public class Idno extends Element {
     @NotNull
     private String text;
 
+    private Idno() {
+        super("cei:idno", Namespace.CEI.getUri());
+    }
+
     public Idno(@NotNull String id, @NotNull String text) {
 
-        super("cei:idno", Namespace.CEI.getUri());
+        this();
 
-        this.text = text;
-        this.id = id;
-
-        appendChild(text);
-        addAttribute(new Attribute("id", id));
+        initText(text);
+        initAttributes("", id, "", "");
 
     }
 
-    /**
-     * Instantiates a new Idno.
-     *
-     * @param id   The {@code cei:idno/@id}-attribute.
-     * @param text The text content.
-     */
-    public Idno(@NotNull String id, @NotNull String text, @NotNull String old, @NotNull String facs, @NotNull String n) {
+    public Idno(@NotNull String text, @NotNull String facs, @NotNull String id, @NotNull String n, @NotNull String old) {
 
-        this(id, text);
+        this();
 
-        if (!old.isEmpty()) {
-            addAttribute(new Attribute("old", old));
-            this.old = Optional.of(old);
+        initText(text);
+        initAttributes(facs, id, n, old);
+
+    }
+
+    public Idno(@NotNull Element idnoElement) {
+
+        this();
+
+        if (!idnoElement.getLocalName().equals("idno")) {
+            String message = String.format("The provided element is '%s' instead of 'cei:idno'.",
+                    idnoElement.getQualifiedName());
+            throw new IllegalArgumentException(message);
         }
 
-        if (!facs.isEmpty()) {
-            addAttribute(new Attribute("facs", facs));
-            this.facs = Optional.of(facs);
-        }
+        String text = idnoElement.getValue();
 
-        if (!n.isEmpty()) {
-            addAttribute(new Attribute("n", n));
-            this.n = Optional.of(n);
-        }
+        initText(text);
 
+        String facs = idnoElement.getAttributeValue("facs");
+        String id = idnoElement.getAttributeValue("id");
+        String n = idnoElement.getAttributeValue("n");
+        String old = idnoElement.getAttributeValue("old");
+
+        initAttributes(facs, id, n, old);
 
     }
 
@@ -76,9 +82,6 @@ public class Idno extends Element {
         return facs;
     }
 
-    /**
-     * @return The value of the {@code cei:idno/@id}-attribute.
-     */
     @NotNull
     public String getId() {
         return id;
@@ -94,12 +97,45 @@ public class Idno extends Element {
         return old;
     }
 
-    /**
-     * @return The text content.
-     */
     @NotNull
     public String getText() {
         return text;
+    }
+
+    private void initAttributes(@Nullable String facs, @NotNull String id, @Nullable String n, @Nullable String old) {
+
+        if (facs != null && !facs.isEmpty()) {
+            addAttribute(new Attribute("facs", facs));
+            this.facs = Optional.of(facs);
+        }
+
+        if (id.isEmpty()) {
+            throw new IllegalArgumentException("Id is not allowed to be an empty string.");
+        }
+        this.id = id;
+        addAttribute(new Attribute("id", id));
+
+        if (n != null && !n.isEmpty()) {
+            addAttribute(new Attribute("n", n));
+            this.n = Optional.of(n);
+        }
+
+        if (old != null && !old.isEmpty()) {
+            addAttribute(new Attribute("old", old));
+            this.old = Optional.of(old);
+        }
+
+    }
+
+    private void initText(String text) {
+
+        if (text.isEmpty()) {
+            throw new IllegalArgumentException("The text is not allowed to be an empty string.");
+        }
+
+        this.text = text;
+        appendChild(text);
+
     }
 
 }
