@@ -589,24 +589,6 @@ public class Charter extends AtomResource {
 
     }
 
-    private List<Node> readUnusedFrontElements(Element xml) {
-
-        List<Node> results = new ArrayList<>(0);
-
-        List<Node> nodes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_FRONT)
-                .stream()
-                .filter(node -> node instanceof Element)
-                .filter(node -> ((Element) node).getLocalName().equals("sourceDesc")).collect(Collectors.toList());
-        for (Node node : nodes) {
-            if (node instanceof Element && ((Element) node).getLocalName().equals("sourceDesc")) {
-                results.add(node);
-            }
-        }
-
-        return results;
-
-    }
-
     @Override
     public void regenerateXmlContent() {
 
