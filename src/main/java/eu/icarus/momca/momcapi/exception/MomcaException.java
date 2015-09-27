@@ -27,4 +27,11 @@ public class MomcaException extends RuntimeException {
     public MomcaException(@NotNull String message) {
         super(message);
     }
+
+    /**
+     * Instantiates a new MomCa-Exception.
+     */
+    public MomcaException() {
+        super();
+    }
 }
