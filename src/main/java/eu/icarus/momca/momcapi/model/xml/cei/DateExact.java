@@ -1,6 +1,5 @@
 package eu.icarus.momca.momcapi.model.xml.cei;
 
-import eu.icarus.momca.momcapi.model.xml.Namespace;
 import nu.xom.Attribute;
 import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
@@ -18,31 +17,32 @@ import org.jetbrains.annotations.NotNull;
  */
 public class DateExact extends DateAbstract {
 
+    public static final String LOCAL_NAME = "date";
     @NotNull
-    private final DateValue dateValue;
-
-    /**
-     * Instantiates a new date.
-     *
-     * @param numericDate The numeric date value, e.g. {@code 12970311}.
-     * @param literalDate The literal date value, e.g. {@code 11th March 1297}.
-     */
-    public DateExact(@NotNull String numericDate, @NotNull String literalDate) {
-
-        super(new Element("cei:date", Namespace.CEI.getUri()), literalDate);
-
-        addAttribute(new Attribute("value", numericDate));
-        dateValue = new DateValue(numericDate);
-
-    }
+    private DateValue dateValue;
 
     public DateExact(@NotNull String numericDate, @NotNull String literalDate, @NotNull String certainty,
                      @NotNull String lang, @NotNull String facs, @NotNull String id, @NotNull String n) {
+        super(LOCAL_NAME, literalDate, certainty, facs, id, lang, n);
+        initAttributes(numericDate);
+    }
 
-        super(new Element("cei:date", Namespace.CEI.getUri()), literalDate, certainty, lang, facs, id, n);
+    public DateExact(@NotNull String numericDate, @NotNull String literalDate) {
+        this(numericDate, literalDate, "", "", "", "", "");
+    }
 
-        addAttribute(new Attribute("value", numericDate));
-        dateValue = new DateValue(numericDate);
+    public DateExact(@NotNull Element dateElement) {
+
+        super(LOCAL_NAME, dateElement);
+
+        String value = dateElement.getAttributeValue("value");
+
+        if (value == null || value.isEmpty()) {
+            String message = String.format("No value attribute present in date element '%s'", dateElement.toXML());
+            throw new IllegalArgumentException(message);
+        }
+
+        initAttributes(value);
 
     }
 
@@ -68,6 +68,11 @@ public class DateExact extends DateAbstract {
     @NotNull
     public DateValue getDateValue() {
         return dateValue;
+    }
+
+    private void initAttributes(@NotNull String numericDate) {
+        addAttribute(new Attribute("value", numericDate));
+        dateValue = new DateValue(numericDate);
     }
 
     @Override

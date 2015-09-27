@@ -1,8 +1,10 @@
 package eu.icarus.momca.momcapi.model.xml.cei;
 
+import eu.icarus.momca.momcapi.model.xml.Namespace;
 import nu.xom.Attribute;
 import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -16,8 +18,6 @@ import java.util.Optional;
 public abstract class DateAbstract extends Element {
 
     @NotNull
-    private final String literalDate;
-    @NotNull
     private Optional<String> certainty = Optional.empty();
     @NotNull
     private Optional<String> facs = Optional.empty();
@@ -26,54 +26,43 @@ public abstract class DateAbstract extends Element {
     @NotNull
     private Optional<String> lang = Optional.empty();
     @NotNull
+    private String literalDate = "";
+    @NotNull
     private Optional<String> n = Optional.empty();
 
-    /**
-     * Instantiates a new abstract cei-date.
-     *
-     * @param element     The root element, e.g. {@code cei:date} or {@code cei:dateRange}.
-     * @param literalDate The literal date, e.g. {@code 2nd December 1678}.
-     */
-    DateAbstract(@NotNull Element element, @NotNull String literalDate) {
+    private DateAbstract(@NotNull String localName) {
+        super("cei:" + localName, Namespace.CEI.getUri());
+    }
 
-        super(element);
+    DateAbstract(@NotNull String localName, @NotNull String literalDate, @NotNull String certainty,
+                 @NotNull String facs, @NotNull String id, @NotNull String lang, @NotNull String n) {
 
-        this.literalDate = literalDate;
-        if (!literalDate.isEmpty()) {
-            this.appendChild(literalDate);
-        }
+        this(localName);
+
+        initLiteralDate(literalDate);
+        initAttributes(certainty, facs, id, lang, n);
 
     }
 
-    DateAbstract(@NotNull Element element, @NotNull String literalDate, @NotNull String certainty, @NotNull String lang,
-                 @NotNull String facs, @NotNull String id, @NotNull String n) {
+    DateAbstract(@NotNull String localName, @NotNull Element dateElement) {
 
-        this(element, literalDate);
+        this(localName);
 
-        if (!certainty.isEmpty()) {
-            addAttribute(new Attribute("certainty", certainty));
-            this.certainty = Optional.of(certainty);
+        if (!dateElement.getLocalName().equals(localName)) {
+            String message = String.format("The provided element is named '%s' instead of 'cei:%s'.",
+                    dateElement.getQualifiedName(), localName);
+            throw new IllegalArgumentException(message);
         }
 
-        if (!lang.isEmpty()) {
-            addAttribute(new Attribute("lang", lang));
-            this.lang = Optional.of(lang);
-        }
+        initLiteralDate(dateElement.getValue());
 
-        if (!facs.isEmpty()) {
-            addAttribute(new Attribute("facs", facs));
-            this.facs = Optional.of(facs);
-        }
+        String certainty = dateElement.getAttributeValue("certainty");
+        String facs = dateElement.getAttributeValue("facs");
+        String id = dateElement.getAttributeValue("id");
+        String lang = dateElement.getAttributeValue("lang");
+        String n = dateElement.getAttributeValue("n");
 
-        if (!id.isEmpty()) {
-            addAttribute(new Attribute("id", id));
-            this.id = Optional.of(id);
-        }
-
-        if (!n.isEmpty()) {
-            addAttribute(new Attribute("n", n));
-            this.n = Optional.of(n);
-        }
+        initAttributes(certainty, facs, id, lang, n);
 
     }
 
@@ -121,6 +110,46 @@ public abstract class DateAbstract extends Element {
     @NotNull
     public Optional<String> getN() {
         return n;
+    }
+
+    private void initAttributes(@Nullable String certainty, @Nullable String facs, @Nullable String id,
+                                @Nullable String lang, @Nullable String n) {
+
+        if (certainty != null && !certainty.isEmpty()) {
+            addAttribute(new Attribute("certainty", certainty));
+            this.certainty = Optional.of(certainty);
+        }
+
+        if (facs != null && !facs.isEmpty()) {
+            addAttribute(new Attribute("facs", facs));
+            this.facs = Optional.of(facs);
+        }
+
+        if (id != null && !id.isEmpty()) {
+            addAttribute(new Attribute("id", id));
+            this.id = Optional.of(id);
+        }
+
+        if (lang != null && !lang.isEmpty()) {
+            addAttribute(new Attribute("lang", lang));
+            this.lang = Optional.of(lang);
+        }
+
+        if (n != null && !n.isEmpty()) {
+            addAttribute(new Attribute("n", n));
+            this.n = Optional.of(n);
+        }
+
+    }
+
+    private void initLiteralDate(@NotNull String literalDate) {
+
+        this.literalDate = literalDate;
+
+        if (!literalDate.isEmpty()) {
+            this.appendChild(literalDate);
+        }
+
     }
 
     public abstract boolean isUndated();

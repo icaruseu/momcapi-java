@@ -82,7 +82,7 @@ public class Archive extends AtomResource {
                 .orElseThrow(IllegalArgumentException::new);
         this.country = readCountryFromXml(xml, eagDesc).orElseThrow(IllegalArgumentException::new);
         this.regionName = readRegionNameFromXml(eagDesc);
-        this.creator = readCreatorFromXml(xml);
+        this.creator = initCreatorFromXml(xml);
         this.address = readAddressFromXml(eagDesc);
         this.contactInformation = readContactInformationFromXml(eagDesc);
         this.logoUrl = readLogoUrlFromXml(eagDesc);

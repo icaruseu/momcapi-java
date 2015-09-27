@@ -12,7 +12,10 @@ import eu.icarus.momca.momcapi.model.id.IdUser;
 import eu.icarus.momca.momcapi.model.xml.Namespace;
 import eu.icarus.momca.momcapi.model.xml.XmlValidationProblem;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomEntry;
-import eu.icarus.momca.momcapi.model.xml.cei.*;
+import eu.icarus.momca.momcapi.model.xml.cei.Bibliography;
+import eu.icarus.momca.momcapi.model.xml.cei.DateExact;
+import eu.icarus.momca.momcapi.model.xml.cei.DateRange;
+import eu.icarus.momca.momcapi.model.xml.cei.Idno;
 import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.*;
 import eu.icarus.momca.momcapi.query.XpathQuery;
 import nu.xom.*;
@@ -101,22 +104,30 @@ public class Charter extends AtomResource {
 
         Element xml = toDocument().getRootElement();
 
-        creator = readCreatorFromXml(xml);
-        charterStatus = readCharterStatus();
+        creator = initCreatorFromXml(xml);
+
+        charterStatus = initCharterStatus();
 
         idno = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_BODY_IDNO)
                 .map(Idno::new)
                 .orElseThrow(MomcaException::new);
 
-        date = readDate(xml);
+        date = initDateFromXml(xml);
 
-        unusedFrontNodes = readUnusedFrontElements(xml);
+        unusedFrontNodes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_FRONT)
+                .stream()
+                .filter(node -> node instanceof Element)
+                .map(node -> ((Element) node))
+                .filter(element -> !element.getLocalName().equals("sourceDesc"))
+                .collect(Collectors.toList());
 
         diplomaticAnalysis = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_DIPLOMATIC_ANALYSIS)
                 .orElse(new Element("cei:diplomaticAnalysis", CEI_URI));
 
         sourceDescAbstractBibliography = readSourceDescAbstractBibliography(xml);
+
         sourceDescTenorBibliography = readSourceDescTenorBibliography(xml);
+
         tenor = readTenor(xml);
 
         charterAbstract = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_ABSTRACT)
@@ -134,27 +145,32 @@ public class Charter extends AtomResource {
         backPlaceNames = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_BACK_PLACE_NAME)
                 .stream()
                 .map(node -> new PlaceName((Element) node))
-                .filter(placeName -> !placeName.getContent().isEmpty()).collect(Collectors.toList());
+                .filter(placeName -> !placeName.getContent().isEmpty())
+                .collect(Collectors.toList());
 
         backGeogNames = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_BACK_GEOG_NAME)
                 .stream()
                 .map(node -> new GeogName((Element) node))
-                .filter(geogName -> !geogName.getContent().isEmpty()).collect(Collectors.toList());
+                .filter(geogName -> !geogName.getContent().isEmpty())
+                .collect(Collectors.toList());
 
         backPersNames = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_BACK_PERS_NAME)
                 .stream()
                 .map(node -> new PersName((Element) node))
-                .filter(persName -> !persName.getContent().isEmpty()).collect(Collectors.toList());
+                .filter(persName -> !persName.getContent().isEmpty())
+                .collect(Collectors.toList());
 
         backIndexes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_BACK_INDEX)
                 .stream()
                 .map(node -> new Index((Element) node))
-                .filter(index -> !index.getContent().isEmpty()).collect(Collectors.toList());
+                .filter(index -> !index.getContent().isEmpty())
+                .collect(Collectors.toList());
 
         backDivNotes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_BACK_NOTE)
                 .stream()
                 .map(node -> new Note((Element) node))
-                .filter(note -> !note.getContent().isEmpty()).collect(Collectors.toList());
+                .filter(note -> !note.getContent().isEmpty())
+                .collect(Collectors.toList());
 
     }
 
@@ -399,11 +415,7 @@ public class Charter extends AtomResource {
         return validationProblems;
     }
 
-    public boolean isValidCei() {
-        return validationProblems.isEmpty();
-    }
-
-    private CharterStatus readCharterStatus() {
+    private CharterStatus initCharterStatus() {
 
         CharterStatus status;
 
@@ -421,77 +433,36 @@ public class Charter extends AtomResource {
 
     }
 
-    private Date readDate(Element xml) {
+    private Date initDateFromXml(Element xml) {
 
-        DateAbstract dateCei;
+        Date result;
 
-        List<Node> dateNodes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_ISSUED_DATE);
-        List<Node> dateRangeNodes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_ISSUED_DATE_RANGE);
+        Optional<Date> dateExact = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_ISSUED_DATE)
+                .map(DateExact::new)
+                .filter(DateExact::isValid)
+                .map(Date::new);
 
-        if ((dateNodes.size() == 1 && dateRangeNodes.size() == 0) || (dateNodes.size() == 0 && dateRangeNodes.size() == 1)) {
+        Optional<Date> dateRange = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_ISSUED_DATE_RANGE)
+                .map(DateRange::new)
+                .filter(DateRange::isValid)
+                .map(Date::new);
 
-            if (dateNodes.size() == 1) {
-
-                Element dateElement = (Element) dateNodes.get(0);
-                String value = dateElement.getAttributeValue("value");
-                String text = dateElement.getValue();
-
-                if (value == null || value.isEmpty()) {
-                    throw new IllegalArgumentException("No value attribute present in date element '" + dateElement.toXML() + "'");
-                }
-
-                String certainty = dateElement.getAttributeValue("certainty");
-                String facs = dateElement.getAttributeValue("facs");
-                String id = dateElement.getAttributeValue("id");
-                String lang = dateElement.getAttributeValue("lang");
-                String n = dateElement.getAttributeValue("n");
-
-                dateCei = new DateExact(
-                        value,
-                        text,
-                        certainty == null ? "" : certainty,
-                        lang == null ? "" : lang,
-                        facs == null ? "" : facs,
-                        id == null ? "" : id,
-                        n == null ? "" : n);
-
-            } else {
-
-                Element dateRangeElement = (Element) dateRangeNodes.get(0);
-                String from = dateRangeElement.getAttributeValue("from");
-                String to = dateRangeElement.getAttributeValue("to");
-                String text = dateRangeElement.getValue();
-
-                if ((from == null || from.isEmpty()) || (to == null || to.isEmpty())) {
-                    throw new MomcaException(
-                            "At least either 'to' or 'from' element must be present in the 'dateRange' Element `"
-                                    + dateRangeElement.toXML() + "`");
-                }
-
-                String certainty = dateRangeElement.getAttributeValue("certainty");
-                String facs = dateRangeElement.getAttributeValue("facs");
-                String id = dateRangeElement.getAttributeValue("id");
-                String lang = dateRangeElement.getAttributeValue("lang");
-                String n = dateRangeElement.getAttributeValue("n");
-
-                dateCei = new DateRange(
-                        from,
-                        to,
-                        text,
-                        certainty == null ? "" : certainty,
-                        lang == null ? "" : lang,
-                        facs == null ? "" : facs,
-                        id == null ? "" : id,
-                        n == null ? "" : n);
-
-            }
-
-        } else {
-            throw new MomcaException("No date present in provided xml!");
+        if (!dateExact.isPresent() && !dateRange.isPresent()) {
+            throw new MomcaException("No valid date present in provided xml!");
         }
 
-        return new Date(dateCei);
+        if (dateExact.isPresent() && !dateRange.isPresent()) {
+            result = dateExact.get();
+        } else {
+            result = dateRange.get();
+        }
 
+        return result;
+
+    }
+
+    public boolean isValidCei() {
+        return validationProblems.isEmpty();
     }
 
     private Optional<Bibliography> readSourceDescAbstractBibliography(Element xml) {
@@ -622,9 +593,11 @@ public class Charter extends AtomResource {
 
         List<Node> results = new ArrayList<>(0);
 
-        List<Node> nodes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_FRONT);
-        for (int i = 0; i < nodes.size(); i++) {
-            Node node = nodes.get(i);
+        List<Node> nodes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_FRONT)
+                .stream()
+                .filter(node -> node instanceof Element)
+                .filter(node -> ((Element) node).getLocalName().equals("sourceDesc")).collect(Collectors.toList());
+        for (Node node : nodes) {
             if (node instanceof Element && ((Element) node).getLocalName().equals("sourceDesc")) {
                 results.add(node);
             }
@@ -647,6 +620,8 @@ public class Charter extends AtomResource {
         cei.appendChild(front);
         cei.appendChild(body);
         cei.appendChild(back);
+
+        Util.changeNamespace(cei, Namespace.CEI);
 
         setXmlContent(new Document(new AtomEntry(id.getContentXml(), createAtomAuthor(), AtomResource.localTime(), cei)));
 

@@ -70,7 +70,7 @@ public class Collection extends AtomResource {
 
         this.name = Util.queryXmlForOptionalString(xml, XpathQuery.QUERY_CEI_PROVENANCE_TEXT)
                 .orElseThrow(IllegalArgumentException::new).replaceAll("\\s+", " ");
-        this.creator = readCreatorFromXml(xml);
+        this.creator = initCreatorFromXml(xml);
         this.country = readCountryFromXml(xml);
         this.region = readRegionFromXml(xml);
         this.imageFolderName = Util.queryXmlForOptionalString(xml, XpathQuery.QUERY_CEI_IMAGE_SERVER_FOLDER);

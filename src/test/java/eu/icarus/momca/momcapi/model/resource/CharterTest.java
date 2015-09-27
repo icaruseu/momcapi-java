@@ -441,7 +441,7 @@ public class CharterTest {
 
         assertEquals(charter.getDate(), newDate);
         assertTrue(charter.isValidCei());
-        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date certainty=\"certainty\" lang=\"lang\" facs=\"facs\" id=\"id\" n=\"n\" value=\"12180619\">19th June, 1218</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date certainty=\"certainty\" facs=\"facs\" id=\"id\" lang=\"lang\" n=\"n\" value=\"12180619\">19th June, 1218</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
 
     }
 

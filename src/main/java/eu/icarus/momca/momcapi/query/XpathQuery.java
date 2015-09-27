@@ -32,7 +32,7 @@ public enum XpathQuery {
     QUERY_CEI_COUNTRY_TEXT("//cei:country/text()", Namespace.CEI),
     QUERY_CEI_COUNTRY_ID("//cei:country/@id", Namespace.CEI),
     QUERY_CEI_DIPLOMATIC_ANALYSIS("//cei:diplomaticAnalysis", Namespace.CEI),
-    QUERY_CEI_FRONT("//cei:country/@id", Namespace.CEI),
+    QUERY_CEI_FRONT("//cei:front/child::*", Namespace.CEI),
     QUERY_CEI_ISSUED_DATE("//cei:issued/cei:date", Namespace.CEI),
     QUERY_CEI_ISSUED_DATE_RANGE("//cei:issued/cei:dateRange", Namespace.CEI),
     QUERY_CEI_ISSUED_PLACE_NAME("//cei:issued/cei:placeName", Namespace.CEI),

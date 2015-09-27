@@ -1,6 +1,6 @@
 package eu.icarus.momca.momcapi.model.xml.cei;
 
-import eu.icarus.momca.momcapi.model.xml.Namespace;
+import eu.icarus.momca.momcapi.exception.MomcaException;
 import nu.xom.Attribute;
 import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
@@ -18,45 +18,43 @@ import org.jetbrains.annotations.NotNull;
  */
 public class DateRange extends DateAbstract {
 
+    public static final String LOCAL_NAME = "dateRange";
     @NotNull
-    private final DateValue fromDateValue;
+    private DateValue fromDateValue;
     @NotNull
-    private final DateValue toDateValue;
+    private DateValue toDateValue;
 
-
-    /**
-     * Instantiates a new ceiDateRange.
-     *
-     * @param fromDateValue The numeric {@code from} date value, e.q. {@code 12970301}.
-     * @param toDateValue   The numeric {@code to} date value, e.q. {@code 12970331}.
-     * @param literalDate   The literal date value, e.g. {@code March 1297}.
-     */
-    public DateRange(@NotNull String fromDateValue, @NotNull String toDateValue, @NotNull String literalDate) {
-
-        super(new Element("cei:dateRange", Namespace.CEI.getUri()), literalDate);
-
-        addAttribute(new Attribute("from", fromDateValue));
-        addAttribute(new Attribute("to", toDateValue));
-
-        this.fromDateValue = new DateValue(fromDateValue);
-        this.toDateValue = new DateValue(toDateValue);
-
-    }
 
     public DateRange(@NotNull String fromDateValue, @NotNull String toDateValue, @NotNull String literalDate,
                      @NotNull String certainty, @NotNull String lang, @NotNull String facs, @NotNull String id,
                      @NotNull String n) {
 
-        super(new Element("cei:dateRange", Namespace.CEI.getUri()), literalDate, certainty, lang, facs, id, n);
-
-        addAttribute(new Attribute("from", fromDateValue));
-        addAttribute(new Attribute("to", toDateValue));
-
-        this.fromDateValue = new DateValue(fromDateValue);
-        this.toDateValue = new DateValue(toDateValue);
+        super(LOCAL_NAME, literalDate, certainty, facs, id, lang, n);
+        initAttributes(fromDateValue, toDateValue);
 
     }
 
+    public DateRange(@NotNull String fromDateValue, @NotNull String toDateValue, @NotNull String literalDate) {
+        this(fromDateValue, toDateValue, literalDate, "", "", "", "", "");
+    }
+
+    public DateRange(@NotNull Element dateElement) {
+
+        super(LOCAL_NAME, dateElement);
+
+        String from = dateElement.getAttributeValue("from");
+        String to = dateElement.getAttributeValue("to");
+
+        if ((from == null || from.isEmpty()) || (to == null || to.isEmpty())) {
+            String message = String.format(
+                    "At least either 'to' or 'from' element must be present in the 'dateRange' Element `%s`",
+                    dateElement.toXML());
+            throw new MomcaException(message);
+        }
+
+        initAttributes(from, to);
+
+    }
 
     @Override
     public boolean couldBeOtherDateType() {
@@ -81,12 +79,23 @@ public class DateRange extends DateAbstract {
         return toDateValue;
     }
 
+    private void initAttributes(@NotNull String fromDateValue, @NotNull String toDateValue) {
+
+        this.fromDateValue = new DateValue(fromDateValue);
+        if (!fromDateValue.isEmpty()) {
+            addAttribute(new Attribute("from", fromDateValue));
+        }
+
+        this.toDateValue = new DateValue(toDateValue);
+        if (!toDateValue.isEmpty()) {
+            addAttribute(new Attribute("to", toDateValue));
+        }
+
+    }
+
     @Override
     public boolean isUndated() {
-
         return !getFromDateValue().getYear().isPresent() && !getToDateValue().getYear().isPresent();
-
-
     }
 
     @Override

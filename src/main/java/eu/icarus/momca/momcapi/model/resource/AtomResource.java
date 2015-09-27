@@ -94,12 +94,7 @@ public abstract class AtomResource extends ExistResource {
     }
 
     @NotNull
-    static String localTime() {
-        return ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-    }
-
-    @NotNull
-    Optional<IdUser> readCreatorFromXml(@NotNull Element xml) {
+    Optional<IdUser> initCreatorFromXml(@NotNull Element xml) {
 
         Optional<IdUser> result = Optional.empty();
         String queryResult = Util.queryXmlForString(xml, XpathQuery.QUERY_ATOM_EMAIL);
@@ -110,6 +105,11 @@ public abstract class AtomResource extends ExistResource {
 
         return result;
 
+    }
+
+    @NotNull
+    static String localTime() {
+        return ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
     }
 
     public abstract void regenerateXmlContent();
