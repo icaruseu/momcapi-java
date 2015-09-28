@@ -203,9 +203,19 @@ public class Archive extends AtomResource {
 
         EagDesc eagDesc = new EagDesc(country.getNativeName(), regionNativeName, address, contactInformation, logoUrlString);
         Element eag = createEagElement(id.getIdentifier(), getName(), country.getCountryCode().getCode(), eagDesc);
-        AtomId id = new AtomId(getId().getContentXml().getText());
+        AtomId id = getId().getContentXml();
 
-        setXmlContent(new Document(new AtomEntry(id, createAtomAuthor(), AtomResource.localTime(), eag)));
+        String published = getPublished();
+        String updated = getUpdated();
+
+        setXmlContent(
+                new Document(
+                        new AtomEntry(
+                                id,
+                                createAtomAuthor(),
+                                (published.isEmpty()) ? AtomResource.localTime() : published,
+                                (updated.isEmpty()) ? AtomResource.localTime() : updated,
+                                eag)));
 
     }
 

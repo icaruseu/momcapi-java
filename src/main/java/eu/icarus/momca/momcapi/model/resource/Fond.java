@@ -367,8 +367,17 @@ public class Fond extends AtomResource {
             throw new IllegalArgumentException("EAD is not valid. The following errors were reported:\n" + validationErrors.toString());
         }
 
-        AtomId id = new AtomId(getId().getContentXml().getText());
-        setXmlContent(new Document(new AtomEntry(id, createAtomAuthor(), AtomResource.localTime(), ead)));
+        String published = getPublished();
+        String updated = getUpdated();
+
+        setXmlContent(
+                new Document(
+                        new AtomEntry(
+                                getId().getContentXml(),
+                                createAtomAuthor(),
+                                (published.isEmpty()) ? AtomResource.localTime() : published,
+                                (updated.isEmpty()) ? AtomResource.localTime() : updated,
+                                ead)));
 
     }
 

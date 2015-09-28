@@ -62,8 +62,7 @@ public class DateTest {
     @Test(expectedExceptions = MomcaException.class)
     public void testDateExactInvalidDate() throws Exception {
         DateAbstract dateExact = new DateExact("", "unknown");
-        System.out.println(new Date(dateExact).toCeiDate().toXML());
-
+        new Date(dateExact);
     }
 
     @Test

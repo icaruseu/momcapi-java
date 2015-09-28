@@ -5,9 +5,8 @@ import eu.icarus.momca.momcapi.model.Country;
 import eu.icarus.momca.momcapi.model.CountryCode;
 import eu.icarus.momca.momcapi.model.Region;
 import eu.icarus.momca.momcapi.model.id.IdCollection;
-import eu.icarus.momca.momcapi.model.xml.Namespace;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomEntry;
-import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
+import eu.icarus.momca.momcapi.model.xml.xrx.Keywords;
 import eu.icarus.momca.momcapi.query.XpathQuery;
 import nu.xom.Document;
 import nu.xom.Element;
@@ -108,22 +107,6 @@ public class Collection extends AtomResource {
     }
 
     @NotNull
-    private Optional<Element> createKeywordsElement() {
-
-        return this.keyword.flatMap(kw -> {
-
-            Element keywordsElement = new Element("xrx:keywords", Namespace.XRX.getUri());
-            Element keywordElement = new Element("xrx:keyword", Namespace.XRX.getUri());
-            keywordElement.appendChild(kw);
-            keywordsElement.appendChild(keywordElement);
-            keywordElement.detach();
-            return Optional.of(keywordElement);
-
-        });
-
-    }
-
-    @NotNull
     public Optional<Country> getCountry() {
         return country;
     }
@@ -203,12 +186,20 @@ public class Collection extends AtomResource {
     @Override
     public void regenerateXmlContent() {
 
-        Optional<Element> keywords = createKeywordsElement();
         Element cei = createCeiElement();
 
-        AtomId id = new AtomId(this.getId().getContentXml().getText());
-        Element resourceContent = new AtomEntry(id, createAtomAuthor(), AtomResource.localTime(), cei);
-        keywords.ifPresent(element -> resourceContent.insertChild(element, 6));
+        String published = getPublished();
+        String updated = getUpdated();
+
+        Element resourceContent =
+                new AtomEntry(
+                        getId().getContentXml(),
+                        createAtomAuthor(),
+                        (published.isEmpty()) ? AtomResource.localTime() : published,
+                        (updated.isEmpty()) ? AtomResource.localTime() : updated,
+                        cei);
+
+        keyword.ifPresent(s -> resourceContent.insertChild(new Keywords(s), 6));
 
         setXmlContent(new Document(resourceContent));
 

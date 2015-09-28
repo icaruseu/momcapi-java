@@ -33,10 +33,8 @@ public class CollectionManager extends AbstractManager {
         }
 
         momcaConnection.addCollection(collection.getIdentifier(), ResourceRoot.ARCHIVAL_COLLECTIONS.getUri());
-
-        ExistResource resource = new ExistResource(collection.getResourceName(), collection.getParentUri(),
-                collection.toDocument().toXML());
-        momcaConnection.storeExistResource(resource);
+        String time = momcaConnection.getRemoteDateTime();
+        momcaConnection.storeAtomResource(collection, time, time);
 
     }
 

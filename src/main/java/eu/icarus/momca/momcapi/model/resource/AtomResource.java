@@ -1,11 +1,14 @@
 package eu.icarus.momca.momcapi.model.resource;
 
 import eu.icarus.momca.momcapi.Util;
+import eu.icarus.momca.momcapi.exception.MomcaException;
 import eu.icarus.momca.momcapi.model.id.*;
+import eu.icarus.momca.momcapi.model.xml.Namespace;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomAuthor;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
 import eu.icarus.momca.momcapi.query.XpathQuery;
 import nu.xom.Element;
+import nu.xom.Elements;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,6 +49,25 @@ public abstract class AtomResource extends ExistResource {
     @NotNull
     AtomAuthor createAtomAuthor() {
         return new AtomAuthor(getCreator().map(IdAbstract::getIdentifier).orElse(""));
+    }
+
+    @NotNull
+    public Element getContent() {
+
+        Element content = toDocument().getRootElement().getFirstChildElement("content", Namespace.ATOM.getUri());
+
+        if (content == null) {
+            throw new MomcaException("No 'atom:content' present in xml.");
+        }
+
+        Elements childElements = content.getChildElements();
+
+        if (childElements.size() != 1) {
+            throw new MomcaException("The 'atom:content' element must have exactly one child element!");
+        }
+
+        return (Element) childElements.get(0).copy();
+
     }
 
     @NotNull
@@ -91,6 +113,14 @@ public abstract class AtomResource extends ExistResource {
     @NotNull
     public final String getIdentifier() {
         return id.getIdentifier();
+    }
+
+    public String getPublished() {
+        return Util.queryXmlForString(toDocument().getRootElement(), XpathQuery.QUERY_ATOM_PUBLISHED);
+    }
+
+    public String getUpdated() {
+        return Util.queryXmlForString(toDocument().getRootElement(), XpathQuery.QUERY_ATOM_UPDATED);
     }
 
     @NotNull

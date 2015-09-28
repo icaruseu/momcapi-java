@@ -18,6 +18,8 @@ public enum XpathQuery {
 
     QUERY_ATOM_EMAIL("//atom:email/text()", Namespace.ATOM),
     QUERY_ATOM_ID("//atom:id/text()", Namespace.ATOM),
+    QUERY_ATOM_PUBLISHED("//atom:published", Namespace.ATOM),
+    QUERY_ATOM_UPDATED("//atom:updated", Namespace.ATOM),
     QUERY_CEI_ABSTRACT("//cei:abstract", Namespace.CEI),
     QUERY_CEI_BACK_GEOG_NAME("//cei:back/cei:geogName", Namespace.CEI),
     QUERY_CEI_BACK_INDEX("//cei:back/cei:index", Namespace.CEI),

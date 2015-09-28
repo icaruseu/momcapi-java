@@ -512,7 +512,17 @@ public class Charter extends AtomResource {
 
         Util.changeNamespace(cei, Namespace.CEI);
 
-        setXmlContent(new Document(new AtomEntry(id.getContentXml(), createAtomAuthor(), AtomResource.localTime(), cei)));
+        String published = getPublished();
+        String updated = getUpdated();
+
+        setXmlContent(
+                new Document(
+                        new AtomEntry(
+                                getId().getContentXml(),
+                                createAtomAuthor(),
+                                (published.isEmpty()) ? AtomResource.localTime() : published,
+                                (updated.isEmpty()) ? AtomResource.localTime() : updated,
+                                cei)));
 
         try {
             validateCei(this);
@@ -708,18 +718,7 @@ public class Charter extends AtomResource {
 
     @NotNull
     public Element toCei() {
-
-        Element xml = (Element) toDocument().getRootElement().copy();
-        Element atomContent = xml.getFirstChildElement("content", Namespace.ATOM.getUri());
-
-        Element cei = atomContent.getFirstChildElement("text", CEI_URI);
-
-        if (cei == null) {
-            throw new MomcaException("The charter doesn't have a 'cei:text' element");
-        }
-
-        return cei;
-
+        return getContent();
     }
 
     private void validateCei(@NotNull ExistResource resource)

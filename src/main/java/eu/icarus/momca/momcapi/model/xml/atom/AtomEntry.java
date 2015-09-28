@@ -10,12 +10,14 @@ import org.jetbrains.annotations.NotNull;
  */
 public class AtomEntry extends Element {
 
-    public AtomEntry(@NotNull AtomId atomId, @NotNull AtomAuthor atomAuthor, @NotNull String currentDateTime, @NotNull Element childContent) {
+    public AtomEntry(@NotNull AtomId atomId, @NotNull AtomAuthor atomAuthor, @NotNull String publishedDateTime,
+                     @NotNull String updatedDateTime, @NotNull Element childContent) {
         super("atom:entry", Namespace.ATOM.getUri());
-        initContent(atomAuthor, currentDateTime, atomId, childContent);
+        initContent(atomAuthor, publishedDateTime, updatedDateTime, atomId, childContent);
     }
 
-    private void initContent(@NotNull AtomAuthor atomAuthor, @NotNull String currentDateTime, @NotNull AtomId atomId, @NotNull Element childContent) {
+    private void initContent(@NotNull AtomAuthor atomAuthor, @NotNull String publishedDateTime, @NotNull String updatedDateTime,
+                             @NotNull AtomId atomId, @NotNull Element childContent) {
 
         String atomUri = Namespace.ATOM.getUri();
         String appUri = Namespace.APP.getUri();
@@ -25,10 +27,11 @@ public class AtomEntry extends Element {
         appendChild(new Element("atom:title", atomUri));
 
         Element atomPublished = new Element("atom:published", atomUri);
-        atomPublished.appendChild(currentDateTime);
+        atomPublished.appendChild(publishedDateTime);
         appendChild(atomPublished);
+
         Element atomUpdated = new Element("atom:updated", atomUri);
-        atomUpdated.appendChild(currentDateTime);
+        atomUpdated.appendChild(updatedDateTime);
         appendChild(atomUpdated);
 
         appendChild(atomAuthor);

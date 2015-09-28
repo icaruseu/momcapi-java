@@ -1,8 +1,16 @@
 package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.exception.MomcaException;
+import eu.icarus.momca.momcapi.model.id.IdUser;
+import eu.icarus.momca.momcapi.model.resource.AtomResource;
 import eu.icarus.momca.momcapi.model.resource.ExistResource;
+import eu.icarus.momca.momcapi.model.xml.atom.AtomAuthor;
+import eu.icarus.momca.momcapi.model.xml.atom.AtomEntry;
+import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
+import eu.icarus.momca.momcapi.model.xml.xrx.Keywords;
 import eu.icarus.momca.momcapi.query.ExistQuery;
+import eu.icarus.momca.momcapi.query.ExistQueryFactory;
+import nu.xom.Element;
 import org.exist.xmldb.RemoteCollection;
 import org.exist.xmldb.RemoteCollectionManagementService;
 import org.exist.xmldb.RemoteUserManagementService;
@@ -234,6 +242,10 @@ public class MomcaConnection {
         return fondManager;
     }
 
+    String getRemoteDateTime() {
+        return queryDatabase(ExistQueryFactory.getCurrentDateTime()).get(0);
+    }
+
     /**
      * Gets root collection of the database, {@code /db}.
      *
@@ -345,6 +357,30 @@ public class MomcaConnection {
         } catch (@NotNull XMLDBException e) {
             throw new MomcaException("Failed to remove the resource '" + resourceToDelete.getUri() + "'", e);
         }
+
+    }
+
+    void storeAtomResource(@NotNull AtomResource resource,
+                           @NotNull String publishedDateTime, @NotNull String updatedDateTime) {
+
+        AtomId id = resource.getId().getContentXml();
+        AtomAuthor author = resource.getCreator().map(IdUser::getContentXml).orElse(new AtomAuthor(""));
+        Element content = resource.getContent();
+
+        AtomEntry newEntry = new AtomEntry(id, author, publishedDateTime, updatedDateTime, content);
+
+        if( resource instanceof eu.icarus.momca.momcapi.model.resource.Collection ){
+            eu.icarus.momca.momcapi.model.resource.Collection coll =
+                    (eu.icarus.momca.momcapi.model.resource.Collection) resource;
+            coll.getKeyword().ifPresent(s -> newEntry.insertChild(new Keywords(s), 6));
+        }
+
+        String resourceName = resource.getResourceName();
+        String parentUri = resource.getParentUri();
+
+        ExistResource updatedResource = new ExistResource(resourceName, parentUri, newEntry.toXML());
+
+        storeExistResource(updatedResource);
 
     }
 

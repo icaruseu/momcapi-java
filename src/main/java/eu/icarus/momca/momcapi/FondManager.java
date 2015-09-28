@@ -36,7 +36,9 @@ public class FondManager extends AbstractManager {
         momcaConnection.addCollection(archiveIdentifier, ResourceRoot.ARCHIVAL_FONDS.getUri());
         momcaConnection.addCollection(identifier, parentUri);
 
-        momcaConnection.storeExistResource(fond);
+        String time = momcaConnection.getRemoteDateTime();
+
+        momcaConnection.storeAtomResource(fond, time, time);
         fond.getFondPreferences().ifPresent(momcaConnection::storeExistResource);
 
     }

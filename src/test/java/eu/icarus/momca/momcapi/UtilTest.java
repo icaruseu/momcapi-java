@@ -18,8 +18,6 @@ public class UtilTest {
         Element element = Util.parseToElement(xml);
         Util.changeNamespace(element, Namespace.CEI);
 
-        System.out.println(element.toXML());
-
     }
 
     @Test

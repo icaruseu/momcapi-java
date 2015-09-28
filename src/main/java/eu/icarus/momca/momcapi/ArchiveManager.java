@@ -48,7 +48,8 @@ public class ArchiveManager extends AbstractManager {
         });
 
         momcaConnection.addCollection(newArchive.getIdentifier(), ResourceRoot.ARCHIVES.getUri());
-        momcaConnection.storeExistResource(newArchive);
+        String time = momcaConnection.getRemoteDateTime();
+        momcaConnection.storeAtomResource(newArchive, time, time);
 
     }
 
