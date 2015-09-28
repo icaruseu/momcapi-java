@@ -35,7 +35,7 @@ public class Figure extends Element {
 
     public Figure(@NotNull String url) {
         this();
-        this.graphic = Optional.of(new Graphic(url));
+        initChilds(null, new Graphic(url), null);
     }
 
     public Figure(@Nullable FigDesc figDesc, @Nullable Graphic graphic, @Nullable List<Zone> zones,
@@ -50,7 +50,7 @@ public class Figure extends Element {
         this();
 
         Element figDescElement = figureElement.getFirstChildElement("figDesc", CEI_URI);
-        FigDesc figDesc = (figDescElement == null) ? null : new FigDesc(figureElement);
+        FigDesc figDesc = (figDescElement == null) ? null : new FigDesc(figDescElement);
 
         Element graphicElement = figureElement.getFirstChildElement("graphic", CEI_URI);
         Graphic graphic = (graphicElement == null) ? null : new Graphic(graphicElement);

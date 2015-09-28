@@ -5,7 +5,9 @@ import eu.icarus.momca.momcapi.model.CharterStatus;
 import eu.icarus.momca.momcapi.model.Date;
 import eu.icarus.momca.momcapi.model.id.IdCharter;
 import eu.icarus.momca.momcapi.model.xml.cei.DateExact;
+import eu.icarus.momca.momcapi.model.xml.cei.Figure;
 import eu.icarus.momca.momcapi.model.xml.cei.Idno;
+import eu.icarus.momca.momcapi.model.xml.cei.Witness;
 import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.*;
 import nu.xom.Element;
 import nu.xom.ParsingException;
@@ -224,6 +226,14 @@ public class CharterTest {
         assertEquals(charter.getBackDivNotes().get(0).getId().get(), "id");
         assertEquals(charter.getBackDivNotes().get(0).getN().get(), "n");
         assertEquals(charter.getBackDivNotes().get(0).getContent(), "Unbekannt");
+
+        assertEquals(charter.getWitListPar().size(), 1);
+        assertEquals(charter.getWitListPar().get(0).getTraditioForm().get().getContent(), "Kopie");
+        assertEquals(charter.getWitListPar().get(0).getFigures().size(), 1);
+
+        assertTrue(charter.getWitnessOrig().isPresent());
+        assertEquals(charter.getWitnessOrig().get().getFigures().size(), 2);
+        assertEquals(charter.getWitnessOrig().get().getTraditioForm().get().getContent(), "Original");
 
         charter.regenerateXmlContent();
 
@@ -602,6 +612,51 @@ public class CharterTest {
 
         charter.setTenor(new Tenor(""));
         assertFalse(charter.getTenor().isPresent());
+
+    }
+
+    @Test
+    public void testSetWitListPar() throws Exception {
+
+        Figure figure = new Figure("image1.jpg");
+        List<Figure> figures = new ArrayList<>(1);
+        figures.add(figure);
+        Witness witness = new Witness(null, null, figures, "", "", "", null, null, null);
+
+        List<Witness> witListPar = new ArrayList<>(1);
+        witListPar.add(witness);
+
+        assertTrue(charter.getWitListPar().isEmpty());
+
+        charter.setWitListPar(witListPar);
+
+        assertEquals(charter.getWitListPar().size(), 1);
+        assertEquals(charter.getWitListPar().get(0).getFigures().get(0).getUrl(), "image1.jpg");
+        assertTrue(charter.isValidCei());
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:witnessOrig /><cei:witListPar><cei:witness><cei:figure><cei:graphic url=\"image1.jpg\" /></cei:figure></cei:witness></cei:witListPar><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
+
+    }
+
+    @Test
+    public void testSetWitnessOrig() throws Exception {
+
+
+        Figure figure = new Figure("image1.jpg");
+        List<Figure> figures = new ArrayList<>(1);
+        figures.add(figure);
+        Witness witness = new Witness(null, null, figures, "", "", "", null, null, null);
+
+        assertFalse(charter.getWitnessOrig().isPresent());
+
+        charter.setWitnessOrig(witness);
+
+        assertTrue(charter.getWitnessOrig().isPresent());
+        assertEquals(charter.getWitnessOrig().get().getFigures().get(0).getUrl(), "image1.jpg");
+        assertTrue(charter.isValidCei());
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:witnessOrig><cei:figure><cei:graphic url=\"image1.jpg\" /></cei:figure></cei:witnessOrig><cei:witListPar /><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
+
+        charter.setWitnessOrig(null);
+        assertFalse(charter.getWitnessOrig().isPresent());
 
     }
 

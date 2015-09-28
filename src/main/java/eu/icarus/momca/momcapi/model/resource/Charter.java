@@ -17,6 +17,7 @@ import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.*;
 import eu.icarus.momca.momcapi.query.XpathQuery;
 import nu.xom.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -657,6 +658,29 @@ public class Charter extends AtomResource {
             this.tenor = Optional.empty();
         } else {
             this.tenor = Optional.of(tenor);
+        }
+
+        regenerateXmlContent();
+
+    }
+
+    public void setWitListPar(@NotNull List<Witness> witListPar) {
+
+        this.witListPar = witListPar
+                .stream()
+                .filter(witness -> !witness.isEmpty())
+                .collect(Collectors.toList());
+
+        regenerateXmlContent();
+
+    }
+
+    public void setWitnessOrig(@Nullable Witness witnessOrig) {
+
+        if (witnessOrig == null || witnessOrig.isEmpty()) {
+            this.witnessOrig = Optional.empty();
+        } else {
+            this.witnessOrig = Optional.of(witnessOrig);
         }
 
         regenerateXmlContent();

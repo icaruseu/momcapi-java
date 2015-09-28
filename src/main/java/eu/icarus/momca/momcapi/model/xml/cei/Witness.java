@@ -177,6 +177,7 @@ public class Witness extends Element {
             appendChild(nota);
         }
 
+
         if (figures != null && !figures.isEmpty()) {
             this.figures = figures;
             figures.forEach(this::appendChild);
