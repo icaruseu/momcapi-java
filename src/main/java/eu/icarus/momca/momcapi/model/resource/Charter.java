@@ -60,7 +60,7 @@ public class Charter extends AtomResource {
     @NotNull
     private Date date;
     @NotNull
-    private Element diplomaticAnalysis = new Element("cei:diplomaticAnalysis", CEI_URI);
+    private Optional<DiplomaticAnalysis> diplomaticAnalysis = Optional.empty();
     @NotNull
     private Idno idno;
     @NotNull
@@ -164,7 +164,7 @@ public class Charter extends AtomResource {
         chDesc.appendChild(witListPar);
         this.witListPar.forEach(witness -> witListPar.appendChild(witness.copy()));
 
-        chDesc.appendChild(diplomaticAnalysis.copy());
+        chDesc.appendChild(diplomaticAnalysis.orElse(new DiplomaticAnalysis()));
 
         langMom.ifPresent(s -> {
             Element e = new Element("cei:lang_MOM", CEI_URI);
@@ -304,6 +304,11 @@ public class Charter extends AtomResource {
     }
 
     @NotNull
+    public Optional<DiplomaticAnalysis> getDiplomaticAnalysis() {
+        return diplomaticAnalysis;
+    }
+
+    @NotNull
     @Override
     public IdCharter getId() {
         return (IdCharter) id;
@@ -399,7 +404,8 @@ public class Charter extends AtomResource {
         date = initDateFromXml(xml);
 
         diplomaticAnalysis = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_DIPLOMATIC_ANALYSIS)
-                .orElse(new Element("cei:diplomaticAnalysis", CEI_URI));
+                .map(DiplomaticAnalysis::new)
+                .filter(d -> !d.getContent().isEmpty());
 
         idno = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_BODY_IDNO)
                 .map(Idno::new)
@@ -574,6 +580,19 @@ public class Charter extends AtomResource {
     public void setDate(@NotNull Date date) {
         this.date = date;
         regenerateXmlContent();
+    }
+
+    public void setDiplomaticAnalysis(@Nullable DiplomaticAnalysis diplomaticAnalysis) {
+
+        if (diplomaticAnalysis == null) {
+            this.diplomaticAnalysis = Optional.empty();
+        } else {
+            this.diplomaticAnalysis = Optional.of(diplomaticAnalysis);
+        }
+
+
+        regenerateXmlContent();
+
     }
 
     @Override
