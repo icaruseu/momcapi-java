@@ -13,10 +13,10 @@ import java.util.Optional;
 /**
  * Created by djell on 25/09/2015.
  */
-public class ArchIdentifier extends AbstractMixedContentElement {
+public class Nota extends AbstractMixedContentElement {
 
     public static final String CEI_URI = Namespace.CEI.getUri();
-    public static final String LOCAL_NAME = "archIdentifier";
+    public static final String LOCAL_NAME = "nota";
 
     @NotNull
     private Optional<String> facs = Optional.empty();
@@ -26,19 +26,23 @@ public class ArchIdentifier extends AbstractMixedContentElement {
     private Optional<String> lang = Optional.empty();
     @NotNull
     private Optional<String> n = Optional.empty();
+    @NotNull
+    private Optional<String> position = Optional.empty();
+    @NotNull
+    private Optional<String> type = Optional.empty();
 
-
-    public ArchIdentifier(@NotNull String content) {
+    public Nota(@NotNull String content) {
         super(content, LOCAL_NAME);
     }
 
-    public ArchIdentifier(@NotNull String content,
-                          @NotNull String facs, @NotNull String id, @NotNull String lang, @NotNull String n) {
+    public Nota(@NotNull String content,
+                @NotNull String facs, @NotNull String id, @NotNull String lang, @NotNull String n,
+                @NotNull String position, @NotNull String type) {
         this(content);
-        initAttributes(facs, id, lang, n);
+        initAttributes(facs, id, lang, n, position, type);
     }
 
-    public ArchIdentifier(@NotNull Element archIdentifierElement) {
+    public Nota(@NotNull Element archIdentifierElement) {
 
         this(initContent(archIdentifierElement, LOCAL_NAME));
 
@@ -46,8 +50,10 @@ public class ArchIdentifier extends AbstractMixedContentElement {
         String id = archIdentifierElement.getAttributeValue("id");
         String lang = archIdentifierElement.getAttributeValue("lang");
         String n = archIdentifierElement.getAttributeValue("n");
+        String position = archIdentifierElement.getAttributeValue("position");
+        String type = archIdentifierElement.getAttributeValue("type");
 
-        initAttributes(facs, id, lang, n);
+        initAttributes(facs, id, lang, n, position, type);
 
     }
 
@@ -72,6 +78,11 @@ public class ArchIdentifier extends AbstractMixedContentElement {
     }
 
     @NotNull
+    public Optional<String> getPosition() {
+        return position;
+    }
+
+    @NotNull
     public Optional<Ref> getRef() {
 
         Optional<Ref> result = Optional.empty();
@@ -87,7 +98,13 @@ public class ArchIdentifier extends AbstractMixedContentElement {
 
     }
 
-    private void initAttributes(@Nullable String facs, @Nullable String id, @Nullable String lang, @Nullable String n) {
+    @NotNull
+    public Optional<String> getType() {
+        return type;
+    }
+
+    private void initAttributes(@Nullable String facs, @Nullable String id, @Nullable String lang, @Nullable String n,
+                                @Nullable String position, @Nullable String type) {
 
         if (facs != null && !facs.isEmpty()) {
             addAttribute(new Attribute("facs", facs));
@@ -107,6 +124,16 @@ public class ArchIdentifier extends AbstractMixedContentElement {
         if (n != null && !n.isEmpty()) {
             addAttribute(new Attribute("n", n));
             this.n = Optional.of(n);
+        }
+
+        if (position != null && !position.isEmpty()) {
+            addAttribute(new Attribute("position", position));
+            this.position = Optional.of(position);
+        }
+
+        if (type != null && !type.isEmpty()) {
+            addAttribute(new Attribute("type", type));
+            this.type = Optional.of(type);
         }
 
     }

@@ -13,10 +13,10 @@ import java.util.Optional;
 /**
  * Created by djell on 25/09/2015.
  */
-public class ArchIdentifier extends AbstractMixedContentElement {
+public class Auth extends AbstractMixedContentElement {
 
     public static final String CEI_URI = Namespace.CEI.getUri();
-    public static final String LOCAL_NAME = "archIdentifier";
+    public static final String LOCAL_NAME = "auth";
 
     @NotNull
     private Optional<String> facs = Optional.empty();
@@ -28,17 +28,17 @@ public class ArchIdentifier extends AbstractMixedContentElement {
     private Optional<String> n = Optional.empty();
 
 
-    public ArchIdentifier(@NotNull String content) {
+    public Auth(@NotNull String content) {
         super(content, LOCAL_NAME);
     }
 
-    public ArchIdentifier(@NotNull String content,
-                          @NotNull String facs, @NotNull String id, @NotNull String lang, @NotNull String n) {
+    public Auth(@NotNull String content,
+                @NotNull String facs, @NotNull String id, @NotNull String lang, @NotNull String n) {
         this(content);
         initAttributes(facs, id, lang, n);
     }
 
-    public ArchIdentifier(@NotNull Element archIdentifierElement) {
+    public Auth(@NotNull Element archIdentifierElement) {
 
         this(initContent(archIdentifierElement, LOCAL_NAME));
 
