@@ -128,7 +128,9 @@ public class Charter extends AtomResource {
 
         sourceDescTenorBibliography = readSourceDescTenorBibliography(xml);
 
-        tenor = readTenor(xml);
+        tenor = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_TENOR)
+                .map(Tenor::new)
+                .filter(t -> !t.getContent().isEmpty());
 
         charterAbstract = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_ABSTRACT)
                 .map(Abstract::new)
@@ -548,40 +550,6 @@ public class Charter extends AtomResource {
             }
 
             result = Optional.of(new Bibliography("sourceDescVolltext", list));
-
-        }
-
-        return result;
-
-    }
-
-    private Optional<Tenor> readTenor(Element xml) {
-
-        Optional<Tenor> result = Optional.empty();
-
-        List<Node> nodes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_TENOR);
-
-        if (nodes.size() != 0) {
-
-            Element element = (Element) nodes.get(0);
-
-            String content = Util.joinChildNodes(element);
-
-            if (!content.isEmpty()) {
-
-                String facs = element.getAttributeValue("facs");
-                String id = element.getAttributeValue("id");
-                String n = element.getAttributeValue("n");
-
-                result = Optional.of(
-                        new Tenor(
-                                content,
-                                facs == null ? "" : facs,
-                                id == null ? "" : id,
-                                n == null ? "" : n
-                        ));
-
-            }
 
         }
 

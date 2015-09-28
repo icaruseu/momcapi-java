@@ -1,7 +1,9 @@
 package eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement;
 
 import nu.xom.Attribute;
+import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -10,7 +12,7 @@ import java.util.Optional;
  */
 public class TraditioForm extends AbstractMixedContentElement {
 
-
+    public static final String LOCAL_NAME = "traditioForm";
     @NotNull
     private Optional<String> facs = Optional.empty();
     @NotNull
@@ -19,27 +21,23 @@ public class TraditioForm extends AbstractMixedContentElement {
     private Optional<String> n = Optional.empty();
 
     public TraditioForm(@NotNull String content) {
-        super(content, "traditioForm");
+        super(content, LOCAL_NAME);
     }
 
     public TraditioForm(@NotNull String content, @NotNull String facs, @NotNull String id, @NotNull String n) {
-
         this(content);
+        initAttributes(facs, id, n);
+    }
 
-        if (!facs.isEmpty()) {
-            addAttribute(new Attribute("facs", facs));
-            this.facs = Optional.of(facs);
-        }
+    public TraditioForm(@NotNull Element tenorElement) {
 
-        if (!id.isEmpty()) {
-            addAttribute(new Attribute("id", id));
-            this.id = Optional.of(id);
-        }
+        this(initContent(tenorElement, LOCAL_NAME));
 
-        if (!n.isEmpty()) {
-            addAttribute(new Attribute("n", n));
-            this.n = Optional.of(n);
-        }
+        String facs = tenorElement.getAttributeValue("facs");
+        String id = tenorElement.getAttributeValue("id");
+        String n = tenorElement.getAttributeValue("n");
+
+        initAttributes(facs, id, n);
 
     }
 
@@ -56,6 +54,25 @@ public class TraditioForm extends AbstractMixedContentElement {
     @NotNull
     public Optional<String> getN() {
         return n;
+    }
+
+    private void initAttributes(@Nullable String facs, @Nullable String id, @Nullable String n) {
+
+        if (facs != null && !facs.isEmpty()) {
+            addAttribute(new Attribute("facs", facs));
+            this.facs = Optional.of(facs);
+        }
+
+        if (id != null && !id.isEmpty()) {
+            addAttribute(new Attribute("id", id));
+            this.id = Optional.of(id);
+        }
+
+        if (n != null && !n.isEmpty()) {
+            addAttribute(new Attribute("n", n));
+            this.n = Optional.of(n);
+        }
+
     }
 
 }
