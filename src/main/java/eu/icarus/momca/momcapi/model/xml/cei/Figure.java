@@ -1,125 +1,146 @@
 package eu.icarus.momca.momcapi.model.xml.cei;
 
 import eu.icarus.momca.momcapi.model.xml.Namespace;
+import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.FigDesc;
+import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.Zone;
 import nu.xom.Attribute;
 import nu.xom.Element;
+import nu.xom.Elements;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * A representation of the {@code cei:figure} element that is used to represents images of the documents.<br/>
- * <br/>
- * Example:<br/>
- * {@code <figure n="RS-IAGNS_F1.-fasc.16,-sub.-N-1513_1">
- * <graphic url="RS-IAGNS_F1.-fasc.16,-sub.-N-1513_1.jpg">RS-IAGNS_F1.-fasc.16,-sub.-N-1513_1.jpg</graphic>
- * </figure>}
- *
- * @author Daniel Jeller
- *         Created on 09.07.2015.
- */
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 public class Figure extends Element {
 
+    public static final String CEI_URI = Namespace.CEI.getUri();
     @NotNull
-    private final String n;
+    private Optional<String> facs = Optional.empty();
     @NotNull
-    private final String text;
+    private Optional<FigDesc> figDesc = Optional.empty();
     @NotNull
-    private final String url;
+    private Optional<Graphic> graphic = Optional.empty();
+    @NotNull
+    private Optional<String> id = Optional.empty();
+    @NotNull
+    private Optional<String> n = Optional.empty();
+    @NotNull
+    private List<Zone> zones = new ArrayList<>(0);
 
+    private Figure() {
+        super("cei:figure", CEI_URI);
+    }
 
-    /**
-     * Instantiates a new Figure with a full set of metadata.
-     *
-     * @param url  The {@code cei:figure/cei:grapic/@url}-attribute responsible for identifying the image in an
-     *             external storage. Can be either just a relative URI (e.g. {@code image1.jpg}) or an
-     *             absolute URL ({@code http://server.com/images/image1.jpg}).
-     * @param n    The {@code cei:figure/@n}-attribute.
-     * @param text The text content of the {@code cei:figure/cei:graphic}-element.
-     */
-    public Figure(@NotNull String url, @Nullable String n, @Nullable String text) {
+    public Figure(@NotNull String url) {
+        this();
+        this.graphic = Optional.of(new Graphic(url));
+    }
 
-        super("cei:figure", Namespace.CEI.getUri());
+    public Figure(@Nullable FigDesc figDesc, @Nullable Graphic graphic, @Nullable List<Zone> zones,
+                  @NotNull String facs, @NotNull String id, @NotNull String n) {
+        this();
+        initChilds(figDesc, graphic, zones);
+        initAttributes(facs, id, n);
+    }
 
-        if (url.isEmpty()) {
-            throw new IllegalArgumentException("An value for 'cei:figure/cei:graphic/@url' is mandatory!");
+    public Figure(@NotNull Element figureElement) {
+
+        this();
+
+        Element figDescElement = figureElement.getFirstChildElement("figDesc", CEI_URI);
+        FigDesc figDesc = (figDescElement == null) ? null : new FigDesc(figureElement);
+
+        Element graphicElement = figureElement.getFirstChildElement("graphic", CEI_URI);
+        Graphic graphic = (graphicElement == null) ? null : new Graphic(graphicElement);
+
+        Elements zoneElements = figureElement.getChildElements("zone", CEI_URI);
+        List<Zone> zones = new ArrayList<>(0);
+        for (int i = 0; i < zoneElements.size(); i++) {
+            zones.add(new Zone(zoneElements.get(i)));
         }
 
-        this.url = url;
-        this.n = (n == null) ? "" : n;
-        this.text = (text == null) ? "" : text;
+        initChilds(figDesc, graphic, zones);
 
-        initXml();
+        String facs = figureElement.getAttributeValue("facs");
+        String id = figureElement.getAttributeValue("id");
+        String n = figureElement.getAttributeValue("n");
+
+        initAttributes(facs, id, n);
 
     }
 
-    /**
-     * Instantiates a new Cei figure.
-     *
-     * @param url The {@code cei:figure/cei:grapic/@url}-attribute responsible for identifying the image in an
-     *            external storage. Can be either just a relative URI (e.g. {@code image1.jpg}) or an
-     *            absolute URL ({@code http://server.com/images/image1.jpg}).
-     */
-    public Figure(@NotNull String url) {
-        this(url, "", "");
-    }
-
-    /**
-     * @return The value of the {@code cei:figure/@n}-attribute.
-     */
     @NotNull
-    public String getN() {
+    public Optional<String> getFacs() {
+        return facs;
+    }
+
+    @NotNull
+    public Optional<FigDesc> getFigDesc() {
+        return figDesc;
+    }
+
+    @NotNull
+    public Optional<Graphic> getGraphic() {
+        return graphic;
+    }
+
+    @NotNull
+    public Optional<String> getId() {
+        return id;
+    }
+
+    @NotNull
+    public Optional<String> getN() {
         return n;
     }
 
-    /**
-     * @return The value of the {@code cei:figure/cei:graphic}-element.
-     */
-    @NotNull
-    public String getText() {
-        return text;
-    }
-
-    /**
-     * @return The Value of the {@code cei:figure/cei:grapic/@url}-attribute responsible for identifying the image in an external storage. Can be either just a relative URI (e.g. {@code image1.jpg}) or an absolute URL ({@code http://server.com/images/image1.jpg}).
-     * @see #hasAbsoluteUrl()
-     */
     @NotNull
     public String getUrl() {
-        return url;
-    }
-
-    /**
-     * @return {@code True} if the {@code cei:figure/cei:grapic/@url}-Attribute is an absolute URL (starting
-     * with {@code http://} or {@code https://}).
-     */
-    public boolean hasAbsoluteUrl() {
-        return url.startsWith("http://") || url.startsWith("https://");
-    }
-
-    private void initXml() {
-
-        if (!n.isEmpty()) {
-            addAttribute(new Attribute("n", n));
-        }
-
-        Element ceiGraphic = new Element("cei:graphic", Namespace.CEI.getUri());
-        ceiGraphic.addAttribute(new Attribute("url", url));
-        if (!text.isEmpty()) {
-            ceiGraphic.appendChild(text);
-        }
-        appendChild(ceiGraphic);
-
+        return graphic.map(Graphic::getUrl).orElse("");
     }
 
     @NotNull
-    @Override
-    public String toString() {
+    public List<Zone> getZones() {
+        return zones;
+    }
 
-        return "Figure{" +
-                ", n='" + n + '\'' +
-                ", text='" + text + '\'' +
-                ", url='" + url + '\'' +
-                "} " + super.toString();
+    private void initAttributes(@Nullable String facs, @Nullable String id, @Nullable String n) {
+
+        if (facs != null && !facs.isEmpty()) {
+            addAttribute(new Attribute("facs", facs));
+            this.facs = Optional.of(facs);
+        }
+
+        if (id != null && !id.isEmpty()) {
+            addAttribute(new Attribute("id", id));
+            this.id = Optional.of(id);
+        }
+
+        if (n != null && !n.isEmpty()) {
+            addAttribute(new Attribute("n", n));
+            this.n = Optional.of(n);
+        }
+
+    }
+
+    private void initChilds(@Nullable FigDesc figDesc, @Nullable Graphic graphic, @Nullable List<Zone> zones) {
+
+        if (figDesc != null) {
+            this.figDesc = Optional.of(figDesc);
+            appendChild(figDesc);
+        }
+
+        if (graphic != null) {
+            this.graphic = Optional.of(graphic);
+            appendChild(graphic);
+        }
+
+        if (zones != null && !zones.isEmpty()) {
+            this.zones = zones;
+            zones.forEach(this::appendChild);
+        }
 
     }
 
