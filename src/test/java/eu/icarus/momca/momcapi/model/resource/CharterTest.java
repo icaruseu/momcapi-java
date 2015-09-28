@@ -225,7 +225,7 @@ public class CharterTest {
         assertEquals(charter.getBackDivNotes().get(0).getN().get(), "n");
         assertEquals(charter.getBackDivNotes().get(0).getContent(), "Unbekannt");
 
-        charter.setAbstract(new Abstract("New Abstract"));
+        charter.regenerateXmlContent();
 
         assertTrue(charter.isValidCei());
         assertEquals(charter.toCei().toXML(), "");
@@ -514,7 +514,7 @@ public class CharterTest {
 
         assertFalse(charter.getSourceDescAbstractBibliography().isPresent());
 
-        Bibl bibl1 = new Bibl("bibl1", "key", "facs", "id", "lang", "n");
+        Bibl bibl1 = new Bibl("bibl1", "facs", "id", "key", "lang", "n");
         Bibl bibl2 = new Bibl("bibl2");
         List<Bibl> bibl = new ArrayList<>(2);
         bibl.add(bibl1);
@@ -525,7 +525,7 @@ public class CharterTest {
         assertTrue(charter.isValidCei());
         assertTrue(charter.getSourceDescAbstractBibliography().isPresent());
         assertEquals(charter.getSourceDescAbstractBibliography().get().getEntries().size(), 2);
-        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front><cei:sourceDesc><cei:sourceDescRegest><cei:bibl key=\"key\" facs=\"facs\" id=\"id\" lang=\"lang\" n=\"n\">bibl1</cei:bibl><cei:bibl>bibl2</cei:bibl></cei:sourceDescRegest></cei:sourceDesc></cei:front><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front><cei:sourceDesc><cei:sourceDescRegest><cei:bibl facs=\"facs\" id=\"id\" key=\"key\" lang=\"lang\" n=\"n\">bibl1</cei:bibl><cei:bibl>bibl2</cei:bibl></cei:sourceDescRegest></cei:sourceDesc></cei:front><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
 
         charter.setSourceDescAbstractBibliography(new ArrayList<>(0));
 
@@ -539,7 +539,7 @@ public class CharterTest {
 
         assertFalse(charter.getSourceDescTenorBibliography().isPresent());
 
-        Bibl bibl1 = new Bibl("bibl1", "key", "facs", "id", "lang", "n");
+        Bibl bibl1 = new Bibl("bibl1", "facs", "id", "key", "lang", "n");
         Bibl bibl2 = new Bibl("bibl2");
         List<Bibl> bibl = new ArrayList<>(2);
         bibl.add(bibl1);
@@ -550,7 +550,7 @@ public class CharterTest {
         assertTrue(charter.isValidCei());
         assertTrue(charter.getSourceDescTenorBibliography().isPresent());
         assertEquals(charter.getSourceDescTenorBibliography().get().getEntries().size(), 2);
-        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front><cei:sourceDesc><cei:sourceDescVolltext><cei:bibl key=\"key\" facs=\"facs\" id=\"id\" lang=\"lang\" n=\"n\">bibl1</cei:bibl><cei:bibl>bibl2</cei:bibl></cei:sourceDescVolltext></cei:sourceDesc></cei:front><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front><cei:sourceDesc><cei:sourceDescVolltext><cei:bibl facs=\"facs\" id=\"id\" key=\"key\" lang=\"lang\" n=\"n\">bibl1</cei:bibl><cei:bibl>bibl2</cei:bibl></cei:sourceDescVolltext></cei:sourceDesc></cei:front><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
 
         charter.setSourceDescTenorBibliography(new ArrayList<>(0));
 

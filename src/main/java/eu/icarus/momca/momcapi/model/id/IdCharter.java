@@ -85,6 +85,27 @@ public class IdCharter extends IdAtomId {
     }
 
     @NotNull
+    public String getHierarchicalUriPart() {
+
+        String idPart;
+
+        if (isInFond()) {
+
+            String archiveIdentifier = getIdFond().get().getIdArchive().getIdentifier();
+            String fondIdentifier = getIdFond().get().getIdentifier();
+            idPart = archiveIdentifier + "/" + fondIdentifier;
+
+        } else {
+
+            idPart = getIdCollection().get().getIdentifier();
+
+        }
+
+        return idPart;
+
+    }
+
+    @NotNull
     public Optional<IdCollection> getIdCollection() {
         return idCollection;
     }
@@ -145,4 +166,5 @@ public class IdCharter extends IdAtomId {
         String[] parts = getContentXml().getText().split("/");
         return parts.length == ResourceType.CHARTER.getMaxIdParts();
     }
+
 }

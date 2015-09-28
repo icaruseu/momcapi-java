@@ -1,7 +1,9 @@
 package eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement;
 
 import nu.xom.Attribute;
+import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -10,6 +12,7 @@ import java.util.Optional;
  */
 public class Bibl extends AbstractMixedContentElement {
 
+    public static final String LOCAL_NAME = "bibl";
     @NotNull
     private Optional<String> facs = Optional.empty();
     @NotNull
@@ -22,37 +25,26 @@ public class Bibl extends AbstractMixedContentElement {
     private Optional<String> n = Optional.empty();
 
     public Bibl(@NotNull String content) {
-        super(content, "bibl");
+        super(content, LOCAL_NAME);
     }
 
-    public Bibl(@NotNull String content, @NotNull String key, @NotNull String facs, @NotNull String id, @NotNull String lang, @NotNull String n) {
-
+    public Bibl(@NotNull String content, @NotNull String facs, @NotNull String id, @NotNull String key,
+                @NotNull String lang, @NotNull String n) {
         this(content);
+        initAttributes(facs, id, key, lang, n);
+    }
 
-        if (!key.isEmpty()) {
-            addAttribute(new Attribute("key", key));
-            this.key = Optional.of(key);
-        }
+    public Bibl(@NotNull Element biblElement) {
 
-        if (!facs.isEmpty()) {
-            addAttribute(new Attribute("facs", facs));
-            this.facs = Optional.of(facs);
-        }
+        this(initContent(biblElement, LOCAL_NAME));
 
-        if (!id.isEmpty()) {
-            addAttribute(new Attribute("id", id));
-            this.id = Optional.of(id);
-        }
+        String facs = biblElement.getAttributeValue("facs");
+        String id = biblElement.getAttributeValue("id");
+        String key = biblElement.getAttributeValue("key");
+        String lang = biblElement.getAttributeValue("lang");
+        String n = biblElement.getAttributeValue("n");
 
-        if (!lang.isEmpty()) {
-            addAttribute(new Attribute("lang", lang));
-            this.lang = Optional.of(lang);
-        }
-
-        if (!n.isEmpty()) {
-            addAttribute(new Attribute("n", n));
-            this.n = Optional.of(n);
-        }
+        initAttributes(facs, id, key, lang, n);
 
     }
 
@@ -79,6 +71,36 @@ public class Bibl extends AbstractMixedContentElement {
     @NotNull
     public Optional<String> getN() {
         return n;
+    }
+
+    private void initAttributes(@Nullable String facs, @Nullable String id, @Nullable String key,
+                                @Nullable String lang, @Nullable String n) {
+
+        if (facs != null && !facs.isEmpty()) {
+            addAttribute(new Attribute("facs", facs));
+            this.facs = Optional.of(facs);
+        }
+
+        if (id != null && !id.isEmpty()) {
+            addAttribute(new Attribute("id", id));
+            this.id = Optional.of(id);
+        }
+
+        if (key != null && !key.isEmpty()) {
+            addAttribute(new Attribute("key", key));
+            this.key = Optional.of(key);
+        }
+
+        if (lang != null && !lang.isEmpty()) {
+            addAttribute(new Attribute("lang", lang));
+            this.lang = Optional.of(lang);
+        }
+
+        if (n != null && !n.isEmpty()) {
+            addAttribute(new Attribute("n", n));
+            this.n = Optional.of(n);
+        }
+
     }
 
 

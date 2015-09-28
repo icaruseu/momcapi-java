@@ -23,7 +23,7 @@
                 <cei:sourceDesc>
                     <cei:sourceDescRegest><cei:bibl lang="lang" facs="facs" id="id" key="key"
                                                     n="n">QW I/1, Nr. 28</cei:bibl></cei:sourceDescRegest>
-                    <cei:sourceDescVolltext><cei:bibl>Volltext</cei:bibl></cei:sourceDescVolltext>
+                    <cei:sourceDescVolltext id="id"><cei:bibl>Volltext</cei:bibl></cei:sourceDescVolltext>
                 </cei:sourceDesc>
                 <cei:publicationStmt>
                     <p>Published 2013</p>

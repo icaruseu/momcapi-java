@@ -124,9 +124,11 @@ public class Charter extends AtomResource {
         diplomaticAnalysis = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_DIPLOMATIC_ANALYSIS)
                 .orElse(new Element("cei:diplomaticAnalysis", CEI_URI));
 
-        sourceDescAbstractBibliography = readSourceDescAbstractBibliography(xml);
+        sourceDescAbstractBibliography = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_SOURCE_DESC_REGEST)
+                .map(element -> new Bibliography("sourceDescRegest", element));
 
-        sourceDescTenorBibliography = readSourceDescTenorBibliography(xml);
+        sourceDescTenorBibliography = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_SOURCE_DESC_VOLLTEXT)
+                .map(element -> new Bibliography("sourceDescVolltext", element));
 
         tenor = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_TENOR)
                 .map(Tenor::new)
@@ -261,19 +263,19 @@ public class Charter extends AtomResource {
                         ResourceRoot.USER_DATA.getUri(),
                         creator.getIdentifier(),
                         "metadata.charter",
-                        idCharter.getIdCollection().get().getIdentifier());
+                        idCharter.getHierarchicalUriPart());
                 break;
 
             case IMPORTED:
                 parentUri = String.format("%s/%s",
                         ResourceRoot.IMPORTED_ARCHIVAL_CHARTERS.getUri(),
-                        extractHierarchicalUriPart(idCharter));
+                        idCharter.getHierarchicalUriPart());
                 break;
 
             case PUBLIC:
                 parentUri = String.format("%s/%s",
                         ResourceRoot.PUBLIC_CHARTERS.getUri(),
-                        extractHierarchicalUriPart(idCharter));
+                        idCharter.getHierarchicalUriPart());
                 break;
 
             case SAVED:
@@ -310,26 +312,6 @@ public class Charter extends AtomResource {
 
     }
 
-    @NotNull
-    private static String extractHierarchicalUriPart(@NotNull IdCharter idCharter) {
-
-        String idPart;
-
-        if (idCharter.isInFond()) {
-
-            String archiveIdentifier = idCharter.getIdFond().get().getIdArchive().getIdentifier();
-            String fondIdentifier = idCharter.getIdFond().get().getIdentifier();
-            idPart = archiveIdentifier + "/" + fondIdentifier;
-
-        } else {
-
-            idPart = idCharter.getIdCollection().get().getIdentifier();
-
-        }
-
-        return idPart;
-
-    }
 
     @NotNull
     public Optional<Abstract> getAbstract() {
@@ -465,96 +447,6 @@ public class Charter extends AtomResource {
 
     public boolean isValidCei() {
         return validationProblems.isEmpty();
-    }
-
-    private Optional<Bibliography> readSourceDescAbstractBibliography(Element xml) {
-
-        Optional<Bibliography> result = Optional.empty();
-
-        List<Node> nodes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_SOURCE_DESC_REGEST_BIBL);
-
-        if (nodes.size() != 0) {
-
-            List<Bibl> list = new ArrayList<>(0);
-
-            for (int i = 0; i < nodes.size(); i++) {
-
-                Element element = (Element) nodes.get(i);
-
-                String content = Util.joinChildNodes(element);
-
-                if (!content.isEmpty()) {
-
-                    String key = element.getAttributeValue("key");
-                    String facs = element.getAttributeValue("facs");
-                    String id = element.getAttributeValue("id");
-                    String lang = element.getAttributeValue("lang");
-                    String n = element.getAttributeValue("n");
-
-                    list.add(new Bibl(
-                            content,
-                            key == null ? "" : key,
-                            facs == null ? "" : facs,
-                            id == null ? "" : id,
-                            lang == null ? "" : lang,
-                            n == null ? "" : n
-                    ));
-
-                }
-
-            }
-
-            result = Optional.of(new Bibliography("sourceDescRegest", list));
-
-        }
-
-        return result;
-
-    }
-
-    private Optional<Bibliography> readSourceDescTenorBibliography(Element xml) {
-
-        Optional<Bibliography> result = Optional.empty();
-
-        List<Node> nodes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_SOURCE_DESC_VOLLTEXT_BIBL);
-
-        if (nodes.size() != 0) {
-
-            List<Bibl> list = new ArrayList<>(0);
-
-            for (int i = 0; i < nodes.size(); i++) {
-
-                Element element = (Element) nodes.get(i);
-
-                String content = Util.joinChildNodes(element);
-
-                if (!content.isEmpty()) {
-
-                    String key = element.getAttributeValue("key");
-                    String facs = element.getAttributeValue("facs");
-                    String id = element.getAttributeValue("id");
-                    String lang = element.getAttributeValue("lang");
-                    String n = element.getAttributeValue("n");
-
-                    list.add(new Bibl(
-                            content,
-                            key == null ? "" : key,
-                            facs == null ? "" : facs,
-                            id == null ? "" : id,
-                            lang == null ? "" : lang,
-                            n == null ? "" : n
-                    ));
-
-                }
-
-            }
-
-            result = Optional.of(new Bibliography("sourceDescVolltext", list));
-
-        }
-
-        return result;
-
     }
 
     @Override
