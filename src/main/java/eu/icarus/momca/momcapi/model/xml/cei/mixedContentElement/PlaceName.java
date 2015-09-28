@@ -50,19 +50,19 @@ public class PlaceName extends AbstractMixedContentElement {
         initAttributes(certainty, existent, facs, id, key, lang, n, reg, type);
     }
 
-    public PlaceName(@NotNull Element geogNameElement) {
+    public PlaceName(@NotNull Element placeNameElement) {
 
-        this(initContent(geogNameElement, LOCAL_NAME));
+        this(initContent(placeNameElement, LOCAL_NAME));
 
-        String certainty = geogNameElement.getAttributeValue("certainty");
-        String existent = geogNameElement.getAttributeValue("existent");
-        String facs = geogNameElement.getAttributeValue("facs");
-        String id = geogNameElement.getAttributeValue("id");
-        String key = geogNameElement.getAttributeValue("key");
-        String lang = geogNameElement.getAttributeValue("lang");
-        String n = geogNameElement.getAttributeValue("n");
-        String reg = geogNameElement.getAttributeValue("reg");
-        String type = geogNameElement.getAttributeValue("type");
+        String certainty = placeNameElement.getAttributeValue("certainty");
+        String existent = placeNameElement.getAttributeValue("existent");
+        String facs = placeNameElement.getAttributeValue("facs");
+        String id = placeNameElement.getAttributeValue("id");
+        String key = placeNameElement.getAttributeValue("key");
+        String lang = placeNameElement.getAttributeValue("lang");
+        String n = placeNameElement.getAttributeValue("n");
+        String reg = placeNameElement.getAttributeValue("reg");
+        String type = placeNameElement.getAttributeValue("type");
 
         initAttributes(certainty, existent, facs, id, key, lang, n, reg, type);
 

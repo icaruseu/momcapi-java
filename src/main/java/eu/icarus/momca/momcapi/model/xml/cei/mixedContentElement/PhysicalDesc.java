@@ -29,13 +29,13 @@ public class PhysicalDesc extends AbstractMixedContentElement {
         initAttributes(facs, id, n);
     }
 
-    public PhysicalDesc(@NotNull Element tenorElement) {
+    public PhysicalDesc(@NotNull Element physicalDescElement) {
 
-        this(initContent(tenorElement, LOCAL_NAME));
+        this(initContent(physicalDescElement, LOCAL_NAME));
 
-        String facs = tenorElement.getAttributeValue("facs");
-        String id = tenorElement.getAttributeValue("id");
-        String n = tenorElement.getAttributeValue("n");
+        String facs = physicalDescElement.getAttributeValue("facs");
+        String id = physicalDescElement.getAttributeValue("id");
+        String n = physicalDescElement.getAttributeValue("n");
 
         initAttributes(facs, id, n);
 

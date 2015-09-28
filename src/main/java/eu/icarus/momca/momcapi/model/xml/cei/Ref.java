@@ -61,24 +61,24 @@ public class Ref extends Element {
 
     }
 
-    public Ref(@NotNull Element ref) {
+    public Ref(@NotNull Element refElement) {
 
         this();
 
-        if (!Objects.equals(ref.getLocalName(), "ref") && !ref.getNamespaceURI().equals(CEI_URI)) {
+        if (!Objects.equals(refElement.getLocalName(), "ref") && !refElement.getNamespaceURI().equals(CEI_URI)) {
             throw new IllegalArgumentException("The provided XML Element is not a 'cei:ref' element");
         }
 
-        String text = ref.getValue();
+        String text = refElement.getValue();
 
-        String facs = ref.getAttributeValue("facs");
-        String id = ref.getAttributeValue("id");
-        String key = ref.getAttributeValue("key");
-        String lang = ref.getAttributeValue("lang");
-        String n = ref.getAttributeValue("n");
-        String resp = ref.getAttributeValue("resp");
-        String target = ref.getAttributeValue("target");
-        String type = ref.getAttributeValue("type");
+        String facs = refElement.getAttributeValue("facs");
+        String id = refElement.getAttributeValue("id");
+        String key = refElement.getAttributeValue("key");
+        String lang = refElement.getAttributeValue("lang");
+        String n = refElement.getAttributeValue("n");
+        String resp = refElement.getAttributeValue("resp");
+        String target = refElement.getAttributeValue("target");
+        String type = refElement.getAttributeValue("type");
 
         initMembers(text, facs, id, key, lang, n, resp, target, type);
 

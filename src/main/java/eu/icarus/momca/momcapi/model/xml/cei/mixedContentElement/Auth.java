@@ -38,14 +38,14 @@ public class Auth extends AbstractMixedContentElement {
         initAttributes(facs, id, lang, n);
     }
 
-    public Auth(@NotNull Element archIdentifierElement) {
+    public Auth(@NotNull Element authElement) {
 
-        this(initContent(archIdentifierElement, LOCAL_NAME));
+        this(initContent(authElement, LOCAL_NAME));
 
-        String facs = archIdentifierElement.getAttributeValue("facs");
-        String id = archIdentifierElement.getAttributeValue("id");
-        String lang = archIdentifierElement.getAttributeValue("lang");
-        String n = archIdentifierElement.getAttributeValue("n");
+        String facs = authElement.getAttributeValue("facs");
+        String id = authElement.getAttributeValue("id");
+        String lang = authElement.getAttributeValue("lang");
+        String n = authElement.getAttributeValue("n");
 
         initAttributes(facs, id, lang, n);
 

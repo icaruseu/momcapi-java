@@ -29,13 +29,13 @@ public class TraditioForm extends AbstractMixedContentElement {
         initAttributes(facs, id, n);
     }
 
-    public TraditioForm(@NotNull Element tenorElement) {
+    public TraditioForm(@NotNull Element traditioFormElement) {
 
-        this(initContent(tenorElement, LOCAL_NAME));
+        this(initContent(traditioFormElement, LOCAL_NAME));
 
-        String facs = tenorElement.getAttributeValue("facs");
-        String id = tenorElement.getAttributeValue("id");
-        String n = tenorElement.getAttributeValue("n");
+        String facs = traditioFormElement.getAttributeValue("facs");
+        String id = traditioFormElement.getAttributeValue("id");
+        String n = traditioFormElement.getAttributeValue("n");
 
         initAttributes(facs, id, n);
 

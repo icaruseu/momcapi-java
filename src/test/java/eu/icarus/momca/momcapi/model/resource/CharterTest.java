@@ -496,7 +496,6 @@ public class CharterTest {
         assertTrue(charter.isValidCei());
         assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:witnessOrig /><cei:witListPar /><cei:diplomaticAnalysis><cei:listBiblRegest><cei:bibl>UB Südl. St. Gallen, Band I, Nr. 67.</cei:bibl><cei:bibl>Hidber, Urkundenregister, Band I, Nr. 1025.</cei:bibl></cei:listBiblRegest><cei:listBiblErw><cei:bibl>Sickel, Kaiserurkunden, S. 70, 72-77.</cei:bibl></cei:listBiblErw></cei:diplomaticAnalysis></cei:chDesc></cei:body><cei:back /></cei:text>");
 
-
     }
 
     @Test

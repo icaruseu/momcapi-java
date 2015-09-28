@@ -33,13 +33,13 @@ public class DiplomaticAnalysis extends AbstractMixedContentElement {
         initAttributes(facs, id, n);
     }
 
-    public DiplomaticAnalysis(@NotNull Element tenorElement) {
+    public DiplomaticAnalysis(@NotNull Element diplomaticAnalysisElement) {
 
-        this(initContent(tenorElement, LOCAL_NAME));
+        this(initContent(diplomaticAnalysisElement, LOCAL_NAME));
 
-        String facs = tenorElement.getAttributeValue("facs");
-        String id = tenorElement.getAttributeValue("id");
-        String n = tenorElement.getAttributeValue("n");
+        String facs = diplomaticAnalysisElement.getAttributeValue("facs");
+        String id = diplomaticAnalysisElement.getAttributeValue("id");
+        String n = diplomaticAnalysisElement.getAttributeValue("n");
 
         initAttributes(facs, id, n);
 

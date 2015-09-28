@@ -42,16 +42,16 @@ public class Nota extends AbstractMixedContentElement {
         initAttributes(facs, id, lang, n, position, type);
     }
 
-    public Nota(@NotNull Element archIdentifierElement) {
+    public Nota(@NotNull Element notaElement) {
 
-        this(initContent(archIdentifierElement, LOCAL_NAME));
+        this(initContent(notaElement, LOCAL_NAME));
 
-        String facs = archIdentifierElement.getAttributeValue("facs");
-        String id = archIdentifierElement.getAttributeValue("id");
-        String lang = archIdentifierElement.getAttributeValue("lang");
-        String n = archIdentifierElement.getAttributeValue("n");
-        String position = archIdentifierElement.getAttributeValue("position");
-        String type = archIdentifierElement.getAttributeValue("type");
+        String facs = notaElement.getAttributeValue("facs");
+        String id = notaElement.getAttributeValue("id");
+        String lang = notaElement.getAttributeValue("lang");
+        String n = notaElement.getAttributeValue("n");
+        String position = notaElement.getAttributeValue("position");
+        String type = notaElement.getAttributeValue("type");
 
         initAttributes(facs, id, lang, n, position, type);
 

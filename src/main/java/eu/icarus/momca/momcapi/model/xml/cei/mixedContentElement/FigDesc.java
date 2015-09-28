@@ -29,13 +29,13 @@ public class FigDesc extends AbstractMixedContentElement {
         initAttributes(facs, id, n);
     }
 
-    public FigDesc(@NotNull Element tenorElement) {
+    public FigDesc(@NotNull Element figDescElement) {
 
-        this(initContent(tenorElement, LOCAL_NAME));
+        this(initContent(figDescElement, LOCAL_NAME));
 
-        String facs = tenorElement.getAttributeValue("facs");
-        String id = tenorElement.getAttributeValue("id");
-        String n = tenorElement.getAttributeValue("n");
+        String facs = figDescElement.getAttributeValue("facs");
+        String id = figDescElement.getAttributeValue("id");
+        String n = figDescElement.getAttributeValue("n");
 
         initAttributes(facs, id, n);
 

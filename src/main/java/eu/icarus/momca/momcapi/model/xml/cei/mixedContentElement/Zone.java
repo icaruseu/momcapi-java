@@ -29,13 +29,13 @@ public class Zone extends AbstractMixedContentElement {
         initAttributes(facs, id, n);
     }
 
-    public Zone(@NotNull Element tenorElement) {
+    public Zone(@NotNull Element zoneElement) {
 
-        this(initContent(tenorElement, LOCAL_NAME));
+        this(initContent(zoneElement, LOCAL_NAME));
 
-        String facs = tenorElement.getAttributeValue("facs");
-        String id = tenorElement.getAttributeValue("id");
-        String n = tenorElement.getAttributeValue("n");
+        String facs = zoneElement.getAttributeValue("facs");
+        String id = zoneElement.getAttributeValue("id");
+        String n = zoneElement.getAttributeValue("n");
 
         initAttributes(facs, id, n);
 
