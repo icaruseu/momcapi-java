@@ -25,7 +25,7 @@ public class IdnoTest {
     @Test
     public void testToXML() throws Exception {
         assertEquals(CEI_IDNO_WITHOUT_OLD.toXML(), "<cei:idno xmlns:cei=\"http://www.monasterium.net/NS/cei\" id=\"id\">text</cei:idno>");
-        assertEquals(CEI_IDNO_WITH_OLD.toXML(), "<cei:idno xmlns:cei=\"http://www.monasterium.net/NS/cei\" id=\"id\" old=\"old\" facs=\"facs\" n=\"n\">text</cei:idno>");
+        assertEquals(CEI_IDNO_WITH_OLD.toXML(), "<cei:idno xmlns:cei=\"http://www.monasterium.net/NS/cei\" facs=\"facs\" id=\"id\" n=\"n\" old=\"old\">text</cei:idno>");
     }
 
     @Test

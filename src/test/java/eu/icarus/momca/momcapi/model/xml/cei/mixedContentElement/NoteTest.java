@@ -15,8 +15,9 @@ public class NoteTest {
         String content = "<sup>2</sup>\nru auf Rasur; das dritte o korrigiert aus u<lb />";
 
         Note note = new Note(content);
-        assertEquals(note.getContent(), content);
-        assertEquals(note.toXML(), "<cei:note xmlns:cei=\"http://www.monasterium.net/NS/cei\">" + content + "</cei:note>");
+        assertEquals(note.getContent(), "<cei:sup>2</cei:sup>\nru auf Rasur; das dritte o korrigiert aus u<cei:lb />");
+        assertEquals(note.toXML(), "<cei:note xmlns:cei=\"http://www.monasterium.net/NS/cei\"><cei:sup>2</cei:sup>\n" +
+                "ru auf Rasur; das dritte o korrigiert aus u<cei:lb /></cei:note>");
         assertFalse(note.getPlace().isPresent());
 
         note = new Note(content, "Line 2");
@@ -25,4 +26,5 @@ public class NoteTest {
         assertEquals(note.getPlace().get(), "Line 2");
 
     }
+
 }
