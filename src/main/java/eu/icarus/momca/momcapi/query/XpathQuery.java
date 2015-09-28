@@ -50,6 +50,8 @@ public enum XpathQuery {
     QUERY_CEI_SOURCE_DESC_VOLLTEXT_BIBL("//cei:sourceDesc//cei:sourceDescVolltext//cei:bibl", Namespace.CEI),
     QUERY_CEI_TENOR("//cei:tenor", Namespace.CEI),
     QUERY_CEI_TEXT("//cei:text", Namespace.CEI),
+    QUERY_CEI_WITNESS_ORIG("//cei:witnessOrig", Namespace.CEI),
+    QUERY_CEI_WITLIST_PAR_WITNESS("//cei:witListPar/cei:witness", Namespace.CEI),
     QUERY_CEI_WITNESS_ORIG_FIGURE("//cei:witnessOrig/cei:figure", Namespace.CEI),
     QUERY_EAD_BIBLIOGRAPHY("//ead:bibliography", Namespace.EAD),
     QUERY_EAD_BIOGHIST("//ead:bioghist", Namespace.EAD),

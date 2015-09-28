@@ -77,7 +77,7 @@ public class CharterTest {
         assertEquals(charter.getBackIndexes().size(), 0);
 
         assertTrue(charter.isValidCei());
-        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:witnessOrig /><cei:witListPar /><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
 
     }
 
@@ -106,7 +106,7 @@ public class CharterTest {
         charter.setAbstract(new Abstract("New Abstract"));
 
         assertTrue(charter.isValidCei());
-        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"empty_charter\">New Charter</cei:idno><cei:chDesc><cei:issued><cei:date value=\"99999999\" /></cei:issued><cei:abstract>New Abstract</cei:abstract><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"empty_charter\">New Charter</cei:idno><cei:chDesc><cei:abstract>New Abstract</cei:abstract><cei:issued><cei:date value=\"99999999\" /></cei:issued><cei:witnessOrig /><cei:witListPar /><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
 
     }
 
@@ -228,7 +228,35 @@ public class CharterTest {
         charter.regenerateXmlContent();
 
         assertTrue(charter.isValidCei());
-        assertEquals(charter.toCei().toXML(), "");
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front><cei:sourceDesc><cei:sourceDescRegest><cei:bibl facs=\"facs\" id=\"id\" key=\"key\" lang=\"lang\" n=\"n\">QW I/1, Nr. 28</cei:bibl></cei:sourceDescRegest><cei:sourceDescVolltext id=\"id\"><cei:bibl>Volltext</cei:bibl></cei:sourceDescVolltext></cei:sourceDesc><cei:publicationStmt>\n" +
+                "                    <cei:p>Published 2013</cei:p>\n" +
+                "                </cei:publicationStmt></cei:front><cei:body><cei:idno facs=\"facs\" id=\"KAE_Urkunde_Nr_1\" n=\"n\" old=\"1\">KAE, Urkunde Nr. 1</cei:idno><cei:chDesc><cei:class>Urkunde</cei:class><cei:abstract facs=\"facs\" id=\"id\" lang=\"lang\" n=\"n\">König Otto I. verleiht auf Bitte Herzog Hermanns dem Kloster Meinradszell (Einsiedeln), das samt einer Kirche vom jetzigen <cei:persName>Abt Eberhard</cei:persName> auf Boden, der dem Herzog von einigen Getreuen zu eigen gegeben worden war, mit dessen Unterstützung errichtet worden ist, das Recht freier Wahl des Abtes nach dem Tode Eberhards und Immunität.</cei:abstract><cei:issued><cei:placeName lang=\"lang\" type=\"City\">Frankfurt <cei:hi>am Main</cei:hi></cei:placeName><cei:date certainty=\"certainty\" facs=\"facs\" id=\"id\" lang=\"lang\" n=\"n\" value=\"9471027\">0947-10-27</cei:date></cei:issued><cei:witnessOrig n=\"A\"><cei:traditioForm>Original</cei:traditioForm><cei:archIdentifier>\n" +
+                "                            <cei:arch>Klosterarchiv Einsiedeln</cei:arch>\n" +
+                "                            <cei:idno>KAE, A.BI.1</cei:idno>\n" +
+                "                        </cei:archIdentifier><cei:auth>\n" +
+                "                            <cei:sealDesc>1 Siegel</cei:sealDesc>\n" +
+                "                        </cei:auth><cei:figure><cei:graphic url=\"KAE_A_BI_1-v.jpg\" /></cei:figure><cei:figure><cei:graphic url=\"KAE_A_BI_1-r.jpg\" /></cei:figure></cei:witnessOrig><cei:witListPar><cei:witness n=\"B\"><cei:traditioForm>Kopie</cei:traditioForm><cei:archIdentifier>\n" +
+                "                                <cei:arch>Klosterarchiv Einsiedeln</cei:arch>\n" +
+                "                                <cei:idno>KAE, A.II.1</cei:idno>\n" +
+                "                            </cei:archIdentifier><cei:physicalDesc /><cei:figure><cei:graphic url=\"http://www.klosterarchiv.ch/archivalien/KAE_A_II_1-1440/KAE_A_II_1-0067.jpg\" /></cei:figure></cei:witness></cei:witListPar><cei:diplomaticAnalysis>\n" +
+                "                        <cei:listBiblRegest>\n" +
+                "                            <cei:bibl facs=\"1\">Morel, Nr. 1.</cei:bibl>\n" +
+                "                            <cei:bibl>Regesta imperii II/1, 1, Nr. 157.</cei:bibl>\n" +
+                "                            <cei:bibl>Helbok, Regesten Vorarlberg, Nr. 132.</cei:bibl>\n" +
+                "                            <cei:bibl>UB Südl. St. Gallen, Band I, Nr. 67.</cei:bibl>\n" +
+                "                            <cei:bibl>Hidber, Urkundenregister, Band I, Nr. 1025.</cei:bibl>\n" +
+                "                        </cei:listBiblRegest>\n" +
+                "                        <cei:listBiblEdition>\n" +
+                "                            <cei:bibl>MGH DO I, Nr. 94.</cei:bibl>\n" +
+                "                            <cei:bibl>DAE, Band G, Nr. 25, S. 25.</cei:bibl>\n" +
+                "                            <cei:bibl>QW I/1, Nr. 28.</cei:bibl>\n" +
+                "                            <cei:bibl>Gfr, Band 43, 1888, S. 322f..</cei:bibl>\n" +
+                "                        </cei:listBiblEdition>\n" +
+                "                        <cei:listBiblErw>\n" +
+                "                            <cei:bibl>Sickel, Kaiserurkunden, S. 70, 72-77.</cei:bibl>\n" +
+                "                            <cei:bibl>MGH Ergänzungen, Nr. O.I.094.</cei:bibl>\n" +
+                "                        </cei:listBiblErw>\n" +
+                "                    </cei:diplomaticAnalysis><cei:lang_MOM>Latein</cei:lang_MOM></cei:chDesc><cei:tenor facs=\"facs\" id=\"id\" n=\"n\">This is the <cei:hi>Winter</cei:hi> of our discontempt.</cei:tenor></cei:body><cei:back><cei:persName reg=\"Karl der Große\" type=\"Kaiser\">Carolus <cei:hi>Magnus</cei:hi></cei:persName><cei:persName certainty=\"certainty\" facs=\"facs\" id=\"id\" key=\"key\" lang=\"lang\" n=\"n\" reg=\"reg\" type=\"type\">Eginhardus</cei:persName><cei:placeName certainty=\"certainty\" existent=\"existent\" facs=\"facs\" id=\"id\" key=\"key\" lang=\"lang\" n=\"n\" reg=\"reg\" type=\"type\">Frankfurt</cei:placeName><cei:placeName reg=\"Einsiedeln\">Kloster <cei:hi>Einsiedeln</cei:hi> in der Schweiz</cei:placeName><cei:geogName certainty=\"certainty\" existent=\"existent\" facs=\"facs\" id=\"id\" key=\"key\" lang=\"lang\" n=\"n\" reg=\"reg\" type=\"type\">Ein Berg</cei:geogName><cei:geogName>Der <cei:hi>Grabeshügel</cei:hi></cei:geogName><cei:index facs=\"facs\" id=\"id\" indexName=\"indexName\" lang=\"lang\" lemma=\"lemma\" n=\"n\" sublemma=\"sublemma\" type=\"type\">Schwert</cei:index><cei:divNotes><cei:note place=\"§1\" id=\"id\" n=\"n\">Unbekannt</cei:note></cei:divNotes></cei:back></cei:text>");
 
     }
 
@@ -271,7 +299,7 @@ public class CharterTest {
         assertTrue(charter.getAbstract().isPresent());
         assertEquals(charter.getAbstract().get().getContent(), "An abstract with an <cei:issuer>issuer</cei:issuer>");
         assertTrue(charter.isValidCei());
-        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:abstract facs=\"facs\" id=\"id\" lang=\"lang\" n=\"n\">An abstract with an <cei:issuer>issuer</cei:issuer></cei:abstract><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:abstract facs=\"facs\" id=\"id\" lang=\"lang\" n=\"n\">An abstract with an <cei:issuer>issuer</cei:issuer></cei:abstract><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:witnessOrig /><cei:witListPar /><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
 
         charter.setAbstract(new Abstract(""));
 
@@ -296,7 +324,7 @@ public class CharterTest {
         assertTrue(charter.isValidCei());
         assertEquals(charter.getBackDivNotes().size(), 2);
         assertEquals(charter.getBackDivNotes().get(1).toXML(), note2.toXML());
-        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back><cei:divNotes><cei:note place=\"Somewhere\" id=\"id\" n=\"n\">Note1</cei:note><cei:note place=\"Over\">Note2</cei:note></cei:divNotes></cei:back></cei:text>");
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:witnessOrig /><cei:witListPar /><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back><cei:divNotes><cei:note place=\"Somewhere\" id=\"id\" n=\"n\">Note1</cei:note><cei:note place=\"Over\">Note2</cei:note></cei:divNotes></cei:back></cei:text>");
 
         charter.setBackDivNotes(new ArrayList<>(0));
 
@@ -319,7 +347,7 @@ public class CharterTest {
 
         assertTrue(charter.isValidCei());
         assertEquals(charter.getBackGeogNames(), geogNames);
-        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back><cei:geogName certainty=\"certainty\" existent=\"existent\" facs=\"facs\" id=\"id\" key=\"key\" lang=\"lang\" n=\"n\" reg=\"reg\" type=\"type\">Ein Berg</cei:geogName><cei:geogName reg=\"Hügel\" type=\"Ding\">Ein Hügel</cei:geogName></cei:back></cei:text>");
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:witnessOrig /><cei:witListPar /><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back><cei:geogName certainty=\"certainty\" existent=\"existent\" facs=\"facs\" id=\"id\" key=\"key\" lang=\"lang\" n=\"n\" reg=\"reg\" type=\"type\">Ein Berg</cei:geogName><cei:geogName reg=\"Hügel\" type=\"Ding\">Ein Hügel</cei:geogName></cei:back></cei:text>");
 
         charter.setBackGeogNames(new ArrayList<>(0));
 
@@ -344,7 +372,7 @@ public class CharterTest {
         assertTrue(charter.isValidCei());
         assertEquals(charter.getBackIndexes().size(), 2);
         assertEquals(charter.getBackIndexes().get(1).getContent(), index2.getContent());
-        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back><cei:index indexName=\"Waffen\">Schwert</cei:index><cei:index facs=\"e\" id=\"d\" indexName=\"Waffen\" lang=\"f\" lemma=\"a\" n=\"g\" sublemma=\"b\" type=\"c\">Axt</cei:index></cei:back></cei:text>");
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:witnessOrig /><cei:witListPar /><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back><cei:index indexName=\"Waffen\">Schwert</cei:index><cei:index facs=\"e\" id=\"d\" indexName=\"Waffen\" lang=\"f\" lemma=\"a\" n=\"g\" sublemma=\"b\" type=\"c\">Axt</cei:index></cei:back></cei:text>");
 
         charter.setBackIndexes(new ArrayList<>(0));
 
@@ -371,7 +399,7 @@ public class CharterTest {
         assertEquals(charter.getBackPersNames(), names);
         assertEquals(charter.getBackPersNames().get(1).getContent(), "Einhard");
 
-        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back><cei:persName reg=\"Karl der Große\" type=\"Kaiser\">Carolus <cei:hi>Magnus</cei:hi></cei:persName><cei:persName certainty=\"certainty\" facs=\"facs\" id=\"id\" key=\"key\" lang=\"lang\" n=\"n\" reg=\"reg\" type=\"type\">Einhard</cei:persName></cei:back></cei:text>");
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:witnessOrig /><cei:witListPar /><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back><cei:persName reg=\"Karl der Große\" type=\"Kaiser\">Carolus <cei:hi>Magnus</cei:hi></cei:persName><cei:persName certainty=\"certainty\" facs=\"facs\" id=\"id\" key=\"key\" lang=\"lang\" n=\"n\" reg=\"reg\" type=\"type\">Einhard</cei:persName></cei:back></cei:text>");
 
         charter.setBackPersNames(new ArrayList<>(0));
 
@@ -394,7 +422,7 @@ public class CharterTest {
 
         assertTrue(charter.isValidCei());
         assertEquals(charter.getBackPlaceNames(), placeNames);
-        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back><cei:placeName certainty=\"certainty\" existent=\"existent\" facs=\"facs\" id=\"id\" key=\"key\" lang=\"lang\" n=\"n\" reg=\"reg\" type=\"type\">Frankfurt</cei:placeName><cei:placeName reg=\"Salzburg\" type=\"City\">Iuvavum</cei:placeName></cei:back></cei:text>");
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:witnessOrig /><cei:witListPar /><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back><cei:placeName certainty=\"certainty\" existent=\"existent\" facs=\"facs\" id=\"id\" key=\"key\" lang=\"lang\" n=\"n\" reg=\"reg\" type=\"type\">Frankfurt</cei:placeName><cei:placeName reg=\"Salzburg\" type=\"City\">Iuvavum</cei:placeName></cei:back></cei:text>");
 
         charter.setBackPlaceNames(new ArrayList<>(0));
 
@@ -441,7 +469,7 @@ public class CharterTest {
 
         assertEquals(charter.getDate(), newDate);
         assertTrue(charter.isValidCei());
-        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date certainty=\"certainty\" facs=\"facs\" id=\"id\" lang=\"lang\" n=\"n\" value=\"12180619\">19th June, 1218</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date certainty=\"certainty\" facs=\"facs\" id=\"id\" lang=\"lang\" n=\"n\" value=\"12180619\">19th June, 1218</cei:date></cei:issued><cei:witnessOrig /><cei:witListPar /><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
 
     }
 
@@ -468,7 +496,7 @@ public class CharterTest {
 
         assertEquals(charter.getIdno(), newId);
         assertTrue(charter.isValidCei());
-        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno facs=\"facs\" id=\"newId\" n=\"n\" old=\"old\">New Idno Text</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno facs=\"facs\" id=\"newId\" n=\"n\" old=\"old\">New Idno Text</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:witnessOrig /><cei:witListPar /><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
 
     }
 
@@ -482,7 +510,7 @@ public class CharterTest {
 
         assertTrue(charter.getIssuedPlace().isPresent());
         assertTrue(charter.isValidCei());
-        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:placeName reg=\"Salzburg\" type=\"City\">Iuvavum</cei:placeName><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:placeName reg=\"Salzburg\" type=\"City\">Iuvavum</cei:placeName><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:witnessOrig /><cei:witListPar /><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
 
         charter.setIssuedPlace(new PlaceName(""));
 
@@ -501,7 +529,7 @@ public class CharterTest {
         assertTrue(charter.getLangMom().isPresent());
         assertEquals(charter.getLangMom().get(), "Deutsch");
         assertTrue(charter.isValidCei());
-        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /><cei:lang_MOM>Deutsch</cei:lang_MOM></cei:chDesc></cei:body><cei:back /></cei:text>");
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:witnessOrig /><cei:witListPar /><cei:diplomaticAnalysis /><cei:lang_MOM>Deutsch</cei:lang_MOM></cei:chDesc></cei:body><cei:back /></cei:text>");
 
         charter.setLangMom("");
         assertFalse(charter.getLangMom().isPresent());
@@ -525,7 +553,7 @@ public class CharterTest {
         assertTrue(charter.isValidCei());
         assertTrue(charter.getSourceDescAbstractBibliography().isPresent());
         assertEquals(charter.getSourceDescAbstractBibliography().get().getEntries().size(), 2);
-        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front><cei:sourceDesc><cei:sourceDescRegest><cei:bibl facs=\"facs\" id=\"id\" key=\"key\" lang=\"lang\" n=\"n\">bibl1</cei:bibl><cei:bibl>bibl2</cei:bibl></cei:sourceDescRegest></cei:sourceDesc></cei:front><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front><cei:sourceDesc><cei:sourceDescRegest><cei:bibl facs=\"facs\" id=\"id\" key=\"key\" lang=\"lang\" n=\"n\">bibl1</cei:bibl><cei:bibl>bibl2</cei:bibl></cei:sourceDescRegest></cei:sourceDesc></cei:front><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:witnessOrig /><cei:witListPar /><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
 
         charter.setSourceDescAbstractBibliography(new ArrayList<>(0));
 
@@ -550,7 +578,7 @@ public class CharterTest {
         assertTrue(charter.isValidCei());
         assertTrue(charter.getSourceDescTenorBibliography().isPresent());
         assertEquals(charter.getSourceDescTenorBibliography().get().getEntries().size(), 2);
-        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front><cei:sourceDesc><cei:sourceDescVolltext><cei:bibl facs=\"facs\" id=\"id\" key=\"key\" lang=\"lang\" n=\"n\">bibl1</cei:bibl><cei:bibl>bibl2</cei:bibl></cei:sourceDescVolltext></cei:sourceDesc></cei:front><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front><cei:sourceDesc><cei:sourceDescVolltext><cei:bibl facs=\"facs\" id=\"id\" key=\"key\" lang=\"lang\" n=\"n\">bibl1</cei:bibl><cei:bibl>bibl2</cei:bibl></cei:sourceDescVolltext></cei:sourceDesc></cei:front><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:witnessOrig /><cei:witListPar /><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
 
         charter.setSourceDescTenorBibliography(new ArrayList<>(0));
 
@@ -570,7 +598,7 @@ public class CharterTest {
 
         assertEquals(charter.getTenor().get().getContent(), "This is the winter of <cei:lb /> our <cei:hi>discontempt</cei:hi>!");
         assertTrue(charter.isValidCei());
-        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:diplomaticAnalysis /></cei:chDesc><cei:tenor facs=\"facs\" id=\"id\" n=\"n\">This is the winter of <cei:lb /> our <cei:hi>discontempt</cei:hi>!</cei:tenor></cei:body><cei:back /></cei:text>");
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued><cei:witnessOrig /><cei:witListPar /><cei:diplomaticAnalysis /></cei:chDesc><cei:tenor facs=\"facs\" id=\"id\" n=\"n\">This is the winter of <cei:lb /> our <cei:hi>discontempt</cei:hi>!</cei:tenor></cei:body><cei:back /></cei:text>");
 
         charter.setTenor(new Tenor(""));
         assertFalse(charter.getTenor().isPresent());

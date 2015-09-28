@@ -12,10 +12,7 @@ import eu.icarus.momca.momcapi.model.id.IdUser;
 import eu.icarus.momca.momcapi.model.xml.Namespace;
 import eu.icarus.momca.momcapi.model.xml.XmlValidationProblem;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomEntry;
-import eu.icarus.momca.momcapi.model.xml.cei.Bibliography;
-import eu.icarus.momca.momcapi.model.xml.cei.DateExact;
-import eu.icarus.momca.momcapi.model.xml.cei.DateRange;
-import eu.icarus.momca.momcapi.model.xml.cei.Idno;
+import eu.icarus.momca.momcapi.model.xml.cei.*;
 import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.*;
 import eu.icarus.momca.momcapi.query.XpathQuery;
 import nu.xom.*;
@@ -79,6 +76,10 @@ public class Charter extends AtomResource {
     private List<Node> unusedFrontNodes = new ArrayList<>(0);
     @NotNull
     private List<XmlValidationProblem> validationProblems = new ArrayList<>(0);
+    @NotNull
+    private List<Witness> witListPar = new ArrayList<>(0);
+    @NotNull
+    private Optional<Witness> witnessOrig = Optional.empty();
 
     public Charter(@NotNull IdCharter id, @NotNull CharterStatus charterStatus, @NotNull User author, @NotNull Date date) {
 
@@ -102,79 +103,7 @@ public class Charter extends AtomResource {
             throw new IllegalArgumentException("Failed to validate the resource.", e);
         }
 
-        Element xml = toDocument().getRootElement();
-
-        creator = initCreatorFromXml(xml);
-
-        charterStatus = initCharterStatus();
-
-        idno = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_BODY_IDNO)
-                .map(Idno::new)
-                .orElseThrow(MomcaException::new);
-
-        date = initDateFromXml(xml);
-
-        unusedFrontNodes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_FRONT)
-                .stream()
-                .filter(node -> node instanceof Element)
-                .map(node -> ((Element) node))
-                .filter(element -> !element.getLocalName().equals("sourceDesc"))
-                .collect(Collectors.toList());
-
-        diplomaticAnalysis = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_DIPLOMATIC_ANALYSIS)
-                .orElse(new Element("cei:diplomaticAnalysis", CEI_URI));
-
-        sourceDescAbstractBibliography = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_SOURCE_DESC_REGEST)
-                .map(element -> new Bibliography("sourceDescRegest", element));
-
-        sourceDescTenorBibliography = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_SOURCE_DESC_VOLLTEXT)
-                .map(element -> new Bibliography("sourceDescVolltext", element));
-
-        tenor = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_TENOR)
-                .map(Tenor::new)
-                .filter(t -> !t.getContent().isEmpty());
-
-        charterAbstract = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_ABSTRACT)
-                .map(Abstract::new)
-                .filter(a -> !a.getContent().isEmpty());
-
-        langMom = Util.queryXmlForOptionalString(xml, XpathQuery.QUERY_CEI_LANG_MOM);
-
-        charterClass = Util.queryXmlForOptionalString(xml, XpathQuery.QUERY_CEI_CLASS);
-
-        issuedPlace = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_ISSUED_PLACE_NAME)
-                .map(PlaceName::new)
-                .filter(placeName -> !placeName.getContent().isEmpty());
-
-        backPlaceNames = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_BACK_PLACE_NAME)
-                .stream()
-                .map(node -> new PlaceName((Element) node))
-                .filter(placeName -> !placeName.getContent().isEmpty())
-                .collect(Collectors.toList());
-
-        backGeogNames = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_BACK_GEOG_NAME)
-                .stream()
-                .map(node -> new GeogName((Element) node))
-                .filter(geogName -> !geogName.getContent().isEmpty())
-                .collect(Collectors.toList());
-
-        backPersNames = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_BACK_PERS_NAME)
-                .stream()
-                .map(node -> new PersName((Element) node))
-                .filter(persName -> !persName.getContent().isEmpty())
-                .collect(Collectors.toList());
-
-        backIndexes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_BACK_INDEX)
-                .stream()
-                .map(node -> new Index((Element) node))
-                .filter(index -> !index.getContent().isEmpty())
-                .collect(Collectors.toList());
-
-        backDivNotes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_BACK_NOTE)
-                .stream()
-                .map(node -> new Note((Element) node))
-                .filter(note -> !note.getContent().isEmpty())
-                .collect(Collectors.toList());
+        initCharterFromXml(toDocument().getRootElement());
 
     }
 
@@ -205,18 +134,34 @@ public class Charter extends AtomResource {
         Element chDesc = new Element("cei:chDesc", CEI_URI);
         body.appendChild(chDesc);
 
-        Element issued = new Element("cei:issued", CEI_URI);
-        chDesc.appendChild(issued);
-        issuedPlace.ifPresent(p -> issued.appendChild(p.copy()));
-        issued.appendChild(date.toCeiDate());
-
-        charterAbstract.ifPresent(a -> chDesc.appendChild(a.copy()));
-
         charterClass.ifPresent(s -> {
             Element e = new Element("cei:class", CEI_URI);
             e.appendChild(s);
             chDesc.appendChild(e);
         });
+
+        charterAbstract.ifPresent(a -> chDesc.appendChild(a.copy()));
+
+        Element issued = new Element("cei:issued", CEI_URI);
+        chDesc.appendChild(issued);
+        issuedPlace.ifPresent(p -> issued.appendChild(p.copy()));
+        issued.appendChild(date.toCeiDate());
+
+        Element witnessOrig = new Element("cei:witnessOrig", CEI_URI);
+        chDesc.appendChild(witnessOrig);
+        this.witnessOrig.ifPresent(w -> {
+
+            w.getId().ifPresent(s -> witnessOrig.addAttribute(new Attribute("id", s)));
+            w.getLang().ifPresent(s -> witnessOrig.addAttribute(new Attribute("lang", s)));
+            w.getN().ifPresent(s -> witnessOrig.addAttribute(new Attribute("n", s)));
+
+            Util.getChildNodes(w).forEach(node -> witnessOrig.appendChild(node.copy()));
+
+        });
+
+        Element witListPar = new Element("cei:witListPar", CEI_URI);
+        chDesc.appendChild(witListPar);
+        this.witListPar.forEach(witness -> witListPar.appendChild(witness.copy()));
 
         chDesc.appendChild(diplomaticAnalysis.copy());
 
@@ -312,7 +257,6 @@ public class Charter extends AtomResource {
 
     }
 
-
     @NotNull
     public Optional<Abstract> getAbstract() {
         return charterAbstract;
@@ -397,6 +341,102 @@ public class Charter extends AtomResource {
     @NotNull
     public List<XmlValidationProblem> getValidationProblems() {
         return validationProblems;
+    }
+
+    @NotNull
+    public List<Witness> getWitListPar() {
+        return witListPar;
+    }
+
+    @NotNull
+    public Optional<Witness> getWitnessOrig() {
+        return witnessOrig;
+    }
+
+    private void initCharterFromXml(Element xml) {
+
+        backDivNotes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_BACK_NOTE)
+                .stream()
+                .map(node -> new Note((Element) node))
+                .filter(note -> !note.getContent().isEmpty())
+                .collect(Collectors.toList());
+
+        backIndexes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_BACK_INDEX)
+                .stream()
+                .map(node -> new Index((Element) node))
+                .filter(index -> !index.getContent().isEmpty())
+                .collect(Collectors.toList());
+
+        backGeogNames = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_BACK_GEOG_NAME)
+                .stream()
+                .map(node -> new GeogName((Element) node))
+                .filter(geogName -> !geogName.getContent().isEmpty())
+                .collect(Collectors.toList());
+
+        backPersNames = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_BACK_PERS_NAME)
+                .stream()
+                .map(node -> new PersName((Element) node))
+                .filter(persName -> !persName.getContent().isEmpty())
+                .collect(Collectors.toList());
+
+        backPlaceNames = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_BACK_PLACE_NAME)
+                .stream()
+                .map(node -> new PlaceName((Element) node))
+                .filter(placeName -> !placeName.getContent().isEmpty())
+                .collect(Collectors.toList());
+
+        charterAbstract = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_ABSTRACT)
+                .map(Abstract::new)
+                .filter(a -> !a.getContent().isEmpty());
+
+        charterClass = Util.queryXmlForOptionalString(xml, XpathQuery.QUERY_CEI_CLASS);
+
+        charterStatus = initCharterStatus();
+
+        creator = initCreatorFromXml(xml);
+
+        date = initDateFromXml(xml);
+
+        diplomaticAnalysis = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_DIPLOMATIC_ANALYSIS)
+                .orElse(new Element("cei:diplomaticAnalysis", CEI_URI));
+
+        idno = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_BODY_IDNO)
+                .map(Idno::new)
+                .orElseThrow(MomcaException::new);
+
+        issuedPlace = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_ISSUED_PLACE_NAME)
+                .map(PlaceName::new)
+                .filter(placeName -> !placeName.getContent().isEmpty());
+
+        langMom = Util.queryXmlForOptionalString(xml, XpathQuery.QUERY_CEI_LANG_MOM);
+
+        sourceDescAbstractBibliography = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_SOURCE_DESC_REGEST)
+                .map(element -> new Bibliography("sourceDescRegest", element));
+
+        sourceDescTenorBibliography = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_SOURCE_DESC_VOLLTEXT)
+                .map(element -> new Bibliography("sourceDescVolltext", element));
+
+        tenor = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_TENOR)
+                .map(Tenor::new)
+                .filter(t -> !t.getContent().isEmpty());
+
+        unusedFrontNodes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_FRONT)
+                .stream()
+                .filter(node -> node instanceof Element)
+                .map(node -> ((Element) node))
+                .filter(element -> !element.getLocalName().equals("sourceDesc"))
+                .collect(Collectors.toList());
+
+        witListPar = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_WITLIST_PAR_WITNESS)
+                .stream()
+                .map(node -> new Witness((Element) node))
+                .filter(witness -> !witness.isEmpty())
+                .collect(Collectors.toList());
+
+        witnessOrig = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_WITNESS_ORIG)
+                .map(Witness::new)
+                .filter(witness -> !witness.isEmpty());
+
     }
 
     private CharterStatus initCharterStatus() {

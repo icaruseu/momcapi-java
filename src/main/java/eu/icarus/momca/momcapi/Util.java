@@ -83,6 +83,18 @@ public class Util {
 
     }
 
+    public static List<Node> getChildNodes(@NotNull Element element) {
+
+        List<Node> nodes = new ArrayList<>(0);
+
+        for (int i = 0; i < element.getChildCount(); i++) {
+            nodes.add(element.getChild(i));
+        }
+
+        return nodes;
+
+    }
+
     /**
      * @param uri An URI.
      * @return The last URI part, e.g. {@code admin.xml} for {@code /db/mom-data/user.xrx/admin.xml}
