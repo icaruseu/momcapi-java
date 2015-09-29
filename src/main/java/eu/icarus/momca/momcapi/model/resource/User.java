@@ -108,7 +108,6 @@ public class User extends ExistResource {
 
         return element;
 
-
     }
 
     @NotNull

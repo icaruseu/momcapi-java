@@ -175,6 +175,13 @@ public class CharterManager extends AbstractManager {
         return queryResults.stream().map(AtomId::new).map(IdCharter::new).collect(Collectors.toList());
     }
 
+    /**
+     * Lists charters that are listed in a users file without them being properly saved to metadata.charter.saved.
+     * This is due to an old bug in the database.
+     *
+     * @param idUser the User
+     * @return A list of improperly saved charters.
+     */
     @NotNull
     public List<IdCharter> listErroneouslySavedCharters(@NotNull IdUser idUser) {
 
