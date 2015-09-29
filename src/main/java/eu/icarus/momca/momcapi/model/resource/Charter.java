@@ -6,8 +6,6 @@ import eu.icarus.momca.momcapi.exception.MomcaException;
 import eu.icarus.momca.momcapi.model.CharterStatus;
 import eu.icarus.momca.momcapi.model.Date;
 import eu.icarus.momca.momcapi.model.id.IdCharter;
-import eu.icarus.momca.momcapi.model.id.IdCollection;
-import eu.icarus.momca.momcapi.model.id.IdFond;
 import eu.icarus.momca.momcapi.model.id.IdUser;
 import eu.icarus.momca.momcapi.model.xml.Namespace;
 import eu.icarus.momca.momcapi.model.xml.XmlValidationProblem;
@@ -209,19 +207,19 @@ public class Charter extends AtomResource {
                         ResourceRoot.USER_DATA.getUri(),
                         creator.getIdentifier(),
                         "metadata.charter",
-                        idCharter.getHierarchicalUriPart());
+                        idCharter.getHierarchicalUriPartsAsString());
                 break;
 
             case IMPORTED:
                 parentUri = String.format("%s/%s",
                         ResourceRoot.IMPORTED_ARCHIVAL_CHARTERS.getUri(),
-                        idCharter.getHierarchicalUriPart());
+                        idCharter.getHierarchicalUriPartsAsString());
                 break;
 
             case PUBLIC:
                 parentUri = String.format("%s/%s",
                         ResourceRoot.PUBLIC_CHARTERS.getUri(),
-                        idCharter.getHierarchicalUriPart());
+                        idCharter.getHierarchicalUriPartsAsString());
                 break;
 
             case SAVED:
@@ -612,12 +610,10 @@ public class Charter extends AtomResource {
             throw new IllegalArgumentException("The identifier is not allowed to be an empty string");
         }
 
-        if (getId().isInFond()) {
-            IdFond idFond = getId().getIdFond().get();
-            id = new IdCharter(idFond.getIdArchive().getIdentifier(), idFond.getIdentifier(), identifier);
+        if (getId().getHierarchicalUriParts().size() == 2) {
+            id = new IdCharter(getId().getHierarchicalUriParts().get(0), getId().getHierarchicalUriParts().get(1), identifier);
         } else {
-            IdCollection idCollection = getId().getIdCollection().get();
-            id = new IdCharter(idCollection.getIdentifier(), identifier);
+            id = new IdCharter(getId().getHierarchicalUriParts().get(0), identifier);
         }
 
         setParentUri(createParentUri(getId(), charterStatus, getCreator().get()));

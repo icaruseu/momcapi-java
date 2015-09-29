@@ -5,7 +5,8 @@ import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Created by daniel on 27.06.2015.
@@ -36,17 +37,15 @@ public class IdCharterTest {
 
         IdCharter id1 = new IdCharter(IDENTIFIER_COLLECTION, IDENTIFIER_COLLECTION_CHARTER);
         assertEquals(id1.getIdentifier(), IDENTIFIER_COLLECTION_CHARTER);
-        assertFalse(id1.isInFond());
-        assertFalse(id1.getIdFond().isPresent());
-        assertEquals(id1.getIdCollection().get().getIdentifier(), IDENTIFIER_COLLECTION);
+        assertEquals(id1.getHierarchicalUriParts().size(), 1);
+        assertEquals(id1.getHierarchicalUriParts().get(0), IDENTIFIER_COLLECTION);
         assertEquals(id1.getContentXml().toXML(), ATOM_ID_COLLECTION_CHARTER);
         assertEquals(id1.getContentXml().getText(), Util.encode(ATOM_ID_TEXT_COLLECTION_CHARTER));
 
         IdCharter id2 = new IdCharter(new AtomId(ATOM_ID_TEXT_COLLECTION_CHARTER));
         assertEquals(id2.getIdentifier(), IDENTIFIER_COLLECTION_CHARTER);
-        assertFalse(id2.isInFond());
-        assertFalse(id2.getIdFond().isPresent());
-        assertEquals(id2.getIdCollection().get().getIdentifier(), IDENTIFIER_COLLECTION);
+        assertEquals(id2.getHierarchicalUriParts().size(), 1);
+        assertEquals(id2.getHierarchicalUriParts().get(0), IDENTIFIER_COLLECTION);
         assertEquals(id2.getContentXml().toXML(), ATOM_ID_COLLECTION_CHARTER);
         assertEquals(id2.getContentXml().getText(), Util.encode(ATOM_ID_TEXT_COLLECTION_CHARTER));
 
@@ -57,18 +56,17 @@ public class IdCharterTest {
 
         IdCharter id1 = new IdCharter(IDENTIFIER_ARCHIVE, IDENTIFIER_FOND, IDENTIFIER_FOND_CHARTER);
         assertEquals(id1.getIdentifier(), IDENTIFIER_FOND_CHARTER);
-        assertTrue(id1.isInFond());
-        assertFalse(id1.getIdCollection().isPresent());
-        assertEquals(id1.getIdFond().get().getIdentifier(), IDENTIFIER_FOND);
-        assertEquals(id1.getIdFond().get().getIdArchive().getIdentifier(), IDENTIFIER_ARCHIVE);
+        assertEquals(id1.getHierarchicalUriParts().size(), 2);
+        assertEquals(id1.getHierarchicalUriParts().get(1), IDENTIFIER_FOND);
+        assertEquals(id1.getHierarchicalUriParts().get(0), IDENTIFIER_ARCHIVE);
         assertEquals(id1.getContentXml().toXML(), ATOM_ID_FOND_CHARTER);
         assertEquals(id1.getContentXml().getText(), Util.encode(ATOM_ID_TEXT_FOND_CHARTER));
 
         IdCharter id2 = new IdCharter(new AtomId(ATOM_ID_TEXT_FOND_CHARTER));
         assertEquals(id2.getIdentifier(), IDENTIFIER_FOND_CHARTER);
-        assertTrue(id2.isInFond());
-        assertEquals(id2.getIdFond().get().getIdentifier(), IDENTIFIER_FOND);
-        assertEquals(id2.getIdFond().get().getIdArchive().getIdentifier(), IDENTIFIER_ARCHIVE);
+        assertEquals(id2.getHierarchicalUriParts().size(), 2);
+        assertEquals(id2.getHierarchicalUriParts().get(1), IDENTIFIER_FOND);
+        assertEquals(id2.getHierarchicalUriParts().get(0), IDENTIFIER_ARCHIVE);
         assertEquals(id2.getContentXml().toXML(), ATOM_ID_FOND_CHARTER);
         assertEquals(id2.getContentXml().getText(), Util.encode(ATOM_ID_TEXT_FOND_CHARTER));
 
@@ -136,39 +134,6 @@ public class IdCharterTest {
         IdCharter id2 = new IdCharter(new AtomId(ATOM_ID_TEXT_COLLECTION_CHARTER));
 
         assertTrue(id1.equals(id2));
-
-    }
-
-    @Test
-    public void testGetIdCollection() throws Exception {
-
-        IdCharter id1 = new IdCharter(IDENTIFIER_COLLECTION, IDENTIFIER_COLLECTION_CHARTER);
-        assertEquals(id1.getIdCollection().get(), new IdCollection(IDENTIFIER_COLLECTION));
-
-        IdCharter id2 = new IdCharter(IDENTIFIER_ARCHIVE, IDENTIFIER_FOND, IDENTIFIER_FOND_CHARTER);
-        assertFalse(id2.getIdCollection().isPresent());
-
-    }
-
-    @Test
-    public void testGetIdFond() throws Exception {
-
-        IdCharter id1 = new IdCharter(IDENTIFIER_COLLECTION, IDENTIFIER_COLLECTION_CHARTER);
-        assertFalse(id1.getIdFond().isPresent());
-
-        IdCharter id2 = new IdCharter(IDENTIFIER_ARCHIVE, IDENTIFIER_FOND, IDENTIFIER_FOND_CHARTER);
-        assertEquals(id2.getIdFond().get(), new IdFond(IDENTIFIER_ARCHIVE, IDENTIFIER_FOND));
-
-    }
-
-    @Test
-    public void testIsInFond() throws Exception {
-
-        IdCharter id1 = new IdCharter(IDENTIFIER_COLLECTION, IDENTIFIER_COLLECTION_CHARTER);
-        assertFalse(id1.isInFond());
-
-        IdCharter id2 = new IdCharter(IDENTIFIER_ARCHIVE, IDENTIFIER_FOND, IDENTIFIER_FOND_CHARTER);
-        assertTrue(id2.isInFond());
 
     }
 

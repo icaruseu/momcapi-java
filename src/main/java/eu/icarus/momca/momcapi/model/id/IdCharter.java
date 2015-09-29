@@ -5,7 +5,9 @@ import eu.icarus.momca.momcapi.model.resource.ResourceType;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Represents the {@code atom:id} of a charter in MOM-CA, e.g.
@@ -17,9 +19,7 @@ import java.util.Optional;
 public class IdCharter extends IdAtomId {
 
     @NotNull
-    private final Optional<IdCollection> idCollection;
-    @NotNull
-    private final Optional<IdFond> idFond;
+    private List<String> hierarchicalUriParts = new ArrayList<>();
 
     public IdCharter(@NotNull AtomId atomId) {
 
@@ -28,100 +28,29 @@ public class IdCharter extends IdAtomId {
         if (getContentXml().getType() != ResourceType.CHARTER) {
             throw new IllegalArgumentException(getContentXml().getText() + " is not a charter atom:id.");
         }
-
-        if (isInFond()) {
-            idFond = Optional.of(getFondFromAtomId(atomId));
-            idCollection = Optional.empty();
-        } else {
-            idFond = Optional.empty();
-            idCollection = Optional.of(getCollectionFromAtomId(atomId));
-        }
-
+        hierarchicalUriParts = initHierarchicalUriParts(atomId.getText());
     }
 
     public IdCharter(@NotNull String archiveIdentifier, @NotNull String fondIdentifier, @NotNull String charterIdentifier) {
         super(initAtomIdForFond(archiveIdentifier, fondIdentifier, charterIdentifier));
-        idFond = Optional.of(new IdFond(archiveIdentifier, fondIdentifier));
-        idCollection = Optional.empty();
+        hierarchicalUriParts = initHierarchicalUriParts(getContentXml().getText());
     }
 
     public IdCharter(@NotNull String collectionIdentifier, @NotNull String charterIdentifier) {
         super(initAtomIdForCollection(collectionIdentifier, charterIdentifier));
-        idCollection = Optional.of(new IdCollection(collectionIdentifier));
-        idFond = Optional.empty();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-
-        IdCharter idCharter = (IdCharter) o;
-
-        if (!idCollection.equals(idCharter.idCollection)) return false;
-        return idFond.equals(idCharter.idFond);
-
+        hierarchicalUriParts = initHierarchicalUriParts(getContentXml().getText());
     }
 
     @NotNull
-    private IdCollection getCollectionFromAtomId(@NotNull AtomId atomId) {
-
-        String[] parts = atomId.getText().split("/");
-        String collectionIdentifier = Util.decode(parts[parts.length - 2]);
-        return new IdCollection(collectionIdentifier);
-
+    public List<String> getHierarchicalUriParts() {
+        return hierarchicalUriParts;
     }
 
     @NotNull
-    private IdFond getFondFromAtomId(@NotNull AtomId atomId) {
-
-        String[] parts = atomId.getText().split("/");
-        String archiveIdentifier = Util.decode(parts[parts.length - 3]);
-        String fondIdentifier = Util.decode(parts[parts.length - 2]);
-
-        return new IdFond(archiveIdentifier, fondIdentifier);
-
+    public String getHierarchicalUriPartsAsString() {
+        return String.join("/", hierarchicalUriParts.toArray(new String[hierarchicalUriParts.size()]));
     }
 
-    @NotNull
-    public String getHierarchicalUriPart() {
-
-        String idPart;
-
-        if (isInFond()) {
-
-            String archiveIdentifier = getIdFond().get().getIdArchive().getIdentifier();
-            String fondIdentifier = getIdFond().get().getIdentifier();
-            idPart = archiveIdentifier + "/" + fondIdentifier;
-
-        } else {
-
-            idPart = getIdCollection().get().getIdentifier();
-
-        }
-
-        return idPart;
-
-    }
-
-    @NotNull
-    public Optional<IdCollection> getIdCollection() {
-        return idCollection;
-    }
-
-    @NotNull
-    public Optional<IdFond> getIdFond() {
-        return idFond;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + idCollection.hashCode();
-        result = 31 * result + idFond.hashCode();
-        return result;
-    }
 
     private static AtomId initAtomIdForCollection(@NotNull String collectionIdentifier, @NotNull String charterIdentifier) {
 
@@ -162,9 +91,22 @@ public class IdCharter extends IdAtomId {
 
     }
 
+    private List<String> initHierarchicalUriParts(String text) {
+
+        text = text.replace("tag:www.monasterium.net,2011:/", "");
+        String[] parts = Util.decode(text).split("/");
+
+        List<String> allParts = new ArrayList<>(0);
+        allParts.addAll(Arrays.asList(parts));
+        allParts.remove(0);
+        allParts.remove(allParts.size() - 1);
+
+        return allParts;
+
+    }
+
     public boolean isInFond() {
-        String[] parts = getContentXml().getText().split("/");
-        return parts.length == ResourceType.CHARTER.getMaxIdParts();
+        return hierarchicalUriParts.size() == 2;
     }
 
 }
