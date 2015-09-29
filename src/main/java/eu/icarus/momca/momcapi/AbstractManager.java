@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Created by djell on 09/08/2015.
@@ -24,7 +25,10 @@ abstract class AbstractManager {
     @NotNull
     Optional<ExistResource> getExistResource(@NotNull AtomId atomId) {
 
-        List<String> resourceUris = momcaConnection.queryDatabase(ExistQueryFactory.getResourceUri(atomId, null));
+        List<String> resourceUris = momcaConnection.queryDatabase(ExistQueryFactory.getResourceUri(atomId, null))
+                .stream()
+                .filter(s -> !s.contains("ead.old."))
+                .collect(Collectors.toList());
 
         Optional<ExistResource> resource = Optional.empty();
 

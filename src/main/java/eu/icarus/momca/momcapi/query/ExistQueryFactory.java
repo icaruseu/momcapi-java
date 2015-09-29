@@ -434,7 +434,7 @@ public class ExistQueryFactory {
     public static ExistQuery listFonds(@NotNull IdArchive idArchive) {
 
         String query = String.format(
-                "%s collection('%s')//atom:id[contains(., '%s')]/text()",
+                "%s collection('%s')//atom:id[contains(., '%s')][not(contains(util:document-name(.),'.ead.old.'))]/text()",
                 getNamespaceDeclaration(Namespace.ATOM),
                 ResourceRoot.ARCHIVAL_FONDS.getUri(),
                 idArchive.getIdentifier());
