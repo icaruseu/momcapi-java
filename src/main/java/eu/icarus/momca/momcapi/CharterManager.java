@@ -6,6 +6,7 @@ import eu.icarus.momca.momcapi.model.id.*;
 import eu.icarus.momca.momcapi.model.resource.Charter;
 import eu.icarus.momca.momcapi.model.resource.MyCollectionStatus;
 import eu.icarus.momca.momcapi.model.resource.ResourceRoot;
+import eu.icarus.momca.momcapi.model.resource.User;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
 import eu.icarus.momca.momcapi.model.xml.xrx.Saved;
 import eu.icarus.momca.momcapi.query.ExistQuery;
@@ -51,7 +52,7 @@ public class CharterManager extends AbstractManager {
 
     }
 
-    public void delete(@NotNull IdCharter id, @NotNull CharterStatus status) {
+    public void deleteCharter(@NotNull IdCharter id, @NotNull CharterStatus status) {
         getCharter(id, status).ifPresent(momcaConnection::deleteExistResource);
     }
 
@@ -197,23 +198,78 @@ public class CharterManager extends AbstractManager {
 
     }
 
+    public void publishCharter(@NotNull IdUser idUser, @NotNull IdCharter idCharter) {
+
+        UserManager userManager = momcaConnection.getUserManager();
+        Optional<User> userOptional = userManager.getUser(idUser);
+
+        if (!userOptional.isPresent()) {
+            throw new IllegalArgumentException("User '" + idUser + "' not existing.");
+        }
+
+        User user = userOptional.get();
+
+        List<Saved> savedList = user.getSavedCharters();
+        List<Saved> withoutCurrent = user.getSavedCharters()
+                .stream()
+                .filter(saved -> !idCharter.equals(saved.getId()))
+                .collect(Collectors.toList());
+
+        if (withoutCurrent.size() == savedList.size() - 1) {
+
+            Optional<Charter> originalCharter = getCharter(idCharter, CharterStatus.SAVED);
+
+            if (!originalCharter.isPresent()) {
+                String message = String.format(
+                        "The charter with the id '%s'to be published for user '%s' is not existing in 'metadata.charter.saved'.",
+                        idCharter, idUser);
+                throw new MomcaException(message);
+            }
+
+            Charter toUpdate = originalCharter.get();
+            toUpdate.setCharterStatus(CharterStatus.PUBLIC);
+
+            updateCharter(toUpdate, idCharter, CharterStatus.SAVED);
+
+            user.setSavedCharters(withoutCurrent);
+
+            userManager.updateUser(user, user.getId());
+
+        }
+
+
+    }
+
     public void updateCharter(@NotNull Charter modifiedCharter, @Nullable IdCharter originalId, @Nullable CharterStatus originalStatus) {
 
         IdCharter realOriginalId = originalId == null ? modifiedCharter.getId() : originalId;
         CharterStatus realOriginalStatus = originalStatus == null ? modifiedCharter.getCharterStatus() : originalStatus;
 
-        if (!getCharter(realOriginalId, realOriginalStatus).isPresent()) {
+        Optional<Charter> originalCharterOptional = getCharter(realOriginalId, realOriginalStatus);
+        if (!originalCharterOptional.isPresent()) {
             throw new MomcaException("The charter to be updated doesn't exist in the database.");
         }
 
-        delete(realOriginalId, realOriginalStatus);
+        Charter originalCharter = originalCharterOptional.get();
+
+        deleteCharter(originalCharter.getId(), originalCharter.getCharterStatus());
 
         if (getCharter(modifiedCharter.getId(), modifiedCharter.getCharterStatus()).isPresent()) {
-            // delete already existing changed charter in case of an overwrite by moving
-            delete(modifiedCharter.getId(), modifiedCharter.getCharterStatus());
+            // deleteCharter already existing changed charter in case of an overwrite by moving
+            deleteCharter(modifiedCharter.getId(), modifiedCharter.getCharterStatus());
         }
 
-        addCharter(modifiedCharter);
+        if (isParentExisting(modifiedCharter.getId())) {
+
+            momcaConnection.createCollectionPath(modifiedCharter.getParentUri());
+            String updated = momcaConnection.getRemoteDateTime();
+            momcaConnection.storeAtomResource(modifiedCharter, originalCharter.getPublished(), updated);
+
+        } else {
+            String message = String.format("The parent for the charter, '%s', is not existing.",
+                    modifiedCharter.getId().getHierarchicalUriPartsAsString());
+            throw new MomcaException(message);
+        }
 
     }
 

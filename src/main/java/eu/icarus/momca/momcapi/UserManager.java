@@ -12,6 +12,7 @@ import org.exist.security.internal.aider.GroupAider;
 import org.exist.security.internal.aider.UserAider;
 import org.exist.xmldb.RemoteUserManagementService;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.xmldb.api.base.XMLDBException;
 
 import java.util.ArrayList;
@@ -264,6 +265,19 @@ public class UserManager extends AbstractManager {
     @NotNull
     public List<IdUser> listUsers() {
         return listUserResourceNames().stream().map(s -> new IdUser(s.replace(".xml", ""))).collect(Collectors.toList());
+    }
+
+    public void updateUser(@NotNull User modifiedUser, @Nullable IdUser originalId) {
+
+        IdUser realOriginalId = originalId == null ? modifiedUser.getId() : originalId;
+
+        if (!getUser(realOriginalId).isPresent()) {
+            throw new MomcaException("The user to be updated doesn't exist in the database.");
+        }
+
+        deleteUser(realOriginalId);
+        momcaConnection.storeExistResource(modifiedUser);
+
     }
 
 }
