@@ -4,6 +4,7 @@ import eu.icarus.momca.momcapi.exception.MomcaException;
 import eu.icarus.momca.momcapi.model.id.IdUser;
 import eu.icarus.momca.momcapi.model.resource.AtomResource;
 import eu.icarus.momca.momcapi.model.resource.ExistResource;
+import eu.icarus.momca.momcapi.model.resource.MyCollection;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomAuthor;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomEntry;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
@@ -369,10 +370,15 @@ public class MomcaConnection {
 
         AtomEntry newEntry = new AtomEntry(id, author, publishedDateTime, updatedDateTime, content);
 
-        if( resource instanceof eu.icarus.momca.momcapi.model.resource.Collection ){
+        if (resource instanceof eu.icarus.momca.momcapi.model.resource.Collection) {
             eu.icarus.momca.momcapi.model.resource.Collection coll =
                     (eu.icarus.momca.momcapi.model.resource.Collection) resource;
             coll.getKeyword().ifPresent(s -> newEntry.insertChild(new Keywords(s), 6));
+        }
+
+        if (resource instanceof MyCollection) {
+            MyCollection myColl = (MyCollection) resource;
+            newEntry.insertChild(myColl.getSharing(), 6);
         }
 
         String resourceName = resource.getResourceName();

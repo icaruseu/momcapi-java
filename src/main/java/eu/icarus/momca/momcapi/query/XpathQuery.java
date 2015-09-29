@@ -18,8 +18,8 @@ public enum XpathQuery {
 
     QUERY_ATOM_EMAIL("//atom:email/text()", Namespace.ATOM),
     QUERY_ATOM_ID("//atom:id/text()", Namespace.ATOM),
-    QUERY_ATOM_PUBLISHED("//atom:published", Namespace.ATOM),
-    QUERY_ATOM_UPDATED("//atom:updated", Namespace.ATOM),
+    QUERY_ATOM_PUBLISHED("//atom:published/text()", Namespace.ATOM),
+    QUERY_ATOM_UPDATED("//atom:updated/text()", Namespace.ATOM),
     QUERY_CEI_ABSTRACT("//cei:abstract", Namespace.CEI),
     QUERY_CEI_BACK_GEOG_NAME("//cei:back/cei:geogName", Namespace.CEI),
     QUERY_CEI_BACK_INDEX("//cei:back/cei:index", Namespace.CEI),
@@ -35,6 +35,7 @@ public enum XpathQuery {
     QUERY_CEI_COUNTRY_ID("//cei:country/@id", Namespace.CEI),
     QUERY_CEI_DIPLOMATIC_ANALYSIS("//cei:diplomaticAnalysis", Namespace.CEI),
     QUERY_CEI_FRONT("//cei:front/child::*", Namespace.CEI),
+    QUERY_CEI_FRONT_PREFACE("//cei:front/cei:div[@type='preface']", Namespace.CEI),
     QUERY_CEI_ISSUED_DATE("//cei:issued/cei:date", Namespace.CEI),
     QUERY_CEI_ISSUED_DATE_RANGE("//cei:issued/cei:dateRange", Namespace.CEI),
     QUERY_CEI_ISSUED_PLACE_NAME("//cei:issued/cei:placeName", Namespace.CEI),
@@ -52,6 +53,7 @@ public enum XpathQuery {
     QUERY_CEI_SOURCE_DESC_VOLLTEXT_BIBL("//cei:sourceDesc//cei:sourceDescVolltext//cei:bibl", Namespace.CEI),
     QUERY_CEI_TENOR("//cei:tenor", Namespace.CEI),
     QUERY_CEI_TEXT("//cei:text", Namespace.CEI),
+    QUERY_CEI_TITLE("//cei:title/text()", Namespace.CEI),
     QUERY_CEI_WITNESS_ORIG("//cei:witnessOrig", Namespace.CEI),
     QUERY_CEI_WITLIST_PAR_WITNESS("//cei:witListPar/cei:witness", Namespace.CEI),
     QUERY_CEI_WITNESS_ORIG_FIGURE("//cei:witnessOrig/cei:figure", Namespace.CEI),
@@ -75,7 +77,9 @@ public enum XpathQuery {
     QUERY_XRX_KEYWORD("//xrx:keyword/text()", Namespace.XRX),
     QUERY_XRX_MODERATOR("//xrx:moderator/text()", Namespace.XRX),
     QUERY_XRX_NAME("//xrx:name/text()", Namespace.XRX),
-    QUERY_XRX_SAVED_ID("//xrx:saved/xrx:id/text()", Namespace.XRX);
+    QUERY_XRX_SAVED_ID("//xrx:saved/xrx:id/text()", Namespace.XRX),
+    QUERY_XRX_USER("//xrx:user/text()", Namespace.XRX),
+    QUERY_XRX_VISIBILITY("//xrx:visibility/text()", Namespace.XRX);
 
     @NotNull
     private final List<Namespace> namespaces;
