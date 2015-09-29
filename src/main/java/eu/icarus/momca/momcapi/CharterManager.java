@@ -1,5 +1,6 @@
 package eu.icarus.momca.momcapi;
 
+import eu.icarus.momca.momcapi.exception.MomcaException;
 import eu.icarus.momca.momcapi.model.CharterStatus;
 import eu.icarus.momca.momcapi.model.id.*;
 import eu.icarus.momca.momcapi.model.resource.Charter;
@@ -27,6 +28,28 @@ public class CharterManager extends AbstractManager {
     }
 
     @NotNull
+    public Optional<Charter> getCharter(@NotNull IdCharter idCharter, @NotNull CharterStatus charterStatus) {
+
+        List<String> uriResults = momcaConnection.queryDatabase(
+                ExistQueryFactory.getResourceUri(idCharter.getContentXml(), charterStatus.getResourceRoot()));
+
+        Optional<Charter> charter;
+
+        if (uriResults.size() > 1) {
+            String message = String.format("More than one possible uri for charter '%s' with status '%s' found.",
+                    idCharter, charterStatus);
+            throw new MomcaException(message);
+        } else if (uriResults.size() == 1) {
+            charter = getCharterFromUri(uriResults.get(0));
+        } else {
+            charter = Optional.empty();
+        }
+
+        return charter;
+
+    }
+
+    @NotNull
     private Optional<Charter> getCharterFromUri(@NotNull String charterUri) {
         String resourceName = Util.getLastUriPart(charterUri);
         String parentUri = Util.getParentUri(charterUri);
@@ -37,18 +60,6 @@ public class CharterManager extends AbstractManager {
     public List<Charter> getCharterInstances(@NotNull IdCharter idCharter) {
 
         return momcaConnection.queryDatabase(ExistQueryFactory.getResourceUri(idCharter.getContentXml(), null
-        )).stream()
-                .map(this::getCharterFromUri)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList());
-
-    }
-
-    @NotNull
-    public List<Charter> getCharterInstances(@NotNull IdCharter idCharter, @NotNull CharterStatus charterStatus) {
-
-        return momcaConnection.queryDatabase(ExistQueryFactory.getResourceUri(idCharter.getContentXml(), charterStatus.getResourceRoot()
         )).stream()
                 .map(this::getCharterFromUri)
                 .filter(Optional::isPresent)

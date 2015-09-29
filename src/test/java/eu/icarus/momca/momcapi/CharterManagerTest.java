@@ -8,6 +8,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.testng.Assert.*;
 
@@ -27,6 +28,41 @@ public class CharterManagerTest {
     }
 
     @Test
+    public void testGetCharterForImportedCharter() throws Exception {
+
+        IdCharter id = new IdCharter("RS-IAGNS", "Charters", "F1_fasc.16_sub_N_1513");
+        Optional<Charter> charter = cm.getCharter(id, CharterStatus.IMPORTED);
+        assertTrue(charter.isPresent());
+
+        charter.get().regenerateXmlContent();
+        assertTrue(charter.get().isValidCei());
+        assertEquals(charter.get().toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"F1_fasc.16_sub_N_1513\">F1. fasc.16, sub. N 1513</cei:idno><cei:chDesc><cei:abstract>Circular of Consilium Regium Locumtenentiale Hungaricum prohibiting the collection of unprescribed duties for goods from Turkey imported or exported in Belgrade, as well as works of Paradise Jocko, requires that the cereals exported across the Danube to the Black Sea only with the permission sought to punish Vilhelm Finns who improperly 3000 mc exported grain to the army of the Kingdom of Sardinia, as well as to individual prisoners sentenced to less punishment may refer to the army.</cei:abstract><cei:issued><cei:dateRange from=\"17930101\" to=\"17931231\">1793</cei:dateRange></cei:issued><cei:witnessOrig><cei:archIdentifier><cei:arch>Historical Archive of Novi Sad</cei:arch></cei:archIdentifier><cei:figure n=\"RS-IAGNS_F1.-fasc.16,-sub.-N-1513_1\"><cei:graphic url=\"RS-IAGNS_F1.-fasc.16,-sub.-N-1513_1.jpg\" /></cei:figure><cei:figure n=\"RS-IAGNS_F1.-fasc.16,-sub.-N-1513_2\"><cei:graphic url=\"RS-IAGNS_F1.-fasc.16,-sub.-N-1513_2.jpg\" /></cei:figure><cei:figure n=\"RS-IAGNS_F1.-fasc.16,-sub.-N-1513_3\"><cei:graphic url=\"RS-IAGNS_F1.-fasc.16,-sub.-N-1513_3.jpg\" /></cei:figure></cei:witnessOrig><cei:witListPar /><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
+
+    }
+
+    @Test
+    public void testGetCharterForPrivateCharter() throws Exception {
+
+        IdCharter id = new IdCharter("ea13e5f1-03b2-4bfa-9dd5-8fb770f98d7b", "46bc10f3-bc35-4fa8-ab82-25827dc243f6");
+        Optional<Charter> charter = cm.getCharter(id, CharterStatus.PRIVATE);
+        assertTrue(charter.isPresent());
+        assertEquals(charter.get().getId().getContentXml().toXML(), id.getContentXml().toXML());
+
+    }
+
+    @Test
+    public void testGetCharterForSavedCharter() throws Exception {
+
+        IdCharter id = new IdCharter("CH-KAE", "Urkunden", "KAE_Urkunde_Nr_2");
+        Optional<Charter> charter = cm.getCharter(id, CharterStatus.SAVED);
+        assertTrue(charter.isPresent());
+        assertEquals(charter.get().getId().getContentXml().toXML(), id.getContentXml().toXML());
+        assertTrue(charter.get().getAbstract().isPresent());
+        assertEquals(charter.get().getAbstract().get().getContent(), "Herzog Hermann von Alamannien, Graf in Unter-Rätien, schenkt als Helfer des <cei:persName>Abtes Eberhard</cei:persName> dem Kloster Einsiedeln sein Eigentum in Gams.");
+
+    }
+
+    @Test
     public void testGetCharterInstances() throws Exception {
 
         IdCharter id = new IdCharter("CH-KAE", "Urkunden", "KAE_Urkunde_Nr_2");
@@ -40,32 +76,12 @@ public class CharterManagerTest {
     }
 
     @Test
-    public void testGetCharterInstancesForImportedCharter() throws Exception {
+    public void testGetGetCharterForPublishedCharter() throws Exception {
 
-        IdCharter id = new IdCharter("RS-IAGNS", "Charters", "F1_fasc.16_sub_N_1513");
-        List<Charter> charters = cm.getCharterInstances(id, CharterStatus.IMPORTED);
-        assertEquals(charters.size(), 1);
-        assertEquals(charters.get(0).getId().getContentXml().toXML(), id.getContentXml().toXML());
-
-    }
-
-    @Test
-    public void testGetCharterInstancesForPrivateCharter() throws Exception {
-
-        IdCharter id = new IdCharter("ea13e5f1-03b2-4bfa-9dd5-8fb770f98d7b", "46bc10f3-bc35-4fa8-ab82-25827dc243f6");
-        List<Charter> charters = cm.getCharterInstances(id, CharterStatus.PRIVATE);
-        assertEquals(charters.size(), 1);
-        assertEquals(charters.get(0).getId().getContentXml().toXML(), id.getContentXml().toXML());
-
-    }
-
-    @Test
-    public void testGetCharterInstancesForSavedCharter() throws Exception {
-
-        IdCharter id = new IdCharter("CH-KAE", "Urkunden", "KAE_Urkunde_Nr_2");
-        List<Charter> charters = cm.getCharterInstances(id, CharterStatus.SAVED);
-        assertEquals(charters.size(), 1);
-        assertEquals(charters.get(0).getId().getContentXml().toXML(), id.getContentXml().toXML());
+        IdCharter id = new IdCharter("CH-KAE", "Urkunden", "KAE_Urkunde_Nr_1");
+        Optional<Charter> charters = cm.getCharter(id, CharterStatus.PUBLIC);
+        assertTrue(charters.isPresent());
+        assertEquals(charters.get().getId().getContentXml().toXML(), id.getContentXml().toXML());
 
     }
 
@@ -74,16 +90,6 @@ public class CharterManagerTest {
         IdCharter id = new IdCharter("RS-IAGNS", "Charters", "NotExisting");
         List<Charter> charters = cm.getCharterInstances(id);
         assertTrue(charters.isEmpty());
-    }
-
-    @Test
-    public void testGetGetCharterInstancesForPublishedCharter() throws Exception {
-
-        IdCharter id = new IdCharter("CH-KAE", "Urkunden", "KAE_Urkunde_Nr_1");
-        List<Charter> charters = cm.getCharterInstances(id, CharterStatus.PUBLIC);
-        assertEquals(charters.size(), 1);
-        assertEquals(charters.get(0).getId().getContentXml().toXML(), id.getContentXml().toXML());
-
     }
 
     @Test
