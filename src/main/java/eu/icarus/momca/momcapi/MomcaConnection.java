@@ -128,6 +128,36 @@ public class MomcaConnection {
 
     }
 
+    public void createCollectionPath(@NotNull String uri) {
+
+        if (!uri.isEmpty() && uri.startsWith("/db/")) {
+
+            uri = uri.replace("/db/", "");
+
+            Collection parent = rootCollection;
+
+            String[] parts = uri.split("/");
+
+            for (String part : parts) {
+
+                try {
+
+                    CollectionManagementService parentService =
+                            (RemoteCollectionManagementService) parent.getService("CollectionManagementService", "1.0");
+
+                    parentService.createCollection(part);
+                    parent = parent.getChildCollection(part);
+
+                } catch (XMLDBException e) {
+                    throw new MomcaException(String.format("Failed to add collection '%s/%s'.", parent.toString(), part), e);
+                }
+
+            }
+
+        }
+
+    }
+
     @NotNull
     private Optional<ExistResource> createExistResourceFromXMLResource(@NotNull String resourceName, @NotNull String parentCollectionPath, @NotNull XMLResource resource) {
 

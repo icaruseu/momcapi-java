@@ -1,12 +1,16 @@
 package eu.icarus.momca.momcapi;
 
+import eu.icarus.momca.momcapi.exception.MomcaException;
 import eu.icarus.momca.momcapi.model.CharterStatus;
+import eu.icarus.momca.momcapi.model.Date;
 import eu.icarus.momca.momcapi.model.id.*;
 import eu.icarus.momca.momcapi.model.resource.Charter;
+import eu.icarus.momca.momcapi.model.resource.User;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +32,120 @@ public class CharterManagerTest {
     }
 
     @Test
+    public void testAddCharter1() throws Exception {
+
+        IdCharter id = new IdCharter("AbteiEberbach", "Charter1");
+        User admin = mc.getUserManager().getUser(new IdUser("admin")).get();
+        Date date = new Date(LocalDate.of(1413, 2, 2), 0, "2nd Februrary, 1413");
+
+        Charter charter = new Charter(id, CharterStatus.PUBLIC, admin, date);
+
+        cm.addCharter(charter);
+
+        Optional<Charter> addedCharter = cm.getCharter(id, CharterStatus.PUBLIC);
+        cm.delete(id, CharterStatus.PUBLIC);
+
+        assertTrue(addedCharter.isPresent());
+        assertEquals(addedCharter.get().getDate(), date);
+
+    }
+
+    @Test
+    public void testAddCharter2() throws Exception {
+
+        IdCharter id = new IdCharter("CH-KAE", "Urkunden", "Charter1");
+        User admin = mc.getUserManager().getUser(new IdUser("admin")).get();
+        Date date = new Date(LocalDate.of(1413, 2, 2), 0, "2nd Februrary, 1413");
+
+        Charter charter = new Charter(id, CharterStatus.PUBLIC, admin, date);
+
+        cm.addCharter(charter);
+
+        Optional<Charter> addedCharter = cm.getCharter(id, CharterStatus.PUBLIC);
+        cm.delete(id, CharterStatus.PUBLIC);
+
+        assertTrue(addedCharter.isPresent());
+        assertEquals(addedCharter.get().getDate(), date);
+
+    }
+
+    @Test
+    public void testAddCharter3() throws Exception {
+
+        IdCharter id = new IdCharter("ea13e5f1-03b2-4bfa-9dd5-8fb770f98d7b", "Charter1");
+        User admin = mc.getUserManager().getUser(new IdUser("admin")).get();
+        Date date = new Date(LocalDate.of(1413, 2, 2), 0, "2nd Februrary, 1413");
+
+        Charter charter = new Charter(id, CharterStatus.PRIVATE, admin, date);
+
+        cm.addCharter(charter);
+
+        Optional<Charter> addedCharter = cm.getCharter(id, CharterStatus.PRIVATE);
+        cm.delete(id, CharterStatus.PRIVATE);
+
+        assertTrue(addedCharter.isPresent());
+        assertEquals(addedCharter.get().getDate(), date);
+
+    }
+
+    @Test
+    public void testAddCharter4() throws Exception {
+
+        IdCharter id = new IdCharter("RS-IAGNS", "Charters", "Charter1");
+        User admin = mc.getUserManager().getUser(new IdUser("admin")).get();
+        Date date = new Date(LocalDate.of(1413, 2, 2), 0, "2nd Februrary, 1413");
+
+        Charter charter = new Charter(id, CharterStatus.IMPORTED, admin, date);
+
+        cm.addCharter(charter);
+
+        Optional<Charter> addedCharter = cm.getCharter(id, CharterStatus.IMPORTED);
+        cm.delete(id, CharterStatus.IMPORTED);
+
+        assertTrue(addedCharter.isPresent());
+        assertEquals(addedCharter.get().getDate(), date);
+
+    }
+
+    @Test(expectedExceptions = MomcaException.class)
+    public void testAddCharter5() throws Exception {
+
+        IdCharter id = new IdCharter("CH-", "Urkunden", "Charter1");
+        User admin = mc.getUserManager().getUser(new IdUser("admin")).get();
+        Date date = new Date(LocalDate.of(1413, 2, 2), 0, "2nd Februrary, 1413");
+
+
+        Charter charter = new Charter(id, CharterStatus.PUBLIC, admin, date);
+
+        cm.addCharter(charter);
+
+
+    }
+
+    @Test
+    public void testDeleteCharter() throws Exception {
+
+        IdCharter id = new IdCharter("RS-IAGNS", "Charters", "Charter1");
+        User admin = mc.getUserManager().getUser(new IdUser("admin")).get();
+        Date date = new Date(LocalDate.of(1413, 2, 2), 0, "2nd Februrary, 1413");
+
+        Charter charter = new Charter(id, CharterStatus.IMPORTED, admin, date);
+
+        cm.addCharter(charter);
+
+        assertTrue(cm.getCharter(charter.getId(), CharterStatus.IMPORTED).isPresent());
+
+        cm.delete(charter.getId(), CharterStatus.PUBLIC);
+
+        assertTrue(cm.getCharter(charter.getId(), CharterStatus.IMPORTED).isPresent());
+
+        cm.delete(charter.getId(), CharterStatus.IMPORTED);
+
+        assertFalse(cm.getCharter(charter.getId(), CharterStatus.IMPORTED).isPresent());
+
+    }
+
+    @Test
     public void testGetCharterForImportedCharter() throws Exception {
 
         IdCharter id = new IdCharter("RS-IAGNS", "Charters", "F1_fasc.16_sub_N_1513");
@@ -36,7 +154,7 @@ public class CharterManagerTest {
 
         charter.get().regenerateXmlContent();
         assertTrue(charter.get().isValidCei());
-        assertEquals(charter.get().toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"F1_fasc.16_sub_N_1513\">F1. fasc.16, sub. N 1513</cei:idno><cei:chDesc><cei:abstract>Circular of Consilium Regium Locumtenentiale Hungaricum prohibiting the collection of unprescribed duties for goods from Turkey imported or exported in Belgrade, as well as works of Paradise Jocko, requires that the cereals exported across the Danube to the Black Sea only with the permission sought to punish Vilhelm Finns who improperly 3000 mc exported grain to the army of the Kingdom of Sardinia, as well as to individual prisoners sentenced to less punishment may refer to the army.</cei:abstract><cei:issued><cei:dateRange from=\"17930101\" to=\"17931231\">1793</cei:dateRange></cei:issued><cei:witnessOrig><cei:archIdentifier><cei:arch>Historical Archive of Novi Sad</cei:arch></cei:archIdentifier><cei:figure n=\"RS-IAGNS_F1.-fasc.16,-sub.-N-1513_1\"><cei:graphic url=\"RS-IAGNS_F1.-fasc.16,-sub.-N-1513_1.jpg\" /></cei:figure><cei:figure n=\"RS-IAGNS_F1.-fasc.16,-sub.-N-1513_2\"><cei:graphic url=\"RS-IAGNS_F1.-fasc.16,-sub.-N-1513_2.jpg\" /></cei:figure><cei:figure n=\"RS-IAGNS_F1.-fasc.16,-sub.-N-1513_3\"><cei:graphic url=\"RS-IAGNS_F1.-fasc.16,-sub.-N-1513_3.jpg\" /></cei:figure></cei:witnessOrig><cei:witListPar /><cei:diplomaticAnalysis /></cei:chDesc></cei:body><cei:back /></cei:text>");
+        assertEquals(charter.get().toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"F1_fasc.16_sub_N_1513\">F1. fasc.16, sub. N 1513</cei:idno><cei:chDesc><cei:abstract>Circular of Consilium Regium Locumtenentiale Hungaricum prohibiting the collection of unprescribed duties for goods from Turkey imported or exported in Belgrade, as well as works of Paradise Jocko, requires that the cereals exported across the Danube to the Black Sea only with the permission sought to punish Vilhelm Finns who improperly 3000 mc exported grain to the army of the Kingdom of Sardinia, as well as to individual prisoners sentenced to less punishment may refer to the army.</cei:abstract><cei:issued><cei:dateRange from=\"17930101\" to=\"17931231\">1793</cei:dateRange></cei:issued><cei:witnessOrig><cei:archIdentifier><cei:arch>Historical Archive of Novi Sad</cei:arch></cei:archIdentifier><cei:figure n=\"RS-IAGNS_F1.-fasc.16,-sub.-N-1513_1\"><cei:graphic url=\"RS-IAGNS_F1.-fasc.16,-sub.-N-1513_1.jpg\" /></cei:figure><cei:figure n=\"RS-IAGNS_F1.-fasc.16,-sub.-N-1513_2\"><cei:graphic url=\"RS-IAGNS_F1.-fasc.16,-sub.-N-1513_2.jpg\" /></cei:figure><cei:figure n=\"RS-IAGNS_F1.-fasc.16,-sub.-N-1513_3\"><cei:graphic url=\"RS-IAGNS_F1.-fasc.16,-sub.-N-1513_3.jpg\" /></cei:figure></cei:witnessOrig></cei:chDesc></cei:body><cei:back /></cei:text>");
 
     }
 

@@ -146,9 +146,10 @@ public class Charter extends AtomResource {
         issuedPlace.ifPresent(p -> issued.appendChild(p.copy()));
         issued.appendChild(date.toCeiDate());
 
-        Element witnessOrig = new Element("cei:witnessOrig", CEI_URI);
-        chDesc.appendChild(witnessOrig);
         this.witnessOrig.ifPresent(w -> {
+
+            Element witnessOrig = new Element("cei:witnessOrig", CEI_URI);
+            chDesc.appendChild(witnessOrig);
 
             w.getId().ifPresent(s -> witnessOrig.addAttribute(new Attribute("id", s)));
             w.getLang().ifPresent(s -> witnessOrig.addAttribute(new Attribute("lang", s)));
@@ -158,11 +159,13 @@ public class Charter extends AtomResource {
 
         });
 
-        Element witListPar = new Element("cei:witListPar", CEI_URI);
-        chDesc.appendChild(witListPar);
-        this.witListPar.forEach(witness -> witListPar.appendChild(witness.copy()));
+        if (!this.witListPar.isEmpty()) {
+            Element witListPar = new Element("cei:witListPar", CEI_URI);
+            chDesc.appendChild(witListPar);
+            this.witListPar.forEach(witness -> witListPar.appendChild(witness.copy()));
+        }
 
-        chDesc.appendChild(diplomaticAnalysis.orElse(new DiplomaticAnalysis()));
+        diplomaticAnalysis.ifPresent(d -> chDesc.appendChild(d.copy()));
 
         langMom.ifPresent(s -> {
             Element e = new Element("cei:lang_MOM", CEI_URI);
@@ -448,11 +451,11 @@ public class Charter extends AtomResource {
 
         CharterStatus status;
 
-        if (getParentUri().contains(ResourceRoot.IMPORTED_ARCHIVAL_CHARTERS.getUri())) {
+        if (getParentUri().startsWith(ResourceRoot.IMPORTED_ARCHIVAL_CHARTERS.getUri())) {
             status = CharterStatus.IMPORTED;
-        } else if (getParentUri().contains(ResourceRoot.USER_DATA.getUri())) {
+        } else if (getParentUri().startsWith(ResourceRoot.USER_DATA.getUri())) {
             status = CharterStatus.PRIVATE;
-        } else if (getParentUri().contains(ResourceRoot.ARCHIVAL_CHARTERS_BEING_EDITED.getUri())) {
+        } else if (getParentUri().startsWith(ResourceRoot.ARCHIVAL_CHARTERS_BEING_EDITED.getUri())) {
             status = CharterStatus.SAVED;
         } else {
             status = CharterStatus.PUBLIC;

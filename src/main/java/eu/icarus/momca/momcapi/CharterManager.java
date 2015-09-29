@@ -4,6 +4,7 @@ import eu.icarus.momca.momcapi.exception.MomcaException;
 import eu.icarus.momca.momcapi.model.CharterStatus;
 import eu.icarus.momca.momcapi.model.id.*;
 import eu.icarus.momca.momcapi.model.resource.Charter;
+import eu.icarus.momca.momcapi.model.resource.MyCollectionStatus;
 import eu.icarus.momca.momcapi.model.resource.ResourceRoot;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
 import eu.icarus.momca.momcapi.model.xml.xrx.Saved;
@@ -25,6 +26,33 @@ public class CharterManager extends AbstractManager {
 
     CharterManager(@NotNull MomcaConnection momcaConnection) {
         super(momcaConnection);
+    }
+
+    public void addCharter(@NotNull Charter charter) {
+
+        IdCharter id = charter.getId();
+        CharterStatus status = charter.getCharterStatus();
+
+        if (getCharter(id, status).isPresent()) {
+            throw new MomcaException(String.format("A charter with id '%s' and status '%s'is already existing.", id, status));
+        }
+
+        if (isParentExisting(id)) {
+
+            momcaConnection.createCollectionPath(charter.getParentUri());
+            String time = momcaConnection.getRemoteDateTime();
+            momcaConnection.storeAtomResource(charter, time, time);
+
+        } else {
+            String message = String.format("The parent for the charter, '%s', is not existing.",
+                    id.getHierarchicalUriPartsAsString());
+            throw new MomcaException(message);
+        }
+
+    }
+
+    public void delete(IdCharter id, CharterStatus status) {
+        getCharter(id, status).ifPresent(momcaConnection::deleteExistResource);
     }
 
     @NotNull
@@ -71,6 +99,32 @@ public class CharterManager extends AbstractManager {
     private boolean isCharterExisting(@NotNull IdCharter idCharter, @Nullable ResourceRoot resourceRoot) {
         ExistQuery query = ExistQueryFactory.checkResourceExistence(idCharter.getContentXml(), resourceRoot);
         return !momcaConnection.queryDatabase(query).isEmpty();
+    }
+
+    private boolean isParentExisting(IdCharter id) {
+
+        boolean parentExists = false;
+
+        List<String> uriParts = id.getHierarchicalUriParts();
+
+        switch (uriParts.size()) {
+
+            case 1:
+                IdCollection idCollection = new IdCollection(uriParts.get(0));
+                IdMyCollection idMyCollection = new IdMyCollection(uriParts.get(0));
+                parentExists = momcaConnection.getCollectionManager().getCollection(idCollection).isPresent() ||
+                        momcaConnection.getMyCollectionManager().getMyCollection(idMyCollection, MyCollectionStatus.PRIVATE).isPresent();
+                break;
+
+            case 2:
+                IdFond idFond = new IdFond(uriParts.get(0), uriParts.get(1));
+                parentExists = momcaConnection.getFondManager().getFond(idFond).isPresent();
+                break;
+
+        }
+
+        return parentExists;
+
     }
 
     @NotNull
