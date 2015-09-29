@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  */
 public class ArchiveManager extends AbstractManager {
 
-    public ArchiveManager(@NotNull MomcaConnection momcaConnection) {
+    ArchiveManager(@NotNull MomcaConnection momcaConnection) {
         super(momcaConnection);
     }
 

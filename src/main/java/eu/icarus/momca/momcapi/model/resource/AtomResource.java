@@ -32,23 +32,49 @@ public abstract class AtomResource extends ExistResource {
     }
 
     AtomResource(@NotNull ExistResource existResource) {
-
         super(existResource);
-
-        String atomIdString = Util.queryXmlForString(existResource.toDocument().getRootElement(), XpathQuery.QUERY_ATOM_ID);
-
-        if (atomIdString.isEmpty()) {
-            throw new IllegalArgumentException("The provided atom resource content does not contain an atom:id: "
-                    + existResource.toDocument().toXML());
-        }
-
-        getIdFromString(atomIdString);
-
+        this.id = readIdAtomIdFromXml(existResource.toDocument().getRootElement());
     }
 
     @NotNull
     AtomAuthor createAtomAuthor() {
         return new AtomAuthor(getCreator().map(IdAbstract::getIdentifier).orElse(""));
+    }
+
+    private static IdAtomId createIdFromString(String atomIdString) {
+
+        AtomId atomId = new AtomId(atomIdString);
+
+        IdAtomId id = null;
+
+        switch (atomId.getType()) {
+
+            case ANNOTATION_IMAGE:
+                id = new IdAnnotation(atomId);
+                break;
+            case ARCHIVE:
+                id = new IdArchive(atomId);
+                break;
+            case CHARTER:
+                id = new IdCharter(atomId);
+                break;
+            case COLLECTION:
+                id = new IdCollection(atomId);
+                break;
+            case FOND:
+                id = new IdFond(atomId);
+                break;
+            case MY_COLLECTION:
+                id = new IdMyCollection(atomId);
+                break;
+            case SVG:
+                id = new IdSvg(atomId);
+                break;
+
+        }
+
+        return id;
+
     }
 
     @NotNull
@@ -78,38 +104,6 @@ public abstract class AtomResource extends ExistResource {
     @NotNull
     public abstract IdAtomId getId();
 
-    private void getIdFromString(String atomIdString) {
-
-        AtomId atomId = new AtomId(atomIdString);
-
-        switch (atomId.getType()) {
-
-            case ANNOTATION_IMAGE:
-                this.id = new IdAnnotation(atomId);
-                break;
-            case ARCHIVE:
-                this.id = new IdArchive(atomId);
-                break;
-            case CHARTER:
-                this.id = new IdCharter(atomId);
-                break;
-            case COLLECTION:
-                this.id = new IdCollection(atomId);
-                break;
-            case FOND:
-                this.id = new IdFond(atomId);
-                break;
-            case MY_COLLECTION:
-                this.id = new IdMyCollection(atomId);
-                break;
-            case SVG:
-                this.id = new IdSvg(atomId);
-                break;
-
-        }
-
-    }
-
     @NotNull
     public final String getIdentifier() {
         return id.getIdentifier();
@@ -124,7 +118,12 @@ public abstract class AtomResource extends ExistResource {
     }
 
     @NotNull
-    Optional<IdUser> initCreatorFromXml(@NotNull Element xml) {
+    static String localTime() {
+        return ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+    }
+
+    @NotNull
+    static Optional<IdUser> readCreatorFromXml(@NotNull Element xml) {
 
         Optional<IdUser> result = Optional.empty();
         String queryResult = Util.queryXmlForString(xml, XpathQuery.QUERY_ATOM_EMAIL);
@@ -137,9 +136,15 @@ public abstract class AtomResource extends ExistResource {
 
     }
 
-    @NotNull
-    static String localTime() {
-        return ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+    static IdAtomId readIdAtomIdFromXml(Element element) {
+        String atomIdString = Util.queryXmlForString(element, XpathQuery.QUERY_ATOM_ID);
+
+        if (atomIdString.isEmpty()) {
+            throw new IllegalArgumentException("The provided atom resource content does not contain an atom:id: "
+                    + element.toXML());
+        }
+
+        return createIdFromString(atomIdString);
     }
 
     public abstract void regenerateXmlContent();

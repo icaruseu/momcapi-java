@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  */
 public class FondManager extends AbstractManager {
 
-    public FondManager(@NotNull MomcaConnection momcaConnection) {
+    FondManager(@NotNull MomcaConnection momcaConnection) {
         super(momcaConnection);
     }
 

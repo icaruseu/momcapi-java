@@ -20,7 +20,7 @@ public class MyCollection extends AtomResource {
 
     public static final String CEI_TEMPLATE = "<cei:cei xmlns:cei='http://www.monasterium.net/NS/cei'><cei:teiHeader><cei:fileDesc><cei:titleStmt><cei:title>%s</cei:title></cei:titleStmt><cei:publicationStmt /></cei:fileDesc></cei:teiHeader><cei:text type='collection'><cei:front><cei:div type='preface' /></cei:front><cei:group><cei:text sameAs='' type='collection' /><cei:text sameAs='' type='charter' /></cei:group><cei:back /></cei:text></cei:cei>";
     public static final String CEI_TEMPLATE_WITH_PREFACE = "<cei:cei xmlns:cei='http://www.monasterium.net/NS/cei'><cei:teiHeader><cei:fileDesc><cei:titleStmt><cei:title>%s</cei:title></cei:titleStmt><cei:publicationStmt /></cei:fileDesc></cei:teiHeader><cei:text type='collection'><cei:front><cei:div type='preface' >%s</cei:div></cei:front><cei:group><cei:text sameAs='' type='collection' /><cei:text sameAs='' type='charter' /></cei:group><cei:back /></cei:text></cei:cei>";
-    public static final String PATH_PART = "metadata.mycollection";
+    public static final String PRIVATE_URI_PART = "metadata.mycollection";
     @NotNull
     private String name;
     @NotNull
@@ -54,18 +54,31 @@ public class MyCollection extends AtomResource {
 
         super(existResource);
 
-        this.status = initStatusFromResource(existResource);
+        this.status = readStatusFromResource(existResource);
 
         Element xml = toDocument().getRootElement();
 
         this.name = Util.queryXmlForOptionalString(xml, XpathQuery.QUERY_CEI_TITLE)
                 .orElseThrow(IllegalArgumentException::new).replaceAll("\\s+", " ");
-        this.creator = initCreatorFromXml(xml);
-        this.sharing = initSharingFromXml(xml);
-        this.preface = initPrefaceFromXml(xml);
-
+        this.creator = readCreatorFromXml(xml);
+        this.sharing = readSharingFromXml(xml);
+        this.preface = readPrefaceFromXml(xml);
 
     }
+
+    public MyCollection(@NotNull MyCollectionStatus status, @NotNull Element content) {
+
+        this(
+                new ExistResource(
+                        createResourceName(readIdAtomIdFromXml(content).getIdentifier()),
+                        createUri(
+                                readIdAtomIdFromXml(content).getIdentifier(),
+                                readCreatorFromXml(content).orElseThrow(RuntimeException::new),
+                                status),
+                        content.toXML()));
+
+    }
+
 
     @NotNull
     private static String createResourceName(@NotNull String identifier) {
@@ -82,7 +95,7 @@ public class MyCollection extends AtomResource {
                 uri = String.format("%s/%s/%s/%s",
                         ResourceRoot.USER_DATA.getUri(),
                         creator.getIdentifier(),
-                        PATH_PART,
+                        PRIVATE_URI_PART,
                         identifier);
                 break;
             case PUBLISHED:
@@ -123,7 +136,7 @@ public class MyCollection extends AtomResource {
         return status;
     }
 
-    private Optional<String> initPrefaceFromXml(Element xml) {
+    private static Optional<String> readPrefaceFromXml(Element xml) {
 
         return Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_FRONT_PREFACE)
                 .map(Util::joinChildNodes)
@@ -131,7 +144,7 @@ public class MyCollection extends AtomResource {
 
     }
 
-    private Sharing initSharingFromXml(Element xml) {
+    private static Sharing readSharingFromXml(Element xml) {
 
         String visibility = Util.queryXmlForString(xml, XpathQuery.QUERY_XRX_VISIBILITY);
         String user = Util.queryXmlForString(xml, XpathQuery.QUERY_XRX_USER);
@@ -140,7 +153,7 @@ public class MyCollection extends AtomResource {
 
     }
 
-    private MyCollectionStatus initStatusFromResource(ExistResource existResource) {
+    private static MyCollectionStatus readStatusFromResource(ExistResource existResource) {
 
         String uri = existResource.getParentUri();
 

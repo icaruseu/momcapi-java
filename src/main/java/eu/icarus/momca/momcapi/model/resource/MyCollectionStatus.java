@@ -5,6 +5,16 @@ package eu.icarus.momca.momcapi.model.resource;
  */
 public enum MyCollectionStatus {
 
-    PRIVATE, PUBLISHED
+    PRIVATE(ResourceRoot.USER_DATA), PUBLISHED(ResourceRoot.PUBLISHED_USER_COLLECTIONS);
+
+    private final ResourceRoot resourceRoot;
+
+    MyCollectionStatus(ResourceRoot resourceRoot) {
+        this.resourceRoot = resourceRoot;
+    }
+
+    public ResourceRoot getResourceRoot() {
+        return resourceRoot;
+    }
 
 }

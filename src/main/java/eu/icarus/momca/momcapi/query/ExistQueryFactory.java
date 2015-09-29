@@ -443,6 +443,28 @@ public class ExistQueryFactory {
 
     }
 
+    public static ExistQuery listMyCollectionsPrivate(IdUser idUser) {
+
+        String query = String.format(
+                "%s collection('/db/mom-data/xrx.user/%s/metadata.mycollection')//atom:id/text()",
+                getNamespaceDeclaration(Namespace.ATOM),
+                idUser.getIdentifier());
+
+        return new ExistQuery(query);
+
+    }
+
+    @NotNull
+    public static ExistQuery listMyCollectionsPublic() {
+
+        String query = String.format(
+                "%s collection('/db/mom-data/metadata.mycollection.public')//atom:id/text()",
+                getNamespaceDeclaration(Namespace.ATOM));
+
+        return new ExistQuery(query);
+
+    }
+
     @NotNull
     public static ExistQuery listRegionsNativeNames(@NotNull CountryCode countryCode) {
 

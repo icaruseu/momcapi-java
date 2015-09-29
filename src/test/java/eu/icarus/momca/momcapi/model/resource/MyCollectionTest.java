@@ -1,8 +1,10 @@
 package eu.icarus.momca.momcapi.model.resource;
 
+import eu.icarus.momca.momcapi.Util;
 import eu.icarus.momca.momcapi.model.id.IdMyCollection;
 import eu.icarus.momca.momcapi.model.id.IdUser;
 import eu.icarus.momca.momcapi.model.xml.xrx.Sharing;
+import nu.xom.Element;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.*;
@@ -55,6 +57,30 @@ public class MyCollectionTest {
         myCollection.regenerateXmlContent();
 
         assertEquals(myCollection.getContent().toXML(), "<cei:cei xmlns:cei=\"http://www.monasterium.net/NS/cei\"><cei:teiHeader><cei:fileDesc><cei:titleStmt><cei:title>A new my collection</cei:title></cei:titleStmt><cei:publicationStmt /></cei:fileDesc></cei:teiHeader><cei:text type=\"collection\"><cei:front><cei:div type=\"preface\"><cei:head>headline</cei:head><cei:p>preface</cei:p></cei:div></cei:front><cei:group><cei:text sameAs=\"\" type=\"collection\" /><cei:text sameAs=\"\" type=\"charter\" /></cei:group><cei:back /></cei:text></cei:cei>");
+
+    }
+
+    @Test
+    public void testConstructor3() throws Exception {
+
+        Element content = Util.parseToElement("<atom:entry xmlns:atom='http://www.w3.org/2005/Atom'><atom:id>tag:www.monasterium.net,2011:/mycollection/ea13e5f1-03b2-4bfa-9dd5-8fb770f98d7b</atom:id><atom:title /><atom:published>2015-06-26T19:27:46.723+02:00</atom:published><atom:updated>2015-06-26T19:27:46.723+02:00</atom:updated><atom:author><atom:email>admin</atom:email></atom:author><app:control xmlns:app='http://www.w3.org/2007/app'><app:draft>no</app:draft></app:control><xrx:sharing xmlns:xrx='http://www.monasterium.net/NS/xrx'><xrx:visibility>private</xrx:visibility><xrx:user /></xrx:sharing><atom:content type='application/xml'><cei:cei xmlns:cei='http://www.monasterium.net/NS/cei'><cei:teiHeader><cei:fileDesc><cei:titleStmt><cei:title>Testcollection</cei:title></cei:titleStmt><cei:publicationStmt /></cei:fileDesc></cei:teiHeader><cei:text type='collection'><cei:front><cei:div type='preface' /></cei:front><cei:group><cei:text sameAs='' type='collection' /><cei:text sameAs='' type='charter' /></cei:group><cei:back /></cei:text></cei:cei></atom:content></atom:entry>");
+
+        MyCollection myCollection = new MyCollection(MyCollectionStatus.PRIVATE, content);
+
+        assertEquals(myCollection.getId(), new IdMyCollection("ea13e5f1-03b2-4bfa-9dd5-8fb770f98d7b"));
+        assertTrue(myCollection.getCreator().isPresent());
+        assertEquals(myCollection.getCreator().get(), new IdUser("admin"));
+        assertEquals(myCollection.getIdentifier(), "ea13e5f1-03b2-4bfa-9dd5-8fb770f98d7b");
+        assertEquals(myCollection.getName(), "Testcollection");
+        assertEquals(myCollection.getResourceName(), "ea13e5f1-03b2-4bfa-9dd5-8fb770f98d7b.mycollection.xml");
+        assertEquals(myCollection.getParentUri(), "/db/mom-data/xrx.user/admin/metadata.mycollection/ea13e5f1-03b2-4bfa-9dd5-8fb770f98d7b");
+        assertEquals(myCollection.getSharing().getContent(), "private");
+        assertFalse(myCollection.getPreface().isPresent());
+
+
+        myCollection.regenerateXmlContent();
+
+        assertEquals(myCollection.getContent().toXML(), "<cei:cei xmlns:cei=\"http://www.monasterium.net/NS/cei\"><cei:teiHeader><cei:fileDesc><cei:titleStmt><cei:title>Testcollection</cei:title></cei:titleStmt><cei:publicationStmt /></cei:fileDesc></cei:teiHeader><cei:text type=\"collection\"><cei:front><cei:div type=\"preface\" /></cei:front><cei:group><cei:text sameAs=\"\" type=\"collection\" /><cei:text sameAs=\"\" type=\"charter\" /></cei:group><cei:back /></cei:text></cei:cei>");
 
     }
 

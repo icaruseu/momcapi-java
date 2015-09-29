@@ -52,6 +52,8 @@ public class MomcaConnection {
     @NotNull
     private final FondManager fondManager;
     @NotNull
+    private final MyCollectionManager myCollectionManager;
+    @NotNull
     private final String password;
     @NotNull
     private final Collection rootCollection;
@@ -79,6 +81,7 @@ public class MomcaConnection {
         fondManager = new FondManager(this);
         collectionManager = new CollectionManager(this);
         charterManager = new CharterManager(this);
+        myCollectionManager = new MyCollectionManager(this);
 
     }
 
@@ -241,6 +244,11 @@ public class MomcaConnection {
     @NotNull
     public FondManager getFondManager() {
         return fondManager;
+    }
+
+    @NotNull
+    public MyCollectionManager getMyCollectionManager() {
+        return myCollectionManager;
     }
 
     String getRemoteDateTime() {

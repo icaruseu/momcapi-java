@@ -19,9 +19,7 @@ import java.util.stream.Collectors;
  */
 public class CollectionManager extends AbstractManager {
 
-    private static final String COLLECTION_TEMPLATE = "<cei:cei xmlns:cei=\"http://www.monasterium.net/NS/cei\"><cei:teiHeader><cei:fileDesc><cei:sourceDesc><cei:p /></cei:sourceDesc></cei:fileDesc></cei:teiHeader><cei:text type=\"collection\"><cei:front><cei:image_server_address>%s</cei:image_server_address><cei:image_server_folder>%s</cei:image_server_folder><cei:user_name /><cei:password /><cei:provenance abbr=\"%s\">%s%s%s</cei:provenance><cei:publicationStmt><cei:availability n=\"ENRICH\" status=\"restricted\" /></cei:publicationStmt><cei:div type=\"preface\" /></cei:front><cei:group /></cei:text></cei:cei>";
-
-    public CollectionManager(@NotNull MomcaConnection momcaConnection) {
+    CollectionManager(@NotNull MomcaConnection momcaConnection) {
         super(momcaConnection);
     }
 

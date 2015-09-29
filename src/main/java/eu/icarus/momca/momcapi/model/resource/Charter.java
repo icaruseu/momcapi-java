@@ -399,7 +399,7 @@ public class Charter extends AtomResource {
 
         charterStatus = initCharterStatus();
 
-        creator = initCreatorFromXml(xml);
+        creator = readCreatorFromXml(xml);
 
         date = initDateFromXml(xml);
 
