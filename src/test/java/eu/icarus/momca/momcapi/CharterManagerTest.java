@@ -367,12 +367,14 @@ public class CharterManagerTest {
         charter.setCharterStatus(CharterStatus.PUBLIC);
         charter.setIdentifier("charter3");
         charter.setAbstract(new Abstract("abstract"));
+
         cm.updateCharter(charter, id, CharterStatus.SAVED);
 
         assertFalse(cm.getCharter(id, CharterStatus.SAVED).isPresent());
 
         Optional<Charter> updated = cm.getCharter(charter.getId(), charter.getCharterStatus());
         cm.deleteCharter(charter.getId(), charter.getCharterStatus());
+
         assertTrue(updated.isPresent());
         assertEquals(updated.get().getAbstract().get().getContent(), "abstract");
 

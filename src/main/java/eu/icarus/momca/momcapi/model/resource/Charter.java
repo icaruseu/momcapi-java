@@ -38,7 +38,9 @@ import java.util.stream.Collectors;
  */
 public class Charter extends AtomResource {
 
-    public static final String CEI_URI = Namespace.CEI.getUri();
+    private static final String CEI_URI = Namespace.CEI.getUri();
+    @NotNull
+    private final List<XmlValidationProblem> validationProblems = new ArrayList<>(0);
     @NotNull
     private List<Note> backDivNotes = new ArrayList<>(0);
     @NotNull
@@ -74,8 +76,6 @@ public class Charter extends AtomResource {
     @NotNull
     private List<Node> unusedFrontNodes = new ArrayList<>(0);
     @NotNull
-    private List<XmlValidationProblem> validationProblems = new ArrayList<>(0);
-    @NotNull
     private List<Witness> witListPar = new ArrayList<>(0);
     @NotNull
     private Optional<Witness> witnessOrig = Optional.empty();
@@ -97,15 +97,26 @@ public class Charter extends AtomResource {
         super(existResource);
 
         try {
-            validateCei(existResource);
+            validateCei();
         } catch (@NotNull SAXException | IOException | ParsingException | ParserConfigurationException e) {
             throw new IllegalArgumentException("Failed to validate the resource.", e);
         }
 
-        initCharterFromXml(toDocument().getRootElement());
+        Element xml = toDocument().getRootElement();
+
+        charterStatus = initCharterStatus();
+
+        date = initDateFromXml(xml);
+
+        idno = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_BODY_IDNO)
+                .map(Idno::new)
+                .orElseThrow(MomcaException::new);
+
+        initCharterFromXml(xml);
 
     }
 
+    @NotNull
     private Element createBackXml() {
 
         Element back = new Element("cei:back", CEI_URI);
@@ -124,6 +135,7 @@ public class Charter extends AtomResource {
 
     }
 
+    @NotNull
     private Element createBodyXml() {
 
         Element body = new Element("cei:body", CEI_URI);
@@ -179,6 +191,7 @@ public class Charter extends AtomResource {
 
     }
 
+    @NotNull
     private Element createFrontXml() {
 
         Element front = new Element("cei:front", CEI_URI);
@@ -360,7 +373,7 @@ public class Charter extends AtomResource {
         return witnessOrig;
     }
 
-    private void initCharterFromXml(Element xml) {
+    private void initCharterFromXml(@NotNull Element xml) {
 
         backDivNotes = Util.queryXmlForNodes(xml, XpathQuery.QUERY_CEI_BACK_NOTE)
                 .stream()
@@ -398,19 +411,11 @@ public class Charter extends AtomResource {
 
         charterClass = Util.queryXmlForOptionalString(xml, XpathQuery.QUERY_CEI_CLASS);
 
-        charterStatus = initCharterStatus();
-
         creator = readCreatorFromXml(xml);
-
-        date = initDateFromXml(xml);
 
         diplomaticAnalysis = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_DIPLOMATIC_ANALYSIS)
                 .map(DiplomaticAnalysis::new)
                 .filter(d -> !d.getContent().isEmpty());
-
-        idno = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_BODY_IDNO)
-                .map(Idno::new)
-                .orElseThrow(MomcaException::new);
 
         issuedPlace = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_ISSUED_PLACE_NAME)
                 .map(PlaceName::new)
@@ -465,7 +470,7 @@ public class Charter extends AtomResource {
 
     }
 
-    private Date initDateFromXml(Element xml) {
+    private Date initDateFromXml(@NotNull Element xml) {
 
         Date result;
 
@@ -526,7 +531,7 @@ public class Charter extends AtomResource {
                                 cei)));
 
         try {
-            validateCei(this);
+            validateCei();
         } catch (@NotNull SAXException | IOException | ParsingException | ParserConfigurationException e) {
             throw new IllegalArgumentException("Failed to validate the resource.", e);
         }
@@ -720,8 +725,10 @@ public class Charter extends AtomResource {
         return getContent();
     }
 
-    private void validateCei(@NotNull ExistResource resource)
+    private void validateCei()
             throws SAXException, ParserConfigurationException, ParsingException, IOException {
+
+        this.validationProblems.clear();
 
         SAXParserFactory factory = SAXParserFactory.newInstance();
         factory.setValidating(false);
