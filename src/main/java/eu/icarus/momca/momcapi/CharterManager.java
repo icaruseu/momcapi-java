@@ -51,7 +51,7 @@ public class CharterManager extends AbstractManager {
 
     }
 
-    public void delete(IdCharter id, CharterStatus status) {
+    public void delete(@NotNull IdCharter id, @NotNull CharterStatus status) {
         getCharter(id, status).ifPresent(momcaConnection::deleteExistResource);
     }
 
@@ -187,6 +187,26 @@ public class CharterManager extends AbstractManager {
                         .collect(Collectors.toList())));
 
         return results;
+
+    }
+
+    public void updateCharter(@NotNull Charter modifiedCharter, @Nullable IdCharter originalId, @Nullable CharterStatus originalStatus) {
+
+        IdCharter realOriginalId = originalId == null ? modifiedCharter.getId() : originalId;
+        CharterStatus realOriginalStatus = originalStatus == null ? modifiedCharter.getCharterStatus() : originalStatus;
+
+        if (!getCharter(realOriginalId, realOriginalStatus).isPresent()) {
+            throw new MomcaException("The charter to be updated doesn't exist in the database.");
+        }
+
+        delete(realOriginalId, realOriginalStatus);
+
+        if (getCharter(modifiedCharter.getId(), modifiedCharter.getCharterStatus()).isPresent()) {
+            // delete already existing changed charter in case of an overwrite by moving
+            delete(modifiedCharter.getId(), modifiedCharter.getCharterStatus());
+        }
+
+        addCharter(modifiedCharter);
 
     }
 

@@ -7,6 +7,7 @@ import eu.icarus.momca.momcapi.model.id.*;
 import eu.icarus.momca.momcapi.model.resource.Charter;
 import eu.icarus.momca.momcapi.model.resource.User;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
+import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.Abstract;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -304,6 +305,30 @@ public class CharterManagerTest {
     @Test
     public void testListChartersSaved() throws Exception {
         assertEquals(cm.listChartersSaved().size(), 3);
+    }
+
+    @Test
+    public void testUpdateCharter1() throws Exception {
+
+        IdCharter id = new IdCharter("CH-KAE", "Urkunden", "Charter2");
+        User admin = mc.getUserManager().getUser(new IdUser("admin")).get();
+        Date date = new Date(LocalDate.of(1413, 2, 2), 0, "2nd Februrary, 1413");
+
+        Charter charter = new Charter(id, CharterStatus.SAVED, admin, date);
+
+        cm.addCharter(charter);
+        assertTrue(cm.getCharter(id, CharterStatus.SAVED).isPresent());
+
+        charter.setCharterStatus(CharterStatus.PUBLIC);
+        charter.setIdentifier("charter3");
+        charter.setAbstract(new Abstract("abstract"));
+        cm.updateCharter(charter, id, CharterStatus.SAVED);
+
+        Optional<Charter> updated = cm.getCharter(charter.getId(), charter.getCharterStatus());
+        cm.delete(charter.getId(), charter.getCharterStatus());
+        assertTrue(updated.isPresent());
+        assertEquals(updated.get().getAbstract().get().getContent(), "abstract");
+
     }
 
     @Test
