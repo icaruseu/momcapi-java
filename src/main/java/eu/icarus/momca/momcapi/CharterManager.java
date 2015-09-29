@@ -38,18 +38,13 @@ public class CharterManager extends AbstractManager {
             throw new MomcaException(String.format("A charter with id '%s' and status '%s'is already existing.", id, status));
         }
 
-        if (isParentExisting(id)) {
+        String currentTime = momcaConnection.getRemoteDateTime();
+        writeCharterToDatabase(charter, currentTime, currentTime);
 
-            momcaConnection.createCollectionPath(charter.getParentUri());
-            String time = momcaConnection.getRemoteDateTime();
-            momcaConnection.storeAtomResource(charter, time, time);
+    }
 
-        } else {
-            String message = String.format("The parent for the charter, '%s', is not existing.",
-                    id.getHierarchicalUriPartsAsString());
-            throw new MomcaException(message);
-        }
-
+    private List<IdCharter> createIds(List<String> atomIdStrings) {
+        return atomIdStrings.stream().map(AtomId::new).map(IdCharter::new).collect(Collectors.toList());
     }
 
     public void deleteCharter(@NotNull IdCharter id, @NotNull CharterStatus status) {
@@ -131,49 +126,49 @@ public class CharterManager extends AbstractManager {
     @NotNull
     public List<IdCharter> listChartersImport(@NotNull IdFond idFond) {
         List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listChartersImport(idFond));
-        return queryResults.stream().map(AtomId::new).map(IdCharter::new).collect(Collectors.toList());
+        return createIds(queryResults);
     }
 
     @NotNull
     public List<IdCharter> listChartersImport(@NotNull IdCollection idCollection) {
         List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listChartersImport(idCollection));
-        return queryResults.stream().map(AtomId::new).map(IdCharter::new).collect(Collectors.toList());
+        return createIds(queryResults);
     }
 
     @NotNull
     public List<IdCharter> listChartersPrivate(@NotNull IdMyCollection idMyCollection) {
         List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listChartersPrivate(idMyCollection));
-        return queryResults.stream().map(AtomId::new).map(IdCharter::new).collect(Collectors.toList());
+        return createIds(queryResults);
     }
 
     @NotNull
     public List<IdCharter> listChartersPrivate(@NotNull IdUser idUser) {
         List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listChartersPrivate(idUser));
-        return queryResults.stream().map(AtomId::new).map(IdCharter::new).collect(Collectors.toList());
+        return createIds(queryResults);
     }
 
     @NotNull
     public List<IdCharter> listChartersPublic(@NotNull IdFond idFond) {
         List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listChartersPublic(idFond));
-        return queryResults.stream().map(AtomId::new).map(IdCharter::new).collect(Collectors.toList());
+        return createIds(queryResults);
     }
 
     @NotNull
     public List<IdCharter> listChartersPublic(@NotNull IdCollection idCollection) {
         List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listChartersPublic(idCollection));
-        return queryResults.stream().map(AtomId::new).map(IdCharter::new).collect(Collectors.toList());
+        return createIds(queryResults);
     }
 
     @NotNull
     public List<IdCharter> listChartersPublic(@NotNull IdMyCollection idMyCollection) {
         List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listChartersPublic(idMyCollection));
-        return queryResults.stream().map(AtomId::new).map(IdCharter::new).collect(Collectors.toList());
+        return createIds(queryResults);
     }
 
     @NotNull
     public List<IdCharter> listChartersSaved() {
         List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listChartersSaved());
-        return queryResults.stream().map(AtomId::new).map(IdCharter::new).collect(Collectors.toList());
+        return createIds(queryResults);
     }
 
     /**
@@ -237,7 +232,6 @@ public class CharterManager extends AbstractManager {
 
         }
 
-
     }
 
     public void updateCharter(@NotNull Charter modifiedCharter, @Nullable IdCharter originalId, @Nullable CharterStatus originalStatus) {
@@ -254,16 +248,16 @@ public class CharterManager extends AbstractManager {
 
         deleteCharter(originalCharter.getId(), originalCharter.getCharterStatus());
 
-        if (getCharter(modifiedCharter.getId(), modifiedCharter.getCharterStatus()).isPresent()) {
-            // deleteCharter already existing changed charter in case of an overwrite by moving
-            deleteCharter(modifiedCharter.getId(), modifiedCharter.getCharterStatus());
-        }
+        writeCharterToDatabase(modifiedCharter, originalCharter.getPublished(), momcaConnection.getRemoteDateTime());
+
+    }
+
+    private void writeCharterToDatabase(@NotNull Charter modifiedCharter, @NotNull String published, @NotNull String updated) {
 
         if (isParentExisting(modifiedCharter.getId())) {
 
             momcaConnection.createCollectionPath(modifiedCharter.getParentUri());
-            String updated = momcaConnection.getRemoteDateTime();
-            momcaConnection.storeAtomResource(modifiedCharter, originalCharter.getPublished(), updated);
+            momcaConnection.storeAtomResource(modifiedCharter, published, updated);
 
         } else {
             String message = String.format("The parent for the charter, '%s', is not existing.",

@@ -343,7 +343,7 @@ public class CharterManagerTest {
         user = userManager.getUser(user.getId()).get();
 
         userManager.deleteUser(user.getId());
-//        cm.deleteCharter(id, CharterStatus.PUBLIC);
+        cm.deleteCharter(id, CharterStatus.PUBLIC);
 
         assertTrue(published.isPresent());
         assertEquals(published.get().getCreator().get(), user.getId());
@@ -368,6 +368,8 @@ public class CharterManagerTest {
         charter.setIdentifier("charter3");
         charter.setAbstract(new Abstract("abstract"));
         cm.updateCharter(charter, id, CharterStatus.SAVED);
+
+        assertFalse(cm.getCharter(id, CharterStatus.SAVED).isPresent());
 
         Optional<Charter> updated = cm.getCharter(charter.getId(), charter.getCharterStatus());
         cm.deleteCharter(charter.getId(), charter.getCharterStatus());
