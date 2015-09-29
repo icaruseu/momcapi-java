@@ -15,8 +15,8 @@ import java.util.Optional;
  */
 public class ArchIdentifier extends AbstractMixedContentElement {
 
-    public static final String CEI_URI = Namespace.CEI.getUri();
-    public static final String LOCAL_NAME = "archIdentifier";
+    private static final String CEI_URI = Namespace.CEI.getUri();
+    private static final String LOCAL_NAME = "archIdentifier";
 
     @NotNull
     private Optional<String> facs = Optional.empty();

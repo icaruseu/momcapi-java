@@ -5,12 +5,8 @@ import eu.icarus.momca.momcapi.Util;
 import eu.icarus.momca.momcapi.query.XpathQuery;
 import nu.xom.Document;
 import nu.xom.Element;
-import nu.xom.Nodes;
 import nu.xom.XPathContext;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * An XML resource stored in the database used by MOM-CA.
@@ -27,15 +23,11 @@ public class ExistResource {
     @NotNull
     private Document xmlContent;
 
-    /**
-     * Instantiates a new ExistResource with an existing resource.
-     *
-     * @param existResource The ExistResource to use.
-     */
-    ExistResource(@NotNull ExistResource existResource) {
-        this.resourceName = existResource.getResourceName();
-        this.xmlContent = existResource.toDocument();
-        this.parentUri = existResource.getParentUri();
+
+    ExistResource(@NotNull ExistResource other) {
+        this.parentUri = other.parentUri;
+        this.resourceName = other.resourceName;
+        this.xmlContent = other.xmlContent;
     }
 
     /**
@@ -87,73 +79,6 @@ public class ExistResource {
         XPathContext context = XPathContext.makeNamespaceContext(root);
         query.getNamespaces().forEach(n -> context.addNamespace(n.getPrefix(), n.getUri()));
         return context;
-    }
-
-    /**
-     * The Xpath Query to execute on the content.
-     *
-     * @param query the query
-     * @return A list of the results as strings.
-     */
-    @NotNull
-    @Deprecated
-    final List<String> queryContentAsList(@NotNull XpathQuery query) {
-
-        Nodes nodes = queryContentAsNodes(query);
-        List<String> results = new LinkedList<>();
-
-        for (int i = 0; i < nodes.size(); i++) {
-            results.add(nodes.get(i).getValue());
-        }
-
-        return results;
-
-    }
-
-    /**
-     * Query the resource's XML content.
-     *
-     * @param query The Xpath Query to execute on the content.
-     * @return The nodes containing the results.
-     */
-    @NotNull
-    @Deprecated
-    final Nodes queryContentAsNodes(@NotNull XpathQuery query) {
-
-        Element rootElement = xmlContent.getRootElement();
-        String queryString = query.asString();
-        XPathContext context = getxPathContext(rootElement, query);
-
-        return rootElement.query(queryString, context);
-
-    }
-
-    @NotNull
-    @Deprecated
-    String queryUniqueElement(@NotNull XpathQuery query) {
-
-        List<String> queryResults = queryContentAsList(query);
-
-        String result;
-
-        switch (queryResults.size()) {
-
-            case 0:
-                result = "";
-                break;
-
-            case 1:
-                result = queryResults.get(0);
-                break;
-
-            default:
-                String errorMessage = String.format("More than one results for Query '%s'", query.asString());
-                throw new IllegalArgumentException(errorMessage);
-
-        }
-
-        return result;
-
     }
 
     void setParentUri(@NotNull String parentUri) {

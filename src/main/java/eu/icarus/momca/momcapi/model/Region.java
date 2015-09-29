@@ -16,8 +16,14 @@ public class Region {
     private String nativeName;
 
     public Region(@Nullable String code, @NotNull String nativeName) {
-        setNativeName(nativeName);
+
+        if (nativeName.isEmpty()) {
+            throw new IllegalArgumentException("The native name is not allowed to be an empty string.");
+        }
+        this.nativeName = nativeName;
+
         setCode(code);
+
     }
 
     public Region(@NotNull String nativeName) {
@@ -32,8 +38,7 @@ public class Region {
 
         Region region = (Region) o;
 
-        if (!code.equals(region.code)) return false;
-        return nativeName.equals(region.nativeName);
+        return code.equals(region.code) && nativeName.equals(region.nativeName);
 
     }
 

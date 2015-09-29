@@ -3,13 +3,9 @@ package eu.icarus.momca.momcapi;
 import eu.icarus.momca.momcapi.model.id.IdUser;
 import eu.icarus.momca.momcapi.model.resource.ExistResource;
 import eu.icarus.momca.momcapi.model.resource.User;
-import eu.icarus.momca.momcapi.query.XpathQuery;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import static org.testng.Assert.*;
@@ -133,30 +129,15 @@ public class UserManagerTest {
         momcaConnection.storeExistResource(userResource);
 
         // create new user without using momcaConnection.addUser()
-        String parentCollection = "/db/system/security/exist/accounts";
         String newUserPassword = "testing123";
-        List<String> expectedGroups = new ArrayList<>(2);
-        expectedGroups.add("atom");
-        expectedGroups.add("guest");
         User user = new User(userResource);
 
         // initialize user
-        User initializedUser = userManager.initializeUser(user.getId(), newUserPassword);
-        assertTrue(userManager.isUserInitialized(initializedUser.getId()));
-
-        // test initialization success directly in the database
-        Optional<ExistResource> resourceOptional = momcaConnection.getExistResource(newUserName + ".xml", parentCollection);
-        assertTrue(resourceOptional.isPresent());
-        ExistResource res = resourceOptional.get();
-        Method queryContentXml = ExistResource.class.getDeclaredMethod("queryContentAsList", XpathQuery.class);
-        queryContentXml.setAccessible(true);
-        //noinspection unchecked
-        assertEquals(((List<String>) queryContentXml.invoke(res, XpathQuery.QUERY_CONFIG_NAME)).get(0), newUserName);
-        //noinspection unchecked
-        assertEquals(((List<String>) queryContentXml.invoke(res, XpathQuery.QUERY_CONFIG_GROUP_NAME)), expectedGroups);
+        userManager.initializeUser(user.getId(), newUserPassword);
+        assertTrue(userManager.isUserInitialized(user.getId()));
 
         // clean up
-        userManager.deleteUser(initializedUser.getId());
+        userManager.deleteUser(user.getId());
 
     }
 

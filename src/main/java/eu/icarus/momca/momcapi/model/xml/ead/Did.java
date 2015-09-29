@@ -39,10 +39,12 @@ public class Did extends Element {
 
     }
 
+    @NotNull
     public String getIdentifier() {
         return identifier;
     }
 
+    @NotNull
     public String getName() {
         return name;
     }

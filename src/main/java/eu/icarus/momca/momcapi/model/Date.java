@@ -183,9 +183,9 @@ public class Date implements Comparable<Date> {
 
         Date date = (Date) o;
 
-        if (daysInRange != date.daysInRange) return false;
-        if (!literalDate.equals(date.literalDate)) return false;
-        return sortingDate.equals(date.sortingDate);
+        return daysInRange == date.daysInRange &&
+                literalDate.equals(date.literalDate) &&
+                sortingDate.equals(date.sortingDate);
 
     }
 

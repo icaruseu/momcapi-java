@@ -32,22 +32,23 @@ public class Idno extends Element {
     @NotNull
     private String text;
 
-    private Idno() {
-        super("cei:idno", Namespace.CEI.getUri());
-    }
-
     public Idno(@NotNull String id, @NotNull String text) {
-
-        this();
-
-        initText(text);
-        initAttributes("", id, "", "");
-
+        this(text, "", id, "", "");
     }
 
     public Idno(@NotNull String text, @NotNull String facs, @NotNull String id, @NotNull String n, @NotNull String old) {
 
-        this();
+        super("cei:idno", Namespace.CEI.getUri());
+
+        if (id.isEmpty()) {
+            throw new IllegalArgumentException("Id is not allowed to be an empty string.");
+        }
+        this.id = id;
+
+        if (text.isEmpty()) {
+            throw new IllegalArgumentException("The text is not allowed to be an empty string.");
+        }
+        this.text = text;
 
         initText(text);
         initAttributes(facs, id, n, old);
@@ -56,7 +57,7 @@ public class Idno extends Element {
 
     public Idno(@NotNull Element idnoElement) {
 
-        this();
+        super("cei:idno", Namespace.CEI.getUri());
 
         if (!idnoElement.getLocalName().equals("idno")) {
             String message = String.format("The provided element is '%s' instead of 'cei:idno'.",
@@ -74,6 +75,16 @@ public class Idno extends Element {
         String old = idnoElement.getAttributeValue("old");
 
         initAttributes(facs, id, n, old);
+
+        if (id.isEmpty()) {
+            throw new IllegalArgumentException("Id is not allowed to be an empty string.");
+        }
+        this.id = id;
+
+        if (text.isEmpty()) {
+            throw new IllegalArgumentException("The text is not allowed to be an empty string.");
+        }
+        this.text = text;
 
     }
 
@@ -109,10 +120,6 @@ public class Idno extends Element {
             this.facs = Optional.of(facs);
         }
 
-        if (id.isEmpty()) {
-            throw new IllegalArgumentException("Id is not allowed to be an empty string.");
-        }
-        this.id = id;
         addAttribute(new Attribute("id", id));
 
         if (n != null && !n.isEmpty()) {
@@ -128,14 +135,7 @@ public class Idno extends Element {
     }
 
     private void initText(String text) {
-
-        if (text.isEmpty()) {
-            throw new IllegalArgumentException("The text is not allowed to be an empty string.");
-        }
-
-        this.text = text;
         appendChild(text);
-
     }
 
 }

@@ -24,6 +24,7 @@ public class DateExact extends DateAbstract {
     public DateExact(@NotNull String numericDate, @NotNull String literalDate, @NotNull String certainty,
                      @NotNull String lang, @NotNull String facs, @NotNull String id, @NotNull String n) {
         super(LOCAL_NAME, literalDate, certainty, facs, id, lang, n);
+        dateValue = new DateValue(numericDate);
         initAttributes(numericDate);
     }
 
@@ -42,6 +43,7 @@ public class DateExact extends DateAbstract {
             throw new IllegalArgumentException(message);
         }
 
+        dateValue = new DateValue(value);
         initAttributes(value);
 
     }
@@ -72,7 +74,6 @@ public class DateExact extends DateAbstract {
 
     private void initAttributes(@NotNull String numericDate) {
         addAttribute(new Attribute("value", numericDate));
-        dateValue = new DateValue(numericDate);
     }
 
     @Override

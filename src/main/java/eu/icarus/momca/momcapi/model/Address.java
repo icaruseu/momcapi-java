@@ -28,9 +28,9 @@ public class Address {
 
         Address address = (Address) o;
 
-        if (!municipality.equals(address.municipality)) return false;
-        if (!postalcode.equals(address.postalcode)) return false;
-        return street.equals(address.street);
+        return municipality.equals(address.municipality) &&
+                postalcode.equals(address.postalcode) &&
+                street.equals(address.street);
 
     }
 

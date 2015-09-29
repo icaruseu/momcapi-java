@@ -22,7 +22,6 @@ public class FondManager extends AbstractManager {
         super(momcaConnection);
     }
 
-    @NotNull
     public void addFond(@NotNull Fond fond) {
 
         if (getFond(fond.getId()).isPresent()) {

@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 public class IdMyCollection extends IdAtomId {
 
     public IdMyCollection(@NotNull String identifier) {
-        super(initAtomId(identifier), identifier);
+        super(initAtomId(identifier));
     }
 
     public IdMyCollection(@NotNull AtomId atomId) {

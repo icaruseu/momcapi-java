@@ -324,9 +324,9 @@ public class Fond extends AtomResource {
             throw new MomcaException("The EAD XML must include at least one 'ead:odd' Element.");
         }
 
-        for (int i = 0; i < queryResults.size(); i++) {
+        for (Node queryResult : queryResults) {
 
-            Element oddElement = (Element) queryResults.get(i);
+            Element oddElement = (Element) queryResult;
             String heading = readHeading(oddElement);
             List<String> paragraphs = readParagraphs(oddElement);
 
@@ -574,7 +574,7 @@ public class Fond extends AtomResource {
 
     private class SimpleErrorHandler implements ErrorHandler {
 
-        private List<String> errorMessages = new ArrayList<>(0);
+        private final List<String> errorMessages = new ArrayList<>(0);
 
         @Override
         public void error(SAXParseException exception) throws SAXException {

@@ -17,7 +17,7 @@ abstract class AbstractManager {
     @NotNull
     final MomcaConnection momcaConnection;
 
-    public AbstractManager(@NotNull MomcaConnection momcaConnection) {
+    AbstractManager(@NotNull MomcaConnection momcaConnection) {
         this.momcaConnection = momcaConnection;
     }
 

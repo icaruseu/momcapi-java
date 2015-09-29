@@ -7,7 +7,7 @@ public enum DescriptiveElementName {
 
     BIOGHIST("ead:bioghist"), CUSTODHIST("ead:custodhist"), ODD("ead:odd");
 
-    private String qualifiedName;
+    private final String qualifiedName;
 
     DescriptiveElementName(String qualifiedName) {
         this.qualifiedName = qualifiedName;

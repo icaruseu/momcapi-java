@@ -1,7 +1,6 @@
 package eu.icarus.momca.momcapi.model.resource;
 
 import eu.icarus.momca.momcapi.Util;
-import eu.icarus.momca.momcapi.query.XpathQuery;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
 
@@ -61,19 +60,6 @@ public class ExistResourceTest {
         String origXml = Util.parseToDocument(XML_CONTENT_WITH_NAMESPACE).getDocument().toXML();
         ExistResource res = new ExistResource(NAME, PARENT_URI, XML_CONTENT_WITH_NAMESPACE);
         assertEquals(res.toDocument().toXML(), origXml);
-    }
-
-    @Test
-    public void testQueryContentXmlWithNamespace() throws Exception {
-        ExistResource res = new ExistResource(NAME, PARENT_URI, XML_CONTENT_WITH_NAMESPACE);
-        assertEquals(res.queryContentAsList(XpathQuery.QUERY_XRX_NAME).get(0), QUERY_RESULT);
-
-    }
-
-    @Test
-    public void testQueryContentXmlWithoutNamespace() throws Exception {
-        ExistResource res = new ExistResource(NAME, PARENT_URI, XML_CONTENT_WITHOUT_NAMESPACE);
-        assertEquals(res.queryContentAsList(XpathQuery.QUERY_NAME).get(0), QUERY_RESULT);
     }
 
 }

@@ -13,8 +13,14 @@ public class Country {
     private String nativeName;
 
     public Country(@NotNull CountryCode countryCode, @NotNull String nativeName) {
-        setNativeName(nativeName);
-        setCountryCode(countryCode);
+
+        this.countryCode = countryCode;
+
+        if (nativeName.isEmpty()) {
+            throw new IllegalArgumentException("The native name is not allowed to be an empty string.");
+        }
+        this.nativeName = nativeName;
+
     }
 
     @Override
@@ -25,8 +31,7 @@ public class Country {
 
         Country country = (Country) o;
 
-        if (!countryCode.equals(country.countryCode)) return false;
-        return nativeName.equals(country.nativeName);
+        return countryCode.equals(country.countryCode) && nativeName.equals(country.nativeName);
 
     }
 

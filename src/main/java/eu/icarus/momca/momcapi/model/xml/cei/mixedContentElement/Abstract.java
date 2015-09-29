@@ -12,7 +12,7 @@ import java.util.Optional;
  */
 public class Abstract extends AbstractMixedContentElement {
 
-    public static final String LOCAL_NAME = "abstract";
+    private static final String LOCAL_NAME = "abstract";
     @NotNull
     private Optional<String> facs = Optional.empty();
     @NotNull

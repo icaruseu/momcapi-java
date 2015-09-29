@@ -31,10 +31,10 @@ public class ContactInformation {
 
         ContactInformation that = (ContactInformation) o;
 
-        if (!email.equals(that.email)) return false;
-        if (!fax.equals(that.fax)) return false;
-        if (!telephone.equals(that.telephone)) return false;
-        return webpage.equals(that.webpage);
+        return email.equals(that.email) &&
+                fax.equals(that.fax) &&
+                telephone.equals(that.telephone) &&
+                webpage.equals(that.webpage);
 
     }
 

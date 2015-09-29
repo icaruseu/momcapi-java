@@ -175,9 +175,8 @@ public class UserManager extends AbstractManager {
      *
      * @param idUser   The id of an uninitialized user.
      * @param password The password.
-     * @return The initialized user.
      */
-    public User initializeUser(@NotNull IdUser idUser, @NotNull String password) {
+    public void initializeUser(@NotNull IdUser idUser, @NotNull String password) {
 
         String userName = idUser.getIdentifier();
 
@@ -202,8 +201,6 @@ public class UserManager extends AbstractManager {
             }
 
         }
-
-        return getUser(idUser).orElseThrow(RuntimeException::new);
 
     }
 

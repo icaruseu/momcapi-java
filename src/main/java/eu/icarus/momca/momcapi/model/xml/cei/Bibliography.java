@@ -43,7 +43,6 @@ public class Bibliography extends Element {
         initAttributes(facs, id, n);
     }
 
-
     public Bibliography(@NotNull String localName, @NotNull Element bibliographyElement) {
 
         this(localName);
@@ -68,6 +67,21 @@ public class Bibliography extends Element {
     @NotNull
     public List<Bibl> getEntries() {
         return entries;
+    }
+
+    @NotNull
+    public Optional<String> getFacs() {
+        return facs;
+    }
+
+    @NotNull
+    public Optional<String> getId() {
+        return id;
+    }
+
+    @NotNull
+    public Optional<String> getN() {
+        return n;
     }
 
     private void initAttributes(@Nullable String facs, @Nullable String id, @Nullable String n) {

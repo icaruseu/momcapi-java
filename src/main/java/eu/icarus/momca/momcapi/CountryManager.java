@@ -37,7 +37,6 @@ public class CountryManager extends AbstractManager {
      *
      * @param country The country to add.
      */
-    @NotNull
     public void addNewCountryToHierarchy(@NotNull Country country) {
 
         String code = country.getCountryCode().getCode();
@@ -100,7 +99,6 @@ public class CountryManager extends AbstractManager {
      * @param country    The country to delete from.
      * @param regionName The native name of the region to delete
      */
-    @NotNull
     public void deleteRegionFromHierarchy(@NotNull Country country, @NotNull String regionName) {
 
         if (getRegions(country).stream().anyMatch(region -> regionName.equals(region.getNativeName()))) {

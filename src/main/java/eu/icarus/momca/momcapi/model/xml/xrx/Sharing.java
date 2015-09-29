@@ -13,10 +13,10 @@ public class Sharing extends Element {
     public static final String URI = Namespace.XRX.getUri();
 
     @NotNull
-    private String content;
+    private final String content;
 
     @NotNull
-    private String user;
+    private final String user;
 
     public Sharing(@NotNull String content, @Nullable String user) {
 

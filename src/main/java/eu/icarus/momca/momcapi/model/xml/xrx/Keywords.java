@@ -11,7 +11,7 @@ public class Keywords extends Element {
 
     public static final String XRX_URI = Namespace.XRX.getUri();
     @NotNull
-    private String keyword;
+    private final String keyword;
 
     public Keywords(@NotNull String keyword) {
 

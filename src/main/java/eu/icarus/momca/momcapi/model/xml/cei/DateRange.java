@@ -18,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class DateRange extends DateAbstract {
 
-    public static final String LOCAL_NAME = "dateRange";
+    private static final String LOCAL_NAME = "dateRange";
     @NotNull
     private DateValue fromDateValue;
     @NotNull
@@ -30,6 +30,10 @@ public class DateRange extends DateAbstract {
                      @NotNull String n) {
 
         super(LOCAL_NAME, literalDate, certainty, facs, id, lang, n);
+
+        this.fromDateValue = new DateValue(fromDateValue);
+        this.toDateValue = new DateValue(toDateValue);
+
         initAttributes(fromDateValue, toDateValue);
 
     }
@@ -51,6 +55,9 @@ public class DateRange extends DateAbstract {
                     dateElement.toXML());
             throw new MomcaException(message);
         }
+
+        this.fromDateValue = new DateValue(from);
+        this.toDateValue = new DateValue(to);
 
         initAttributes(from, to);
 
@@ -81,12 +88,10 @@ public class DateRange extends DateAbstract {
 
     private void initAttributes(@NotNull String fromDateValue, @NotNull String toDateValue) {
 
-        this.fromDateValue = new DateValue(fromDateValue);
         if (!fromDateValue.isEmpty()) {
             addAttribute(new Attribute("from", fromDateValue));
         }
 
-        this.toDateValue = new DateValue(toDateValue);
         if (!toDateValue.isEmpty()) {
             addAttribute(new Attribute("to", toDateValue));
         }
