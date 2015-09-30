@@ -144,10 +144,10 @@ public class Util {
         Builder builder = new Builder();
         try {
 
-            return builder.build(xml, null);
+            return builder.build(replaceAmpersandInString(xml), null);
 
         } catch (ParsingException e) {
-            throw new IllegalArgumentException("Failed to parse xml.", e);
+            throw new IllegalArgumentException("Failed to parse xml: " + xml, e);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -264,6 +264,18 @@ public class Util {
 
         return result;
 
+    }
+
+    /**
+     * Replace single ampersands in a string with the amp entity.
+     * Doesn't replace ampersands part of quot amp apos lt gt and unicode entities.
+     *
+     * @param string The text to replace.
+     * @return The resulting string.
+     */
+    @NotNull
+    public static String replaceAmpersandInString(@NotNull String string) {
+        return string.replaceAll("&(?!(quot;)|(amp;)|(apos;)|(lt;)|(gt;)|(nbsp;)|(#\\d+;))", "&amp;");
     }
 
     private static void testIfUri(@NotNull String possibleUri) {

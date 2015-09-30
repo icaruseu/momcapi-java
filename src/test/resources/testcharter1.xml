@@ -74,6 +74,7 @@
                         </cei:witness>
                     </cei:witListPar>
                     <cei:diplomaticAnalysis>
+                        <cei:quoteOriginaldatierung>Peter &amp; Paul</cei:quoteOriginaldatierung>
                         <cei:listBiblRegest>
                             <cei:bibl facs="1">Morel, Nr. 1.</cei:bibl>
                             <cei:bibl>Regesta imperii II/1, 1, Nr. 157.</cei:bibl>

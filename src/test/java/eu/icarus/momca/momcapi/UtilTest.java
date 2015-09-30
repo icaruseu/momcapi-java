@@ -63,6 +63,23 @@ public class UtilTest {
         assertEquals(Util.getParentUri(uri), parentUri);
     }
 
+    @Test
+    public void testParseToDocument() throws Exception {
+
+        String amp = "<xml>das ist ein test & so</xml>";
+        Element doc1 = Util.parseToDocument(amp).getRootElement();
+        assertEquals(doc1.toXML(), "<xml>das ist ein test &amp; so</xml>");
+
+        String ampEnt = "<xml>das ist ein test &amp; so</xml>";
+        Element doc2 = Util.parseToDocument(ampEnt).getRootElement();
+        assertEquals(doc2.toXML(), "<xml>das ist ein test &amp; so</xml>");
+
+        String quot = "<xml>das ist ein test &quot; so</xml>";
+        Element doc3 = Util.parseToDocument(quot).getRootElement();
+        assertEquals(doc3.toXML(), "<xml>das ist ein test \" so</xml>");
+
+    }
+
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testTestIfUri() throws Exception {
         Util.getParentUri("not_an_uri");
