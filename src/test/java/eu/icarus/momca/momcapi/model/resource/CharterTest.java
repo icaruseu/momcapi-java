@@ -251,6 +251,7 @@ public class CharterTest {
                 "                                <cei:arch>Klosterarchiv Einsiedeln</cei:arch>\n" +
                 "                                <cei:idno>KAE, A.II.1</cei:idno>\n" +
                 "                            </cei:archIdentifier><cei:physicalDesc /><cei:figure><cei:graphic url=\"http://www.klosterarchiv.ch/archivalien/KAE_A_II_1-1440/KAE_A_II_1-0067.jpg\" /></cei:figure></cei:witness></cei:witListPar><cei:diplomaticAnalysis>\n" +
+                "                        <cei:quoteOriginaldatierung>Peter &amp; Paul</cei:quoteOriginaldatierung>\n" +
                 "                        <cei:listBiblRegest>\n" +
                 "                            <cei:bibl facs=\"1\">Morel, Nr. 1.</cei:bibl>\n" +
                 "                            <cei:bibl>Regesta imperii II/1, 1, Nr. 157.</cei:bibl>\n" +
