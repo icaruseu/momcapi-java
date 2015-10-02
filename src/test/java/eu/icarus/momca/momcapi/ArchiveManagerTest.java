@@ -128,7 +128,7 @@ public class ArchiveManagerTest {
         am.deleteArchive(newArchive.getId());
 
         assertFalse(am.getArchive(newArchive.getId()).isPresent());
-        assertFalse(mc.getCollection("/db/mom-data/metadata.fond.public/" + newArchive.getIdentifier()).isPresent());
+        assertFalse(mc.readCollection("/db/mom-data/metadata.fond.public/" + newArchive.getIdentifier()).isPresent());
 
     }
 

@@ -38,7 +38,7 @@ public class CharterManager extends AbstractManager {
             throw new MomcaException(String.format("A charter with id '%s' and status '%s'is already existing.", id, status));
         }
 
-        String currentTime = momcaConnection.getRemoteDateTime();
+        String currentTime = momcaConnection.queryRemoteDateTime();
         writeCharterToDatabase(charter, currentTime, currentTime);
 
     }
@@ -77,7 +77,7 @@ public class CharterManager extends AbstractManager {
     private Optional<Charter> getCharterFromUri(@NotNull String charterUri) {
         String resourceName = Util.getLastUriPart(charterUri);
         String parentUri = Util.getParentUri(charterUri);
-        return momcaConnection.getExistResource(resourceName, parentUri).map(Charter::new);
+        return momcaConnection.readExistResource(resourceName, parentUri).map(Charter::new);
     }
 
     @NotNull
@@ -248,7 +248,7 @@ public class CharterManager extends AbstractManager {
 
         deleteCharter(originalCharter.getId(), originalCharter.getCharterStatus());
 
-        writeCharterToDatabase(modifiedCharter, originalCharter.getPublished(), momcaConnection.getRemoteDateTime());
+        writeCharterToDatabase(modifiedCharter, originalCharter.getPublished(), momcaConnection.queryRemoteDateTime());
 
     }
 
@@ -257,7 +257,7 @@ public class CharterManager extends AbstractManager {
         if (isParentExisting(modifiedCharter.getId())) {
 
             momcaConnection.createCollectionPath(modifiedCharter.getParentUri());
-            momcaConnection.storeAtomResource(modifiedCharter, published, updated);
+            momcaConnection.writeAtomResource(modifiedCharter, published, updated);
 
         } else {
             String message = String.format("The parent for the charter, '%s', is not existing.",

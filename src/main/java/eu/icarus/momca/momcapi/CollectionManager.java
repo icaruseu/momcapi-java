@@ -4,7 +4,6 @@ import eu.icarus.momca.momcapi.model.Country;
 import eu.icarus.momca.momcapi.model.Region;
 import eu.icarus.momca.momcapi.model.id.IdCollection;
 import eu.icarus.momca.momcapi.model.resource.Collection;
-import eu.icarus.momca.momcapi.model.resource.ExistResource;
 import eu.icarus.momca.momcapi.model.resource.ResourceRoot;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
@@ -30,9 +29,9 @@ public class CollectionManager extends AbstractManager {
             throw new IllegalArgumentException(message);
         }
 
-        momcaConnection.addCollection(collection.getIdentifier(), ResourceRoot.ARCHIVAL_COLLECTIONS.getUri());
-        String time = momcaConnection.getRemoteDateTime();
-        momcaConnection.storeAtomResource(collection, time, time);
+        momcaConnection.writeCollection(collection.getIdentifier(), ResourceRoot.ARCHIVAL_COLLECTIONS.getUri());
+        String time = momcaConnection.queryRemoteDateTime();
+        momcaConnection.writeAtomResource(collection, time, time);
 
     }
 

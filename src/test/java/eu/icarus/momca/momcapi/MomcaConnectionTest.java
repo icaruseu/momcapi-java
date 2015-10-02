@@ -32,8 +32,19 @@ public class MomcaConnectionTest {
         String path = "/db";
         String uri = path + "/" + name;
 
-        momcaConnection.addCollection(name, path);
-        assertTrue(momcaConnection.getCollection(uri).isPresent());
+        assertTrue(momcaConnection.writeCollection(name, path));
+        assertTrue(momcaConnection.readCollection(uri).isPresent());
+
+    }
+
+    @Test
+    public void testCreateCollectionPath() throws Exception {
+
+        String path = "/db/path/to/collection";
+        assertTrue(momcaConnection.createCollectionPath(path));
+        momcaConnection.deleteCollection("/db/path");
+
+        assertFalse(momcaConnection.createCollectionPath("not/absolute/path"));
 
     }
 
@@ -44,9 +55,9 @@ public class MomcaConnectionTest {
         String path = "/db";
         String uri = path + "/" + name;
 
-        momcaConnection.addCollection(name, path);
-        momcaConnection.deleteCollection(uri);
-        assertFalse(momcaConnection.getCollection(uri).isPresent());
+        momcaConnection.writeCollection(name, path);
+        assertTrue(momcaConnection.deleteCollection(uri));
+        assertFalse(momcaConnection.readCollection(uri).isPresent());
 
     }
 
@@ -54,17 +65,18 @@ public class MomcaConnectionTest {
     public void testDeleteExistResource() throws Exception {
 
         ExistResource res = new ExistResource("deleteTest.xml", "/db", "<empty/>");
-        momcaConnection.storeExistResource(res);
-        momcaConnection.deleteExistResource(res);
-        assertFalse(momcaConnection.getExistResource(res.getResourceName(), res.getParentUri()).isPresent());
+
+        momcaConnection.writeExistResource(res);
+        assertTrue(momcaConnection.deleteExistResource(res));
+        assertFalse(momcaConnection.readExistResource(res.getResourceName(), res.getParentUri()).isPresent());
 
     }
 
     @Test
     public void testStoreExistResource() throws Exception {
         ExistResource res = new ExistResource("write@Test.xml", "/db", "<empty/>");
-        momcaConnection.storeExistResource(res);
-        assertTrue(momcaConnection.getExistResource(res.getResourceName(), res.getParentUri()).isPresent());
+        assertTrue(momcaConnection.writeExistResource(res));
+        assertTrue(momcaConnection.readExistResource(res.getResourceName(), res.getParentUri()).isPresent());
         momcaConnection.deleteExistResource(res);
     }
 

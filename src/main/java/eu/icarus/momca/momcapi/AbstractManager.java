@@ -51,7 +51,7 @@ abstract class AbstractManager {
     Optional<ExistResource> getExistResource(@NotNull String resourceUri) {
         String resourceName = Util.getLastUriPart(resourceUri);
         String parentUri = Util.getParentUri(resourceUri);
-        return momcaConnection.getExistResource(resourceName, parentUri);
+        return momcaConnection.readExistResource(resourceName, parentUri);
     }
 
 }

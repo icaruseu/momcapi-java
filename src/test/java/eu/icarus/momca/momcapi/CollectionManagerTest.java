@@ -113,7 +113,7 @@ public class CollectionManagerTest {
         Collection collection = new Collection(identifier, name);
 
         cm.addCollection(collection);
-        mc.addCollection(identifier, ResourceRoot.PUBLIC_CHARTERS.getUri()); // add charters collection to test removal
+        mc.writeCollection(identifier, ResourceRoot.PUBLIC_CHARTERS.getUri()); // add charters collection to test removal
 
         cm.deleteCollection(collection.getId());
 
@@ -121,9 +121,9 @@ public class CollectionManagerTest {
 
         // Test if eXist collections are removed
         String collectionUri = ResourceRoot.ARCHIVAL_COLLECTIONS.getUri() + "/" + identifier;
-        assertFalse(mc.getCollection(collectionUri).isPresent());
+        assertFalse(mc.readCollection(collectionUri).isPresent());
         String chartersLocationUri = ResourceRoot.PUBLIC_CHARTERS.getUri() + "/" + identifier;
-        assertFalse(mc.getCollection(chartersLocationUri).isPresent());
+        assertFalse(mc.readCollection(chartersLocationUri).isPresent());
 
     }
 

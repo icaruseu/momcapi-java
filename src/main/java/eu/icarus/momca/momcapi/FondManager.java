@@ -32,13 +32,13 @@ public class FondManager extends AbstractManager {
         String archiveIdentifier = fond.getArchiveId().getIdentifier();
         String parentUri = ResourceRoot.ARCHIVAL_FONDS.getUri() + "/" + archiveIdentifier;
 
-        momcaConnection.addCollection(archiveIdentifier, ResourceRoot.ARCHIVAL_FONDS.getUri());
-        momcaConnection.addCollection(identifier, parentUri);
+        momcaConnection.writeCollection(archiveIdentifier, ResourceRoot.ARCHIVAL_FONDS.getUri());
+        momcaConnection.writeCollection(identifier, parentUri);
 
-        String time = momcaConnection.getRemoteDateTime();
+        String time = momcaConnection.queryRemoteDateTime();
 
-        momcaConnection.storeAtomResource(fond, time, time);
-        fond.getFondPreferences().ifPresent(momcaConnection::storeExistResource);
+        momcaConnection.writeAtomResource(fond, time, time);
+        fond.getFondPreferences().ifPresent(momcaConnection::writeExistResource);
 
     }
 

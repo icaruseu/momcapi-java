@@ -65,8 +65,8 @@ public class FondManagerTest {
         fm.deleteFond(id);
 
         assertFalse(fm.getFond(id).isPresent());
-        assertFalse(mc.getCollection("/db/mom-data/metadata.charter.public/DE-SAMuenchen/MUrkunden").isPresent());
-        assertFalse(mc.getCollection("/db/mom-data/metadata.fond.public/DE-SAMuenchen/MUrkunden").isPresent());
+        assertFalse(mc.readCollection("/db/mom-data/metadata.charter.public/DE-SAMuenchen/MUrkunden").isPresent());
+        assertFalse(mc.readCollection("/db/mom-data/metadata.fond.public/DE-SAMuenchen/MUrkunden").isPresent());
 
     }
 

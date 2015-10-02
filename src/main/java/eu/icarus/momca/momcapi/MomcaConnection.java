@@ -39,6 +39,7 @@ public class MomcaConnection {
 
     @NotNull
     private static final String DRIVER = "org.exist.xmldb.DatabaseImpl";
+    private static final Logger LOGGER = LoggerFactory.getLogger(MomcaConnection.class);
     @NotNull
     private final String admin;
     @NotNull
@@ -62,18 +63,10 @@ public class MomcaConnection {
     @NotNull
     private final UserManager userManager;
 
-    /**
-     * Instantiates a new MomcaConnection.
-     *
-     * @param dbRootUri The root URI of the database, e.g. {@code xmldb:exist://localhost:8181/xmlrpc}.
-     * @param admin     The name of the admin user, e.g. {@code admin}.
-     * @param password  The password of the admin user.
-     */
     public MomcaConnection(@NotNull String dbRootUri, @NotNull String admin, @NotNull String password) {
 
-        Logger logger = LoggerFactory.getLogger(MomcaConnection.class);
 
-        logger.debug("debug");
+        LOGGER.debug("Initiating connection to '{}' for user '{}'.", dbRootUri, admin);
 
         this.dbRootUri = dbRootUri;
         this.admin = admin;
@@ -81,7 +74,7 @@ public class MomcaConnection {
 
         rootCollection = initDatabaseConnection();
 
-        userManager = new UserManager(this);
+        userManager = new UserManager(this, rootCollection);
         countryManager = new CountryManager(this);
         archiveManager = new ArchiveManager(this);
         fondManager = new FondManager(this);
@@ -89,60 +82,38 @@ public class MomcaConnection {
         charterManager = new CharterManager(this);
         myCollectionManager = new MyCollectionManager(this);
 
+        LOGGER.info("Connection to '{}' for user '{}' established.", dbRootUri, admin);
+
     }
 
-    /**
-     * Adds an empty eXist collection to the database.
-     *
-     * @param name      The name of the collection.
-     * @param parentUri The absolute URI of the collections parent collection, e.g. {@code /db/mom-data/metadata.fond.public}.
-     * @see Collection
-     */
-    void addCollection(@NotNull String name, @NotNull String parentUri) {
-        String encodedName = Util.encode(name);
-        String encodedPath = Util.encode(parentUri);
-        getCollection(encodedPath).ifPresent(parent -> createCollectionInExist(name, parentUri, encodedName, parent));
-    }
-
-    /**
-     * Close the Connection.
-     */
     public void closeConnection() {
 
+        LOGGER.debug("Trying to close connection to '{}'.", dbRootUri);
+
         try {
+
             rootCollection.close();
+            LOGGER.info("Connection to '{}' closed.", dbRootUri);
+
         } catch (XMLDBException e) {
-            throw new MomcaException("Failed to close the database connection.", e);
+            LOGGER.error("Failed to close the database connection.", e);
         }
 
     }
 
-    private void createCollectionInExist(@NotNull String name, @NotNull String parentUri, @NotNull String encodedName, @NotNull Collection parent) {
+    boolean createCollectionPath(@NotNull String absoluteUri) {
 
-        try {
+        LOGGER.debug("Trying to create all collections on path '{}'.", absoluteUri);
 
-            CollectionManagementService parentService = (RemoteCollectionManagementService) parent.getService("CollectionManagementService", "1.0");
-            parentService.createCollection(encodedName);
+        boolean success = false;
 
-            Collection newCollection = parent.getChildCollection(encodedName);
-            UserManagementService userService = (RemoteUserManagementService) newCollection.getService("UserManagementService", "1.0");
-            userService.chmod("rwxrwxrwx");
+        if (!absoluteUri.isEmpty() && absoluteUri.startsWith("/db/")) {
 
-        } catch (XMLDBException e) {
-            throw new MomcaException(String.format("Failed to add collection '%s/%s'.", parentUri, name), e);
-        }
-
-    }
-
-    public void createCollectionPath(@NotNull String uri) {
-
-        if (!uri.isEmpty() && uri.startsWith("/db/")) {
-
-            uri = uri.replace("/db/", "");
+            absoluteUri = absoluteUri.replace("/db/", "");
 
             Collection parent = rootCollection;
 
-            String[] parts = uri.split("/");
+            String[] parts = absoluteUri.split("/");
 
             for (String part : parts) {
 
@@ -152,59 +123,107 @@ public class MomcaConnection {
                             (RemoteCollectionManagementService) parent.getService("CollectionManagementService", "1.0");
 
                     parentService.createCollection(part);
+
+                    LOGGER.debug("Collection '{}/{}' created.", parent.getName(), part);
+
                     parent = parent.getChildCollection(part);
 
                 } catch (XMLDBException e) {
-                    throw new MomcaException(String.format("Failed to add collection '%s/%s'.", parent.toString(), part), e);
+                    LOGGER.error("XMLDBException while trying to add collection '{}/{}'. Aborting creation.", parent.toString(), part, e);
+                    break;
                 }
 
             }
 
+            LOGGER.debug("Created all collections on path '{}'.", absoluteUri);
+            success = true;
+
+        } else {
+            LOGGER.debug("Creation of path '{}' aborted. Path invalid.", absoluteUri);
         }
 
+        return success;
+
     }
 
-    @NotNull
-    private Optional<ExistResource> createExistResourceFromXMLResource(@NotNull String resourceName, @NotNull String parentCollectionPath, @NotNull XMLResource resource) {
+    boolean deleteCollection(@NotNull String uri) {
 
-        String content;
-        try {
-            content = (String) resource.getContent();
-        } catch (XMLDBException e) {
-            throw new MomcaException(String.format("Failed to get content of resource '%s'.", resourceName), e);
+        boolean success = false;
+
+        LOGGER.debug("Trying to delete collection '{}'.", uri);
+
+        Optional<Collection> collectionOptional = readCollection(uri);
+
+        if (collectionOptional.isPresent()) {
+
+            Collection collection = collectionOptional.get();
+
+            try {
+
+                RemoteCollectionManagementService service = (RemoteCollectionManagementService) collection
+                        .getParentCollection().getService("CollectionManagementService", "1.0");
+                service.removeCollection(((RemoteCollection) collection).getPathURI());
+
+                success = true;
+
+                LOGGER.debug("Collection '{}' deleted.", uri);
+
+            } catch (XMLDBException e) {
+                LOGGER.error("Failed to delete '{}' due to an XMLDBException.", uri, e);
+            }
+
+        } else {
+            LOGGER.debug("Collection '{}' not existing, nothing deleted.", uri);
         }
-        return Optional.of(new ExistResource(resourceName, parentCollectionPath, content));
+
+        return success;
 
     }
 
-    /**
-     * Deletes an collection from the database.
-     *
-     * @param uri The absolute URI of the collection to delete, e.g. {@code /db/mom-data/metadata.fond.pubic/collectionToDelete}.
-     * @see Collection
-     */
-    void deleteCollection(@NotNull String uri) {
-        getCollection(uri).ifPresent(collection -> removeCollectionInExist(uri, collection));
+    boolean deleteExistResource(@NotNull ExistResource resourceToDelete) {
+
+        boolean success = false;
+
+        LOGGER.debug("Trying to delete resource '{}'", resourceToDelete);
+
+        Optional<Collection> collectionOptional = readCollection(resourceToDelete.getParentUri());
+
+        if (collectionOptional.isPresent()) {
+
+            Collection collection = collectionOptional.get();
+
+            try {
+
+                String path = findMatchingResource(resourceToDelete.getResourceName(), collection.listResources());
+                Resource res = collection.getResource(path);
+
+                if (res != null) {
+
+                    collection.removeResource(res);
+
+                    success = true;
+
+                    LOGGER.debug("Resource '{}' deleted.", resourceToDelete);
+
+                }
+
+            } catch (@NotNull XMLDBException e) {
+                LOGGER.error("Failed to delete '{}' due to an XMLDBException.", resourceToDelete, e);
+            }
+
+        } else {
+            LOGGER.debug("Failed to locate parent collection of resource '{}', nothing deleted.", resourceToDelete);
+        }
+
+        return success;
+
     }
 
-    /**
-     * Deletes an resource from the database.
-     *
-     * @param resourceToDelete The resource to delete.
-     */
-    void deleteExistResource(@NotNull ExistResource resourceToDelete) {
-        getCollection(resourceToDelete.getParentUri()).ifPresent(parent -> removeResourceInExist(resourceToDelete, parent));
-    }
-
-    /**
-     * @param resourceName the name of the resource to find in the list
-     * @param resources    the list of resources
-     * @return The actual name of the resource in the list of resources without regardless of eventual URL-Encodings for special characters like @ and |
-     */
     @NotNull
     private String findMatchingResource(@NotNull String resourceName, @NotNull String[] resources) {
 
         String matchingName = "";
+
         for (String resource : resources) {
 
             if (Util.decode(resource).equals(Util.decode(resourceName))) {
@@ -212,42 +231,19 @@ public class MomcaConnection {
             }
 
         }
+
         return matchingName;
 
     }
 
-    /**
-     * @return The hierarchy manager instance.
-     */
     @NotNull
     public ArchiveManager getArchiveManager() {
         return archiveManager;
     }
 
-    /**
-     * @return The charter manager instance.
-     */
     @NotNull
     public CharterManager getCharterManager() {
         return charterManager;
-    }
-
-    /**
-     * Tries to get a collection from the database.
-     *
-     * @param uri The absolute URI of the collection to get, e.g. {@code /db/mom-data/metadata.fond.pubic/collectionToGet}.
-     * @return The optional collection.
-     * @see Collection
-     */
-    @NotNull
-    Optional<Collection> getCollection(@NotNull String uri) {
-
-        try {
-            return Optional.ofNullable(DatabaseManager.getCollection(dbRootUri + Util.encode(uri), admin, password));
-        } catch (@NotNull XMLDBException e) {
-            throw new MomcaException(String.format("Failed to get collection '%s'.", uri), e);
-        }
-
     }
 
     @NotNull
@@ -255,26 +251,9 @@ public class MomcaConnection {
         return collectionManager;
     }
 
-    /**
-     * @return The country manager instance.
-     */
     @NotNull
     public CountryManager getCountryManager() {
         return countryManager;
-    }
-
-    /**
-     * Tries to get a resource from the database.
-     *
-     * @param resourceName         The name of the resource, e.g. {@code admin.xml}.
-     * @param parentCollectionPath The absolute URI of the parent collection in the database, e.g. {@code /db/mom-data/xrx.user}.
-     * @return The ExistResource.
-     */
-    @NotNull
-    Optional<ExistResource> getExistResource(@NotNull String resourceName, @NotNull String parentCollectionPath) {
-        return getCollection(parentCollectionPath)
-                .flatMap(collection -> getXMLResource(resourceName, collection)
-                        .flatMap(resource -> createExistResourceFromXMLResource(resourceName, parentCollectionPath, resource)));
     }
 
     @NotNull
@@ -287,126 +266,172 @@ public class MomcaConnection {
         return myCollectionManager;
     }
 
-    String getRemoteDateTime() {
-        return queryDatabase(ExistQueryFactory.getCurrentDateTime()).get(0);
-    }
-
-    /**
-     * Gets root collection of the database, {@code /db}.
-     *
-     * @return The root collection.
-     */
-    @NotNull
-    Collection getRootCollection() {
-        return rootCollection;
-    }
-
-    /**
-     * @return The user manager instance.
-     */
     @NotNull
     public UserManager getUserManager() {
         return userManager;
     }
 
-    @NotNull
-    private Optional<XMLResource> getXMLResource(@NotNull String resourceName, @NotNull Collection collection) {
-
-        try {
-            return Optional.ofNullable((XMLResource) collection.getResource(findMatchingResource(resourceName, collection.listResources())));
-        } catch (XMLDBException e) {
-            throw new MomcaException(String.format("Failed to get resource '%s' from parent collection.", resourceName), e);
-        }
-
-    }
-
-    /**
-     * Register the database
-     */
     private Collection initDatabaseConnection() {
 
         try {
 
             org.xmldb.api.base.Database dbDatabase = (org.xmldb.api.base.Database) Class.forName(DRIVER).newInstance();
             DatabaseManager.registerDatabase(dbDatabase);
-            return getCollection("/db").get();
+            return readCollection("/db").get();
 
         } catch (@NotNull ClassNotFoundException | IllegalAccessException | InstantiationException e) {
+
             throw new MomcaException("Failed to initialize database connection.", e);
+
         } catch (XMLDBException e) {
+
             if (e.getMessage().equals("Wrong password for user [admin] ")) {
                 throw new MomcaException("Wrong admin password!", e);
             } else {
                 throw new MomcaException(String.format("Failed to connect to remote database '%s'", dbRootUri), e);
             }
+
         }
 
     }
 
-    /**
-     * Queries the database.
-     *
-     * @param existQuery The query to execute.
-     * @return A list with the resulting XML fragments as {@code String}.
-     */
     @NotNull
     List<String> queryDatabase(@NotNull ExistQuery existQuery) {
 
-        XPathQueryService queryService;
+        LOGGER.debug("Trying to execute query: {}", existQuery.getQuery());
+
+        List<String> resultList = new ArrayList<>(0);
+
+        XPathQueryService queryService = null;
         try {
             queryService = (XPathQueryService) rootCollection.getService("XPathQueryService", "1.0");
         } catch (XMLDBException e) {
-            throw new MomcaException("Failed to get the XPath query service.", e);
+            LOGGER.error("Failed to get the XPath query service. Aborting querying.", e);
         }
 
-        ResourceSet resultSet;
-        try {
-            resultSet = queryService.query(existQuery.getQuery());
-        } catch (XMLDBException e) {
-            throw new MomcaException(String.format("Failed to execute query '%s'", existQuery.getQuery()), e);
-        }
+        if (queryService != null) {
 
-        List<String> resultList = new ArrayList<>(0);
-        try {
-            ResourceIterator iterator = resultSet.getIterator();
-            while (iterator.hasMoreResources()) {
-                XMLResource resource = (XMLResource) iterator.nextResource();
-                resultList.add(resource.getContent().toString());
+            ResourceSet resultSet = null;
+            try {
+                resultSet = queryService.query(existQuery.getQuery());
+            } catch (XMLDBException e) {
+                LOGGER.error("Failed to execute query: {}.", existQuery.getQuery(), e);
             }
-        } catch (XMLDBException e) {
-            throw new MomcaException("Failed to extract results from query resultSet.", e);
+
+            if (resultSet != null) {
+
+                LOGGER.trace("Trying to extract results from query resultSet.");
+
+                try {
+
+                    ResourceIterator iterator = resultSet.getIterator();
+                    while (iterator.hasMoreResources()) {
+                        XMLResource resource = (XMLResource) iterator.nextResource();
+                        resultList.add(resource.getContent().toString());
+                    }
+
+                    LOGGER.debug("Returning {} query results", resultList.size());
+
+                } catch (XMLDBException e) {
+                    LOGGER.error("Failed to extract query results from query resultSet.", e);
+                }
+
+            }
+
         }
 
         return resultList;
 
     }
 
-    private void removeCollectionInExist(@NotNull String uri, @NotNull Collection collection) {
+    String queryRemoteDateTime() {
 
-        try {
-            RemoteCollectionManagementService service = (RemoteCollectionManagementService) collection.getParentCollection().getService("CollectionManagementService", "1.0");
-            service.removeCollection(((RemoteCollection) collection).getPathURI());
-        } catch (XMLDBException e) {
-            throw new MomcaException(String.format("Failed to delete collection '%s'", uri), e);
-        }
+        LOGGER.debug("Trying to query current time from the server.");
+
+        String time = queryDatabase(ExistQueryFactory.getCurrentDateTime()).get(0);
+
+        LOGGER.debug("Time at server is currently '{}'.", time);
+
+        return time;
 
     }
 
-    private void removeResourceInExist(@NotNull ExistResource resourceToDelete, @NotNull Collection collection) {
+    @NotNull
+    Optional<Collection> readCollection(@NotNull String uri) {
+
+        LOGGER.debug("Trying to read collection '{}' from the database.", uri);
+
+        Collection result = null;
 
         try {
-            Resource res = collection.getResource(findMatchingResource(resourceToDelete.getResourceName(), collection.listResources()));
-            if (res != null) {
-                collection.removeResource(res);
+
+            result = DatabaseManager.getCollection(dbRootUri + Util.encode(uri), admin, password);
+
+            if (result == null) {
+                LOGGER.debug("Collection '{}' not found in the database. Returning nothing.", uri);
+            } else {
+                LOGGER.debug("Collection '{}' read from the database.", uri);
             }
+
+
         } catch (@NotNull XMLDBException e) {
-            throw new MomcaException("Failed to remove the resource '" + resourceToDelete.getUri() + "'", e);
+            LOGGER.error("Failed to get collection '{}' from the database due to an XMLDBException. Returning nothing.",
+                    uri, e);
         }
+
+        return Optional.ofNullable(result);
 
     }
 
-    void storeAtomResource(@NotNull AtomResource resource,
-                           @NotNull String publishedDateTime, @NotNull String updatedDateTime) {
+    @NotNull
+    Optional<ExistResource> readExistResource(@NotNull String resourceName, @NotNull String parentCollectionPath) {
+
+        LOGGER.debug("Trying to read resource '{}/{}' from the database.", parentCollectionPath, resourceName);
+
+        ExistResource result = null;
+
+        Optional<Collection> parentCollection = readCollection(parentCollectionPath);
+
+        if (parentCollection.isPresent()) {
+
+            try {
+
+                Collection collection = parentCollection.get();
+
+                String resourcePath = findMatchingResource(resourceName, collection.listResources());
+                XMLResource resource = (XMLResource) collection.getResource(resourcePath);
+
+                if (resource == null) {
+
+                    LOGGER.debug("Resource '{}/{}' not found in the database. Returning nothing.",
+                            parentCollectionPath, resourceName);
+
+                } else {
+
+                    String content = (String) resource.getContent();
+                    result = new ExistResource(resourceName, parentCollectionPath, content);
+                    LOGGER.debug("Resource '{}' read from the database.", result);
+
+                }
+
+            } catch (XMLDBException e) {
+                LOGGER.error("Encountered XMLDBException on trying to get resource '{}' from collection '{}'." +
+                        " Returned 'Optional.empty'", resourceName, parentCollectionPath);
+            }
+
+        } else {
+            LOGGER.debug("Parent collection of resource '{}/{}' not found in the database. Returning nothing.",
+                    resourceName, parentCollectionPath);
+        }
+
+        return Optional.ofNullable(result);
+
+    }
+
+    boolean writeAtomResource(@NotNull AtomResource resource,
+                              @NotNull String publishedDateTime, @NotNull String updatedDateTime) {
+
+        LOGGER.debug("Trying to write atom resource '{}' to the database.", resource.getId());
 
         AtomId id = resource.getId().getContentXml();
         AtomAuthor author = resource.getCreator().map(IdUser::getContentXml).orElse(new AtomAuthor(""));
@@ -414,15 +439,19 @@ public class MomcaConnection {
 
         AtomEntry newEntry = new AtomEntry(id, author, publishedDateTime, updatedDateTime, content);
 
+        LOGGER.trace("Atom entry '{}' created.", newEntry);
+
         if (resource instanceof eu.icarus.momca.momcapi.model.resource.Collection) {
             eu.icarus.momca.momcapi.model.resource.Collection coll =
                     (eu.icarus.momca.momcapi.model.resource.Collection) resource;
             coll.getKeyword().ifPresent(s -> newEntry.insertChild(new Keywords(s), 6));
+            LOGGER.trace("Keywords inserted into MOM-CA collection XML.");
         }
 
         if (resource instanceof MyCollection) {
             MyCollection myColl = (MyCollection) resource;
             newEntry.insertChild(myColl.getSharing(), 6);
+            LOGGER.trace("Sharing data inserted into MyCollection XML.");
         }
 
         String resourceName = resource.getResourceName();
@@ -430,35 +459,96 @@ public class MomcaConnection {
 
         ExistResource updatedResource = new ExistResource(resourceName, parentUri, newEntry.toXML());
 
-        storeExistResource(updatedResource);
+        boolean success = writeExistResource(updatedResource);
 
-    }
-
-    /**
-     * Stores a ExistResource in the database.
-     *
-     * @param resource The resource to store in the database. If a resource with the same uri is already existing, it gets overwritten.
-     */
-    void storeExistResource(@NotNull ExistResource resource) {
-        getCollection(resource.getParentUri()).ifPresent(collection -> storeResourceInExist(resource, collection));
-    }
-
-    private void storeResourceInExist(@NotNull ExistResource resource, @NotNull Collection collection) {
-
-        try {
-
-            XMLResource newResource = (XMLResource) collection.createResource(resource.getResourceName(), "XMLResource");
-            newResource.setContent(resource.toXML());
-            collection.storeResource(newResource);
-
-            UserManagementService userService = (RemoteUserManagementService) collection.getService("UserManagementService", "1.0");
-            userService.chmod(newResource, "rwxrwxrwx");
-
-            collection.close();
-
-        } catch (XMLDBException e) {
-            throw new MomcaException("Failed to create new resource.", e);
+        if (success) {
+            LOGGER.debug("Atom resource '{}' written to the database.", resource);
+        } else {
+            LOGGER.debug("Failed to write resource '{}' to the database.", resource);
         }
+
+        return success;
+
+    }
+
+    boolean writeCollection(@NotNull String name, @NotNull String parentUri) {
+
+        LOGGER.debug("Trying to write collection '{}/{}'.", parentUri, name);
+
+        boolean success = false;
+
+        String encodedName = Util.encode(name);
+        String encodedPath = Util.encode(parentUri);
+
+        Optional<Collection> parent = readCollection(encodedPath);
+
+        if (parent.isPresent()) {
+
+            try {
+
+                CollectionManagementService parentService = (RemoteCollectionManagementService) parent.get().getService("CollectionManagementService", "1.0");
+                parentService.createCollection(encodedName);
+
+                Collection newCollection = parent.get().getChildCollection(encodedName);
+                UserManagementService userService = (RemoteUserManagementService) newCollection.getService("UserManagementService", "1.0");
+                userService.chmod("rwxrwxrwx");
+
+                success = true;
+
+                LOGGER.debug("Collection '{}/{}' written.", parentUri, name);
+
+                newCollection.close();
+
+            } catch (XMLDBException e) {
+                LOGGER.error("XMLDBException while trying to write collection '{}' to '{}'. Adding failed.", name, parentUri, e);
+            }
+
+        } else {
+            LOGGER.debug("Failed to write collection '{}' because parent collection '{}' does not exist.", name, parentUri);
+        }
+
+        return success;
+
+    }
+
+
+    boolean writeExistResource(@NotNull ExistResource resource) {
+
+        boolean success = false;
+
+        LOGGER.debug("Trying to write resource '{}' to the database.", resource);
+
+        Optional<Collection> collectionOptional = readCollection(resource.getParentUri());
+
+        if (collectionOptional.isPresent()) {
+
+            Collection collection = collectionOptional.get();
+
+            try {
+
+                XMLResource newResource = (XMLResource) collection.createResource(resource.getResourceName(), "XMLResource");
+                newResource.setContent(resource.toXML());
+                collection.storeResource(newResource);
+
+                UserManagementService userService = (RemoteUserManagementService) collection.getService("UserManagementService", "1.0");
+                userService.chmod(newResource, "rwxrwxrwx");
+
+                collection.close();
+
+                success = true;
+
+                LOGGER.debug("Resource '{}' written to the database.", resource);
+
+
+            } catch (XMLDBException e) {
+                throw new MomcaException("Failed to create new resource.", e);
+            }
+
+        } else {
+            LOGGER.debug("Failed to locate parent collection for resource '{}'. Aborting write.", resource);
+        }
+
+        return success;
 
     }
 

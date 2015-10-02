@@ -13,6 +13,7 @@ import org.exist.security.internal.aider.UserAider;
 import org.exist.xmldb.RemoteUserManagementService;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.XMLDBException;
 
 import java.util.ArrayList;
@@ -30,13 +31,24 @@ import java.util.stream.Collectors;
  */
 public class UserManager extends AbstractManager {
 
+    private RemoteUserManagementService remoteUserManagementService;
+
     /**
      * Instantiates a new UserManager.
      *
      * @param momcaConnection The connection to the database.
      */
-    UserManager(@NotNull MomcaConnection momcaConnection) {
+    UserManager(@NotNull MomcaConnection momcaConnection,
+                @NotNull Collection rootCollection) {
+
         super(momcaConnection);
+
+        try {
+            remoteUserManagementService = (RemoteUserManagementService) rootCollection.getService("UserManagementService", "1.0");
+        } catch (XMLDBException e) {
+            throw new MomcaException("Failed to get the UserManagementService for the remote database.", e);
+        }
+
     }
 
     /**
@@ -54,7 +66,7 @@ public class UserManager extends AbstractManager {
                 throw new IllegalArgumentException(message);
             }
 
-            momcaConnection.storeExistResource(user);
+            momcaConnection.writeExistResource(user);
             initializeUser(user.getId(), password);
 
         }
@@ -93,12 +105,11 @@ public class UserManager extends AbstractManager {
 
         try {
 
-            RemoteUserManagementService service = getUserService();
-            Account account = service.getAccount(userName);
+            Account account = remoteUserManagementService.getAccount(userName);
 
             if (account != null) {
                 account.setPassword(newPassword);
-                service.updateAccount(account);
+                remoteUserManagementService.updateAccount(account);
             }
 
         } catch (XMLDBException e) {
@@ -116,11 +127,10 @@ public class UserManager extends AbstractManager {
 
         try {
 
-            RemoteUserManagementService service = getUserService();
-            Account account = service.getAccount(accountName);
+            Account account = remoteUserManagementService.getAccount(accountName);
 
             if (account != null) {
-                service.removeAccount(account);
+                remoteUserManagementService.removeAccount(account);
             }
 
         } catch (XMLDBException e) {
@@ -152,20 +162,8 @@ public class UserManager extends AbstractManager {
      */
     @NotNull
     public Optional<User> getUser(@NotNull IdUser idUser) {
-        return momcaConnection.getExistResource(idUser.getIdentifier() + ".xml", ResourceRoot.USER_DATA.getUri())
+        return momcaConnection.readExistResource(idUser.getIdentifier() + ".xml", ResourceRoot.USER_DATA.getUri())
                 .flatMap(existResource -> Optional.of(new User(existResource)));
-    }
-
-    @NotNull
-    private RemoteUserManagementService getUserService() {
-
-        try {
-            return (RemoteUserManagementService) momcaConnection.getRootCollection()
-                    .getService("UserManagementService", "1.0");
-        } catch (XMLDBException e) {
-            throw new MomcaException("Failed to get the UserManagementService for the remote database.", e);
-        }
-
     }
 
     /**
@@ -184,15 +182,13 @@ public class UserManager extends AbstractManager {
 
             try {
 
-                RemoteUserManagementService service = getUserService();
-
                 Group group = new GroupAider("atom");
-                service.addGroup(group);
+                remoteUserManagementService.addGroup(group);
 
                 Account newAccount = new UserAider(userName, group);
                 newAccount.setPassword(password);
-                service.addAccount(newAccount);
-                service.addAccountToGroup(userName, "guest");
+                remoteUserManagementService.addAccount(newAccount);
+                remoteUserManagementService.addAccountToGroup(userName, "guest");
 
             } catch (XMLDBException e) {
                 if (!isExceptionBecauseAccountExists(userName, e)) {
@@ -222,8 +218,7 @@ public class UserManager extends AbstractManager {
         String userName = idUser.getIdentifier();
 
         try {
-            RemoteUserManagementService service = getUserService();
-            return Optional.ofNullable(service.getAccount(userName)).isPresent();
+            return Optional.ofNullable(remoteUserManagementService.getAccount(userName)).isPresent();
         } catch (XMLDBException e) {
             throw new MomcaException("Failed to get resource for user '" + userName + "'", e);
         }
@@ -234,7 +229,7 @@ public class UserManager extends AbstractManager {
     private List<String> listUserResourceNames() {
 
         List<String> users = new ArrayList<>();
-        momcaConnection.getCollection(ResourceRoot.USER_DATA.getUri()).ifPresent(collection -> {
+        momcaConnection.readCollection(ResourceRoot.USER_DATA.getUri()).ifPresent(collection -> {
 
             String[] encodedUserNames;
 
@@ -273,7 +268,7 @@ public class UserManager extends AbstractManager {
         }
 
         deleteUser(realOriginalId);
-        momcaConnection.storeExistResource(modifiedUser);
+        momcaConnection.writeExistResource(modifiedUser);
 
     }
 

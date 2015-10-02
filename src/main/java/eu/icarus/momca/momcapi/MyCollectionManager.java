@@ -46,7 +46,7 @@ public class MyCollectionManager extends AbstractManager {
         if (myCollection.getStatus() == MyCollectionStatus.PRIVATE) {
 
             String rootCollection = myCollection.getStatus().getResourceRoot().getUri() + "/" + idUser.getIdentifier();
-            momcaConnection.addCollection(MyCollection.PRIVATE_URI_PART, rootCollection);
+            momcaConnection.writeCollection(MyCollection.PRIVATE_URI_PART, rootCollection);
 
             parentCollection = rootCollection + "/" + MyCollection.PRIVATE_URI_PART;
 
@@ -56,10 +56,10 @@ public class MyCollectionManager extends AbstractManager {
 
         }
 
-        momcaConnection.addCollection(myCollection.getIdentifier(), parentCollection);
+        momcaConnection.writeCollection(myCollection.getIdentifier(), parentCollection);
 
-        String time = momcaConnection.getRemoteDateTime();
-        momcaConnection.storeAtomResource(myCollection, time, time);
+        String time = momcaConnection.queryRemoteDateTime();
+        momcaConnection.writeAtomResource(myCollection, time, time);
 
     }
 
@@ -113,7 +113,7 @@ public class MyCollectionManager extends AbstractManager {
     private Optional<MyCollection> getMyCollectionFromUri(@NotNull String myCollectionUri) {
         String resourceName = Util.getLastUriPart(myCollectionUri);
         String parentUri = Util.getParentUri(myCollectionUri);
-        return momcaConnection.getExistResource(resourceName, parentUri).map(MyCollection::new);
+        return momcaConnection.readExistResource(resourceName, parentUri).map(MyCollection::new);
     }
 
     @NotNull

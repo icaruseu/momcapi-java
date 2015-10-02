@@ -98,7 +98,7 @@ public class UserManagerTest {
 
         assertFalse(userManager.getUser(id).isPresent());
         assertFalse(userManager.isUserInitialized(id));
-        assertFalse(momcaConnection.getCollection("/db/mom-data/xrx.user/" + userName).isPresent());
+        assertFalse(momcaConnection.readCollection("/db/mom-data/xrx.user/" + userName).isPresent());
 
     }
 
@@ -126,7 +126,7 @@ public class UserManagerTest {
         String newUserName = "testuser@gmail.com";
         String newUserXml = "<xrx:user xmlns:xrx='http://www.monasterium.net/NS/xrx'> <xrx:username /> <xrx:password /> <xrx:firstname>Anna</xrx:firstname> <xrx:name>Madeo</xrx:name> <xrx:email>testuser@gmail.com</xrx:email> <xrx:moderator>admin</xrx:moderator> <xrx:street /> <xrx:zip /> <xrx:town /> <xrx:phone /> <xrx:institution /> <xrx:info /> <xrx:storage> <xrx:saved_list /> <xrx:bookmark_list /> </xrx:storage> </xrx:user>";
         ExistResource userResource = new ExistResource(newUserName + ".xml", "/db/mom-data/xrx.user", newUserXml);
-        momcaConnection.storeExistResource(userResource);
+        momcaConnection.writeExistResource(userResource);
 
         // create new user without using momcaConnection.addUser()
         String newUserPassword = "testing123";
