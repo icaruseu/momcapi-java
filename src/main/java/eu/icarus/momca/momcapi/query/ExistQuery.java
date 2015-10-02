@@ -16,7 +16,7 @@ public class ExistQuery {
      *
      * @param query the query
      */
-    ExistQuery(String query) {
+    public ExistQuery(String query) {
         this.query = query;
     }
 

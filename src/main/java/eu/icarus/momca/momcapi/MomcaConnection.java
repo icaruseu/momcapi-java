@@ -17,6 +17,8 @@ import org.exist.xmldb.RemoteCollectionManagementService;
 import org.exist.xmldb.RemoteUserManagementService;
 import org.exist.xmldb.UserManagementService;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xmldb.api.DatabaseManager;
 import org.xmldb.api.base.*;
 import org.xmldb.api.modules.CollectionManagementService;
@@ -68,6 +70,10 @@ public class MomcaConnection {
      * @param password  The password of the admin user.
      */
     public MomcaConnection(@NotNull String dbRootUri, @NotNull String admin, @NotNull String password) {
+
+        Logger logger = LoggerFactory.getLogger(MomcaConnection.class);
+
+        logger.debug("debug");
 
         this.dbRootUri = dbRootUri;
         this.admin = admin;
