@@ -7,6 +7,7 @@ import nu.xom.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -114,6 +115,16 @@ public class Util {
     public static String getParentUri(@NotNull String uri) {
         testIfUri(uri);
         return uri.substring(0, uri.lastIndexOf('/'));
+    }
+
+    @NotNull
+    public static Document getXmlFromResource(@NotNull String resourceName) throws ParsingException, IOException {
+
+        try (InputStream is = Util.class.getClassLoader().getResourceAsStream(resourceName)) {
+            Builder parser = new Builder();
+            return parser.build(is);
+        }
+
     }
 
     @NotNull
