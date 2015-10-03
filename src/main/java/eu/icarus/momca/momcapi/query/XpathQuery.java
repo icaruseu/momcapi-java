@@ -36,15 +36,21 @@ public enum XpathQuery {
     QUERY_CEI_DIPLOMATIC_ANALYSIS("//cei:diplomaticAnalysis", Namespace.CEI),
     QUERY_CEI_FRONT("//cei:front/child::*", Namespace.CEI),
     QUERY_CEI_FRONT_PREFACE("//cei:front/cei:div[@type='preface']", Namespace.CEI),
+    QUERY_CEI_GEOG_NAME("//cei:geogName", Namespace.CEI),
+    QUERY_CEI_INDEX("//cei:index", Namespace.CEI),
     QUERY_CEI_ISSUED_DATE("//cei:issued/cei:date", Namespace.CEI),
     QUERY_CEI_ISSUED_DATE_RANGE("//cei:issued/cei:dateRange", Namespace.CEI),
     QUERY_CEI_ISSUED_PLACE_NAME("//cei:issued/cei:placeName", Namespace.CEI),
+    QUERY_CEI_ISSUER("//cei:issuer", Namespace.CEI),
     QUERY_CEI_IMAGE_SERVER_ADDRESS("//cei:image_server_address/text()", Namespace.CEI),
     QUERY_CEI_IMAGE_SERVER_FOLDER("//cei:image_server_folder/text()", Namespace.CEI),
     QUERY_CEI_ISSUED("//cei:issued", Namespace.CEI),
     QUERY_CEI_LANG_MOM("//cei:lang_MOM/text()", Namespace.CEI),
+    QUERY_CEI_PERS_NAME("//cei:persName", Namespace.CEI),
+    QUERY_CEI_PLACE_NAME("//cei:placeName", Namespace.CEI),
     QUERY_CEI_PROVENANCE_TEXT("//cei:provenance/text()", Namespace.CEI),
     QUERY_CEI_PROVENANCE_ABBR("//cei:provenance/@abbr", Namespace.CEI),
+    QUERY_CEI_RECIPIENT("//cei:recipient", Namespace.CEI),
     QUERY_CEI_REGION_TEXT("//cei:region/text()", Namespace.CEI),
     QUERY_CEI_REGION_ID("//cei:region/@id", Namespace.CEI),
     QUERY_CEI_SOURCE_DESC_REGEST("//cei:sourceDesc//cei:sourceDescRegest", Namespace.CEI),
@@ -79,7 +85,9 @@ public enum XpathQuery {
     QUERY_XRX_NAME("//xrx:name/text()", Namespace.XRX),
     QUERY_XRX_SAVED_ID("//xrx:saved/xrx:id/text()", Namespace.XRX),
     QUERY_XRX_USER("//xrx:user/text()", Namespace.XRX),
-    QUERY_XRX_VISIBILITY("//xrx:visibility/text()", Namespace.XRX);
+    QUERY_XRX_VISIBILITY("//xrx:visibility/text()", Namespace.XRX),
+
+    QUERY_TEXT("//text()");
 
     @NotNull
     private final List<Namespace> namespaces;

@@ -2,8 +2,12 @@ package eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement;
 
 import eu.icarus.momca.momcapi.Util;
 import eu.icarus.momca.momcapi.model.xml.Namespace;
+import eu.icarus.momca.momcapi.query.XpathQuery;
 import nu.xom.Element;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by djell on 12/09/2015.
@@ -54,6 +58,52 @@ public abstract class AbstractMixedContentElement extends Element {
     @NotNull
     public String getContent() {
         return content;
+    }
+
+    @NotNull
+    public List<GeogName> getGeogNames() {
+
+        return Util.queryXmlForNodes(this, XpathQuery.QUERY_CEI_GEOG_NAME)
+                .stream()
+                .map(node -> new GeogName((Element) node))
+                .collect(Collectors.toList());
+
+    }
+
+    @NotNull
+    public List<Index> getIndexes() {
+
+        return Util.queryXmlForNodes(this, XpathQuery.QUERY_CEI_INDEX)
+                .stream()
+                .map(node -> new Index((Element) node))
+                .collect(Collectors.toList());
+
+    }
+
+    @NotNull
+    public List<PersName> getPersNames() {
+
+        return Util.queryXmlForNodes(this, XpathQuery.QUERY_CEI_PERS_NAME)
+                .stream()
+                .map(node -> new PersName((Element) node))
+                .collect(Collectors.toList());
+
+    }
+
+    @NotNull
+    public List<PlaceName> getPlaceNames() {
+
+        return Util.queryXmlForNodes(this, XpathQuery.QUERY_CEI_PLACE_NAME)
+                .stream()
+                .map(node -> new PlaceName((Element) node))
+                .collect(Collectors.toList());
+
+    }
+
+    @NotNull
+    public String getText() {
+        List<String> nodes = Util.queryXmlForList(this, XpathQuery.QUERY_TEXT);
+        return String.join("", nodes);
     }
 
     static String initContent(@NotNull Element element, @NotNull String localName) {
