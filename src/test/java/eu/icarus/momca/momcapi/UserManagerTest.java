@@ -32,22 +32,17 @@ public class UserManagerTest {
         IdUser id = new IdUser(userName);
         String password = "newPassword";
         String moderator = "admin";
-        userManager.addUser(new User(userName, moderator), password);
+        assertTrue(userManager.addUser(new User(userName, moderator), password));
 
         assertTrue(userManager.getUser(id).isPresent());
         assertTrue(userManager.isUserInitialized(id));
 
         userManager.deleteUser(id);
 
-    }
-
-    @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testAddUserWithWrongModerator() throws Exception {
-
-        String userName = "newUser@dev.monasterium.net";
-        String password = "newPassword";
-        String moderator = "notExistingModerator";
-        userManager.addUser(new User(userName, moderator), password);
+        userName = "newUser@dev.monasterium.net";
+        password = "newPassword";
+        moderator = "notExistingModerator";
+        assertFalse(userManager.addUser(new User(userName, moderator), password));
 
     }
 
@@ -56,16 +51,34 @@ public class UserManagerTest {
 
         String userName = "modUpdateUser";
 
-        User oldModerator = userManager.getUser(new IdUser("admin")).get();
         User newModerator = userManager.getUser(new IdUser("user1.testuser@dev.monasterium.net")).get();
 
         userManager.addUser(new User(userName, "admin"), "");
+
         User originalUser = userManager.getUser(new IdUser(userName)).get();
-        User updatedUser = userManager.changeModerator(originalUser, newModerator);
+        originalUser.setModerator(newModerator.getIdentifier());
 
-        assertEquals(updatedUser.getIdModerator().getIdentifier(), newModerator.getIdentifier());
+        assertTrue(userManager.changeModerator(originalUser.getId(), newModerator.getId()));
+        assertEquals(userManager.getUser(originalUser.getId()).get().getIdModerator().getIdentifier(), newModerator.getIdentifier());
 
-        userManager.deleteUser(updatedUser.getId());
+        userManager.deleteUser(originalUser.getId());
+
+    }
+
+    @Test
+    public void testChangeUserPassword() throws Exception {
+
+        String userName = "user10@dev.monasterium.net";
+        String moderator = "admin";
+        IdUser idUser = new IdUser(userName);
+
+        userManager.addUser(new User(userName, moderator), "");
+
+        User user = userManager.getUser(idUser).get();
+
+        assertTrue(userManager.changeUserPassword(user, "newPassword"));
+
+        userManager.deleteUser(idUser);
 
     }
 
@@ -94,7 +107,7 @@ public class UserManagerTest {
         String moderator = "admin";
 
         userManager.addUser(new User(userName, moderator), password);
-        userManager.deleteUser(id);
+        assertTrue(userManager.deleteUser(id));
 
         assertFalse(userManager.getUser(id).isPresent());
         assertFalse(userManager.isUserInitialized(id));
@@ -107,7 +120,9 @@ public class UserManagerTest {
 
         String userName = "user1.testuser@dev.monasterium.net";
         String moderator = "admin";
+
         User user = userManager.getUser(new IdUser(userName)).get();
+
         assertEquals(user.getIdentifier(), userName);
         assertEquals(user.getIdModerator().getIdentifier(), moderator);
 
@@ -133,7 +148,7 @@ public class UserManagerTest {
         User user = new User(userResource);
 
         // initialize user
-        userManager.initializeUser(user.getId(), newUserPassword);
+        assertTrue(userManager.initializeUser(user.getId(), newUserPassword));
         assertTrue(userManager.isUserInitialized(user.getId()));
 
         // clean up

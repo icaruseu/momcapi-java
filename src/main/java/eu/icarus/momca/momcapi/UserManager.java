@@ -2,17 +2,17 @@ package eu.icarus.momca.momcapi;
 
 import eu.icarus.momca.momcapi.exception.MomcaException;
 import eu.icarus.momca.momcapi.model.id.IdUser;
+import eu.icarus.momca.momcapi.model.resource.ExistResource;
 import eu.icarus.momca.momcapi.model.resource.ResourceRoot;
 import eu.icarus.momca.momcapi.model.resource.User;
-import eu.icarus.momca.momcapi.query.ExistQuery;
-import eu.icarus.momca.momcapi.query.ExistQueryFactory;
 import org.exist.security.Account;
 import org.exist.security.Group;
 import org.exist.security.internal.aider.GroupAider;
 import org.exist.security.internal.aider.UserAider;
 import org.exist.xmldb.RemoteUserManagementService;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.XMLDBException;
 
@@ -31,13 +31,10 @@ import java.util.stream.Collectors;
  */
 public class UserManager extends AbstractManager {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserManager.class);
+
     private RemoteUserManagementService remoteUserManagementService;
 
-    /**
-     * Instantiates a new UserManager.
-     *
-     * @param momcaConnection The connection to the database.
-     */
     UserManager(@NotNull MomcaConnection momcaConnection,
                 @NotNull Collection rootCollection) {
 
@@ -49,134 +46,240 @@ public class UserManager extends AbstractManager {
             throw new MomcaException("Failed to get the UserManagementService for the remote database.", e);
         }
 
+        LOGGER.debug("User manager instantiated.");
+
     }
 
-    /**
-     * Adds a new user to MOM-CA.
-     *
-     * @param user The user to be added to the database.
-     */
-    public void addUser(@NotNull User user, @NotNull String password) {
+    public boolean addUser(@NotNull User user, @NotNull String password) {
 
+        boolean success = false;
+        String identifier = user.getIdentifier();
 
-        if (!getUser(user.getId()).isPresent()) {
+        LOGGER.info("Trying to add user '{}' to the database.", identifier);
 
-            if (!getUser(user.getIdModerator()).isPresent()) {
-                String message = String.format("Moderator '%s' not existing in database.", user.getIdModerator().getIdentifier());
-                throw new IllegalArgumentException(message);
+        if (getUser(user.getId()).isPresent()) {
+            LOGGER.info("User '{}' already existing in the database, adding aborted.", identifier);
+        } else {
+
+            if (getUser(user.getIdModerator()).isPresent()) {
+
+                success = initializeUser(user.getId(), password);
+
+                if (success) {
+                    success = momcaConnection.writeExistResource(user);
+                } else {
+                    LOGGER.info("Failed to add eXist account for user '{}', abort writing to database.", identifier);
+                }
+
+                if (success) {
+
+                    LOGGER.info("User '{}' added.", identifier);
+
+                } else {
+
+                    deleteExistUserAccount(identifier);
+                    LOGGER.info("Failed to add user file for user '{}' to the database." +
+                            " Aborting write and deleting created eXist user account.", identifier);
+
+                }
+
+            } else {
+                LOGGER.info("User '{}' doesn't have a valid moderator. Adding aborted.", identifier);
             }
-
-            momcaConnection.writeExistResource(user);
-            initializeUser(user.getId(), password);
 
         }
 
-    }
-
-    /**
-     * Changes the moderator of an user.
-     *
-     * @param user         The user to change.
-     * @param newModerator The new moderator.
-     * @return The updated user.
-     */
-    @NotNull
-    public User changeModerator(@NotNull User user, @NotNull User newModerator) {
-
-        String newModeratorElement = String.format("<xrx:moderator>%s</xrx:moderator>", newModerator.getIdentifier());
-        String userUri = user.getUri();
-        ExistQuery query = ExistQueryFactory.replaceFirstInResource(userUri, "xrx:moderator", newModeratorElement);
-
-        momcaConnection.queryDatabase(query);
-
-        return getUser(user.getId()).orElseThrow(RuntimeException::new);
+        return success;
 
     }
 
-    /**
-     * Changes the password of an user.
-     *
-     * @param user        The user to change.
-     * @param newPassword The new password.
-     */
-    public void changeUserPassword(@NotNull User user, @NotNull String newPassword) {
+    public boolean changeModerator(@NotNull IdUser idUser, @NotNull IdUser idModerator) {
+
+        boolean success = false;
+        String userIdentifier = idUser.getIdentifier();
+        String moderatorIdentifier = idModerator.getIdentifier();
+
+        LOGGER.info("Trying to update moderator of userIdentifier '{}' to '{}'.", userIdentifier, moderatorIdentifier);
+
+        Optional<User> userOptional = getUser(idUser);
+
+        if (userOptional.isPresent()) {
+
+            if (getUser(idModerator).isPresent()) {
+
+                User user = userOptional.get();
+                user.setModerator(moderatorIdentifier);
+
+                success = updateUserData(user);
+
+                if (success) {
+                    LOGGER.info("Updated moderator of userIdentifier '{}' to '{}'",
+                            userIdentifier, moderatorIdentifier);
+                } else {
+                    LOGGER.info("Failed to get updated userIdentifier '{}' from the database after changing moderator.",
+                            userIdentifier);
+                }
+
+            } else {
+                LOGGER.info("Moderator '{}'is not existing in database, aborting moderator change.", moderatorIdentifier);
+            }
+
+        } else {
+            LOGGER.info("User '{}' is not existing, aborting moderator change.", userIdentifier);
+        }
+
+        return success;
+
+    }
+
+    public boolean changeUserPassword(@NotNull User user, @NotNull String newPassword) {
+
+        boolean success = false;
 
         String userName = user.getIdentifier();
 
-        try {
+        LOGGER.info("Trying to change password for user '{}'.", userName);
 
-            Account account = remoteUserManagementService.getAccount(userName);
+        if (momcaConnection.isResourceExisting(user)) {
 
-            if (account != null) {
-                account.setPassword(newPassword);
-                remoteUserManagementService.updateAccount(account);
+            try {
+
+                Account account = remoteUserManagementService.getAccount(userName);
+
+                if (account == null) {
+
+                    LOGGER.info("User '{}' is not initialized in eXist. Aborting password change.", userName);
+
+                } else {
+
+                    account.setPassword(newPassword);
+                    remoteUserManagementService.updateAccount(account);
+
+                    success = true;
+
+                    LOGGER.info("Password for user '{}' changed.", userName);
+
+                }
+
+            } catch (XMLDBException e) {
+                LOGGER.error("Failed to change the password for user '{}' due to an XMLDBException.", userName, e);
             }
 
-        } catch (XMLDBException e) {
-            throw new MomcaException("Failed to change the password for '" + userName + "'", e);
+        } else {
+            LOGGER.info("User '{}' is not existing in the database, aborting password change.", userName);
         }
+
+        return success;
 
     }
 
-    /**
-     * Deletes an eXist user account. This does not delete the MOM-CA-user file and collection in {@code xrx.user}.
-     *
-     * @param accountName The name of the account to delete.
-     */
-    void deleteExistUserAccount(@NotNull String accountName) {
+    boolean deleteExistUserAccount(@NotNull String accountName) {
+
+        boolean success = false;
+
+        LOGGER.debug("Trying to delete the eXist account '{}'.", accountName);
 
         try {
 
             Account account = remoteUserManagementService.getAccount(accountName);
 
-            if (account != null) {
+            if (account == null) {
+
+                LOGGER.debug("Account '{}' not existing, abort deletion.", accountName);
+
+            } else {
+
                 remoteUserManagementService.removeAccount(account);
+                success = remoteUserManagementService.getAccount(accountName) == null;
+
+                if (success) {
+                    LOGGER.debug("Exist acount '{}' deleted.", accountName);
+                } else {
+                    LOGGER.debug("Failed to delete eXist account '{}'.", accountName);
+                }
+
             }
 
         } catch (XMLDBException e) {
-            throw new MomcaException("Failed to remove account '" + accountName + "'", e);
+            LOGGER.error("Failed to delete eXist account '{}' due to an XMLDBException.", accountName, e);
         }
 
-    }
-
-    /**
-     * Deletes an existing user from MOM-CA.
-     *
-     * @param idUser The id of the user to delete.
-     */
-    public void deleteUser(@NotNull IdUser idUser) {
-
-        getUser(idUser).ifPresent(u -> {
-            deleteExistUserAccount(u.getIdentifier());
-            momcaConnection.deleteExistResource(u);
-            momcaConnection.deleteCollection(ResourceRoot.USER_DATA.getUri() + "/" + u.getIdentifier());
-        });
+        return success;
 
     }
 
-    /**
-     * Gets a user from the database.
-     *
-     * @param idUser The id of the user.
-     * @return The user.
-     */
+    public boolean deleteUser(@NotNull IdUser idUser) {
+
+        boolean success = false;
+        String identifier = idUser.getIdentifier();
+
+        LOGGER.info("Trying to delete user '{}'.", identifier);
+
+        Optional<User> userOptional = getUser(idUser);
+        if (userOptional.isPresent()) {
+
+            User user = userOptional.get();
+
+            success = !isUserInitialized(idUser) || deleteExistUserAccount(user.getIdentifier());
+            if (success) {
+
+                success = momcaConnection.deleteExistResource(user);
+                if (success) {
+
+                    String uri = String.format("%s/%s", ResourceRoot.USER_DATA.getUri(), identifier);
+                    success = !momcaConnection.isCollectionExisting(uri) || momcaConnection.deleteCollection(uri);
+
+                    if (success) {
+                        LOGGER.info("User '{}' deleted.", identifier);
+                    } else {
+                        LOGGER.info("User '{}' deleted but failed to delete user collection '{}'.", identifier, uri);
+                    }
+
+                } else {
+                    LOGGER.info("Deleted eXist account for user '{}' but failed to delete user resource. ", identifier);
+                }
+
+            } else {
+                LOGGER.info("Failed to delete eXist account for user '{}', aborting deletion.", identifier);
+            }
+
+        }
+
+        return success;
+
+    }
+
     @NotNull
     public Optional<User> getUser(@NotNull IdUser idUser) {
-        return momcaConnection.readExistResource(idUser.getIdentifier() + ".xml", ResourceRoot.USER_DATA.getUri())
-                .flatMap(existResource -> Optional.of(new User(existResource)));
+
+        String identifier = idUser.getIdentifier();
+        User user = null;
+
+        LOGGER.info("Trying to get user '{}' from the database.", identifier);
+
+        Optional<ExistResource> userResource = momcaConnection
+                .readExistResource(identifier + ".xml", ResourceRoot.USER_DATA.getUri());
+
+        if (userResource.isPresent()) {
+
+            user = new User(userResource.get());
+
+            LOGGER.info("User '{}' read from the database.", user);
+
+        } else {
+            LOGGER.info("User '{}' not found in database, returning nothing.", identifier);
+        }
+
+        return Optional.ofNullable(user);
+
     }
 
-    /**
-     * Initializes a registered but uninitialized user. This happens if the User doesn't receive the registration-email
-     * or doesn't click on the confirmation link. Before this, the user is added to {@code xrx.user} but not added as
-     * an eXist-account.
-     *
-     * @param idUser   The id of an uninitialized user.
-     * @param password The password.
-     */
-    public void initializeUser(@NotNull IdUser idUser, @NotNull String password) {
+    public boolean initializeUser(@NotNull IdUser idUser, @NotNull String password) {
 
-        String userName = idUser.getIdentifier();
+        boolean success = false;
+        String identifier = idUser.getIdentifier();
+
+        LOGGER.info("Trying to initialize account for user '{}' in eXist.", identifier);
 
         if (!isUserInitialized(idUser)) {
 
@@ -185,90 +288,135 @@ public class UserManager extends AbstractManager {
                 Group group = new GroupAider("atom");
                 remoteUserManagementService.addGroup(group);
 
-                Account newAccount = new UserAider(userName, group);
+                Account newAccount = new UserAider(identifier, group);
                 newAccount.setPassword(password);
                 remoteUserManagementService.addAccount(newAccount);
-                remoteUserManagementService.addAccountToGroup(userName, "guest");
+                remoteUserManagementService.addAccountToGroup(identifier, "guest");
+
+                success = true;
+
+                LOGGER.info("Account for user '{}' initialized in eXist.", identifier);
 
             } catch (XMLDBException e) {
-                if (!isExceptionBecauseAccountExists(userName, e)) {
-                    throw new MomcaException("Failed to create user '" + userName + "'", e);
+                if (!isExceptionBecauseAccountExists(identifier, e)) {
+                    LOGGER.error("Failed to initialize account for user '{}' in eXist due to an XMLDBException.", identifier);
                 }
             }
 
+        } else {
+            LOGGER.info("User '{}' is already initialized in eXist. Aborting initialization.", identifier);
         }
+
+        return success;
 
     }
 
     private boolean isExceptionBecauseAccountExists(@NotNull String userName, @NotNull XMLDBException e) {
+
         String existingAccountErrorMessage =
                 String.format("Failed to invoke method addAccount in class " +
                         "org.exist.xmlrpc.RpcConnection: Account '%s' exist", userName);
+
         return e.getMessage().equals(existingAccountErrorMessage);
+
     }
 
-    /**
-     * Checks if a user is initialized (an eXist account with the same name is existing).
-     *
-     * @param idUser The id of the user to test.
-     * @return {@code True} if the user is initialized.
-     */
     boolean isUserInitialized(@NotNull IdUser idUser) {
 
+        boolean success = false;
         String userName = idUser.getIdentifier();
 
+        LOGGER.debug("Try to test if user '{}' is initialized.", userName);
+
         try {
-            return Optional.ofNullable(remoteUserManagementService.getAccount(userName)).isPresent();
+
+            Account account = remoteUserManagementService.getAccount(userName);
+            success = account != null;
+
+            LOGGER.debug("User initialization status for '{}' determined, returning '{}'.", userName, success);
+
         } catch (XMLDBException e) {
-            throw new MomcaException("Failed to get resource for user '" + userName + "'", e);
+            LOGGER.error("Failed to test if user '{}' is initialized due to an XMLDBException. Returning 'false'.", userName, e);
         }
+
+        return success;
 
     }
 
     @NotNull
-    private List<String> listUserResourceNames() {
+    public List<IdUser> listUsers() {
 
-        List<String> users = new ArrayList<>();
-        momcaConnection.readCollection(ResourceRoot.USER_DATA.getUri()).ifPresent(collection -> {
+        List<IdUser> users = new ArrayList<>();
 
-            String[] encodedUserNames;
+        LOGGER.info("Trying to get a list of all users.");
 
+        Optional<Collection> userCollectionOptional = momcaConnection.readCollection(ResourceRoot.USER_DATA.getUri());
+
+        if (userCollectionOptional.isPresent()) {
+
+            Collection userCollection = userCollectionOptional.get();
+
+            String[] encodedUserNames = null;
             try {
-                encodedUserNames = collection.listResources();
+                encodedUserNames = userCollection.listResources();
             } catch (XMLDBException e) {
-                String message = String.format("Failed to list resources in collection '%s'.", ResourceRoot.USER_DATA.getUri());
-                throw new MomcaException(message, e);
+                LOGGER.error("Failed to list the user resources due to an XMLDBException. Aborting listing users.", e);
             }
 
-            for (String encodedUserName : encodedUserNames) {
-                users.add(Util.decode(encodedUserName));
+            if (encodedUserNames != null) {
+
+                List<String> userResourceNames = new ArrayList<>();
+
+                for (String encodedUserName : encodedUserNames) {
+                    userResourceNames.add(Util.decode(encodedUserName));
+                }
+
+                userResourceNames.sort(Comparator.<String>naturalOrder());
+
+                users = userResourceNames
+                        .stream()
+                        .map(s -> new IdUser(s.replace(".xml", "")))
+                        .collect(Collectors.toList());
+
+                LOGGER.info("Returning list of '{}' users from the database.", users.size());
+
             }
 
-        });
+        } else {
+            LOGGER.error("Failed to get user root collection from the database. Aborting listing users.");
+        }
 
-        users.sort(Comparator.<String>naturalOrder());
         return users;
 
     }
 
     /**
-     * @return A list of all registered users in the database.
+     * Update the metadata of a specific user. Doesn't update the id.
+     *
+     * @param updatedUser the user with updated data. Has to exist in the database.
      */
-    @NotNull
-    public List<IdUser> listUsers() {
-        return listUserResourceNames().stream().map(s -> new IdUser(s.replace(".xml", ""))).collect(Collectors.toList());
-    }
+    boolean updateUserData(@NotNull User updatedUser) {
 
-    public void updateUser(@NotNull User modifiedUser, @Nullable IdUser originalId) {
+        boolean success = false;
+        String identifier = updatedUser.getIdentifier();
 
-        IdUser realOriginalId = originalId == null ? modifiedUser.getId() : originalId;
+        LOGGER.debug("Trying to update user '{}'.", identifier);
 
-        if (!getUser(realOriginalId).isPresent()) {
-            throw new MomcaException("The user to be updated doesn't exist in the database.");
+        if (momcaConnection.isResourceExisting(updatedUser)) {
+
+            success = momcaConnection.writeExistResource(updatedUser);
+
+            if (success) {
+                LOGGER.debug("Updated user '{}'.", identifier);
+            } else {
+                LOGGER.debug("Failed to update user data.");
+            }
+
+        } else {
+            LOGGER.debug("User '{}' doesn't exist in the database, aborting update.", identifier);
         }
 
-        deleteUser(realOriginalId);
-        momcaConnection.writeExistResource(modifiedUser);
+        return success;
 
     }
 

@@ -295,6 +295,30 @@ public class MomcaConnection {
 
     }
 
+    boolean isCollectionExisting(@NotNull String collectionUri) {
+
+        LOGGER.debug("Testing existence of collection '{}'.", collectionUri);
+
+        boolean isExisting = queryToBoolean(ExistQueryFactory.checkCollectionExistence(collectionUri));
+
+        LOGGER.debug("Returning '{}' for the existence of collection '{}'.", isExisting, collectionUri);
+
+        return isExisting;
+
+    }
+
+    boolean isResourceExisting(@NotNull ExistResource resource) {
+
+        LOGGER.debug("Testing existence of resource '{}'.", resource);
+
+        boolean isExisting = queryToBoolean(ExistQueryFactory.checkExistResourceExistence(resource));
+
+        LOGGER.debug("Returning '{}' for the existence of resource '{}'.", isExisting, resource);
+
+        return isExisting;
+
+    }
+
     @NotNull
     List<String> queryDatabase(@NotNull ExistQuery existQuery) {
 
@@ -353,6 +377,22 @@ public class MomcaConnection {
         LOGGER.debug("Time at server is currently '{}'.", time);
 
         return time;
+
+    }
+
+    private boolean queryToBoolean(ExistQuery query) {
+
+        List<String> results = queryDatabase(query);
+
+        boolean resultingBool = false;
+
+        if (results.size() != 1) {
+            LOGGER.debug("Result list doesn't have exactly one entry. Returning 'false'.");
+        } else {
+            resultingBool = Boolean.parseBoolean(results.get(0));
+        }
+
+        return resultingBool;
 
     }
 

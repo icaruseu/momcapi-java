@@ -93,7 +93,7 @@ public class CharterManager extends AbstractManager {
     }
 
     private boolean isCharterExisting(@NotNull IdCharter idCharter, @Nullable ResourceRoot resourceRoot) {
-        ExistQuery query = ExistQueryFactory.checkResourceExistence(idCharter.getContentXml(), resourceRoot);
+        ExistQuery query = ExistQueryFactory.checkAtomResourceExistence(idCharter.getContentXml(), resourceRoot);
         return !momcaConnection.queryDatabase(query).isEmpty();
     }
 
@@ -228,7 +228,7 @@ public class CharterManager extends AbstractManager {
 
             user.setSavedCharters(withoutCurrent);
 
-            userManager.updateUser(user, user.getId());
+            userManager.updateUserData(user);
 
         }
 

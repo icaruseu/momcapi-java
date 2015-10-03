@@ -73,6 +73,21 @@ public class MomcaConnectionTest {
     }
 
     @Test
+    public void testIsCollectionExisting() throws Exception {
+
+        assertTrue(momcaConnection.isCollectionExisting("/db/mom-data/metadata.charter.public/CH-KAE"));
+        assertFalse(momcaConnection.isCollectionExisting("/some/random/collection"));
+    }
+
+    @Test
+    public void testIsResourceExisting() throws Exception {
+
+        ExistResource resource = new ExistResource("admin.xml", "/db/mom-data/xrx.user", "<empty/>");
+        assertTrue(momcaConnection.isResourceExisting(resource));
+
+    }
+
+    @Test
     public void testStoreExistResource() throws Exception {
         ExistResource res = new ExistResource("write@Test.xml", "/db", "<empty/>");
         assertTrue(momcaConnection.writeExistResource(res));

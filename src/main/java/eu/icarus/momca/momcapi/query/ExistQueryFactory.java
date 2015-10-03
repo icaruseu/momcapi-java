@@ -2,6 +2,7 @@ package eu.icarus.momca.momcapi.query;
 
 import eu.icarus.momca.momcapi.model.CountryCode;
 import eu.icarus.momca.momcapi.model.id.*;
+import eu.icarus.momca.momcapi.model.resource.ExistResource;
 import eu.icarus.momca.momcapi.model.resource.ResourceRoot;
 import eu.icarus.momca.momcapi.model.xml.Namespace;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
@@ -31,13 +32,37 @@ public class ExistQueryFactory {
      * specified {@code resourceRoot}.
      */
     @NotNull
-    public static ExistQuery checkResourceExistence(@NotNull AtomId resourceAtomId, @Nullable ResourceRoot resourceRoot) {
+    public static ExistQuery checkAtomResourceExistence(@NotNull AtomId resourceAtomId, @Nullable ResourceRoot resourceRoot) {
 
         String query = String.format(
                 "%s collection('%s')//atom:entry[.//atom:id/text()='%s'][1]",
                 getNamespaceDeclaration(Namespace.ATOM),
                 getRootCollectionString(resourceRoot),
                 resourceAtomId.getText());
+
+        return new ExistQuery(query);
+
+    }
+
+    @NotNull
+    public static ExistQuery checkCollectionExistence(@NotNull String collectionUri) {
+
+        String query = String.format(
+                "exists(collection('%s'))",
+                collectionUri
+        );
+
+        return new ExistQuery(query);
+
+    }
+
+    @NotNull
+    public static ExistQuery checkExistResourceExistence(@NotNull ExistResource resource) {
+
+        String query = String.format(
+                "exists(doc('%s'))",
+                resource.getUri()
+        );
 
         return new ExistQuery(query);
 
