@@ -10,11 +10,6 @@ import org.jetbrains.annotations.NotNull;
  */
 public class IdAtomId extends IdAbstract {
 
-    @Deprecated
-    public IdAtomId(@NotNull AtomId atomIdXml, @NotNull String identifier) {
-        super(atomIdXml, identifier);
-    }
-
     public IdAtomId(@NotNull AtomId atomIdXml) {
         super(atomIdXml, initIdentifier(atomIdXml));
     }
@@ -29,6 +24,11 @@ public class IdAtomId extends IdAbstract {
 
         return getContentXml().getText().equals(otherId.getContentXml().getText());
 
+    }
+
+    @NotNull
+    public final String getAtomIdText() {
+        return getContentXml().getText();
     }
 
     @NotNull
