@@ -134,6 +134,15 @@ public class Util {
         return context;
     }
 
+    /**
+     * @param archIdentifierElement Element to test.
+     * @return true if the provided Element has neither text content or child elements.
+     */
+    public static boolean isEmptyElement(Element archIdentifierElement) {
+        return archIdentifierElement == null ||
+                (archIdentifierElement.getValue().isEmpty() && archIdentifierElement.getChildElements().size() == 0);
+    }
+
     @NotNull
     public static String joinChildNodes(@NotNull Element xml) {
 

@@ -1,5 +1,6 @@
 package eu.icarus.momca.momcapi.model.xml.cei;
 
+import eu.icarus.momca.momcapi.Util;
 import eu.icarus.momca.momcapi.model.xml.Namespace;
 import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.*;
 import nu.xom.Attribute;
@@ -54,10 +55,12 @@ public class Witness extends Element {
         this();
 
         Element archIdentifierElement = witnessElement.getFirstChildElement("archIdentifier", CEI_URI);
-        ArchIdentifier archIdentifier = (archIdentifierElement == null) ? null : new ArchIdentifier(archIdentifierElement);
+        ArchIdentifier archIdentifier = Util.isEmptyElement(archIdentifierElement)
+                ? null : new ArchIdentifier(archIdentifierElement);
 
         Element authElement = witnessElement.getFirstChildElement("auth", CEI_URI);
-        Auth auth = (authElement == null) ? null : new Auth(authElement);
+        Auth auth = Util.isEmptyElement(authElement)
+                ? null : new Auth(authElement);
 
         Elements figureElements = witnessElement.getChildElements("figure", CEI_URI);
         List<Figure> figures = new ArrayList<>(0);
@@ -66,13 +69,16 @@ public class Witness extends Element {
         }
 
         Element notaElement = witnessElement.getFirstChildElement("nota", CEI_URI);
-        Nota nota = (notaElement == null) ? null : new Nota(notaElement);
+        Nota nota = Util.isEmptyElement(notaElement)
+                ? null : new Nota(notaElement);
 
         Element physicalDescElement = witnessElement.getFirstChildElement("physicalDesc", CEI_URI);
-        PhysicalDesc physicalDesc = (physicalDescElement == null) ? null : new PhysicalDesc(physicalDescElement);
+        PhysicalDesc physicalDesc = Util.isEmptyElement(physicalDescElement)
+                ? null : new PhysicalDesc(physicalDescElement);
 
         Element traditioFormElement = witnessElement.getFirstChildElement("traditioForm", CEI_URI);
-        TraditioForm traditioForm = (traditioFormElement == null) ? null : new TraditioForm(traditioFormElement);
+        TraditioForm traditioForm = Util.isEmptyElement(traditioFormElement)
+                ? null : new TraditioForm(traditioFormElement);
 
         initChilds(archIdentifier, auth, figures, nota, physicalDesc, traditioForm);
 

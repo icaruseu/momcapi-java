@@ -121,14 +121,37 @@ public class Charter extends AtomResource {
 
         Element back = new Element("cei:back", CEI_URI);
 
-        backPersNames.forEach(persName -> back.appendChild(persName.copy()));
-        backPlaceNames.forEach(placeName -> back.appendChild(placeName.copy()));
-        backGeogNames.forEach(geogName -> back.appendChild(geogName.copy()));
-        backIndexes.forEach(index -> back.appendChild(index.copy()));
+        backPersNames
+                .stream()
+                .filter(p -> !p.getText().isEmpty())
+                .forEach(persName -> back.appendChild(persName.copy()));
+
+        backPlaceNames
+                .stream()
+                .filter(p -> !p.getText().isEmpty())
+                .forEach(placeName -> back.appendChild(placeName.copy()));
+
+        backGeogNames
+                .stream()
+                .filter(g -> !g.getText().isEmpty())
+                .forEach(geogName -> back.appendChild(geogName.copy()));
+
+        backIndexes
+                .stream()
+                .filter(i -> !i.getText().isEmpty())
+                .forEach(index -> back.appendChild(index.copy()));
+
         if (!backDivNotes.isEmpty()) {
+
             Element divNotes = new Element("cei:divNotes", CEI_URI);
-            backDivNotes.forEach(note -> divNotes.appendChild(note.copy()));
-            back.appendChild(divNotes);
+            backDivNotes.stream()
+                    .filter(n -> !n.getText().isEmpty())
+                    .forEach(note -> divNotes.appendChild(note.copy()));
+
+            if (!Util.isEmptyElement(divNotes)) {
+                back.appendChild(divNotes);
+            }
+
         }
 
         return back;
