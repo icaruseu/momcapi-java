@@ -1,6 +1,5 @@
 package eu.icarus.momca.momcapi;
 
-import eu.icarus.momca.momcapi.exception.MomcaException;
 import eu.icarus.momca.momcapi.model.*;
 import eu.icarus.momca.momcapi.model.id.IdArchive;
 import eu.icarus.momca.momcapi.model.id.IdUser;
@@ -71,7 +70,7 @@ public class ArchiveManagerTest {
         archiveFromDb.setContactInformation(contactInformation);
         archiveFromDb.setLogoUrl(logoUrl);
 
-        am.addArchive(archiveFromDb);
+        assertTrue(am.addArchive(archiveFromDb));
         Optional<Archive> changedArchiveOptional = am.getArchive(archiveFromDb.getId());
         am.deleteArchive(archiveFromDb.getId());
         assertTrue(changedArchiveOptional.isPresent());
@@ -89,11 +88,11 @@ public class ArchiveManagerTest {
 
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class)
+    @Test
     public void testAddArchiveAlreadyExisting() throws Exception {
-        am.addArchive(
+        assertFalse(am.addArchive(
                 new Archive("DE-BayHStA", "München, Bayerisches Hauptstaatsarchiv",
-                        new Country(new CountryCode("DE"), "Deutschland")));
+                        new Country(new CountryCode("DE"), "Deutschland"))));
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
@@ -106,13 +105,13 @@ public class ArchiveManagerTest {
         am.addArchive(new Archive("sarchive", "", new Country(new CountryCode("DE"), "Deutschland")));
     }
 
-    @Test(expectedExceptions = MomcaException.class)
+    @Test
     public void testAddArchiveWithWrongRegion() throws Exception {
 
         Archive archive = new Archive("DE-StAM", "Staatsarchiv München",
                 new Country(new CountryCode("DE"), "Deutschland"));
         archive.setRegionName("Campania");
-        am.addArchive(archive);
+        assertFalse(am.addArchive(archive));
 
     }
 

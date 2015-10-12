@@ -86,18 +86,22 @@ public class MomcaConnection {
 
     }
 
-    public void closeConnection() {
+    public boolean closeConnection() {
 
+        boolean success = false;
         LOGGER.debug("Trying to close connection to '{}'.", dbRootUri);
 
         try {
 
             rootCollection.close();
+            success = true;
             LOGGER.info("Connection to '{}' closed.", dbRootUri);
 
         } catch (XMLDBException e) {
             LOGGER.error("Failed to close the database connection.", e);
         }
+
+        return success;
 
     }
 

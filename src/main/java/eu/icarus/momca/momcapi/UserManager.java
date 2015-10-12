@@ -32,7 +32,6 @@ import java.util.stream.Collectors;
 public class UserManager extends AbstractManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserManager.class);
-
     private RemoteUserManagementService remoteUserManagementService;
 
     UserManager(@NotNull MomcaConnection momcaConnection,

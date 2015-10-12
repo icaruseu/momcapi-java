@@ -1,6 +1,5 @@
 package eu.icarus.momca.momcapi;
 
-import eu.icarus.momca.momcapi.exception.MomcaException;
 import eu.icarus.momca.momcapi.model.Country;
 import eu.icarus.momca.momcapi.model.Region;
 import eu.icarus.momca.momcapi.model.id.IdArchive;
@@ -9,6 +8,8 @@ import eu.icarus.momca.momcapi.model.resource.ResourceRoot;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,37 +20,52 @@ import java.util.stream.Collectors;
  */
 public class ArchiveManager extends AbstractManager {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ArchiveManager.class);
+
     ArchiveManager(@NotNull MomcaConnection momcaConnection) {
         super(momcaConnection);
     }
 
-    public void addArchive(@NotNull Archive newArchive) {
+    public boolean addArchive(@NotNull Archive newArchive) {
+
+        boolean success = false;
+        String identifier = newArchive.getIdentifier();
+
+        LOGGER.info("Try to add archive '{}' to the database.", identifier);
 
         if (getArchive(newArchive.getId()).isPresent()) {
-            String message = String.format("The archive '%s' that is to be added already exists.",
-                    newArchive.getId().getIdentifier());
-            throw new IllegalArgumentException(message);
-        }
 
-        newArchive.getRegionName().ifPresent(s -> {
+            LOGGER.info("Archive '{}' already exists, aborting addition.", identifier);
 
-            if (momcaConnection.getCountryManager().getRegions(newArchive.getCountry())
-                    .stream().noneMatch(region -> s.equals(region.getNativeName()))
-                    ) {
+        } else {
 
-                String message = String.format("The region of the archive ('%s') to be added is not part of the " +
-                                "archive's country ('%s') in the database.",
-                        newArchive.getRegionName(),
+            boolean isRegionOk = newArchive.getRegionName()
+                    .map(s -> momcaConnection.getCountryManager()
+                            .getRegions(newArchive.getCountry())
+                            .stream()
+                            .anyMatch(region -> s.equals(region.getNativeName())))
+                    .orElse(true);
+
+            if (isRegionOk) {
+
+                momcaConnection.writeCollection(identifier, ResourceRoot.ARCHIVES.getUri());
+                String time = momcaConnection.queryRemoteDateTime();
+                momcaConnection.writeAtomResource(newArchive, time, time);
+
+                success = true;
+                LOGGER.info("Archive '{}' added.", identifier);
+
+            } else {
+
+                LOGGER.info("The region of the archive to be added ({}) is not part of '{}' in the database, aborting addition",
+                        newArchive.getRegionName().get(),
                         newArchive.getCountry().getNativeName());
-                throw new MomcaException(message);
 
             }
 
-        });
+        }
 
-        momcaConnection.writeCollection(newArchive.getIdentifier(), ResourceRoot.ARCHIVES.getUri());
-        String time = momcaConnection.queryRemoteDateTime();
-        momcaConnection.writeAtomResource(newArchive, time, time);
+        return success;
 
     }
 
