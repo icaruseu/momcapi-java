@@ -68,7 +68,7 @@ public class FondManager extends AbstractManager {
 
         Optional<Fond> fond = Optional.empty();
 
-        Optional<ExistResource> fondResource = getExistResource(idFond.getContentXml());
+        Optional<ExistResource> fondResource = getFirstMatchingExistResource(idFond.getContentXml());
 
         if (fondResource.isPresent()) {
 

@@ -124,17 +124,17 @@ public class ArchiveManagerTest {
 
         Archive newArchive = new Archive(shortName, name, country);
         am.addArchive(newArchive);
-        am.deleteArchive(newArchive.getId());
+        assertTrue(am.deleteArchive(newArchive.getId()));
 
         assertFalse(am.getArchive(newArchive.getId()).isPresent());
         assertFalse(mc.readCollection("/db/mom-data/metadata.fond.public/" + newArchive.getIdentifier()).isPresent());
 
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class)
+    @Test
     public void testDeleteArchiveWithExistingFonds() throws Exception {
         IdArchive id = new IdArchive("CH-KAE");
-        am.deleteArchive(id);
+        assertFalse(am.deleteArchive(id));
     }
 
     @Test

@@ -57,7 +57,8 @@ public class ArchiveManager extends AbstractManager {
 
             } else {
 
-                LOGGER.info("The region of the archive to be added ({}) is not part of '{}' in the database, aborting addition",
+                LOGGER.info("The region of the archive to be added ({}) is not part of '{}' in the database," +
+                                " aborting addition",
                         newArchive.getRegionName().get(),
                         newArchive.getCountry().getNativeName());
 
@@ -69,44 +70,133 @@ public class ArchiveManager extends AbstractManager {
 
     }
 
-    public void deleteArchive(@NotNull IdArchive idArchive) {
+    private List<IdArchive> collectArchiveIds(List<String> queryResults) {
 
-        if (!momcaConnection.getFondManager().listFonds(idArchive).isEmpty()) {
-            String message = String.format("The archive '%s',  that is to be deleted still has associated fonds.",
-                    idArchive.getIdentifier());
-            throw new IllegalArgumentException(message);
+        return queryResults
+                .stream()
+                .map(AtomId::new)
+                .map(IdArchive::new)
+                .collect(Collectors.toList());
+
+    }
+
+    public boolean deleteArchive(@NotNull IdArchive idArchive) {
+
+        boolean success = false;
+        String identifier = idArchive.getIdentifier();
+
+        LOGGER.info("Trying to delete archive '{}'", identifier);
+
+        boolean stillHasFonds = !momcaConnection.getFondManager().listFonds(idArchive).isEmpty();
+
+        if (stillHasFonds) {
+
+            LOGGER.info("The archive '{}',  that is to be deleted still has associated fonds, aborting deletion.",
+                    identifier);
+
+        } else {
+
+            String archiveCollectionUri = String.format("%s/%s", ResourceRoot.ARCHIVES.getUri(), identifier);
+            LOGGER.trace("Trying to delete archival collection at '{}'", archiveCollectionUri);
+
+            success = momcaConnection.deleteCollection(archiveCollectionUri);
+
+            if (success) {
+
+                String archiveFondsCollectionUri = String.format("%s/%s", ResourceRoot.ARCHIVAL_FONDS.getUri(), identifier);
+                success = momcaConnection.deleteCollection(archiveFondsCollectionUri);
+
+                if (success) {
+                    LOGGER.info("Deleted archive '{}'.", identifier);
+                } else {
+                    LOGGER.info("Deleted archive '{}' but failed to delete archival fonds collection at '{}'.",
+                            identifier, archiveFondsCollectionUri);
+                    success = true;
+                }
+
+            } else {
+                LOGGER.info("Failed to delete archival collection at '{}', aborting deletion.", archiveCollectionUri);
+            }
+
         }
 
-        momcaConnection.deleteCollection(String.format("%s/%s", ResourceRoot.ARCHIVES.getUri(),
-                idArchive.getIdentifier()));
-        momcaConnection.deleteCollection(String.format("%s/%s",
-                ResourceRoot.ARCHIVAL_FONDS.getUri(), idArchive.getIdentifier()));
+        return success;
 
     }
 
     @NotNull
     public Optional<Archive> getArchive(@NotNull IdArchive idArchive) {
-        return getExistResource(idArchive.getContentXml()).map(Archive::new);
-    }
 
-    @NotNull
-    public List<IdArchive> listArchives(@NotNull Region region) {
-        List<String> queryResults = momcaConnection.queryDatabase(
-                ExistQueryFactory.listArchivesForRegion(region.getNativeName()));
-        return queryResults.stream().map(AtomId::new).map(IdArchive::new).collect(Collectors.toList());
+        String identifier = idArchive.getIdentifier();
+
+        LOGGER.info("Trying to get archive '{}'.", identifier);
+
+        Optional<Archive> archive = getFirstMatchingExistResource(idArchive.getContentXml()).map(Archive::new);
+
+        LOGGER.info("Returning '{}' for archive '{}'.", archive, identifier);
+
+        return archive;
+
     }
 
     @NotNull
     public List<IdArchive> listArchives() {
+
+        LOGGER.info("Trying to list all archives in the database.");
+
         List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listArchives());
-        return queryResults.stream().map(AtomId::new).map(IdArchive::new).collect(Collectors.toList());
+
+        List<IdArchive> archiveList = collectArchiveIds(queryResults);
+
+        int resultSize = archiveList.size();
+        LOGGER.info("Returning {} {}.",
+                resultSize,
+                resultSize == 1 ? "archive" : "archives");
+
+        return archiveList;
+
+    }
+
+    @NotNull
+    public List<IdArchive> listArchives(@NotNull Region region) {
+
+        String nativeName = region.getNativeName();
+
+        LOGGER.info("Trying to list all archives for region '{}'.", nativeName);
+
+        List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listArchivesForRegion(nativeName));
+
+        List<IdArchive> archiveList = collectArchiveIds(queryResults);
+
+        int resultSize = archiveList.size();
+        LOGGER.info("Returning {} {} for region '{}'.",
+                resultSize,
+                resultSize == 1 ? "archive" : "archives",
+                nativeName);
+
+        return archiveList;
+
     }
 
     @NotNull
     public List<IdArchive> listArchives(@NotNull Country country) {
+
+        String nativeName = country.getNativeName();
+        LOGGER.info("Trying to list all archives for country '{}'.", nativeName);
+
         List<String> queryResults = momcaConnection.queryDatabase(
                 ExistQueryFactory.listArchivesForCountry(country.getCountryCode()));
-        return queryResults.stream().map(AtomId::new).map(IdArchive::new).collect(Collectors.toList());
+
+        List<IdArchive> archiveList = collectArchiveIds(queryResults);
+
+        int resultSize = archiveList.size();
+        LOGGER.info("Returning {} {} for country '{}'.",
+                resultSize,
+                resultSize == 1 ? "archive" : "archives",
+                nativeName);
+
+        return archiveList;
+
     }
 
 }

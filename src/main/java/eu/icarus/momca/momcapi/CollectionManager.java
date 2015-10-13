@@ -53,7 +53,7 @@ public class CollectionManager extends AbstractManager {
 
     @NotNull
     public Optional<Collection> getCollection(@NotNull IdCollection idCollection) {
-        return getExistResource(idCollection.getContentXml()).map(Collection::new);
+        return getFirstMatchingExistResource(idCollection.getContentXml()).map(Collection::new);
     }
 
     @NotNull
