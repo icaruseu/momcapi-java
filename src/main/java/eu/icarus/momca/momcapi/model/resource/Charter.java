@@ -634,6 +634,21 @@ public class Charter extends AtomResource {
 
     }
 
+    public void setId(@NotNull IdCharter idCharter) {
+
+        if (!idCharter.equals(getId())) {
+
+            this.id = idCharter;
+
+            setParentUri(createParentUri(getId(), charterStatus, getCreator().get()));
+            setResourceName(createResourceName(getId(), charterStatus));
+
+            regenerateXmlContent();
+
+        }
+
+    }
+
     @Override
     public void setIdentifier(@NotNull String identifier) {
 

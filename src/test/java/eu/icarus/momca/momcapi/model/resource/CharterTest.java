@@ -500,6 +500,23 @@ public class CharterTest {
     }
 
     @Test
+    public void testSetId() throws Exception {
+
+        assertEquals(charter.getResourceName(), "charter1.cei.xml");
+        assertEquals(charter.getParentUri(), "/db/mom-data/metadata.charter.public/collection");
+
+        IdCharter newId = new IdCharter("archive", "fond", "newId");
+        charter.setId(newId);
+
+        assertEquals(charter.getId(), newId);
+        assertEquals(charter.getIdentifier(), "newId");
+        assertEquals(charter.getResourceName(), "newId.cei.xml");
+        assertEquals(charter.getParentUri(), "/db/mom-data/metadata.charter.public/archive/fond");
+        assertTrue(charter.isValidCei());
+
+    }
+
+    @Test
     public void testSetIdentifier() throws Exception {
 
         charter = createCharter("empty_charter.xml");
@@ -508,6 +525,8 @@ public class CharterTest {
 
         assertEquals(charter.getIdentifier(), new_identifier);
         assertEquals(charter.getId(), new IdCharter("collection", new_identifier));
+        assertEquals(charter.getResourceName(), "new_identifier.cei.xml");
+        assertEquals(charter.getParentUri(), "/db/mom-data/metadata.charter.public/collection");
         assertTrue(charter.isValidCei());
 
     }
