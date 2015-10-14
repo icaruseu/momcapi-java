@@ -13,6 +13,8 @@ import eu.icarus.momca.momcapi.query.ExistQuery;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,21 +27,39 @@ import java.util.stream.Collectors;
  */
 public class CharterManager extends AbstractManager {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(CharterManager.class);
+
     CharterManager(@NotNull MomcaConnection momcaConnection) {
         super(momcaConnection);
     }
 
-    public void addCharter(@NotNull Charter charter) {
+    public boolean addCharter(@NotNull Charter charter) {
+
+        boolean success = false;
+        String atomIdText = charter.getId().getAtomIdText();
+        LOGGER.info("Trying to add charter '{}' to the database.", atomIdText);
 
         IdCharter id = charter.getId();
         CharterStatus status = charter.getCharterStatus();
 
         if (getCharter(id, status).isPresent()) {
-            throw new MomcaException(String.format("A charter with id '%s' and status '%s'is already existing.", id, status));
+
+            LOGGER.info("A charter with id '{}' and status '{}'is already existing, aborting addition.", id, status);
+
+        } else {
+
+            String currentTime = momcaConnection.queryRemoteDateTime();
+            success = writeCharterToDatabase(charter, currentTime, currentTime);
+
+            if (success) {
+                LOGGER.info("Charter '{}' added to the database.", atomIdText);
+            } else {
+                LOGGER.info("Failed to add charter '{}' to the database.", atomIdText);
+            }
+
         }
 
-        String currentTime = momcaConnection.queryRemoteDateTime();
-        writeCharterToDatabase(charter, currentTime, currentTime);
+        return success;
 
     }
 
@@ -252,18 +272,41 @@ public class CharterManager extends AbstractManager {
 
     }
 
-    private void writeCharterToDatabase(@NotNull Charter modifiedCharter, @NotNull String published, @NotNull String updated) {
+    private boolean writeCharterToDatabase(@NotNull Charter charter, @NotNull String published,
+                                           @NotNull String updated) {
+        boolean success = false;
+        String atomIdText = charter.getId().getAtomIdText();
+        LOGGER.debug("Trying to write charter '{}' to the database.", atomIdText);
 
-        if (isParentExisting(modifiedCharter.getId())) {
+        if (isParentExisting(charter.getId())) {
 
-            momcaConnection.createCollectionPath(modifiedCharter.getParentUri());
-            momcaConnection.writeAtomResource(modifiedCharter, published, updated);
+            String parentUri = charter.getParentUri();
+            success = momcaConnection.createCollectionPath(parentUri);
+
+            if (success) {
+
+                success = momcaConnection.writeAtomResource(charter, published, updated);
+
+                if (success) {
+                    LOGGER.debug("Charter '{}' written to the database.", atomIdText);
+                } else {
+                    LOGGER.debug("Failed to write charter '{}' into newly created collection '{}'.",
+                            atomIdText, parentUri);
+                }
+
+            } else {
+
+                LOGGER.debug("Failed to create collection path '{}', aborting write.", parentUri);
+
+            }
+
 
         } else {
-            String message = String.format("The parent for the charter, '%s', is not existing.",
-                    modifiedCharter.getId().getHierarchicalUriPartsAsString());
-            throw new MomcaException(message);
+            LOGGER.debug("The parent for the charter, '{}', is not existing, aborting write.",
+                    charter.getId().getHierarchicalUriPartsAsString());
         }
+
+        return success;
 
     }
 

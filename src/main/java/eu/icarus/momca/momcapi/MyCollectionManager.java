@@ -56,6 +56,7 @@ public class MyCollectionManager extends AbstractManager {
 
         }
 
+        momcaConnection.createCollectionPath(parentCollection);
         momcaConnection.writeCollection(myCollection.getIdentifier(), parentCollection);
 
         String time = momcaConnection.queryRemoteDateTime();

@@ -160,27 +160,27 @@ public class Witness extends Element {
 
         if (traditioForm != null) {
             this.traditioForm = Optional.of(traditioForm);
-            appendChild(traditioForm);
+            appendChild(traditioForm.copy());
         }
 
         if (archIdentifier != null) {
             this.archIdentifier = Optional.of(archIdentifier);
-            appendChild(archIdentifier);
+            appendChild(archIdentifier.copy());
         }
 
         if (auth != null) {
             this.auth = Optional.of(auth);
-            appendChild(auth);
+            appendChild(auth.copy());
         }
 
         if (physicalDesc != null) {
             this.physicalDesc = Optional.of(physicalDesc);
-            appendChild(physicalDesc);
+            appendChild(physicalDesc.copy());
         }
 
         if (nota != null) {
             this.nota = Optional.of(nota);
-            appendChild(nota);
+            appendChild(nota.copy());
         }
 
 

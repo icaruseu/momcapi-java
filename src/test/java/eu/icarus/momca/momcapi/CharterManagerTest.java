@@ -1,10 +1,11 @@
 package eu.icarus.momca.momcapi;
 
-import eu.icarus.momca.momcapi.exception.MomcaException;
 import eu.icarus.momca.momcapi.model.CharterStatus;
 import eu.icarus.momca.momcapi.model.Date;
 import eu.icarus.momca.momcapi.model.id.*;
 import eu.icarus.momca.momcapi.model.resource.Charter;
+import eu.icarus.momca.momcapi.model.resource.MyCollection;
+import eu.icarus.momca.momcapi.model.resource.MyCollectionStatus;
 import eu.icarus.momca.momcapi.model.resource.User;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
 import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.Abstract;
@@ -110,7 +111,7 @@ public class CharterManagerTest {
 
     }
 
-    @Test(expectedExceptions = MomcaException.class)
+    @Test
     public void testAddCharter5() throws Exception {
 
         IdCharter id = new IdCharter("CH-", "Urkunden", "Charter1");
@@ -120,8 +121,60 @@ public class CharterManagerTest {
 
         Charter charter = new Charter(id, CharterStatus.PUBLIC, admin, date);
 
-        cm.addCharter(charter);
+        assertFalse(cm.addCharter(charter));
 
+
+    }
+
+    @Test
+    public void testAddCharter6() throws Exception {
+
+        Charter savedCharter = cm.getCharter(
+                new IdCharter("CH-KAE", "Urkunden", "KAE_Urkunde_Nr_3"),
+                CharterStatus.SAVED).get();
+
+        IdUser newIdUser = new IdUser("admin");
+        CharterStatus newStatus = CharterStatus.PRIVATE;
+        IdCharter newIdCharter = new IdCharter("ea13e5f1-03b2-4bfa-9dd5-8fb770f98d7b", savedCharter.getIdentifier());
+
+        savedCharter.setCreator(newIdUser.getIdentifier());
+        savedCharter.setCharterStatus(newStatus);
+        savedCharter.setId(newIdCharter);
+
+        assertTrue(cm.addCharter(savedCharter));
+
+        Optional<Charter> newPrivateCharter = cm.getCharter(newIdCharter, newStatus);
+
+        cm.deleteCharter(newIdCharter, newStatus);
+
+        assertTrue(newPrivateCharter.isPresent());
+
+    }
+
+    @Test
+    public void testAddCharter7() throws Exception {
+
+        User newUser = new User("newUser", "admin");
+        mc.getUserManager().addUser(newUser, "password");
+
+        IdMyCollection idMyCollection = new IdMyCollection("532ffe0f-668b-4f02-a992-35bcc660e958");
+        MyCollection myCollection = new MyCollection(idMyCollection.getIdentifier(),
+                "Test MyCollection", newUser.getId(), MyCollectionStatus.PRIVATE);
+
+        mc.getMyCollectionManager().addMyCollection(myCollection);
+
+        IdCharter id = new IdCharter(idMyCollection.getIdentifier(), "f48cd631-9b3b-46b3-b819-f1f20026594b");
+        Date date = new Date(LocalDate.of(1413, 2, 2), 0, "2nd Februrary, 1413");
+        Charter charter = new Charter(id, CharterStatus.PRIVATE, newUser, date);
+
+        assertTrue(cm.addCharter(charter));
+
+        charter = cm.getCharter(charter.getId(), charter.getCharterStatus()).get();
+
+        cm.deleteCharter(charter.getId(), charter.getCharterStatus());
+        mc.getUserManager().deleteUser(newUser.getId());
+
+        assertTrue(charter.toCei().toXML().contains("cei:dateRange"));
 
     }
 

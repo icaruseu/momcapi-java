@@ -377,6 +377,50 @@ public class Date implements Comparable<Date> {
 
     }
 
+    @NotNull
+    public DateRange toCeiDateRange() {
+
+        DateRange dateRange;
+
+        if (sortingDate.isPresent()) {
+
+            LocalDate date = sortingDate.get();
+
+            if (daysInRange == 0) {
+
+                String value = String.valueOf(date.getYear()) +
+                        String.format("%02d", date.getMonth().getValue()) +
+                        String.format("%02d", date.getDayOfMonth());
+
+                dateRange = new DateRange(value, value, literalDate);
+
+            } else {
+
+                LocalDate offsetDate = getEarliestPossibleDate().get();
+
+                String valueFrom = String.valueOf(offsetDate.getYear()) +
+                        String.format("%02d", offsetDate.getMonth().getValue()) +
+                        String.format("%02d", offsetDate.getDayOfMonth());
+
+                String valueTo = String.valueOf(date.getYear()) +
+                        String.format("%02d", date.getMonth().getValue()) +
+                        String.format("%02d", date.getDayOfMonth());
+
+                dateRange = new DateRange(valueFrom, valueTo, literalDate,
+                        certainty.orElse(""), lang.orElse(""), facs.orElse(""), id.orElse(""), n.orElse(""));
+
+            }
+
+        } else {
+
+            dateRange = new DateRange("99999999", "99999999", literalDate);
+
+        }
+
+        return dateRange;
+
+    }
+
     @Override
     public String toString() {
         return "Date{" +

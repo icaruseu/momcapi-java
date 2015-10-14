@@ -159,7 +159,7 @@ public class Charter extends AtomResource {
     }
 
     @NotNull
-    private Element createBodyXml() {
+    private Element createBodyXml(boolean forceDateRange) {
 
         Element body = new Element("cei:body", CEI_URI);
 
@@ -179,7 +179,10 @@ public class Charter extends AtomResource {
         Element issued = new Element("cei:issued", CEI_URI);
         chDesc.appendChild(issued);
         issuedPlace.ifPresent(p -> issued.appendChild(p.copy()));
-        issued.appendChild(date.toCeiDate());
+
+        DateAbstract ceiDate = forceDateRange ? date.toCeiDateRange() : date.toCeiDate();
+
+        issued.appendChild(ceiDate);
 
         this.witnessOrig.ifPresent(w -> {
 
@@ -224,8 +227,8 @@ public class Charter extends AtomResource {
             Element sourceDesc = new Element("cei:sourceDesc", CEI_URI);
             front.appendChild(sourceDesc);
 
-            sourceDescAbstractBibliography.ifPresent(sourceDesc::appendChild);
-            sourceDescTenorBibliography.ifPresent(sourceDesc::appendChild);
+            sourceDescAbstractBibliography.ifPresent((child) -> sourceDesc.appendChild(child.copy()));
+            sourceDescTenorBibliography.ifPresent((child) -> sourceDesc.appendChild(child.copy()));
 
         }
 
@@ -525,14 +528,13 @@ public class Charter extends AtomResource {
         return validationProblems.isEmpty();
     }
 
-    @Override
-    public void regenerateXmlContent() {
+    public void regenerateXmlContent(boolean forceDateRange) {
 
         Element cei = new Element("cei:text", CEI_URI);
         cei.addAttribute(new Attribute("type", "charter"));
 
         Element front = createFrontXml();
-        Element body = createBodyXml();
+        Element body = createBodyXml(forceDateRange);
         Element back = createBackXml();
 
         cei.appendChild(front);
@@ -558,6 +560,18 @@ public class Charter extends AtomResource {
         } catch (@NotNull SAXException | IOException | ParsingException | ParserConfigurationException e) {
             throw new IllegalArgumentException("Failed to validate the resource.", e);
         }
+
+    }
+
+    @Override
+    public void regenerateXmlContent() {
+
+        boolean forceDateRange = false;
+        if (charterStatus == CharterStatus.PRIVATE) {
+            forceDateRange = true;
+        }
+
+        regenerateXmlContent(forceDateRange);
 
     }
 
