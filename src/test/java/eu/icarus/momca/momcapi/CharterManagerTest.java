@@ -191,11 +191,11 @@ public class CharterManagerTest {
 
         assertTrue(cm.getCharter(charter.getId(), CharterStatus.IMPORTED).isPresent());
 
-        cm.deleteCharter(charter.getId(), CharterStatus.PUBLIC);
+        assertFalse(cm.deleteCharter(charter.getId(), CharterStatus.PUBLIC));
 
         assertTrue(cm.getCharter(charter.getId(), CharterStatus.IMPORTED).isPresent());
 
-        cm.deleteCharter(charter.getId(), CharterStatus.IMPORTED);
+        assertTrue(cm.deleteCharter(charter.getId(), CharterStatus.IMPORTED));
 
         assertFalse(cm.getCharter(charter.getId(), CharterStatus.IMPORTED).isPresent());
 

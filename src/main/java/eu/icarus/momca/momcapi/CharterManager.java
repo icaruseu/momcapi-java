@@ -67,8 +67,29 @@ public class CharterManager extends AbstractManager {
         return atomIdStrings.stream().map(AtomId::new).map(IdCharter::new).collect(Collectors.toList());
     }
 
-    public void deleteCharter(@NotNull IdCharter id, @NotNull CharterStatus status) {
-        getCharter(id, status).ifPresent(momcaConnection::deleteExistResource);
+    public boolean deleteCharter(@NotNull IdCharter id, @NotNull CharterStatus status) {
+
+        boolean success = false;
+        LOGGER.info("Trying to delete charter '{}' with status '{}'", id, status);
+
+        Optional<Charter> charter = getCharter(id, status);
+
+        if (charter.isPresent()) {
+
+            success = momcaConnection.deleteExistResource(charter.get());
+
+            if (success) {
+                LOGGER.info("Charter '{}' with status '{}' deleted.", id, status);
+            } else {
+                LOGGER.info("Charter '{}' with status '{}' not deleted.", id, status);
+            }
+
+        } else {
+            LOGGER.info("Charter '{}' with status '{}' not existing, aborting deletion.", id, status);
+        }
+
+        return success;
+
     }
 
     @NotNull
