@@ -788,7 +788,7 @@ public class Charter extends AtomResource {
 
         SchemaFactory schemaFactory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
         factory.setSchema(schemaFactory.newSchema(new Source[]{
-                new StreamSource(this.getClass().getResourceAsStream("/cei.xsd"))}));
+                new StreamSource(this.getClass().getResourceAsStream("/cei10.xsd"))}));
 
         SAXParser parser = factory.newSAXParser();
         XMLReader reader = parser.getXMLReader();
