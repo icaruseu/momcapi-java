@@ -70,9 +70,9 @@
 
     -->
     <xs:import namespace="http://www.w3.org/XML/1998/namespace"
-               schemaLocation="src/main/resources/xml.xsd"/>
+               schemaLocation="http://www.monasterium.net/mom/resource/?atomid=tag:www.monasterium.net,2011:/mom/resource/xsd/xml"/>
     <xs:import namespace="http://www.w3.org/1999/xlink"
-               schemaLocation="src/main/resources/xlink.xsd"/>
+               schemaLocation="http://www.monasterium.net/mom/resource/?atomid=tag:www.monasterium.net,2011:/mom/resource/xsd/xlink"/>
     <xs:attributeGroup name="am.date.normal">
         <xs:attribute name="normal">
             <xs:simpleType>

@@ -1,7 +1,8 @@
 <xs:schema xmlns:xrxe="http://www.monasterium.net/NS/xrxe" xmlns:xrx="http://www.monasterium.net/NS/xrx"
            xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xlink="http://www.w3.org/1999/xlink"
            targetNamespace="http://www.w3.org/1999/xlink" elementFormDefault="qualified">
-    <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="../../xml/xsd/xml.xsd"/>
+    <xs:import namespace="http://www.w3.org/XML/1998/namespace"
+               schemaLocation="http://www.monasterium.net/mom/resource/?atomid=tag:www.monasterium.net,2011:/mom/resource/xsd/xml"/>
     <xs:attribute name="href" type="xs:anyURI">
         <xs:annotation>
             <xs:appinfo source="EditVDU">

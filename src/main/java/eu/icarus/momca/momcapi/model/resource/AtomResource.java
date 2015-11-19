@@ -118,7 +118,7 @@ public abstract class AtomResource extends ExistResource {
     }
 
     @NotNull
-    static String localTime() {
+    public static String localTime() {
         return ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
     }
 

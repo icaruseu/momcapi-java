@@ -6,6 +6,7 @@ import eu.icarus.momca.momcapi.exception.MomcaException;
 import eu.icarus.momca.momcapi.model.CharterStatus;
 import eu.icarus.momca.momcapi.model.Date;
 import eu.icarus.momca.momcapi.model.id.IdCharter;
+import eu.icarus.momca.momcapi.model.id.IdFond;
 import eu.icarus.momca.momcapi.model.id.IdUser;
 import eu.icarus.momca.momcapi.model.xml.Namespace;
 import eu.icarus.momca.momcapi.model.xml.XmlValidationProblem;
@@ -92,6 +93,22 @@ public class Charter extends AtomResource {
 
     }
 
+    public Charter(@NotNull Element ceiContent, @NotNull IdFond fond, @NotNull CharterStatus charterStatus, @NotNull User author) {
+
+        super(initIdCharterFromXml(ceiContent, fond),
+                createParentUri(initIdCharterFromXml(ceiContent, fond), charterStatus, author.getId()),
+                createResourceName(initIdCharterFromXml(ceiContent, fond), charterStatus));
+
+        this.charterStatus = charterStatus;
+        this.date = initDateFromXml(ceiContent);
+        this.idno = initIdnoFromXml(ceiContent);
+
+        initCharterFromXml(ceiContent);
+
+        regenerateXmlContent();
+
+    }
+
     public Charter(@NotNull ExistResource existResource) {
 
         super(existResource);
@@ -104,13 +121,9 @@ public class Charter extends AtomResource {
 
         Element xml = toDocument().getRootElement();
 
-        charterStatus = initCharterStatus();
-
-        date = initDateFromXml(xml);
-
-        idno = Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_BODY_IDNO)
-                .map(Idno::new)
-                .orElseThrow(MomcaException::new);
+        this.charterStatus = initCharterStatus();
+        this.date = initDateFromXml(xml);
+        this.idno = initIdnoFromXml(xml);
 
         initCharterFromXml(xml);
 
@@ -522,6 +535,23 @@ public class Charter extends AtomResource {
 
         return result;
 
+    }
+
+    @NotNull
+    private static IdCharter initIdCharterFromXml(@NotNull Element ceiContent, @NotNull IdFond fond) {
+
+        return
+                new IdCharter(
+                        fond.getIdArchive().getIdentifier(),
+                        fond.getIdentifier(),
+                        Util.queryXmlForString(ceiContent, XpathQuery.QUERY_CEI_BODY_IDNO_ID));
+
+    }
+
+    private Idno initIdnoFromXml(Element xml) {
+        return Util.queryXmlForOptionalElement(xml, XpathQuery.QUERY_CEI_BODY_IDNO)
+                .map(Idno::new)
+                .orElseThrow(MomcaException::new);
     }
 
     public boolean isValidCei() {
