@@ -327,6 +327,10 @@ public class Date implements Comparable<Date> {
 
     }
 
+    public boolean isDateRange() {
+        return daysInRange != 0;
+    }
+
     private boolean isUndated(@NotNull DateValue value) {
         String valueString = value.getValue();
         return valueString.isEmpty() || valueString.equals("99999999");
