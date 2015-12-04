@@ -32,7 +32,6 @@
             <cei:body>
                 <cei:idno id="KAE_Urkunde_Nr_1" old="1" facs="facs" n="n">KAE, Urkunde Nr. 1</cei:idno>
                 <cei:chDesc>
-                    <cei:class>Urkunde</cei:class>
                     <cei:abstract lang="lang" n="n" id="id" facs="facs">König Otto I. verleiht auf Bitte Herzog Hermanns dem Kloster Meinradszell (Einsiedeln), das samt einer Kirche vom jetzigen <cei:persName>Abt Eberhard</cei:persName> auf Boden, der dem Herzog von einigen Getreuen zu eigen gegeben worden war, mit dessen Unterstützung errichtet worden ist, das Recht freier Wahl des Abtes nach dem Tode Eberhards und Immunität.</cei:abstract>
                     <cei:issued>
                         <cei:placeName type="City" lang="lang">Frankfurt <cei:hi>am Main</cei:hi></cei:placeName>
@@ -98,6 +97,7 @@
                 <cei:tenor n="n" id="id" facs="facs">This is the <cei:hi>Winter</cei:hi> of our discontempt.</cei:tenor>
             </cei:body>
             <cei:back>
+                <cei:class>Urkunde</cei:class>
                 <cei:placeName certainty="certainty" existent="existent" facs="facs" id="id" key="key" lang="lang" n="n"
                                reg="reg" type="type">Frankfurt</cei:placeName>
                 <cei:placeName reg="Einsiedeln">Kloster <cei:hi>Einsiedeln</cei:hi> in der Schweiz</cei:placeName>

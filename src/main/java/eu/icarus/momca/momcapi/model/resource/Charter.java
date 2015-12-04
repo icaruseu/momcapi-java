@@ -134,6 +134,12 @@ public class Charter extends AtomResource {
 
         Element back = new Element("cei:back", CEI_URI);
 
+        charterClass.ifPresent(s -> {
+            Element e = new Element("cei:class", CEI_URI);
+            e.appendChild(s);
+            back.appendChild(e);
+        });
+
         backPersNames
                 .stream()
                 .filter(p -> !p.getText().isEmpty())
@@ -180,12 +186,6 @@ public class Charter extends AtomResource {
 
         Element chDesc = new Element("cei:chDesc", CEI_URI);
         body.appendChild(chDesc);
-
-        charterClass.ifPresent(s -> {
-            Element e = new Element("cei:class", CEI_URI);
-            e.appendChild(s);
-            chDesc.appendChild(e);
-        });
 
         charterAbstract.ifPresent(a -> chDesc.appendChild(a.copy()));
 
