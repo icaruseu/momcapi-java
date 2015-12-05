@@ -355,17 +355,18 @@ public class Fond extends AtomResource {
     public void regenerateXmlContent() {
 
         Element ead = createEadElement();
-        List<String> validationErrors = new ArrayList<>(0);
 
-        try {
-            validationErrors.addAll(validateEad(ead));
-        } catch (SAXException | ParserConfigurationException | IOException | ParsingException e) {
-            throw new RuntimeException("Failed to validate EAD.", e);
-        }
-
-        if (!validationErrors.isEmpty()) {
-            throw new IllegalArgumentException("EAD is not valid. The following errors were reported:\n" + validationErrors.toString());
-        }
+//        List<String> validationErrors = new ArrayList<>(0);
+//
+//        try {
+//            validationErrors.addAll(validateEad(ead));
+//        } catch (SAXException | ParserConfigurationException | IOException | ParsingException e) {
+//            throw new RuntimeException("Failed to validate EAD.", e);
+//        }
+//
+//        if (!validationErrors.isEmpty()) {
+//            throw new IllegalArgumentException("EAD is not valid. The following errors were reported:\n" + validationErrors.toString());
+//        }
 
         String published = getPublished();
         String updated = getUpdated();
