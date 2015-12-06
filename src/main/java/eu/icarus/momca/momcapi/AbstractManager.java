@@ -30,12 +30,9 @@ abstract class AbstractManager {
 
         LOGGER.debug("Trying to get resource with uri '{}' from the database.", resourceUri);
 
-        String resourceName = Util.getLastUriPart(resourceUri);
-        String parentUri = Util.getParentUri(resourceUri);
+        Optional<ExistResource> resource = momcaConnection.readExistResource(resourceUri);
 
-        Optional<ExistResource> resource = momcaConnection.readExistResource(resourceName, parentUri);
-
-        LOGGER.debug("Returning '{}' for URI '{}' from the database.", resource, resourceUri);
+        LOGGER.debug("Returning resource '{}' for URI '{}' from the database.", resource, resourceUri);
 
         return resource;
 

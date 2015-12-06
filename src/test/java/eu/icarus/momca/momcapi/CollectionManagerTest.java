@@ -113,7 +113,7 @@ public class CollectionManagerTest {
         Collection collection = new Collection(identifier, name);
 
         cm.addCollection(collection);
-        mc.writeCollection(identifier, ResourceRoot.PUBLIC_CHARTERS.getUri()); // add charters collection to test removal
+        mc.createCollection(identifier, ResourceRoot.PUBLIC_CHARTERS.getUri()); // add charters collection to test removal
 
         cm.deleteCollection(collection.getId());
 

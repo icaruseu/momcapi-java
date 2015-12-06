@@ -5,6 +5,8 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.util.Optional;
+
 import static org.testng.Assert.*;
 
 /**
@@ -32,7 +34,7 @@ public class MomcaConnectionTest {
         String path = "/db";
         String uri = path + "/" + name;
 
-        assertTrue(momcaConnection.writeCollection(name, path));
+        assertTrue(momcaConnection.createCollection(name, path));
         assertTrue(momcaConnection.readCollection(uri).isPresent());
 
     }
@@ -55,7 +57,7 @@ public class MomcaConnectionTest {
         String path = "/db";
         String uri = path + "/" + name;
 
-        momcaConnection.writeCollection(name, path);
+        momcaConnection.createCollection(name, path);
         assertTrue(momcaConnection.deleteCollection(uri));
         assertFalse(momcaConnection.readCollection(uri).isPresent());
 
@@ -64,26 +66,40 @@ public class MomcaConnectionTest {
     @Test
     public void testDeleteExistResource() throws Exception {
 
-        ExistResource res = new ExistResource("deleteTest.xml", "/db", "<empty/>");
+        ExistResource res = new ExistResource("delete@Test.xml", "/db", "<empty/>");
 
         momcaConnection.writeExistResource(res);
         assertTrue(momcaConnection.deleteExistResource(res));
-        assertFalse(momcaConnection.readExistResource(res.getResourceName(), res.getParentUri()).isPresent());
+        assertFalse(momcaConnection.readExistResource(res.getUri()).isPresent());
 
     }
 
     @Test
     public void testIsCollectionExisting() throws Exception {
 
-        assertTrue(momcaConnection.isCollectionExisting("/db/mom-data/metadata.charter.public/CH-KAE"));
+        assertTrue(momcaConnection.isCollectionExisting("/db/mom-data/xrx.user/user2.testuser@dev.monasterium.net/metadata.mycollection/0d48f895-f296-485b-a6d9-e88b4523cc92"));
+        assertTrue(momcaConnection.isCollectionExisting("/db/mom-data/metadata.charter.public/CH-KAE/Urkunden"));
         assertFalse(momcaConnection.isCollectionExisting("/some/random/collection"));
     }
 
     @Test
     public void testIsResourceExisting() throws Exception {
 
-        ExistResource resource = new ExistResource("admin.xml", "/db/mom-data/xrx.user", "<empty/>");
-        assertTrue(momcaConnection.isResourceExisting(resource));
+        ExistResource resource1 = new ExistResource("AGNS_F.1_the_fascia_9_Sub_3499|1817.cei.xml", "/db/mom-data/metadata.charter.import/RS-IAGNS/Charters", "<empty/>");
+        assertTrue(momcaConnection.isResourceExisting(resource1));
+
+        ExistResource resource2 = new ExistResource("KAE_Urkunde_Nr_1.cei.xml", "/db/mom-data/metadata.charter.public/CH-KAE/Urkunden", "<empty/>");
+        assertTrue(momcaConnection.isResourceExisting(resource2));
+
+    }
+
+    @Test
+    public void testReadExistResource() throws Exception {
+
+        String uri = "/db/mom-data/xrx.user/user2.testuser@dev.monasterium.net/metadata.mycollection/0d48f895-f296-485b-a6d9-e88b4523cc92/0d48f895-f296-485b-a6d9-e88b4523cc92.mycollection.xml";
+        Optional<ExistResource> resource = momcaConnection.readExistResource(uri);
+
+        assertTrue(resource.isPresent());
 
     }
 
@@ -91,9 +107,7 @@ public class MomcaConnectionTest {
     public void testStoreExistResource() throws Exception {
         ExistResource res = new ExistResource("write@Test.xml", "/db", "<empty/>");
         assertTrue(momcaConnection.writeExistResource(res));
-        assertTrue(momcaConnection.readExistResource(res.getResourceName(), res.getParentUri()).isPresent());
+        assertTrue(momcaConnection.readExistResource(res.getUri()).isPresent());
         momcaConnection.deleteExistResource(res);
     }
-
-
 }

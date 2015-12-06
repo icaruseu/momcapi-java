@@ -32,8 +32,8 @@ public class FondManager extends AbstractManager {
         String archiveIdentifier = fond.getArchiveId().getIdentifier();
         String parentUri = ResourceRoot.ARCHIVAL_FONDS.getUri() + "/" + archiveIdentifier;
 
-        momcaConnection.writeCollection(archiveIdentifier, ResourceRoot.ARCHIVAL_FONDS.getUri());
-        momcaConnection.writeCollection(identifier, parentUri);
+        momcaConnection.createCollection(archiveIdentifier, ResourceRoot.ARCHIVAL_FONDS.getUri());
+        momcaConnection.createCollection(identifier, parentUri);
 
         String time = momcaConnection.queryRemoteDateTime();
 

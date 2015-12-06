@@ -35,7 +35,7 @@ public class UserManagerTest {
         assertTrue(userManager.addUser(new User(userName, moderator), password));
 
         assertTrue(userManager.getUser(id).isPresent());
-        assertTrue(userManager.isUserInitialized(id));
+        assertTrue(userManager.isInitialized(id));
 
         userManager.deleteUser(id);
 
@@ -92,7 +92,7 @@ public class UserManagerTest {
         User user = userManager.getUser(new IdUser(userName)).get();
         userManager.deleteExistUserAccount(userName);
 
-        assertFalse(userManager.isUserInitialized(new IdUser(userName)));
+        assertFalse(userManager.isInitialized(new IdUser(userName)));
 
         userManager.deleteUser(user.getId());
 
@@ -110,7 +110,7 @@ public class UserManagerTest {
         assertTrue(userManager.deleteUser(id));
 
         assertFalse(userManager.getUser(id).isPresent());
-        assertFalse(userManager.isUserInitialized(id));
+        assertFalse(userManager.isInitialized(id));
         assertFalse(momcaConnection.readCollection("/db/mom-data/xrx.user/" + userName).isPresent());
 
     }
@@ -149,7 +149,7 @@ public class UserManagerTest {
 
         // initialize user
         assertTrue(userManager.initializeUser(user.getId(), newUserPassword));
-        assertTrue(userManager.isUserInitialized(user.getId()));
+        assertTrue(userManager.isInitialized(user.getId()));
 
         // clean up
         userManager.deleteUser(user.getId());
@@ -157,9 +157,15 @@ public class UserManagerTest {
     }
 
     @Test
-    public void testIsUserInitialized() throws Exception {
-        assertFalse(userManager.isUserInitialized(new IdUser("uninitialized.testuser@dev.monasterium.net")));
-        assertTrue(userManager.isUserInitialized(new IdUser("admin")));
+    public void testIsExisting() throws Exception {
+        assertTrue(userManager.isExisting(new IdUser("user1.testuser@dev.monasterium.net")));
+        assertFalse(userManager.isExisting(new IdUser("user17.testuser@dev.monasterium.net")));
+    }
+
+    @Test
+    public void testIsInitialized() throws Exception {
+        assertFalse(userManager.isInitialized(new IdUser("uninitialized.testuser@dev.monasterium.net")));
+        assertTrue(userManager.isInitialized(new IdUser("admin")));
     }
 
     @Test

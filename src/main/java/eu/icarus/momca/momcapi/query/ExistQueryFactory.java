@@ -68,6 +68,31 @@ public class ExistQueryFactory {
 
     }
 
+    @NotNull
+    public static ExistQuery checkUserExistence(@NotNull IdUser idUser) {
+
+        String query = String.format(
+                "xmldb:exists-user('%s')",
+                idUser.getIdentifier()
+        );
+
+        return new ExistQuery(query);
+
+    }
+
+    @NotNull
+    public static ExistQuery createCollection(@NotNull String parentUri, @NotNull String name) {
+
+        String query = String.format(
+                "xmldb:create-collection('%s', '%s')",
+                parentUri,
+                name
+        );
+
+        return new ExistQuery(query);
+
+    }
+
     /**
      * @param eapText The text value that signifies which element to delete. Can be either a {@code eap:code} or
      *                {@code eap:nativeform}
@@ -172,6 +197,18 @@ public class ExistQueryFactory {
                 regionNativeName,
                 ResourceRoot.ARCHIVAL_COLLECTIONS.getUri(),
                 regionNativeName);
+
+        return new ExistQuery(query);
+
+    }
+
+    @NotNull
+    public static ExistQuery getResource(@NotNull String uri) {
+
+        String query = String.format(
+                "doc('%s')",
+                uri
+        );
 
         return new ExistQuery(query);
 
@@ -506,6 +543,44 @@ public class ExistQueryFactory {
 
     }
 
+    @NotNull
+    public static ExistQuery listUserIds() {
+
+        String query = String.format(
+                "%s collection('/db/mom-data/xrx.user')//xrx:email/text()",
+                getNamespaceDeclaration(Namespace.XRX)
+        );
+
+        return new ExistQuery(query);
+
+    }
+
+    public static ExistQuery removeCollection(@NotNull String collectionUri) {
+
+        String query = String.format(
+                "xmldb:remove('%s')",
+                collectionUri
+        );
+
+        return new ExistQuery(query);
+
+    }
+
+    public static ExistQuery removeResource(@NotNull ExistResource existResource) {
+
+        String parentUri = existResource.getParentUri();
+        String name = existResource.getResourceName();
+
+        String query = String.format(
+                "xmldb:remove('%s', '%s')",
+                parentUri,
+                name
+        );
+
+        return new ExistQuery(query);
+
+    }
+
     /**
      * @param resourceUri      The full uri of the resource, e.g. {@code /db/mom-data/xrx.user/admin.xml}.
      * @param elementToReplace The qualified name of the XML element to replace, e.g. {@code cei:idno} or {@code
@@ -523,6 +598,23 @@ public class ExistQueryFactory {
                 resourceUri,
                 elementToReplace,
                 newElement);
+
+        return new ExistQuery(query);
+
+    }
+
+    @NotNull
+    public static ExistQuery storeResource(@NotNull ExistResource existResource) {
+
+        String collectionUri = existResource.getParentUri();
+        String resourceName = existResource.getResourceName();
+        String resourceContent = existResource.toXML();
+
+        String query = String.format(
+                "xmldb:store('%s', '%s', '%s')",
+                collectionUri,
+                resourceName,
+                resourceContent);
 
         return new ExistQuery(query);
 

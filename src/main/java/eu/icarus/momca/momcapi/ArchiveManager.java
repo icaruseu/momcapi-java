@@ -48,7 +48,7 @@ public class ArchiveManager extends AbstractManager {
 
             if (isRegionOk) {
 
-                momcaConnection.writeCollection(identifier, ResourceRoot.ARCHIVES.getUri());
+                momcaConnection.createCollection(identifier, ResourceRoot.ARCHIVES.getUri());
                 String time = momcaConnection.queryRemoteDateTime();
                 momcaConnection.writeAtomResource(newArchive, time, time);
 

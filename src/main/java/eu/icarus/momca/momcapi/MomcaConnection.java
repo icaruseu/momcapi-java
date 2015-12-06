@@ -12,16 +12,14 @@ import eu.icarus.momca.momcapi.model.xml.xrx.Keywords;
 import eu.icarus.momca.momcapi.query.ExistQuery;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
 import nu.xom.Element;
-import org.exist.xmldb.RemoteCollection;
-import org.exist.xmldb.RemoteCollectionManagementService;
-import org.exist.xmldb.RemoteUserManagementService;
-import org.exist.xmldb.UserManagementService;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmldb.api.DatabaseManager;
-import org.xmldb.api.base.*;
-import org.xmldb.api.modules.CollectionManagementService;
+import org.xmldb.api.base.Collection;
+import org.xmldb.api.base.ResourceIterator;
+import org.xmldb.api.base.ResourceSet;
+import org.xmldb.api.base.XMLDBException;
 import org.xmldb.api.modules.XMLResource;
 import org.xmldb.api.modules.XPathQueryService;
 
@@ -105,6 +103,30 @@ public class MomcaConnection {
 
     }
 
+    boolean createCollection(@NotNull String name, @NotNull String parentUri) {
+
+        LOGGER.debug("Trying to write collection '{}/{}'.", parentUri, name);
+
+        String encodedName = Util.encode(name);
+        String encodedParentUri = Util.encode(parentUri);
+
+        ExistQuery query = ExistQueryFactory.createCollection(encodedParentUri, encodedName);
+        List<String> result = queryDatabase(query);
+
+        String resultingCollectionUri = encodedParentUri + "/" + encodedName;
+
+        boolean success = result.size() == 1 && result.get(0).equals(resultingCollectionUri);
+
+        if (success) {
+            LOGGER.debug("Collection '{}' written.", resultingCollectionUri);
+        } else {
+            LOGGER.debug("Collection '{}' not written.", resultingCollectionUri);
+        }
+
+        return success;
+
+    }
+
     boolean createCollectionPath(@NotNull String absoluteUri) {
 
         LOGGER.debug("Trying to create all collections on path '{}'.", absoluteUri);
@@ -113,34 +135,26 @@ public class MomcaConnection {
 
         if (!absoluteUri.isEmpty() && absoluteUri.startsWith("/db/")) {
 
-            absoluteUri = absoluteUri.replace("/db/", "");
-
-            Collection parent = rootCollection;
-
-            String[] parts = absoluteUri.split("/");
+            String[] parts = absoluteUri.replace("/db/", "").split("/");
+            String parentUri = "/db";
 
             for (String part : parts) {
 
-                try {
+                success = createCollection(part, parentUri);
+                parentUri = parentUri + "/" + part;
 
-                    CollectionManagementService parentService =
-                            (RemoteCollectionManagementService) parent.getService("CollectionManagementService", "1.0");
-
-                    parentService.createCollection(part);
-
-                    LOGGER.debug("Collection '{}/{}' created.", parent.getName(), part);
-
-                    parent = parent.getChildCollection(part);
-
-                } catch (XMLDBException e) {
-                    LOGGER.error("XMLDBException while trying to add collection '{}/{}'. Aborting creation.", parent.toString(), part, e);
+                if (!success) {
+                    LOGGER.debug("Failed to create collection '{}' on path '{}'. Aborting further creation attempts.", part, absoluteUri);
                     break;
                 }
 
             }
 
-            LOGGER.debug("Created all collections on path '{}'.", absoluteUri);
-            success = true;
+            if (success) {
+                LOGGER.debug("Created all collections on path '{}'.", absoluteUri);
+            } else {
+                LOGGER.debug("Failed to create all collections on path '{}'", absoluteUri);
+            }
 
         } else {
             LOGGER.debug("Creation of path '{}' aborted. Path invalid.", absoluteUri);
@@ -152,91 +166,21 @@ public class MomcaConnection {
 
     boolean deleteCollection(@NotNull String uri) {
 
-        boolean success = false;
-
         LOGGER.debug("Trying to delete collection '{}'.", uri);
 
-        Optional<Collection> collectionOptional = readCollection(uri);
+        ExistQuery query = ExistQueryFactory.removeCollection(Util.encode(uri));
+        queryDatabase(query);
 
-        if (collectionOptional.isPresent()) {
-
-            Collection collection = collectionOptional.get();
-
-            try {
-
-                RemoteCollectionManagementService service = (RemoteCollectionManagementService) collection
-                        .getParentCollection().getService("CollectionManagementService", "1.0");
-                service.removeCollection(((RemoteCollection) collection).getPathURI());
-
-                success = true;
-
-                LOGGER.debug("Collection '{}' deleted.", uri);
-
-            } catch (XMLDBException e) {
-                LOGGER.error("Failed to delete '{}' due to an XMLDBException.", uri, e);
-            }
-
-        } else {
-            LOGGER.debug("Collection '{}' not existing, nothing deleted.", uri);
-        }
-
-        return success;
+        return !isCollectionExisting(uri);
 
     }
 
-    boolean deleteExistResource(@NotNull ExistResource resourceToDelete) {
+    boolean deleteExistResource(@NotNull ExistResource resource) {
 
-        boolean success = false;
+        ExistQuery query = ExistQueryFactory.removeResource(resource);
+        queryDatabase(query);
 
-        LOGGER.debug("Trying to delete resource '{}'", resourceToDelete);
-
-        Optional<Collection> collectionOptional = readCollection(resourceToDelete.getParentUri());
-
-        if (collectionOptional.isPresent()) {
-
-            Collection collection = collectionOptional.get();
-
-            try {
-
-                String path = findMatchingResource(resourceToDelete.getResourceName(), collection.listResources());
-                Resource res = collection.getResource(path);
-
-                if (res != null) {
-
-                    collection.removeResource(res);
-
-                    success = true;
-
-                    LOGGER.debug("Resource '{}' deleted.", resourceToDelete);
-
-                }
-
-            } catch (@NotNull XMLDBException e) {
-                LOGGER.error("Failed to delete '{}' due to an XMLDBException.", resourceToDelete, e);
-            }
-
-        } else {
-            LOGGER.debug("Failed to locate parent collection of resource '{}', nothing deleted.", resourceToDelete);
-        }
-
-        return success;
-
-    }
-
-    @NotNull
-    private String findMatchingResource(@NotNull String resourceName, @NotNull String[] resources) {
-
-        String matchingName = "";
-
-        for (String resource : resources) {
-
-            if (Util.decode(resource).equals(Util.decode(resourceName))) {
-                matchingName = resource;
-            }
-
-        }
-
-        return matchingName;
+        return !isResourceExisting(resource);
 
     }
 
@@ -303,7 +247,15 @@ public class MomcaConnection {
 
         LOGGER.debug("Testing existence of collection '{}'.", collectionUri);
 
-        boolean isExisting = queryToBoolean(ExistQueryFactory.checkCollectionExistence(collectionUri));
+        String encodedUri = Util.encode(collectionUri);
+        ExistQuery query = ExistQueryFactory.checkCollectionExistence(encodedUri);
+        List<String> result = queryDatabase(query);
+
+        if (result.size() != 1) {
+            throw new MomcaException("Failed to test for existence of collection '" + collectionUri + "'");
+        }
+
+        boolean isExisting = result.get(0).equals("true");
 
         LOGGER.debug("Returning '{}' for the existence of collection '{}'.", isExisting, collectionUri);
 
@@ -315,7 +267,14 @@ public class MomcaConnection {
 
         LOGGER.debug("Testing existence of resource '{}'.", resource);
 
-        boolean isExisting = queryToBoolean(ExistQueryFactory.checkExistResourceExistence(resource));
+        ExistQuery query = ExistQueryFactory.checkExistResourceExistence(resource);
+        List<String> result = queryDatabase(query);
+
+        if (result.size() != 1) {
+            throw new MomcaException("Failed to test for existence of resource '" + resource.getUri() + "'");
+        }
+
+        boolean isExisting = result.get(0).equals("true");
 
         LOGGER.debug("Returning '{}' for the existence of resource '{}'.", isExisting, resource);
 
@@ -384,22 +343,6 @@ public class MomcaConnection {
 
     }
 
-    private boolean queryToBoolean(ExistQuery query) {
-
-        List<String> results = queryDatabase(query);
-
-        boolean resultingBool = false;
-
-        if (results.size() != 1) {
-            LOGGER.debug("Result list doesn't have exactly one entry. Returning 'false'.");
-        } else {
-            resultingBool = Boolean.parseBoolean(results.get(0));
-        }
-
-        return resultingBool;
-
-    }
-
     @NotNull
     Optional<Collection> readCollection(@NotNull String uri) {
 
@@ -409,7 +352,8 @@ public class MomcaConnection {
 
         try {
 
-            result = DatabaseManager.getCollection(dbRootUri + Util.encode(uri), admin, password);
+            String absoluteUri = dbRootUri + Util.encode(uri);
+            result = DatabaseManager.getCollection(absoluteUri, admin, password);
 
             if (result == null) {
                 LOGGER.debug("Collection '{}' not found in the database. Returning nothing.", uri);
@@ -428,47 +372,33 @@ public class MomcaConnection {
     }
 
     @NotNull
-    Optional<ExistResource> readExistResource(@NotNull String resourceName, @NotNull String parentCollectionPath) {
+    Optional<ExistResource> readExistResource(@NotNull String resourceUri) {
 
-        LOGGER.debug("Trying to read resource '{}/{}' from the database.", parentCollectionPath, resourceName);
+        LOGGER.debug("Trying to read resource '{}' from the database.", resourceUri);
 
-        ExistResource result = null;
+        ExistResource resource = null;
 
-        Optional<Collection> parentCollection = readCollection(parentCollectionPath);
+        String encodedUri = Util.encode(resourceUri);
+        ExistQuery query = ExistQueryFactory.getResource(encodedUri);
+        List<String> result = queryDatabase(query);
 
-        if (parentCollection.isPresent()) {
+        if (result.size() == 1) {
 
-            try {
+            String name = Util.getLastUriPart(resourceUri);
+            String parentUri = Util.getParentUri(resourceUri);
+            String content = result.get(0);
 
-                Collection collection = parentCollection.get();
+            resource = new ExistResource(name, parentUri, content);
 
-                String resourcePath = findMatchingResource(resourceName, collection.listResources());
-                XMLResource resource = (XMLResource) collection.getResource(resourcePath);
-
-                if (resource == null) {
-
-                    LOGGER.debug("Resource '{}/{}' not found in the database. Returning nothing.",
-                            parentCollectionPath, resourceName);
-
-                } else {
-
-                    String content = (String) resource.getContent();
-                    result = new ExistResource(resourceName, parentCollectionPath, content);
-                    LOGGER.debug("Resource '{}' read from the database.", result);
-
-                }
-
-            } catch (XMLDBException e) {
-                LOGGER.error("Encountered XMLDBException on trying to get resource '{}' from collection '{}'." +
-                        " Returned 'Optional.empty'", resourceName, parentCollectionPath);
-            }
-
-        } else {
-            LOGGER.debug("Parent collection of resource '{}/{}' not found in the database. Returning nothing.",
-                    resourceName, parentCollectionPath);
         }
 
-        return Optional.ofNullable(result);
+        if (resource == null) {
+            LOGGER.debug("Failed to read resource '{}' from the database.", resourceUri);
+        } else {
+            LOGGER.debug("Resource '{}' read from the database: {}", resourceUri, resource);
+        }
+
+        return Optional.ofNullable(resource);
 
     }
 
@@ -515,81 +445,21 @@ public class MomcaConnection {
 
     }
 
-    boolean writeCollection(@NotNull String name, @NotNull String parentUri) {
-
-        LOGGER.debug("Trying to write collection '{}/{}'.", parentUri, name);
-
-        boolean success = false;
-
-        String encodedName = Util.encode(name);
-        String encodedPath = Util.encode(parentUri);
-
-        Optional<Collection> parent = readCollection(encodedPath);
-
-        if (parent.isPresent()) {
-
-            try {
-
-                CollectionManagementService parentService = (RemoteCollectionManagementService) parent.get().getService("CollectionManagementService", "1.0");
-                parentService.createCollection(encodedName);
-
-                Collection newCollection = parent.get().getChildCollection(encodedName);
-                UserManagementService userService = (RemoteUserManagementService) newCollection.getService("UserManagementService", "1.0");
-                userService.chmod("rwxrwxrwx");
-
-                success = true;
-
-                LOGGER.debug("Collection '{}/{}' written.", parentUri, name);
-
-                newCollection.close();
-
-            } catch (XMLDBException e) {
-                LOGGER.error("XMLDBException while trying to write collection '{}' to '{}'. Adding failed.", name, parentUri, e);
-            }
-
-        } else {
-            LOGGER.debug("Failed to write collection '{}' because parent collection '{}' does not exist.", name, parentUri);
-        }
-
-        return success;
-
-    }
-
-
     boolean writeExistResource(@NotNull ExistResource resource) {
 
-        boolean success = false;
+        String resourceUri = resource.getUri();
 
-        LOGGER.debug("Trying to write resource '{}' to the database.", resource);
+        LOGGER.debug("Trying to write resource '{}' to the database.", resourceUri);
 
-        Optional<Collection> collectionOptional = readCollection(resource.getParentUri());
+        ExistQuery query = ExistQueryFactory.storeResource(resource);
+        List<String> result = queryDatabase(query);
 
-        if (collectionOptional.isPresent()) {
+        boolean success = result.size() == 1 && result.get(0).equals(resourceUri);
 
-            Collection collection = collectionOptional.get();
-
-            try {
-
-                XMLResource newResource = (XMLResource) collection.createResource(resource.getResourceName(), "XMLResource");
-                newResource.setContent(resource.toXML());
-                collection.storeResource(newResource);
-
-                UserManagementService userService = (RemoteUserManagementService) collection.getService("UserManagementService", "1.0");
-                userService.chmod(newResource, "rwxrwxrwx");
-
-                collection.close();
-
-                success = true;
-
-                LOGGER.debug("Resource '{}' written to the database.", resource);
-
-
-            } catch (XMLDBException e) {
-                throw new MomcaException("Failed to create new resource.", e);
-            }
-
+        if (success) {
+            LOGGER.debug("Resource '{}' written to the database.", resourceUri);
         } else {
-            LOGGER.debug("Failed to locate parent collection for resource '{}'. Aborting write.", resource);
+            LOGGER.debug("Failed to write resource '{}' to the database", resourceUri);
         }
 
         return success;

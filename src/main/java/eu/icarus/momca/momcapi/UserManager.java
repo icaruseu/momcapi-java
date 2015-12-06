@@ -5,6 +5,8 @@ import eu.icarus.momca.momcapi.model.id.IdUser;
 import eu.icarus.momca.momcapi.model.resource.ExistResource;
 import eu.icarus.momca.momcapi.model.resource.ResourceRoot;
 import eu.icarus.momca.momcapi.model.resource.User;
+import eu.icarus.momca.momcapi.query.ExistQuery;
+import eu.icarus.momca.momcapi.query.ExistQueryFactory;
 import org.exist.security.Account;
 import org.exist.security.Group;
 import org.exist.security.internal.aider.GroupAider;
@@ -16,8 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.XMLDBException;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -56,11 +56,11 @@ public class UserManager extends AbstractManager {
 
         LOGGER.info("Trying to add user '{}' to the database.", identifier);
 
-        if (getUser(user.getId()).isPresent()) {
+        if (isExisting(user.getId())) {
             LOGGER.info("User '{}' already existing in the database, adding aborted.", identifier);
         } else {
 
-            if (getUser(user.getIdModerator()).isPresent()) {
+            if (isExisting(user.getIdModerator())) {
 
                 success = initializeUser(user.getId(), password);
 
@@ -219,7 +219,7 @@ public class UserManager extends AbstractManager {
 
             User user = userOptional.get();
 
-            success = !isUserInitialized(idUser) || deleteExistUserAccount(user.getIdentifier());
+            success = !isInitialized(idUser) || deleteExistUserAccount(user.getIdentifier());
             if (success) {
 
                 success = momcaConnection.deleteExistResource(user);
@@ -256,8 +256,8 @@ public class UserManager extends AbstractManager {
 
         LOGGER.info("Trying to get user '{}' from the database.", identifier);
 
-        Optional<ExistResource> userResource = momcaConnection
-                .readExistResource(identifier + ".xml", ResourceRoot.USER_DATA.getUri());
+        String resourceUri = String.format("%s/%s.xml", ResourceRoot.USER_DATA.getUri(), identifier);
+        Optional<ExistResource> userResource = momcaConnection.readExistResource(resourceUri);
 
         if (userResource.isPresent()) {
 
@@ -280,7 +280,7 @@ public class UserManager extends AbstractManager {
 
         LOGGER.info("Trying to initialize account for user '{}' in eXist.", identifier);
 
-        if (!isUserInitialized(idUser)) {
+        if (!isInitialized(idUser)) {
 
             try {
 
@@ -320,7 +320,28 @@ public class UserManager extends AbstractManager {
 
     }
 
-    boolean isUserInitialized(@NotNull IdUser idUser) {
+    public boolean isExisting(@NotNull IdUser idUser) {
+
+        String identifier = idUser.getIdentifier();
+
+        LOGGER.info("Testing the existence of user '{}'.", identifier);
+
+        ExistQuery query = ExistQueryFactory.checkUserExistence(idUser);
+        List<String> result = momcaConnection.queryDatabase(query);
+
+        if (result.size() != 1) {
+            throw new MomcaException("Failed to test for the existence of user '" + identifier + "'");
+        }
+
+        boolean isExisting = result.get(0).equals("true");
+
+        LOGGER.info("Returning '{}' for the existence of user '{}'.", isExisting, identifier);
+
+        return isExisting;
+
+    }
+
+    boolean isInitialized(@NotNull IdUser idUser) {
 
         boolean success = false;
         String userName = idUser.getIdentifier();
@@ -345,47 +366,19 @@ public class UserManager extends AbstractManager {
     @NotNull
     public List<IdUser> listUsers() {
 
-        List<IdUser> users = new ArrayList<>();
-
         LOGGER.info("Trying to get a list of all users.");
 
-        Optional<Collection> userCollectionOptional = momcaConnection.readCollection(ResourceRoot.USER_DATA.getUri());
+        ExistQuery query = ExistQueryFactory.listUserIds();
+        List<String> result = momcaConnection.queryDatabase(query);
 
-        if (userCollectionOptional.isPresent()) {
+        List<IdUser> userIds = result
+                .stream()
+                .map(IdUser::new)
+                .collect(Collectors.toList());
 
-            Collection userCollection = userCollectionOptional.get();
+        LOGGER.info("Returning {} users ids: {}", userIds.size(), userIds);
 
-            String[] encodedUserNames = null;
-            try {
-                encodedUserNames = userCollection.listResources();
-            } catch (XMLDBException e) {
-                LOGGER.error("Failed to list the user resources due to an XMLDBException. Aborting listing users.", e);
-            }
-
-            if (encodedUserNames != null) {
-
-                List<String> userResourceNames = new ArrayList<>();
-
-                for (String encodedUserName : encodedUserNames) {
-                    userResourceNames.add(Util.decode(encodedUserName));
-                }
-
-                userResourceNames.sort(Comparator.<String>naturalOrder());
-
-                users = userResourceNames
-                        .stream()
-                        .map(s -> new IdUser(s.replace(".xml", "")))
-                        .collect(Collectors.toList());
-
-                LOGGER.info("Returning list of '{}' users from the database.", users.size());
-
-            }
-
-        } else {
-            LOGGER.error("Failed to get user root collection from the database. Aborting listing users.");
-        }
-
-        return users;
+        return userIds;
 
     }
 

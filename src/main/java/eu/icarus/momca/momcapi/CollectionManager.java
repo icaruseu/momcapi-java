@@ -29,7 +29,7 @@ public class CollectionManager extends AbstractManager {
             throw new IllegalArgumentException(message);
         }
 
-        momcaConnection.writeCollection(collection.getIdentifier(), ResourceRoot.ARCHIVAL_COLLECTIONS.getUri());
+        momcaConnection.createCollection(collection.getIdentifier(), ResourceRoot.ARCHIVAL_COLLECTIONS.getUri());
         String time = momcaConnection.queryRemoteDateTime();
         momcaConnection.writeAtomResource(collection, time, time);
 

@@ -116,9 +116,7 @@ public class CharterManager extends AbstractManager {
 
     @NotNull
     private Optional<Charter> getCharterFromUri(@NotNull String charterUri) {
-        String resourceName = Util.getLastUriPart(charterUri);
-        String parentUri = Util.getParentUri(charterUri);
-        return momcaConnection.readExistResource(resourceName, parentUri).map(Charter::new);
+        return momcaConnection.readExistResource(charterUri).map(Charter::new);
     }
 
     @NotNull
