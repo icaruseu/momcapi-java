@@ -139,7 +139,7 @@ public class UserManager extends AbstractManager {
 
         LOGGER.info("Trying to change password for user '{}'.", userName);
 
-        if (momcaConnection.isResourceExisting(user)) {
+        if (momcaConnection.isResourceExisting(user.getUri())) {
 
             try {
 
@@ -394,7 +394,7 @@ public class UserManager extends AbstractManager {
 
         LOGGER.debug("Trying to update user '{}'.", identifier);
 
-        if (momcaConnection.isResourceExisting(updatedUser)) {
+        if (momcaConnection.isResourceExisting(updatedUser.getUri())) {
 
             success = momcaConnection.writeExistResource(updatedUser);
 

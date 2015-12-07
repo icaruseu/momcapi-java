@@ -127,43 +127,6 @@ public class MomcaConnection {
 
     }
 
-    boolean createCollectionPath(@NotNull String absoluteUri) {
-
-        LOGGER.debug("Trying to create all collections on path '{}'.", absoluteUri);
-
-        boolean success = false;
-
-        if (!absoluteUri.isEmpty() && absoluteUri.startsWith("/db/")) {
-
-            String[] parts = absoluteUri.replace("/db/", "").split("/");
-            String parentUri = "/db";
-
-            for (String part : parts) {
-
-                success = createCollection(part, parentUri);
-                parentUri = parentUri + "/" + part;
-
-                if (!success) {
-                    LOGGER.debug("Failed to create collection '{}' on path '{}'. Aborting further creation attempts.", part, absoluteUri);
-                    break;
-                }
-
-            }
-
-            if (success) {
-                LOGGER.debug("Created all collections on path '{}'.", absoluteUri);
-            } else {
-                LOGGER.debug("Failed to create all collections on path '{}'", absoluteUri);
-            }
-
-        } else {
-            LOGGER.debug("Creation of path '{}' aborted. Path invalid.", absoluteUri);
-        }
-
-        return success;
-
-    }
-
     boolean deleteCollection(@NotNull String uri) {
 
         LOGGER.debug("Trying to delete collection '{}'.", uri);
@@ -180,7 +143,7 @@ public class MomcaConnection {
         ExistQuery query = ExistQueryFactory.removeResource(resource);
         queryDatabase(query);
 
-        return !isResourceExisting(resource);
+        return !isResourceExisting(resource.getUri());
 
     }
 
@@ -263,22 +226,72 @@ public class MomcaConnection {
 
     }
 
-    boolean isResourceExisting(@NotNull ExistResource resource) {
+    boolean isResourceExisting(@NotNull String resourceUri) {
 
-        LOGGER.debug("Testing existence of resource '{}'.", resource);
+        LOGGER.debug("Testing existence of resource '{}'.", resourceUri);
 
-        ExistQuery query = ExistQueryFactory.checkExistResourceExistence(resource);
+        ExistQuery query = ExistQueryFactory.checkExistResourceExistence(resourceUri);
         List<String> result = queryDatabase(query);
 
         if (result.size() != 1) {
-            throw new MomcaException("Failed to test for existence of resource '" + resource.getUri() + "'");
+            throw new MomcaException("Failed to test for existence of resource '" + resourceUri + "'");
         }
 
         boolean isExisting = result.get(0).equals("true");
 
-        LOGGER.debug("Returning '{}' for the existence of resource '{}'.", isExisting, resource);
+        LOGGER.debug("Returning '{}' for the existence of resource '{}'.", isExisting, resourceUri);
 
         return isExisting;
+
+    }
+
+    boolean makeSureCollectionPathExists(@NotNull String absoluteUri) {
+
+        LOGGER.debug("Trying to create all collections on path '{}'.", absoluteUri);
+
+        boolean success = false;
+
+        if (!absoluteUri.isEmpty() && absoluteUri.startsWith("/db/")) {
+
+            if (isCollectionExisting(absoluteUri)) {
+
+                success = true;
+                LOGGER.debug("Collection '{}' already exists. Aborting creation.", absoluteUri);
+
+            } else {
+
+                String[] parts = absoluteUri.replace("/db/", "").split("/");
+                String parentUri = "/db";
+
+                for (String part : parts) {
+
+                    LOGGER.debug("Trying to add collection '{}' in '{}'", part, parentUri);
+
+                    success = createCollection(part, parentUri);
+                    parentUri = parentUri + "/" + part;
+
+                    if (success) {
+                        LOGGER.debug("Successfully added collection '{}' in '{}'", part, parentUri);
+                    } else {
+                        LOGGER.debug("Failed to create collection '{}' on path '{}'. Aborting further creation attempts.", part, absoluteUri);
+                        break;
+                    }
+
+                }
+
+                if (success) {
+                    LOGGER.debug("Created all collections on path '{}'.", absoluteUri);
+                } else {
+                    LOGGER.debug("Failed to create all collections on path '{}'", absoluteUri);
+                }
+
+            }
+
+        } else {
+            LOGGER.debug("Creation of path '{}' aborted. Path invalid.", absoluteUri);
+        }
+
+        return success;
 
     }
 

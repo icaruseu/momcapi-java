@@ -115,6 +115,12 @@ public class FondManagerTest {
     }
 
     @Test
+    public void testIsFondExisting() throws Exception {
+        assertTrue(fm.isFondExisting(new IdFond("CH-KAE", "Urkunden")));
+        assertTrue(fm.isFondExisting(new IdFond("CH-KAE", "Urkunden")));
+    }
+
+    @Test
     public void testListFonds() throws Exception {
 
         IdArchive id1 = new IdArchive("CH-KAE");

@@ -554,6 +554,11 @@ public class Charter extends AtomResource {
                 .orElseThrow(MomcaException::new);
     }
 
+    @NotNull
+    public boolean isInFond() {
+        return getId().isInFond();
+    }
+
     public boolean isValidCei() {
         return validationProblems.isEmpty();
     }

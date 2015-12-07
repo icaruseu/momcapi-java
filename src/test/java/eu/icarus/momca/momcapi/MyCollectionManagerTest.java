@@ -143,6 +143,23 @@ public class MyCollectionManagerTest {
     }
 
     @Test
+    public void testIsMyCollectionExisting() throws Exception {
+
+        IdMyCollection idPrivate = new IdMyCollection("ea13e5f1-03b2-4bfa-9dd5-8fb770f98d7b");
+        assertTrue(mm.isMyCollectionExisting(idPrivate, MyCollectionStatus.PRIVATE));
+        assertFalse(mm.isMyCollectionExisting(idPrivate, MyCollectionStatus.PUBLISHED));
+
+        IdMyCollection idPublished = new IdMyCollection("67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3");
+        assertTrue(mm.isMyCollectionExisting(idPublished, MyCollectionStatus.PRIVATE));
+        assertTrue(mm.isMyCollectionExisting(idPublished, MyCollectionStatus.PUBLISHED));
+
+        IdMyCollection idNotExisting = new IdMyCollection("ea13e5f1-03b2-4bfa-");
+        assertFalse(mm.isMyCollectionExisting(idNotExisting, MyCollectionStatus.PRIVATE));
+        assertFalse(mm.isMyCollectionExisting(idNotExisting, MyCollectionStatus.PUBLISHED));
+
+    }
+
+    @Test
     public void testListPrivateMyCollections() throws Exception {
 
         IdUser idUser = new IdUser("admin");

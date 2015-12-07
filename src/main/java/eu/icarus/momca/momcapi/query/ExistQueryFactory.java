@@ -3,6 +3,7 @@ package eu.icarus.momca.momcapi.query;
 import eu.icarus.momca.momcapi.model.CountryCode;
 import eu.icarus.momca.momcapi.model.id.*;
 import eu.icarus.momca.momcapi.model.resource.ExistResource;
+import eu.icarus.momca.momcapi.model.resource.MyCollectionStatus;
 import eu.icarus.momca.momcapi.model.resource.ResourceRoot;
 import eu.icarus.momca.momcapi.model.xml.Namespace;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
@@ -57,11 +58,27 @@ public class ExistQueryFactory {
     }
 
     @NotNull
-    public static ExistQuery checkExistResourceExistence(@NotNull ExistResource resource) {
+    public static ExistQuery checkExistResourceExistence(@NotNull String resourceUri) {
 
         String query = String.format(
                 "exists(doc('%s'))",
-                resource.getUri()
+                resourceUri
+        );
+
+        return new ExistQuery(query);
+
+    }
+
+    @NotNull
+    public static ExistQuery checkMyCollectionExistence(@NotNull IdMyCollection idMyCollection,
+                                                        @NotNull MyCollectionStatus myCollectionStatus) {
+
+        String query = String.format(
+                "%s exists(collection('%s')//atom:entry[.//atom:id/text()='%s'])",
+                getNamespaceDeclaration(Namespace.ATOM, Namespace.CEI),
+                myCollectionStatus == MyCollectionStatus.PRIVATE ?
+                        ResourceRoot.USER_DATA.getUri() : ResourceRoot.PUBLISHED_USER_COLLECTIONS.getUri(),
+                idMyCollection.getAtomIdText()
         );
 
         return new ExistQuery(query);
@@ -163,7 +180,7 @@ public class ExistQueryFactory {
 
         for (Namespace namespace : namespaces) {
             declarationBuilder.append(String.format(
-                    "declare namespace %s='%s';",
+                    "declare namespace %s='%s'; ",
                     namespace.getPrefix(),
                     namespace.getUri()));
         }
@@ -496,9 +513,10 @@ public class ExistQueryFactory {
     public static ExistQuery listFonds(@NotNull IdArchive idArchive) {
 
         String query = String.format(
-                "%s collection('%s')//atom:id[contains(., '%s')][not(contains(util:document-name(.),'.ead.old.'))]/text()",
+                "%s collection('%s/%s')//atom:id[contains(., '%s')][not(contains(util:document-name(.),'.ead.old.'))]/text()",
                 getNamespaceDeclaration(Namespace.ATOM),
                 ResourceRoot.ARCHIVAL_FONDS.getUri(),
+                idArchive.getIdentifier(),
                 idArchive.getIdentifier());
 
         return new ExistQuery(query);

@@ -118,7 +118,6 @@ public class CharterManagerTest {
         User admin = mc.getUserManager().getUser(new IdUser("admin")).get();
         Date date = new Date(LocalDate.of(1413, 2, 2), 0, "2nd Februrary, 1413");
 
-
         Charter charter = new Charter(id, CharterStatus.PUBLIC, admin, date);
 
         assertFalse(cm.addCharter(charter));

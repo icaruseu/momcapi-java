@@ -7,8 +7,11 @@ import eu.icarus.momca.momcapi.model.resource.MyCollection;
 import eu.icarus.momca.momcapi.model.resource.MyCollectionStatus;
 import eu.icarus.momca.momcapi.model.resource.ResourceRoot;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
+import eu.icarus.momca.momcapi.query.ExistQuery;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +21,8 @@ import java.util.stream.Collectors;
  * Created by djell on 29/09/2015.
  */
 public class MyCollectionManager extends AbstractManager {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MyCollectionManager.class);
 
     MyCollectionManager(@NotNull MomcaConnection momcaConnection) {
         super(momcaConnection);
@@ -56,7 +61,7 @@ public class MyCollectionManager extends AbstractManager {
 
         }
 
-        momcaConnection.createCollectionPath(parentCollection);
+        momcaConnection.makeSureCollectionPathExists(parentCollection);
         momcaConnection.createCollection(myCollection.getIdentifier(), parentCollection);
 
         String time = momcaConnection.queryRemoteDateTime();
@@ -113,6 +118,28 @@ public class MyCollectionManager extends AbstractManager {
     @NotNull
     private Optional<MyCollection> getMyCollectionFromUri(@NotNull String myCollectionUri) {
         return momcaConnection.readExistResource(myCollectionUri).map(MyCollection::new);
+    }
+
+    public boolean isMyCollectionExisting(@NotNull IdMyCollection idMyCollection,
+                                          @NotNull MyCollectionStatus myCollectionStatus) {
+
+        LOGGER.info("Trying to determine existence of myCollection '{}' with status '{}'",
+                idMyCollection, myCollectionStatus);
+
+        ExistQuery query = ExistQueryFactory.checkMyCollectionExistence(idMyCollection, myCollectionStatus);
+        List<String> results = momcaConnection.queryDatabase(query);
+
+        if (results.size() != 1) {
+            throw new MomcaException("Failed to test for existence of myCollection '" + idMyCollection + "'");
+        }
+
+        boolean isExisting = results.get(0).equals("true");
+
+        LOGGER.info("Returning '{}' for the existence of myCollection '{}' with status '{}'",
+                isExisting, idMyCollection, myCollectionStatus);
+
+        return isExisting;
+
     }
 
     @NotNull

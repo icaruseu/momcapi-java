@@ -36,27 +36,33 @@ public class CharterManager extends AbstractManager {
     public boolean addCharter(@NotNull Charter charter) {
 
         boolean success = false;
-        String atomIdText = charter.getId().getAtomIdText();
-        LOGGER.info("Trying to add charter '{}' to the database.", atomIdText);
 
-        IdCharter id = charter.getId();
-        CharterStatus status = charter.getCharterStatus();
+        String charterUri = charter.getUri();
+        LOGGER.info("Trying to add charter '{}' to the database.", charterUri);
 
-        if (getCharter(id, status).isPresent()) {
+        if (isParentExisting(charter)) {
 
-            LOGGER.info("A charter with id '{}' and status '{}'is already existing, aborting addition.", id, status);
+            IdCharter id = charter.getId();
+            CharterStatus status = charter.getCharterStatus();
 
-        } else {
+            if (momcaConnection.isResourceExisting(charter.getUri())) {
 
-            String currentTime = momcaConnection.queryRemoteDateTime();
-            success = writeCharterToDatabase(charter, currentTime, currentTime);
+                LOGGER.info("A charter with id '{}' and status '{}'is already existing, aborting addition.", id, status);
 
-            if (success) {
-                LOGGER.info("Charter '{}' added to the database.", atomIdText);
             } else {
-                LOGGER.info("Failed to add charter '{}' to the database.", atomIdText);
-            }
 
+                String currentTime = momcaConnection.queryRemoteDateTime();
+                success = writeCharterToDatabase(charter, currentTime, currentTime);
+
+                if (success) {
+                    LOGGER.info("Charter '{}' added to the database.", charterUri);
+                } else {
+                    LOGGER.info("Failed to add charter '{}' to the database.", charterUri);
+                }
+
+            }
+        } else {
+            LOGGER.info("The parent of charter '{}' is not existing. Aborting addition.", charter.getUri());
         }
 
         return success;
@@ -64,7 +70,13 @@ public class CharterManager extends AbstractManager {
     }
 
     private List<IdCharter> createIds(List<String> atomIdStrings) {
-        return atomIdStrings.stream().map(AtomId::new).map(IdCharter::new).collect(Collectors.toList());
+
+        return atomIdStrings
+                .stream()
+                .map(AtomId::new)
+                .map(IdCharter::new)
+                .collect(Collectors.toList());
+
     }
 
     public boolean deleteCharter(@NotNull IdCharter id, @NotNull CharterStatus status) {
@@ -95,19 +107,25 @@ public class CharterManager extends AbstractManager {
     @NotNull
     public Optional<Charter> getCharter(@NotNull IdCharter idCharter, @NotNull CharterStatus charterStatus) {
 
-        List<String> uriResults = momcaConnection.queryDatabase(
-                ExistQueryFactory.getResourceUri(idCharter.getContentXml(), charterStatus.getResourceRoot()));
+        ExistQuery query = ExistQueryFactory.getResourceUri(idCharter.getContentXml(), charterStatus.getResourceRoot());
+        List<String> results = momcaConnection.queryDatabase(query);
 
         Optional<Charter> charter;
 
-        if (uriResults.size() > 1) {
+        if (results.size() > 1) {
+
             String message = String.format("More than one possible uri for charter '%s' with status '%s' found.",
                     idCharter, charterStatus);
             throw new MomcaException(message);
-        } else if (uriResults.size() == 1) {
-            charter = getCharterFromUri(uriResults.get(0));
+
+        } else if (results.size() == 1) {
+
+            charter = getCharterFromUri(results.get(0));
+
         } else {
+
             charter = Optional.empty();
+
         }
 
         return charter;
@@ -136,30 +154,36 @@ public class CharterManager extends AbstractManager {
         return !momcaConnection.queryDatabase(query).isEmpty();
     }
 
-    private boolean isParentExisting(IdCharter id) {
+    private boolean isParentExisting(@NotNull Charter charter) {
 
-        boolean parentExists = false;
+        List<String> hierarchicalUriParts = charter.getId().getHierarchicalUriParts();
 
-        List<String> uriParts = id.getHierarchicalUriParts();
+        boolean isExisting;
 
-        switch (uriParts.size()) {
+        if (charter.isInFond()) {
 
-            case 1:
-                IdCollection idCollection = new IdCollection(uriParts.get(0));
-                IdMyCollection idMyCollection = new IdMyCollection(uriParts.get(0));
-                parentExists = momcaConnection.getCollectionManager().getCollection(idCollection).isPresent() ||
-                        momcaConnection.getMyCollectionManager().getMyCollection(idMyCollection, MyCollectionStatus.PRIVATE).isPresent();
-                break;
+            String archiveIdentifier = hierarchicalUriParts.get(0);
+            String fondIdentifier = hierarchicalUriParts.get(1);
+            FondManager fm = momcaConnection.getFondManager();
+            IdFond idFond = new IdFond(archiveIdentifier, fondIdentifier);
 
-            case 2:
-                IdFond idFond = new IdFond(uriParts.get(0), uriParts.get(1));
-                parentExists = momcaConnection.getFondManager().getFond(idFond).isPresent();
-                break;
+            isExisting = fm.isFondExisting(idFond);
+
+        } else {
+
+            String identifier = hierarchicalUriParts.get(0);
+            CollectionManager cm = momcaConnection.getCollectionManager();
+            MyCollectionManager mm = momcaConnection.getMyCollectionManager();
+            IdCollection idCollection = new IdCollection(identifier);
+            IdMyCollection idMyCollection = new IdMyCollection(identifier);
+
+            isExisting = cm.isCollectionExisting(idCollection) ||
+                    mm.isMyCollectionExisting(idMyCollection, MyCollectionStatus.PRIVATE) ||
+                    mm.isMyCollectionExisting(idMyCollection, MyCollectionStatus.PUBLISHED);
 
         }
 
-        return parentExists;
-
+        return isExisting;
     }
 
     @NotNull
@@ -291,38 +315,21 @@ public class CharterManager extends AbstractManager {
 
     }
 
-    private boolean writeCharterToDatabase(@NotNull Charter charter, @NotNull String published,
-                                           @NotNull String updated) {
+    private boolean writeCharterToDatabase(@NotNull Charter charter, @NotNull String published, @NotNull String updated) {
+
+        String charterUri = charter.getUri();
+        LOGGER.debug("Trying to write charter '{}' to the database.", charterUri);
+
         boolean success = false;
-        String atomIdText = charter.getId().getAtomIdText();
-        LOGGER.debug("Trying to write charter '{}' to the database.", atomIdText);
 
-        if (isParentExisting(charter.getId())) {
+        if (momcaConnection.makeSureCollectionPathExists(charter.getParentUri())) {
+            success = momcaConnection.writeAtomResource(charter, published, updated);
+        }
 
-            String parentUri = charter.getParentUri();
-            success = momcaConnection.createCollectionPath(parentUri);
-
-            if (success) {
-
-                success = momcaConnection.writeAtomResource(charter, published, updated);
-
-                if (success) {
-                    LOGGER.debug("Charter '{}' written to the database.", atomIdText);
-                } else {
-                    LOGGER.debug("Failed to write charter '{}' into newly created collection '{}'.",
-                            atomIdText, parentUri);
-                }
-
-            } else {
-
-                LOGGER.debug("Failed to create collection path '{}', aborting write.", parentUri);
-
-            }
-
-
+        if (success) {
+            LOGGER.debug("Charter '{}' written to the database.", charterUri);
         } else {
-            LOGGER.debug("The parent for the charter, '{}', is not existing, aborting write.",
-                    charter.getId().getHierarchicalUriPartsAsString());
+            LOGGER.debug("Failed to write charter '{}' to the database.", charterUri);
         }
 
         return success;

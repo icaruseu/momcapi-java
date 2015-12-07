@@ -40,17 +40,6 @@ public class MomcaConnectionTest {
     }
 
     @Test
-    public void testCreateCollectionPath() throws Exception {
-
-        String path = "/db/path/to/collection";
-        assertTrue(momcaConnection.createCollectionPath(path));
-        momcaConnection.deleteCollection("/db/path");
-
-        assertFalse(momcaConnection.createCollectionPath("not/absolute/path"));
-
-    }
-
-    @Test
     public void testDeleteCollection() throws Exception {
 
         String name = "te@m";
@@ -86,10 +75,21 @@ public class MomcaConnectionTest {
     public void testIsResourceExisting() throws Exception {
 
         ExistResource resource1 = new ExistResource("AGNS_F.1_the_fascia_9_Sub_3499|1817.cei.xml", "/db/mom-data/metadata.charter.import/RS-IAGNS/Charters", "<empty/>");
-        assertTrue(momcaConnection.isResourceExisting(resource1));
+        assertTrue(momcaConnection.isResourceExisting(resource1.getUri()));
 
         ExistResource resource2 = new ExistResource("KAE_Urkunde_Nr_1.cei.xml", "/db/mom-data/metadata.charter.public/CH-KAE/Urkunden", "<empty/>");
-        assertTrue(momcaConnection.isResourceExisting(resource2));
+        assertTrue(momcaConnection.isResourceExisting(resource2.getUri()));
+
+    }
+
+    @Test
+    public void testMakeSureCollectionPathExists() throws Exception {
+
+        String path = "/db/path/to/collection";
+        assertTrue(momcaConnection.makeSureCollectionPathExists(path));
+        momcaConnection.deleteCollection("/db/path");
+
+        assertFalse(momcaConnection.makeSureCollectionPathExists("not/absolute/path"));
 
     }
 

@@ -5,6 +5,7 @@ import eu.icarus.momca.momcapi.model.Region;
 import eu.icarus.momca.momcapi.model.id.IdCollection;
 import eu.icarus.momca.momcapi.model.resource.Collection;
 import eu.icarus.momca.momcapi.model.resource.ResourceRoot;
+import eu.icarus.momca.momcapi.model.resource.ResourceType;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
 import org.jetbrains.annotations.NotNull;
@@ -54,6 +55,17 @@ public class CollectionManager extends AbstractManager {
     @NotNull
     public Optional<Collection> getCollection(@NotNull IdCollection idCollection) {
         return getFirstMatchingExistResource(idCollection.getContentXml()).map(Collection::new);
+    }
+
+    public boolean isCollectionExisting(@NotNull IdCollection idCollection) {
+
+        String identifier = idCollection.getIdentifier();
+        String resourceName = identifier + ResourceType.COLLECTION.getNameSuffix();
+        String rootUri = ResourceRoot.ARCHIVAL_COLLECTIONS.getUri();
+        String resourceUri = String.join("/", rootUri, identifier, resourceName);
+
+        return momcaConnection.isResourceExisting(resourceUri);
+
     }
 
     @NotNull

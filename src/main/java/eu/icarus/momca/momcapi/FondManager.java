@@ -5,6 +5,7 @@ import eu.icarus.momca.momcapi.model.id.IdFond;
 import eu.icarus.momca.momcapi.model.resource.ExistResource;
 import eu.icarus.momca.momcapi.model.resource.Fond;
 import eu.icarus.momca.momcapi.model.resource.ResourceRoot;
+import eu.icarus.momca.momcapi.model.resource.ResourceType;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
 import org.jetbrains.annotations.NotNull;
@@ -24,7 +25,7 @@ public class FondManager extends AbstractManager {
 
     public void addFond(@NotNull Fond fond) {
 
-        if (getFond(fond.getId()).isPresent()) {
+        if (momcaConnection.isResourceExisting(fond.getUri())) {
             throw new IllegalArgumentException(String.format("The fond '%s' is already existing in the database.", fond.getId()));
         }
 
@@ -80,6 +81,18 @@ public class FondManager extends AbstractManager {
         }
 
         return fond;
+
+    }
+
+    public boolean isFondExisting(@NotNull IdFond idFond) {
+
+        String identifier = idFond.getIdentifier();
+        String resourceName = idFond.getIdentifier() + ResourceType.FOND.getNameSuffix();
+        String archiveIdentifier = idFond.getIdArchive().getIdentifier();
+        String rootUri = ResourceRoot.ARCHIVAL_FONDS.getUri();
+        String uri = String.join("/", rootUri, archiveIdentifier, identifier, resourceName);
+
+        return momcaConnection.isResourceExisting(uri);
 
     }
 

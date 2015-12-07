@@ -167,6 +167,12 @@ public class CollectionManagerTest {
     }
 
     @Test
+    public void testIsCollectionExisting() throws Exception {
+        assertTrue(cm.isCollectionExisting(new IdCollection("AbteiEberbach")));
+        assertFalse(cm.isCollectionExisting(new IdCollection("NotExistingCollection")));
+    }
+
+    @Test
     public void testListCollections() throws Exception {
         assertEquals(cm.listCollections().size(), 3);
     }
