@@ -51,6 +51,17 @@ public class ExistResource {
     }
 
     /**
+     * Instantiates a new ExistResource with empty xml content.
+     *
+     * @param resourceName        The name of the resource, e.g. {@code user.xmlContent}.
+     * @param parentCollectionUri The URI of the collection, the resource is stored in in the database,
+     *                            e.g. {@code /db/mom-data/xrx.user}.
+     */
+    public ExistResource(@NotNull String resourceName, @NotNull String parentCollectionUri) {
+        this(resourceName, parentCollectionUri, "<empty/>");
+    }
+
+    /**
      * @return The URI of the collection, the resource is stored in in the database, e.g. {@code /db/mom-data/xrx.user}.
      */
     @NotNull

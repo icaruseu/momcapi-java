@@ -131,19 +131,54 @@ public class MomcaConnection {
 
         LOGGER.debug("Trying to delete collection '{}'.", uri);
 
-        ExistQuery query = ExistQueryFactory.removeCollection(Util.encode(uri));
-        queryDatabase(query);
+        boolean success = false;
 
-        return !isCollectionExisting(uri);
+        if (isCollectionExisting(uri)) {
+
+            ExistQuery query = ExistQueryFactory.removeCollection(Util.encode(uri));
+            queryDatabase(query);
+
+            success = !isCollectionExisting(uri);
+
+            if (success) {
+                LOGGER.debug("Collection '{}' deleted.", uri);
+            } else {
+                LOGGER.debug("Failed to delete collection '{}'", uri);
+            }
+
+        } else {
+            LOGGER.info("Collection '{}' not existing. Aborting deletion.", uri);
+        }
+
+        return success;
 
     }
 
     boolean deleteExistResource(@NotNull ExistResource resource) {
 
-        ExistQuery query = ExistQueryFactory.removeResource(resource);
-        queryDatabase(query);
+        String uri = resource.getUri();
+        LOGGER.debug("Trying to delete resource '{}'.", uri);
 
-        return !isResourceExisting(resource.getUri());
+        boolean success = false;
+
+        if (isResourceExisting(uri)) {
+
+            ExistQuery query = ExistQueryFactory.removeResource(resource);
+            queryDatabase(query);
+
+            success = !isResourceExisting(uri);
+
+            if (success) {
+                LOGGER.debug("Resource '{}' deleted.", uri);
+            } else {
+                LOGGER.debug("Failed to delete resource '{}'", uri);
+            }
+
+        } else {
+            LOGGER.info("Resource '{}' not existing. Aborting deletion.", uri);
+        }
+
+        return success;
 
     }
 
@@ -222,7 +257,7 @@ public class MomcaConnection {
 
         LOGGER.debug("Returning '{}' for the existence of collection '{}'.", isExisting, collectionUri);
 
-        return isExisting;
+        return isExisting; //TODO doesn't seem to work for collections without childs
 
     }
 

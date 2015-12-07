@@ -56,7 +56,7 @@ public class User extends ExistResource {
 
     public User(@NotNull String identifier, @NotNull String moderatorIdentifier) {
 
-        super(identifier + ".xml", ResourceRoot.USER_DATA.getUri(), "<empty/>");
+        super(identifier + ".xml", ResourceRoot.USER_DATA.getUri());
 
         if (identifier.isEmpty() || moderatorIdentifier.isEmpty()) {
             throw new IllegalArgumentException("User and moderator identifiers are not allowed to be empty strings.");

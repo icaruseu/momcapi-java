@@ -3,10 +3,7 @@ package eu.icarus.momca.momcapi;
 import eu.icarus.momca.momcapi.exception.MomcaException;
 import eu.icarus.momca.momcapi.model.CharterStatus;
 import eu.icarus.momca.momcapi.model.id.*;
-import eu.icarus.momca.momcapi.model.resource.Charter;
-import eu.icarus.momca.momcapi.model.resource.MyCollectionStatus;
-import eu.icarus.momca.momcapi.model.resource.ResourceRoot;
-import eu.icarus.momca.momcapi.model.resource.User;
+import eu.icarus.momca.momcapi.model.resource.*;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
 import eu.icarus.momca.momcapi.model.xml.xrx.Saved;
 import eu.icarus.momca.momcapi.query.ExistQuery;
@@ -79,25 +76,49 @@ public class CharterManager extends AbstractManager {
 
     }
 
-    public boolean deleteCharter(@NotNull IdCharter id, @NotNull CharterStatus status) {
+    public boolean deletePrivateCharter(@NotNull IdCharter id, @NotNull IdUser creator) {
+
+        LOGGER.info("Trying to delete private charter '{}' of user '{}'", id, creator);
+
+        boolean success;
+
+        String uri = Charter.createParentUri(id, CharterStatus.PRIVATE, creator);
+        String name = Charter.createResourceName(id, CharterStatus.PRIVATE);
+        ExistResource resource = new ExistResource(name, uri);
+
+        success = momcaConnection.deleteExistResource(resource);
+
+        if (success) {
+            LOGGER.info("Private charter '{}' of user '{}' deleted.", id, creator);
+        } else {
+            LOGGER.info("Failed to delete private charter '{}' of user '{}'", id, creator);
+        }
+
+        return success;
+
+    }
+
+    public boolean deletePublicCharter(@NotNull IdCharter id, @NotNull CharterStatus status) {
 
         boolean success = false;
-        LOGGER.info("Trying to delete charter '{}' with status '{}'", id, status);
+        LOGGER.info("Trying to delete public charter '{}' with status '{}'", id, status);
 
-        Optional<Charter> charter = getCharter(id, status);
+        if (status != CharterStatus.PRIVATE) {
 
-        if (charter.isPresent()) {
+            String uri = Charter.createParentUri(id, status, null);
+            String name = Charter.createResourceName(id, status);
+            ExistResource resource = new ExistResource(name, uri);
 
-            success = momcaConnection.deleteExistResource(charter.get());
+            success = momcaConnection.deleteExistResource(resource);
 
             if (success) {
-                LOGGER.info("Charter '{}' with status '{}' deleted.", id, status);
+                LOGGER.info("Public charter '{}' with status '{}' deleted.", id, status);
             } else {
-                LOGGER.info("Charter '{}' with status '{}' not deleted.", id, status);
+                LOGGER.info("Failed to delete public charter '{}' with status '{}'.", id, status);
             }
 
         } else {
-            LOGGER.info("Charter '{}' with status '{}' not existing, aborting deletion.", id, status);
+            LOGGER.info("Charter status '{}' is forbidden. Aborting deletion.", status);
         }
 
         return success;
@@ -256,16 +277,7 @@ public class CharterManager extends AbstractManager {
 
     }
 
-    public void publishCharter(@NotNull IdUser idUser, @NotNull IdCharter idCharter) {
-
-        UserManager userManager = momcaConnection.getUserManager();
-        Optional<User> userOptional = userManager.getUser(idUser);
-
-        if (!userOptional.isPresent()) {
-            throw new IllegalArgumentException("User '" + idUser + "' not existing.");
-        }
-
-        User user = userOptional.get();
+    public void publishCharter(@NotNull User user, @NotNull IdCharter idCharter) {
 
         List<Saved> savedList = user.getSavedCharters();
         List<Saved> withoutCurrent = user.getSavedCharters()
@@ -280,7 +292,7 @@ public class CharterManager extends AbstractManager {
             if (!originalCharter.isPresent()) {
                 String message = String.format(
                         "The charter with the id '%s'to be published for user '%s' is not existing in 'metadata.charter.saved'.",
-                        idCharter, idUser);
+                        idCharter, user.getId());
                 throw new MomcaException(message);
             }
 
@@ -291,7 +303,7 @@ public class CharterManager extends AbstractManager {
 
             user.setSavedCharters(withoutCurrent);
 
-            userManager.updateUserData(user);
+            momcaConnection.getUserManager().updateUserData(user);
 
         }
 
@@ -309,7 +321,7 @@ public class CharterManager extends AbstractManager {
 
         Charter originalCharter = originalCharterOptional.get();
 
-        deleteCharter(originalCharter.getId(), originalCharter.getCharterStatus());
+        momcaConnection.deleteExistResource(originalCharter);
 
         writeCharterToDatabase(modifiedCharter, originalCharter.getPublished(), momcaConnection.queryRemoteDateTime());
 

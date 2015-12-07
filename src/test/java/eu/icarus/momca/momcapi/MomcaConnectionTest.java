@@ -55,7 +55,7 @@ public class MomcaConnectionTest {
     @Test
     public void testDeleteExistResource() throws Exception {
 
-        ExistResource res = new ExistResource("delete@Test.xml", "/db", "<empty/>");
+        ExistResource res = new ExistResource("delete@Test.xml", "/db");
 
         momcaConnection.writeExistResource(res);
         assertTrue(momcaConnection.deleteExistResource(res));
@@ -74,10 +74,10 @@ public class MomcaConnectionTest {
     @Test
     public void testIsResourceExisting() throws Exception {
 
-        ExistResource resource1 = new ExistResource("AGNS_F.1_the_fascia_9_Sub_3499|1817.cei.xml", "/db/mom-data/metadata.charter.import/RS-IAGNS/Charters", "<empty/>");
+        ExistResource resource1 = new ExistResource("AGNS_F.1_the_fascia_9_Sub_3499|1817.cei.xml", "/db/mom-data/metadata.charter.import/RS-IAGNS/Charters");
         assertTrue(momcaConnection.isResourceExisting(resource1.getUri()));
 
-        ExistResource resource2 = new ExistResource("KAE_Urkunde_Nr_1.cei.xml", "/db/mom-data/metadata.charter.public/CH-KAE/Urkunden", "<empty/>");
+        ExistResource resource2 = new ExistResource("KAE_Urkunde_Nr_1.cei.xml", "/db/mom-data/metadata.charter.public/CH-KAE/Urkunden");
         assertTrue(momcaConnection.isResourceExisting(resource2.getUri()));
 
     }
@@ -105,7 +105,7 @@ public class MomcaConnectionTest {
 
     @Test
     public void testStoreExistResource() throws Exception {
-        ExistResource res = new ExistResource("write@Test.xml", "/db", "<empty/>");
+        ExistResource res = new ExistResource("write@Test.xml", "/db");
         assertTrue(momcaConnection.writeExistResource(res));
         assertTrue(momcaConnection.readExistResource(res.getUri()).isPresent());
         momcaConnection.deleteExistResource(res);

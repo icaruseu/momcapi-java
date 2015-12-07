@@ -251,18 +251,26 @@ public class Charter extends AtomResource {
 
     }
 
-    private static String createParentUri(@NotNull IdCharter idCharter, @NotNull CharterStatus charterStatus, @NotNull IdUser creator) {
+    public static String createParentUri(@NotNull IdCharter idCharter, @NotNull CharterStatus charterStatus, @Nullable IdUser creator) {
 
         String parentUri = "";
 
         switch (charterStatus) {
 
             case PRIVATE:
-                parentUri = String.format("%s/%s/%s/%s",
-                        ResourceRoot.USER_DATA.getUri(),
-                        creator.getIdentifier(),
-                        "metadata.charter",
-                        idCharter.getHierarchicalUriPartsAsString());
+
+                if (creator == null) {
+                    throw new IllegalArgumentException(
+                            "Creator is not allowed to be 'null' when the charter status is 'PRIVATE'.");
+                } else {
+
+                    parentUri = String.format("%s/%s/%s/%s",
+                            ResourceRoot.USER_DATA.getUri(),
+                            creator.getIdentifier(),
+                            "metadata.charter",
+                            idCharter.getHierarchicalUriPartsAsString());
+                }
+
                 break;
 
             case IMPORTED:
@@ -288,7 +296,7 @@ public class Charter extends AtomResource {
     }
 
     @NotNull
-    private static String createResourceName(@NotNull IdCharter id, @NotNull CharterStatus charterStatus) {
+    public static String createResourceName(@NotNull IdCharter id, @NotNull CharterStatus charterStatus) {
 
         String resourceName;
 
