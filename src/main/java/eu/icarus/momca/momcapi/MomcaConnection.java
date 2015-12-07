@@ -257,7 +257,7 @@ public class MomcaConnection {
 
         LOGGER.debug("Returning '{}' for the existence of collection '{}'.", isExisting, collectionUri);
 
-        return isExisting; //TODO doesn't seem to work for collections without childs
+        return isExisting;
 
     }
 

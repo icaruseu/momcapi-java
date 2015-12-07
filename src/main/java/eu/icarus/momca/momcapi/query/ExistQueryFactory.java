@@ -49,7 +49,7 @@ public class ExistQueryFactory {
     public static ExistQuery checkCollectionExistence(@NotNull String collectionUri) {
 
         String query = String.format(
-                "exists(collection('%s'))",
+                "xmldb:collection-available('%s')",
                 collectionUri
         );
 
