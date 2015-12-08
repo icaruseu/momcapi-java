@@ -466,16 +466,16 @@ public class CharterManagerTest {
         IdCharter originalId = new IdCharter("CH-KAE", "Urkunden", "Charter2");
         User admin = mc.getUserManager().getUser(new IdUser("admin")).get();
         Date date = new Date(LocalDate.of(1413, 2, 2), 0, "2nd Februrary, 1413");
-
         CharterStatus originalStatus = CharterStatus.SAVED;
+
         Charter charter = new Charter(originalId, originalStatus, admin, date);
 
         cm.addCharter(charter);
-        assertTrue(cm.getCharter(originalId, originalStatus).isPresent());
 
         charter.setCharterStatus(CharterStatus.PUBLIC);
         charter.setIdentifier("charter3");
         charter.setAbstract(new Abstract("abstract"));
+
         cm.updateCharter(charter, originalId, originalStatus);
 
         assertFalse(cm.getCharter(originalId, originalStatus).isPresent());
@@ -485,6 +485,35 @@ public class CharterManagerTest {
 
         assertTrue(updated.isPresent());
         assertEquals(updated.get().getAbstract().get().getContent(), "abstract");
+
+    }
+
+    @Test
+    public void testUpdateCharter2() throws Exception {
+
+        IdCharter idCharter = new IdCharter("CH-KAE", "Urkunden", "Charter2");
+        User admin = mc.getUserManager().getUser(new IdUser("admin")).get();
+        Date date = new Date(LocalDate.of(1413, 2, 2), 0, "2nd Februrary, 1413");
+        CharterStatus charterStatus = CharterStatus.PUBLIC;
+
+        Charter charter = new Charter(idCharter, charterStatus, admin, date);
+
+        cm.addCharter(charter);
+
+        charter.setAbstract(new Abstract("New abstract"));
+
+        assertTrue(cm.updateCharter(charter));
+
+        Optional<Charter> updated = cm.getCharter(charter.getId(), charter.getCharterStatus());
+
+        cm.deletePublicCharter(charter.getId(), charter.getCharterStatus());
+
+        assertTrue(updated.isPresent());
+        assertEquals(updated.get().getAbstract().get().getContent(), "New abstract");
+
+        charter.setCharterStatus(CharterStatus.PRIVATE);
+
+        assertFalse(cm.updateCharter(charter));
 
     }
 

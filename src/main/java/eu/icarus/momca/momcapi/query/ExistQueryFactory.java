@@ -2,6 +2,7 @@ package eu.icarus.momca.momcapi.query;
 
 import eu.icarus.momca.momcapi.model.CountryCode;
 import eu.icarus.momca.momcapi.model.id.*;
+import eu.icarus.momca.momcapi.model.resource.Charter;
 import eu.icarus.momca.momcapi.model.resource.ExistResource;
 import eu.icarus.momca.momcapi.model.resource.MyCollectionStatus;
 import eu.icarus.momca.momcapi.model.resource.ResourceRoot;
@@ -36,7 +37,7 @@ public class ExistQueryFactory {
     public static ExistQuery checkAtomResourceExistence(@NotNull AtomId resourceAtomId, @Nullable ResourceRoot resourceRoot) {
 
         String query = String.format(
-                "%scollection('%s')//atom:entry[.//atom:id/text()='%s'][1]",
+                "%scollection('%s')//atom:id[./text()='%s'][1]",
                 getNamespaceDeclaration(Namespace.ATOM),
                 getRootCollectionString(resourceRoot),
                 resourceAtomId.getText());
@@ -635,6 +636,23 @@ public class ExistQueryFactory {
                 collectionUri,
                 resourceName,
                 resourceContent);
+
+        return new ExistQuery(query);
+
+    }
+
+    @NotNull
+    public static ExistQuery updateCharterContent(@NotNull Charter charter) {
+
+        String query = String.format(
+                "%s\n" +
+                        "let $charter := doc('%s')\n" +
+                        "let $replacement := %s\n" +
+                        "return (update replace $charter//cei:text with $replacement," +
+                        "        update replace $charter//atom:updated/text() with current-dateTime())",
+                getNamespaceDeclaration(Namespace.ATOM, Namespace.CEI),
+                charter.getUri(),
+                charter.toCei().toXML());
 
         return new ExistQuery(query);
 

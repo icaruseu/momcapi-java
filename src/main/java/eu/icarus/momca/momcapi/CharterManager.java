@@ -184,11 +184,22 @@ public class CharterManager extends AbstractManager {
     }
 
     private boolean isCharterExisting(@NotNull IdCharter idCharter, @Nullable ResourceRoot resourceRoot) {
+
+        LOGGER.trace("Trying to determine the existence of charter '{}' in '{}'.", idCharter, resourceRoot);
+
         ExistQuery query = ExistQueryFactory.checkAtomResourceExistence(idCharter.getContentAsElement(), resourceRoot);
-        return !momcaConnection.queryDatabase(query).isEmpty();
+
+        boolean isCharterExisting = !momcaConnection.queryDatabase(query).isEmpty();
+
+        LOGGER.trace("Result of query for existence of charter '{}' in '{}': '{}'", idCharter, resourceRoot, isCharterExisting);
+
+        return isCharterExisting;
+
     }
 
     private boolean isParentExisting(@NotNull Charter charter) {
+
+        LOGGER.trace("Trying to determine the existence of the parent of charter '{}'.", charter.getId());
 
         List<String> hierarchicalUriParts = charter.getId().getHierarchicalUriParts();
 
@@ -216,6 +227,9 @@ public class CharterManager extends AbstractManager {
                     mm.isMyCollectionExisting(idMyCollection, MyCollectionStatus.PUBLISHED);
 
         }
+
+        LOGGER.trace("Returning the result of the query for the existence of the parent of charter '{}': '{}'",
+                charter.getId(), isExisting);
 
         return isExisting;
     }
@@ -380,28 +394,90 @@ public class CharterManager extends AbstractManager {
 
     }
 
-    public void updateCharter(@NotNull Charter modifiedCharter, @Nullable IdCharter originalId, @Nullable CharterStatus originalStatus) {
+    public boolean updateCharter(@NotNull Charter updatedCharter) {
+
+        String uri = updatedCharter.getUri();
+
+        LOGGER.info("Trying to update charter '{}'.", uri);
+
+        boolean success = false;
+
+        if (isCharterExisting(updatedCharter.getId(), updatedCharter.getCharterStatus().getResourceRoot())) {
+
+            ExistQuery query = ExistQueryFactory.updateCharterContent(updatedCharter);
+            momcaConnection.queryDatabase(query);
+
+            success = true;
+
+            LOGGER.info("Charter '{}' updated.", uri);
+
+        } else {
+            LOGGER.info("Charter '{}' is not existing. Aborting update.", uri);
+        }
+
+        return success;
+
+    }
+
+    public boolean updateCharter(@NotNull Charter modifiedCharter, @NotNull IdCharter originalId) {
+
+
+    }
+
+    public boolean updateCharter(@NotNull Charter modifiedCharter, @NotNull IdCharter originalId) {
+
+
+    }
+
+    public boolean updateCharter(@NotNull Charter modifiedCharter, @NotNull IdCharter originalId, @Nullable CharterStatus originalStatus) {
+
+        boolean success = false;
+
+        LOGGER.info("Trying to update charter '{}' with original id '{}' and original status '{}'.",
+                modifiedCharter, originalId, originalStatus);
 
         IdCharter realOriginalId = originalId == null ? modifiedCharter.getId() : originalId;
         CharterStatus realOriginalStatus = originalStatus == null ? modifiedCharter.getCharterStatus() : originalStatus;
 
-        Optional<Charter> originalCharterOptional = getCharter(realOriginalId, realOriginalStatus);
-        if (!originalCharterOptional.isPresent()) {
-            throw new MomcaException("The charter to be updated doesn't exist in the database.");
+        boolean writeAndDeleteNeccessary = !modifiedCharter.getId().equals(realOriginalId) ||
+                modifiedCharter.getCharterStatus() != realOriginalStatus;
+
+        LOGGER.debug("The neccessity to fully write and delete the charter is '{}'.", writeAndDeleteNeccessary);
+
+        if (writeAndDeleteNeccessary) {
+
+            LOGGER.trace("Actual original id of '{}' is '{}''.", modifiedCharter, realOriginalId);
+            LOGGER.trace("Actual original status of '{}' is '{}.'", modifiedCharter, realOriginalStatus);
+
+            Optional<Charter> originalCharterOptional = getCharter(realOriginalId, realOriginalStatus);
+            if (!originalCharterOptional.isPresent()) {
+                LOGGER.info("The charter with id '{}' and status '{}' does not exist in the database.");
+            }
+
+            Charter originalCharter = originalCharterOptional.get();
+
+            LOGGER.debug("Removing old version of charter with id '{}' and status '{}'.",
+                    realOriginalId, realOriginalStatus);
+            momcaConnection.deleteExistResource(originalCharter);
+            LOGGER.debug("Old version of the charter with id '{}' and status '{}' removed.",
+                    realOriginalId, realOriginalStatus);
+
+            LOGGER.debug("Inserting updated charter '{}'.", modifiedCharter);
+            writeCharterToDatabase(modifiedCharter, originalCharter.getPublished(), momcaConnection.queryRemoteDateTime());
+            LOGGER.debug("Updated charter '{}' inserted.", modifiedCharter);
+
+        } else {
+
         }
 
-        Charter originalCharter = originalCharterOptional.get();
-
-        momcaConnection.deleteExistResource(originalCharter);
-
-        writeCharterToDatabase(modifiedCharter, originalCharter.getPublished(), momcaConnection.queryRemoteDateTime());
+        return success;
 
     }
 
     private boolean writeCharterToDatabase(@NotNull Charter charter, @NotNull String published, @NotNull String updated) {
 
         String charterUri = charter.getUri();
-        LOGGER.debug("Trying to write charter '{}' to the database.", charterUri);
+        LOGGER.trace("Trying to write charter '{}' to the database.", charterUri);
 
         boolean success = false;
 
@@ -410,9 +486,9 @@ public class CharterManager extends AbstractManager {
         }
 
         if (success) {
-            LOGGER.debug("Charter '{}' written to the database.", charterUri);
+            LOGGER.trace("Charter '{}' written to the database.", charterUri);
         } else {
-            LOGGER.debug("Failed to write charter '{}' to the database.", charterUri);
+            LOGGER.trace("Failed to write charter '{}' to the database.", charterUri);
         }
 
         return success;
