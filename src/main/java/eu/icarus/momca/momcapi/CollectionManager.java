@@ -38,8 +38,8 @@ public class CollectionManager extends AbstractManager {
 
     public void deleteCollection(@NotNull IdCollection idCollection) {
 
-        if (!momcaConnection.getCharterManager().listChartersPublic(idCollection).isEmpty()
-                || !momcaConnection.getCharterManager().listChartersImport(idCollection).isEmpty()) {
+        if (!momcaConnection.getCharterManager().listPublicCharters(idCollection).isEmpty()
+                || !momcaConnection.getCharterManager().listImportedCharters(idCollection).isEmpty()) {
             String message = String.format("There are still existing charters for collection '%s'",
                     idCollection.getIdentifier());
             throw new IllegalArgumentException(message);
@@ -54,7 +54,7 @@ public class CollectionManager extends AbstractManager {
 
     @NotNull
     public Optional<Collection> getCollection(@NotNull IdCollection idCollection) {
-        return getFirstMatchingExistResource(idCollection.getContentXml()).map(Collection::new);
+        return getFirstMatchingExistResource(idCollection.getContentAsElement()).map(Collection::new);
     }
 
     public boolean isCollectionExisting(@NotNull IdCollection idCollection) {

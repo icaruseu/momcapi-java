@@ -131,7 +131,7 @@ public class CharterManager extends AbstractManager {
 
         LOGGER.info("Trying to get charter '{}' with status '{}' from the database.", idCharter, charterStatus);
 
-        ExistQuery query = ExistQueryFactory.getResourceUri(idCharter.getContentXml(), charterStatus.getResourceRoot());
+        ExistQuery query = ExistQueryFactory.getResourceUri(idCharter.getContentAsElement(), charterStatus.getResourceRoot());
         List<String> results = momcaConnection.queryDatabase(query);
 
         Optional<Charter> charter;
@@ -168,7 +168,8 @@ public class CharterManager extends AbstractManager {
 
         LOGGER.info("Trying to get all instances for the charter '{}' from the database.", idCharter);
 
-        ExistQuery resourceUri = ExistQueryFactory.getResourceUri(idCharter.getContentXml(), null);
+        ExistQuery resourceUri = ExistQueryFactory.getResourceUri(idCharter.getContentAsElement(), null);
+
         List<Charter> charters = momcaConnection.queryDatabase(resourceUri)
                 .stream()
                 .map(this::getCharterFromUri)
@@ -183,7 +184,7 @@ public class CharterManager extends AbstractManager {
     }
 
     private boolean isCharterExisting(@NotNull IdCharter idCharter, @Nullable ResourceRoot resourceRoot) {
-        ExistQuery query = ExistQueryFactory.checkAtomResourceExistence(idCharter.getContentXml(), resourceRoot);
+        ExistQuery query = ExistQueryFactory.checkAtomResourceExistence(idCharter.getContentAsElement(), resourceRoot);
         return !momcaConnection.queryDatabase(query).isEmpty();
     }
 
@@ -220,51 +221,44 @@ public class CharterManager extends AbstractManager {
     }
 
     @NotNull
-    public List<IdCharter> listChartersImport(@NotNull IdFond idFond) {
-        List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listChartersImport(idFond));
-        return createIds(queryResults);
-    }
+    public List<IdCharter> listChartersInPrivateMyCollection(@NotNull IdMyCollection idMyCollection) {
 
-    @NotNull
-    public List<IdCharter> listChartersImport(@NotNull IdCollection idCollection) {
-        List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listChartersImport(idCollection));
-        return createIds(queryResults);
-    }
+        LOGGER.info("Trying to list charters in private myCollection '{}'.", idMyCollection);
 
-    @NotNull
-    public List<IdCharter> listChartersPrivate(@NotNull IdMyCollection idMyCollection) {
         List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listChartersPrivate(idMyCollection));
-        return createIds(queryResults);
+        List<IdCharter> ids = createIds(queryResults);
+
+        LOGGER.info("Returning the following {} charters for private myCollection '{}': {}", ids.size(), idMyCollection, ids);
+
+        return ids;
+
     }
 
     @NotNull
-    public List<IdCharter> listChartersPrivate(@NotNull IdUser idUser) {
-        List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listChartersPrivate(idUser));
-        return createIds(queryResults);
-    }
+    public List<IdCharter> listImportedCharters(@NotNull IdAtomId idParent) {
 
-    @NotNull
-    public List<IdCharter> listChartersPublic(@NotNull IdFond idFond) {
-        List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listChartersPublic(idFond));
-        return createIds(queryResults);
-    }
+        LOGGER.info("Trying to list imported charters for parent '{}'.", idParent);
 
-    @NotNull
-    public List<IdCharter> listChartersPublic(@NotNull IdCollection idCollection) {
-        List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listChartersPublic(idCollection));
-        return createIds(queryResults);
-    }
+        List<String> queryResult;
 
-    @NotNull
-    public List<IdCharter> listChartersPublic(@NotNull IdMyCollection idMyCollection) {
-        List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listChartersPublic(idMyCollection));
-        return createIds(queryResults);
-    }
+        if (idParent instanceof IdFond) {
 
-    @NotNull
-    public List<IdCharter> listChartersSaved() {
-        List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listChartersSaved());
-        return createIds(queryResults);
+            LOGGER.trace("Parent '{}' is an archival fond.", idParent);
+            queryResult = momcaConnection.queryDatabase(ExistQueryFactory.listChartersImport((IdFond) idParent));
+
+        } else {
+
+            LOGGER.trace("Parent '{}' is an archival collection.", idParent);
+            queryResult = momcaConnection.queryDatabase(ExistQueryFactory.listChartersImport((IdCollection) idParent));
+
+        }
+
+        List<IdCharter> ids = createIds(queryResult);
+
+        LOGGER.info("Returning ids for {} charters belonging to parent '{}': {}", ids.size(), idParent, ids);
+
+        return ids;
+
     }
 
     /**
@@ -275,7 +269,9 @@ public class CharterManager extends AbstractManager {
      * @return A list of improperly saved charters.
      */
     @NotNull
-    public List<IdCharter> listErroneouslySavedCharters(@NotNull IdUser idUser) {
+    public List<IdCharter> listNotExistingSavedCharters(@NotNull IdUser idUser) {
+
+        LOGGER.info("Trying to list saved charters that are not existing in the userspace of user '{}'.", idUser);
 
         List<IdCharter> results = new ArrayList<>(0);
 
@@ -285,7 +281,70 @@ public class CharterManager extends AbstractManager {
                         .filter(idCharter -> !isCharterExisting(idCharter, ResourceRoot.ARCHIVAL_CHARTERS_BEING_EDITED))
                         .collect(Collectors.toList())));
 
+        LOGGER.info("Returning ids for {} saved charters that are not existing in the userspace of user '{}': {}",
+                results.size(), idUser, results);
+
         return results;
+
+    }
+
+    @NotNull
+    public List<IdCharter> listPublicCharters(@NotNull IdAtomId idParent) {
+
+        LOGGER.info("Trying to list all public charters belonging to '{}'.", idParent);
+
+        List<String> queryResult;
+
+        if (idParent instanceof IdFond) {
+
+            LOGGER.trace("'{}' is an archival fond.", idParent);
+            queryResult = momcaConnection.queryDatabase(ExistQueryFactory.listChartersPublic((IdFond) idParent));
+
+        } else if (idParent instanceof IdCollection) {
+
+            LOGGER.trace("'{}' is an archival collection.", idParent);
+            queryResult = momcaConnection.queryDatabase(ExistQueryFactory.listChartersPublic((IdCollection) idParent));
+
+        } else {
+
+            LOGGER.trace("'{}' is a myCollection.", idParent);
+            queryResult = momcaConnection.queryDatabase(ExistQueryFactory.listChartersPublic((IdMyCollection) idParent));
+
+        }
+
+        List<IdCharter> charters = createIds(queryResult);
+
+        LOGGER.info("Returning ids for {} charters belonging to '{}': {}", charters.size(), idParent, charters);
+
+        return charters;
+
+    }
+
+    @NotNull
+    public List<IdCharter> listSavedCharters() {
+
+        LOGGER.info("Trying to list all saved charters.");
+
+        List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listChartersSaved());
+        List<IdCharter> ids = createIds(queryResults);
+
+        LOGGER.info("Returning ids for {} saved charters: {}", ids.size(), ids);
+
+        return ids;
+
+    }
+
+    @NotNull
+    public List<IdCharter> listUsersPrivateCharters(@NotNull IdUser idUser) {
+
+        LOGGER.info("Trying to list all private charters of user '{}'.", idUser);
+
+        List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listChartersPrivate(idUser));
+        List<IdCharter> ids = createIds(queryResults);
+
+        LOGGER.info("Returning ids of {} private chartes of user '{}: {}'", ids.size(), idUser, ids);
+
+        return ids;
 
     }
 

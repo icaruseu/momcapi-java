@@ -203,7 +203,7 @@ public class Archive extends AtomResource {
 
         EagDesc eagDesc = new EagDesc(country.getNativeName(), regionNativeName, address, contactInformation, logoUrlString);
         Element eag = createEagElement(id.getIdentifier(), getName(), country.getCountryCode().getCode(), eagDesc);
-        AtomId id = getId().getContentXml();
+        AtomId id = getId().getContentAsElement();
 
         String published = getPublished();
         String updated = getUpdated();

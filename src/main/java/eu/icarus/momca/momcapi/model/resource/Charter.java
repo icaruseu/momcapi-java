@@ -303,7 +303,7 @@ public class Charter extends AtomResource {
         switch (charterStatus) {
 
             case SAVED:
-                resourceName = id.getContentXml().getText().replace("/", "#") + ".xml";
+                resourceName = id.getContentAsElement().getText().replace("/", "#") + ".xml";
                 break;
             case PRIVATE:
                 resourceName = String.format("%s.%s", id.getIdentifier(), "charter.xml");
@@ -592,7 +592,7 @@ public class Charter extends AtomResource {
         setXmlContent(
                 new Document(
                         new AtomEntry(
-                                getId().getContentXml(),
+                                getId().getContentAsElement(),
                                 createAtomAuthor(),
                                 (published.isEmpty()) ? AtomResource.localTime() : published,
                                 (updated.isEmpty()) ? AtomResource.localTime() : updated,

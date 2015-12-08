@@ -39,15 +39,15 @@ public class IdCharterTest {
         assertEquals(id1.getIdentifier(), IDENTIFIER_COLLECTION_CHARTER);
         assertEquals(id1.getHierarchicalUriParts().size(), 1);
         assertEquals(id1.getHierarchicalUriParts().get(0), IDENTIFIER_COLLECTION);
-        assertEquals(id1.getContentXml().toXML(), ATOM_ID_COLLECTION_CHARTER);
-        assertEquals(id1.getContentXml().getText(), Util.encode(ATOM_ID_TEXT_COLLECTION_CHARTER));
+        assertEquals(id1.getContentAsElement().toXML(), ATOM_ID_COLLECTION_CHARTER);
+        assertEquals(id1.getContentAsElement().getText(), Util.encode(ATOM_ID_TEXT_COLLECTION_CHARTER));
 
         IdCharter id2 = new IdCharter(new AtomId(ATOM_ID_TEXT_COLLECTION_CHARTER));
         assertEquals(id2.getIdentifier(), IDENTIFIER_COLLECTION_CHARTER);
         assertEquals(id2.getHierarchicalUriParts().size(), 1);
         assertEquals(id2.getHierarchicalUriParts().get(0), IDENTIFIER_COLLECTION);
-        assertEquals(id2.getContentXml().toXML(), ATOM_ID_COLLECTION_CHARTER);
-        assertEquals(id2.getContentXml().getText(), Util.encode(ATOM_ID_TEXT_COLLECTION_CHARTER));
+        assertEquals(id2.getContentAsElement().toXML(), ATOM_ID_COLLECTION_CHARTER);
+        assertEquals(id2.getContentAsElement().getText(), Util.encode(ATOM_ID_TEXT_COLLECTION_CHARTER));
 
     }
 
@@ -59,16 +59,16 @@ public class IdCharterTest {
         assertEquals(id1.getHierarchicalUriParts().size(), 2);
         assertEquals(id1.getHierarchicalUriParts().get(1), IDENTIFIER_FOND);
         assertEquals(id1.getHierarchicalUriParts().get(0), IDENTIFIER_ARCHIVE);
-        assertEquals(id1.getContentXml().toXML(), ATOM_ID_FOND_CHARTER);
-        assertEquals(id1.getContentXml().getText(), Util.encode(ATOM_ID_TEXT_FOND_CHARTER));
+        assertEquals(id1.getContentAsElement().toXML(), ATOM_ID_FOND_CHARTER);
+        assertEquals(id1.getContentAsElement().getText(), Util.encode(ATOM_ID_TEXT_FOND_CHARTER));
 
         IdCharter id2 = new IdCharter(new AtomId(ATOM_ID_TEXT_FOND_CHARTER));
         assertEquals(id2.getIdentifier(), IDENTIFIER_FOND_CHARTER);
         assertEquals(id2.getHierarchicalUriParts().size(), 2);
         assertEquals(id2.getHierarchicalUriParts().get(1), IDENTIFIER_FOND);
         assertEquals(id2.getHierarchicalUriParts().get(0), IDENTIFIER_ARCHIVE);
-        assertEquals(id2.getContentXml().toXML(), ATOM_ID_FOND_CHARTER);
-        assertEquals(id2.getContentXml().getText(), Util.encode(ATOM_ID_TEXT_FOND_CHARTER));
+        assertEquals(id2.getContentAsElement().toXML(), ATOM_ID_FOND_CHARTER);
+        assertEquals(id2.getContentAsElement().getText(), Util.encode(ATOM_ID_TEXT_FOND_CHARTER));
 
     }
 

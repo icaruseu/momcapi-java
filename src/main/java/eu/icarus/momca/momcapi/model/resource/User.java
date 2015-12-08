@@ -389,7 +389,7 @@ public class User extends ExistResource {
         storage.appendChild(savedList);
 
         Element bookmarkList = new Element("xrx:bookmark_list", uri);
-        bookmarkedCharters.forEach(idCharter -> bookmarkList.appendChild(createElement("bookmark", idCharter.getContentXml().getText())));
+        bookmarkedCharters.forEach(idCharter -> bookmarkList.appendChild(createElement("bookmark", idCharter.getContentAsElement().getText())));
         storage.appendChild(bookmarkList);
 
         root.appendChild(storage);

@@ -78,7 +78,7 @@ public class ExistQueryFactory {
                 getNamespaceDeclaration(Namespace.ATOM, Namespace.CEI),
                 myCollectionStatus == MyCollectionStatus.PRIVATE ?
                         ResourceRoot.USER_DATA.getUri() : ResourceRoot.PUBLISHED_USER_COLLECTIONS.getUri(),
-                idMyCollection.getAtomIdText()
+                idMyCollection.getAtomId()
         );
 
         return new ExistQuery(query);

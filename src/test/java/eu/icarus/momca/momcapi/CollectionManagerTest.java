@@ -145,7 +145,7 @@ public class CollectionManagerTest {
         Collection collection1 = cm.getCollection(new IdCollection("AbteiEberbach")).get();
         assertEquals(collection1.getCountry().get(), new Country(new CountryCode("DE"), "Deutschland"));
         assertEquals(collection1.getRegion().get(), new Region("DE-NRW", "Nordrhein-Westfalen"));
-        assertEquals(collection1.getId().getContentXml().getText(), "tag:www.monasterium.net,2011:/collection/AbteiEberbach");
+        assertEquals(collection1.getId().getContentAsElement().getText(), "tag:www.monasterium.net,2011:/collection/AbteiEberbach");
         assertEquals(collection1.getIdentifier(), "AbteiEberbach");
         assertEquals(collection1.getName(), "Urkundenbuch der Abtei Eberbach (Google data)");
         assertFalse(collection1.getCreator().isPresent());
@@ -156,7 +156,7 @@ public class CollectionManagerTest {
         Collection collection2 = cm.getCollection(new IdCollection("emptycollection")).get();
         assertFalse(collection2.getCountry().isPresent());
         assertFalse(collection2.getRegion().isPresent());
-        assertEquals(collection2.getId().getContentXml().getText(), "tag:www.monasterium.net,2011:/collection/emptycollection");
+        assertEquals(collection2.getId().getContentAsElement().getText(), "tag:www.monasterium.net,2011:/collection/emptycollection");
         assertEquals(collection2.getIdentifier(), "emptycollection");
         assertEquals(collection2.getName(), "Empty Collection");
         assertEquals(collection2.getCreator().get().getIdentifier(), "admin");

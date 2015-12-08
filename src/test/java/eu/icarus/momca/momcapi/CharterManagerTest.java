@@ -236,7 +236,7 @@ public class CharterManagerTest {
         IdCharter id = new IdCharter("ea13e5f1-03b2-4bfa-9dd5-8fb770f98d7b", "46bc10f3-bc35-4fa8-ab82-25827dc243f6");
         Optional<Charter> charter = cm.getCharter(id, CharterStatus.PRIVATE);
         assertTrue(charter.isPresent());
-        assertEquals(charter.get().getId().getContentXml().toXML(), id.getContentXml().toXML());
+        assertEquals(charter.get().getId().getContentAsElement().toXML(), id.getContentAsElement().toXML());
 
     }
 
@@ -246,7 +246,7 @@ public class CharterManagerTest {
         IdCharter id = new IdCharter("CH-KAE", "Urkunden", "KAE_Urkunde_Nr_1");
         Optional<Charter> charters = cm.getCharter(id, CharterStatus.PUBLIC);
         assertTrue(charters.isPresent());
-        assertEquals(charters.get().getId().getContentXml().toXML(), id.getContentXml().toXML());
+        assertEquals(charters.get().getId().getContentAsElement().toXML(), id.getContentAsElement().toXML());
 
     }
 
@@ -256,7 +256,7 @@ public class CharterManagerTest {
         IdCharter id = new IdCharter("CH-KAE", "Urkunden", "KAE_Urkunde_Nr_2");
         Optional<Charter> charter = cm.getCharter(id, CharterStatus.SAVED);
         assertTrue(charter.isPresent());
-        assertEquals(charter.get().getId().getContentXml().toXML(), id.getContentXml().toXML());
+        assertEquals(charter.get().getId().getContentAsElement().toXML(), id.getContentAsElement().toXML());
         assertTrue(charter.get().getAbstract().isPresent());
         assertEquals(charter.get().getAbstract().get().getContent(), "Herzog Hermann von Alamannien, Graf in Unter-Rätien, schenkt als Helfer des <cei:persName>Abtes Eberhard</cei:persName> dem Kloster Einsiedeln sein Eigentum in Gams.");
 
@@ -286,11 +286,11 @@ public class CharterManagerTest {
     public void testListChartersImportForCollections() throws Exception {
 
         IdCollection id1 = new IdCollection("MedDocBulgEmp");
-        List<IdCharter> charters1 = cm.listChartersImport(id1);
+        List<IdCharter> charters1 = cm.listImportedCharters(id1);
         assertEquals(charters1.size(), 37);
 
         IdCollection id2 = new IdCollection("AbteiEiberbach");
-        List<IdCharter> charters2 = cm.listChartersImport(id2);
+        List<IdCharter> charters2 = cm.listImportedCharters(id2);
         assertEquals(charters2.size(), 0);
 
     }
@@ -299,37 +299,24 @@ public class CharterManagerTest {
     public void testListChartersImportForFonds() throws Exception {
 
         IdFond id1 = new IdFond("RS-IAGNS", "Charters");
-        List<IdCharter> charters1 = cm.listChartersImport(id1);
+        List<IdCharter> charters1 = cm.listImportedCharters(id1);
         assertEquals(charters1.size(), 8);
 
         IdFond id2 = new IdFond("CH-KASchwyz", "Urkunden");
-        List<IdCharter> charters2 = cm.listChartersImport(id2);
+        List<IdCharter> charters2 = cm.listImportedCharters(id2);
         assertEquals(charters2.size(), 0);
 
     }
 
     @Test
-    public void testListChartersPrivateForMyCollections() throws Exception {
+    public void testListChartersInPrivateMyCollection() throws Exception {
 
         IdMyCollection id1 = new IdMyCollection("67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3");
-        List<IdCharter> charters1 = cm.listChartersPrivate(id1);
+        List<IdCharter> charters1 = cm.listChartersInPrivateMyCollection(id1);
         assertEquals(charters1.size(), 2);
 
         IdMyCollection id2 = new IdMyCollection("0d48f895-f296-485b-a6d9-e88b4523cc92");
-        List<IdCharter> charters2 = cm.listChartersPrivate(id2);
-        assertEquals(charters2.size(), 0);
-
-    }
-
-    @Test
-    public void testListChartersPrivateForUser() throws Exception {
-
-        IdUser user1 = new IdUser("user1.testuser@dev.monasterium.net");
-        List<IdCharter> charters1 = cm.listChartersPrivate(user1);
-        assertEquals(charters1.size(), 2);
-
-        IdUser user2 = new IdUser("user2.testuser@dev.monasterium.net");
-        List<IdCharter> charters2 = cm.listChartersPrivate(user2);
+        List<IdCharter> charters2 = cm.listChartersInPrivateMyCollection(id2);
         assertEquals(charters2.size(), 0);
 
     }
@@ -338,11 +325,11 @@ public class CharterManagerTest {
     public void testListChartersPublicForCollections() throws Exception {
 
         IdCollection id1 = new IdCollection("AbteiEberbach");
-        List<IdCharter> charters1 = cm.listChartersPublic(id1);
+        List<IdCharter> charters1 = cm.listPublicCharters(id1);
         assertEquals(charters1.size(), 364);
 
         IdCollection id2 = new IdCollection("emptycollection");
-        List<IdCharter> charters2 = cm.listChartersPublic(id2);
+        List<IdCharter> charters2 = cm.listPublicCharters(id2);
         assertEquals(charters2.size(), 0);
 
     }
@@ -351,11 +338,11 @@ public class CharterManagerTest {
     public void testListChartersPublicForFonds() throws Exception {
 
         IdFond id1 = new IdFond("CH-KAE", "Urkunden");
-        List<IdCharter> charters1 = cm.listChartersPublic(id1);
+        List<IdCharter> charters1 = cm.listPublicCharters(id1);
         assertEquals(charters1.size(), 10);
 
         IdFond id2 = new IdFond("CH-KASchwyz", "Urkunden");
-        List<IdCharter> charters2 = cm.listChartersPublic(id2);
+        List<IdCharter> charters2 = cm.listPublicCharters(id2);
         assertEquals(charters2.size(), 0);
 
     }
@@ -364,18 +351,43 @@ public class CharterManagerTest {
     public void testListChartersPublicForMyCollections() throws Exception {
 
         IdMyCollection id1 = new IdMyCollection("67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3");
-        List<IdCharter> charters1 = cm.listChartersPublic(id1);
+        List<IdCharter> charters1 = cm.listPublicCharters(id1);
         assertEquals(charters1.size(), 1);
 
         IdMyCollection id2 = new IdMyCollection("0d48f895-f296-485b-a6d9-e88b4523cc92");
-        List<IdCharter> charters2 = cm.listChartersPublic(id2);
+        List<IdCharter> charters2 = cm.listPublicCharters(id2);
         assertEquals(charters2.size(), 0);
 
     }
 
     @Test
-    public void testListChartersSaved() throws Exception {
-        assertEquals(cm.listChartersSaved().size(), 3);
+    public void testListNotExistingSavedCharters() throws Exception {
+
+        IdUser id = new IdUser("admin");
+        IdCharter erroneouslySavedCharter = new IdCharter(new AtomId("tag:www.monasterium.net,2011:/charter/CH-KAE/Urkunden/KAE_Urkunde_Nr_1"));
+
+        List<IdCharter> erroneouslySavedCharterIds = cm.listNotExistingSavedCharters(id);
+        assertEquals(erroneouslySavedCharterIds.size(), 1);
+        assertEquals(erroneouslySavedCharterIds.get(0).getContentAsElement().toXML(), erroneouslySavedCharter.getContentAsElement().toXML());
+
+    }
+
+    @Test
+    public void testListSavedCharters() throws Exception {
+        assertEquals(cm.listSavedCharters().size(), 3);
+    }
+
+    @Test
+    public void testListUsersPrivateCharters() throws Exception {
+
+        IdUser user1 = new IdUser("user1.testuser@dev.monasterium.net");
+        List<IdCharter> charters1 = cm.listUsersPrivateCharters(user1);
+        assertEquals(charters1.size(), 2);
+
+        IdUser user2 = new IdUser("user2.testuser@dev.monasterium.net");
+        List<IdCharter> charters2 = cm.listUsersPrivateCharters(user2);
+        assertEquals(charters2.size(), 0);
+
     }
 
     @Test
@@ -473,18 +485,6 @@ public class CharterManagerTest {
 
         assertTrue(updated.isPresent());
         assertEquals(updated.get().getAbstract().get().getContent(), "abstract");
-
-    }
-
-    @Test
-    public void testlistErroneouslySavedCharters() throws Exception {
-
-        IdUser id = new IdUser("admin");
-        IdCharter erroneouslySavedCharter = new IdCharter(new AtomId("tag:www.monasterium.net,2011:/charter/CH-KAE/Urkunden/KAE_Urkunde_Nr_1"));
-
-        List<IdCharter> erroneouslySavedCharterIds = cm.listErroneouslySavedCharters(id);
-        assertEquals(erroneouslySavedCharterIds.size(), 1);
-        assertEquals(erroneouslySavedCharterIds.get(0).getContentXml().toXML(), erroneouslySavedCharter.getContentXml().toXML());
 
     }
 

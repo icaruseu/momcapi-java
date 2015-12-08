@@ -25,20 +25,20 @@ public class IdCharter extends IdAtomId {
 
         super(atomId);
 
-        if (getContentXml().getType() != ResourceType.CHARTER) {
-            throw new IllegalArgumentException(getContentXml().getText() + " is not a charter atom:id.");
+        if (getContentAsElement().getType() != ResourceType.CHARTER) {
+            throw new IllegalArgumentException(getContentAsElement().getText() + " is not a charter atom:id.");
         }
         hierarchicalUriParts = initHierarchicalUriParts(atomId.getText());
     }
 
     public IdCharter(@NotNull String archiveIdentifier, @NotNull String fondIdentifier, @NotNull String charterIdentifier) {
         super(initAtomIdForFond(archiveIdentifier, fondIdentifier, charterIdentifier));
-        hierarchicalUriParts = initHierarchicalUriParts(getContentXml().getText());
+        hierarchicalUriParts = initHierarchicalUriParts(getContentAsElement().getText());
     }
 
     public IdCharter(@NotNull String collectionIdentifier, @NotNull String charterIdentifier) {
         super(initAtomIdForCollection(collectionIdentifier, charterIdentifier));
-        hierarchicalUriParts = initHierarchicalUriParts(getContentXml().getText());
+        hierarchicalUriParts = initHierarchicalUriParts(getContentAsElement().getText());
     }
 
     @NotNull

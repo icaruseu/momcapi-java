@@ -21,14 +21,14 @@ public class IdCollectionTest {
                 "tag:www.monasterium.net,2011:/collection/MedDoc%7CBulgEmp</atom:id>";
 
         IdCollection id1 = new IdCollection(identifier);
-        assertEquals(id1.getContentXml().toXML(), atomIdXml);
+        assertEquals(id1.getContentAsElement().toXML(), atomIdXml);
         assertEquals(id1.getIdentifier(), identifier);
-        assertEquals(id1.getContentXml().getText(), Util.encode(atomIdText));
+        assertEquals(id1.getContentAsElement().getText(), Util.encode(atomIdText));
 
         IdCollection id2 = new IdCollection(new AtomId(atomIdText));
-        assertEquals(id2.getContentXml().toXML(), atomIdXml);
+        assertEquals(id2.getContentAsElement().toXML(), atomIdXml);
         assertEquals(id2.getIdentifier(), identifier);
-        assertEquals(id2.getContentXml().getText(), Util.encode(atomIdText));
+        assertEquals(id2.getContentAsElement().getText(), Util.encode(atomIdText));
 
     }
 

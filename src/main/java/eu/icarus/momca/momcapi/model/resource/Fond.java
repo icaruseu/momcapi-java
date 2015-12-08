@@ -374,7 +374,7 @@ public class Fond extends AtomResource {
         setXmlContent(
                 new Document(
                         new AtomEntry(
-                                getId().getContentXml(),
+                                getId().getContentAsElement(),
                                 createAtomAuthor(),
                                 (published.isEmpty()) ? AtomResource.localTime() : published,
                                 (updated.isEmpty()) ? AtomResource.localTime() : updated,

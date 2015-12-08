@@ -85,7 +85,7 @@ public class FondManagerTest {
         Optional<Fond> fondOptional1 = fm.getFond(id1);
         assertTrue(fondOptional1.isPresent());
         Fond fond1 = fondOptional1.get();
-        assertEquals(fond1.getId().getContentXml().toXML(), id1.getContentXml().toXML());
+        assertEquals(fond1.getId().getContentAsElement().toXML(), id1.getContentAsElement().toXML());
         assertEquals(fond1.getName(), "Urkunden (0947-1483)");
         assertEquals(fond1.getImageAccess().get(), ImageAccess.FREE);
         assertFalse(fond1.getDummyImageUrl().isPresent());
@@ -95,7 +95,7 @@ public class FondManagerTest {
         Optional<Fond> fondOptional2 = fm.getFond(id2);
         assertTrue(fondOptional2.isPresent());
         Fond fond2 = fondOptional2.get();
-        assertEquals(fond2.getId().getContentXml().toXML(), id2.getContentXml().toXML());
+        assertEquals(fond2.getId().getContentAsElement().toXML(), id2.getContentAsElement().toXML());
         assertEquals(fond2.getName(), "Urkunden");
         assertEquals(fond2.getImageAccess().get(), ImageAccess.RESTRICTED);
         assertEquals(fond2.getDummyImageUrl().get().toExternalForm(), "http://example.com/dummy.png");

@@ -98,7 +98,7 @@ public class UserTest {
         assertEquals(user.getSavedCharters().get(1).getId().getIdentifier(), "KAE_Urkunde_Nr_1");
 
         assertEquals(user.getBookmarkedCharters().size(), 1);
-        assertEquals(user.getBookmarkedCharters().get(0).getContentXml().getText(), "tag:www.monasterium.net,2011:/charter/CH-KAE/Urkunden/KAE_Urkunde_Nr_1");
+        assertEquals(user.getBookmarkedCharters().get(0).getContentAsElement().getText(), "tag:www.monasterium.net,2011:/charter/CH-KAE/Urkunden/KAE_Urkunde_Nr_1");
 
     }
 

@@ -23,8 +23,8 @@ public class IdCollection extends IdAtomId {
 
         super(atomId);
 
-        if (getContentXml().getType() != ResourceType.COLLECTION) {
-            throw new IllegalArgumentException(getContentXml().getText() + " is not a collection atom:id text.");
+        if (getContentAsElement().getType() != ResourceType.COLLECTION) {
+            throw new IllegalArgumentException(getContentAsElement().getText() + " is not a collection atom:id text.");
         }
 
     }

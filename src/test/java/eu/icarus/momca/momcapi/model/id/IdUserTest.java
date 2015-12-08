@@ -20,11 +20,11 @@ public class IdUserTest {
 
         IdUser id1 = new IdUser(userMail);
         assertEquals(id1.getIdentifier(), userMail);
-        assertEquals(id1.getContentXml().toXML(), atomAuthorText);
+        assertEquals(id1.getContentAsElement().toXML(), atomAuthorText);
 
         IdUser id2 = new IdUser(atomAuthor);
         assertEquals(id2.getIdentifier(), userMail);
-        assertEquals(id2.getContentXml().toXML(), atomAuthorText);
+        assertEquals(id2.getContentAsElement().toXML(), atomAuthorText);
 
     }
 
@@ -32,7 +32,7 @@ public class IdUserTest {
     public void testConstructorWithEmptyIdentifier() throws Exception {
         IdUser id = new IdUser("");
         assertEquals(id.getIdentifier(), "");
-        assertEquals(id.getContentXml().toXML(), "");
+        assertEquals(id.getContentAsElement().toXML(), "");
     }
 
     @Test
@@ -56,10 +56,10 @@ public class IdUserTest {
         AtomAuthor atomAuthor = new AtomAuthor(userMail);
 
         IdUser id1 = new IdUser(userMail);
-        assertEquals(id1.getContentXml().toXML(), atomAuthorText);
+        assertEquals(id1.getContentAsElement().toXML(), atomAuthorText);
 
         IdUser id2 = new IdUser(atomAuthor);
-        assertEquals(id2.getContentXml().toXML(), atomAuthorText);
+        assertEquals(id2.getContentAsElement().toXML(), atomAuthorText);
 
     }
 

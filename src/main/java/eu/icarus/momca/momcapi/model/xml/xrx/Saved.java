@@ -30,7 +30,7 @@ public class Saved extends Element {
         this.startTime = startTime;
         this.freigabe = freigabe;
 
-        appendChild(createElement("id", id.getContentXml().getText()));
+        appendChild(createElement("id", id.getContentAsElement().getText()));
         appendChild(createElement("start_time", startTime));
         appendChild(createElement("freigabe", freigabe));
 

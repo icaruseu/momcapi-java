@@ -20,8 +20,8 @@ public class IdArchive extends IdAtomId {
 
         super(atomId);
 
-        if (getContentXml().getType() != ResourceType.ARCHIVE) {
-            throw new IllegalArgumentException(getContentXml().getText() + " is not a archive atom:id text.");
+        if (getContentAsElement().getType() != ResourceType.ARCHIVE) {
+            throw new IllegalArgumentException(getContentAsElement().getText() + " is not a archive atom:id text.");
         }
 
     }

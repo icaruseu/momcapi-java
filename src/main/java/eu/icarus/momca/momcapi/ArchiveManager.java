@@ -131,7 +131,7 @@ public class ArchiveManager extends AbstractManager {
 
         LOGGER.info("Trying to get archive '{}'.", identifier);
 
-        Optional<Archive> archive = getFirstMatchingExistResource(idArchive.getContentXml()).map(Archive::new);
+        Optional<Archive> archive = getFirstMatchingExistResource(idArchive.getContentAsElement()).map(Archive::new);
 
         LOGGER.info("Returning '{}' for archive '{}'.", archive, identifier);
 

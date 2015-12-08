@@ -180,7 +180,7 @@ public class MyCollection extends AtomResource {
 
 
         Element resourceContent = new AtomEntry(
-                getId().getContentXml(),
+                getId().getContentAsElement(),
                 createAtomAuthor(),
                 (published.isEmpty()) ? AtomResource.localTime() : published,
                 (updated.isEmpty()) ? AtomResource.localTime() : updated,

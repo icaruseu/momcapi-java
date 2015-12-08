@@ -21,14 +21,14 @@ public class IdArchiveTest {
                 "tag:www.monasterium.net,2011:/archive/CH%7CKAE</atom:id>";
 
         IdArchive id1 = new IdArchive(identifier);
-        assertEquals(id1.getContentXml().toXML(), atomIdXml);
+        assertEquals(id1.getContentAsElement().toXML(), atomIdXml);
         assertEquals(id1.getIdentifier(), identifier);
-        assertEquals(id1.getContentXml().getText(), Util.encode(atomIdText));
+        assertEquals(id1.getContentAsElement().getText(), Util.encode(atomIdText));
 
         IdArchive id2 = new IdArchive(new AtomId(atomIdText));
-        assertEquals(id2.getContentXml().toXML(), atomIdXml);
+        assertEquals(id2.getContentAsElement().toXML(), atomIdXml);
         assertEquals(id2.getIdentifier(), identifier);
-        assertEquals(id2.getContentXml().getText(), Util.encode(atomIdText));
+        assertEquals(id2.getContentAsElement().getText(), Util.encode(atomIdText));
 
     }
 

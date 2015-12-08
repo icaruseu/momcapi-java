@@ -22,28 +22,28 @@ public class IdAtomId extends IdAbstract {
 
         IdAtomId otherId = (IdAtomId) o;
 
-        return getContentXml().getText().equals(otherId.getContentXml().getText());
+        return getContentAsElement().getText().equals(otherId.getContentAsElement().getText());
 
     }
 
     @NotNull
-    public final String getAtomIdText() {
-        return getContentXml().getText();
+    public final String getAtomId() {
+        return getContentAsElement().getText();
     }
 
     @NotNull
     @Override
-    public final AtomId getContentXml() {
+    public final AtomId getContentAsElement() {
         return ((AtomId) contentXml);
     }
 
     public final ResourceType getType() {
-        return getContentXml().getType();
+        return getContentAsElement().getType();
     }
 
     @Override
     public int hashCode() {
-        return getContentXml().getText().hashCode();
+        return getContentAsElement().getText().hashCode();
     }
 
     @NotNull
@@ -54,7 +54,7 @@ public class IdAtomId extends IdAbstract {
 
     @Override
     public String toString() {
-        return "IdAtomId{" + getContentXml().getText() + "}";
+        return "IdAtomId{" + getContentAsElement().getText() + "}";
     }
 
 }

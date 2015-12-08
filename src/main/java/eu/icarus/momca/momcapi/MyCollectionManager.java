@@ -72,7 +72,7 @@ public class MyCollectionManager extends AbstractManager {
     public void deleteMyCollection(@NotNull IdMyCollection idMyCollection) {
 
         CharterManager cm = momcaConnection.getCharterManager();
-        if (!cm.listChartersPrivate(idMyCollection).isEmpty()) {
+        if (!cm.listChartersInPrivateMyCollection(idMyCollection).isEmpty()) {
             String message = String.format("There are still existing private charters for collection '%s'.",
                     idMyCollection.getIdentifier());
             throw new MomcaException(message);
@@ -88,7 +88,7 @@ public class MyCollectionManager extends AbstractManager {
     public void deleteMyCollectionPublic(@NotNull IdMyCollection idMyCollection) {
 
         CharterManager cm = momcaConnection.getCharterManager();
-        if (!cm.listChartersPublic(idMyCollection).isEmpty()) {
+        if (!cm.listPublicCharters(idMyCollection).isEmpty()) {
             String message = String.format("There are still existing public charters for collection '%s'.",
                     idMyCollection.getIdentifier());
             throw new MomcaException(message);
@@ -104,7 +104,7 @@ public class MyCollectionManager extends AbstractManager {
                                                   @NotNull MyCollectionStatus status) {
 
         List<MyCollection> instances = momcaConnection.queryDatabase(
-                ExistQueryFactory.getResourceUri(idCollection.getContentXml(), status.getResourceRoot()
+                ExistQueryFactory.getResourceUri(idCollection.getContentAsElement(), status.getResourceRoot()
                 )).stream()
                 .map(this::getMyCollectionFromUri)
                 .filter(Optional::isPresent)

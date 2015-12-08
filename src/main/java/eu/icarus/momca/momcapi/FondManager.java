@@ -45,8 +45,8 @@ public class FondManager extends AbstractManager {
 
     public void deleteFond(@NotNull IdFond idFond) {
 
-        if (!momcaConnection.getCharterManager().listChartersPublic(idFond).isEmpty()
-                || !momcaConnection.getCharterManager().listChartersImport(idFond).isEmpty()) {
+        if (!momcaConnection.getCharterManager().listPublicCharters(idFond).isEmpty()
+                || !momcaConnection.getCharterManager().listImportedCharters(idFond).isEmpty()) {
             throw new IllegalArgumentException("There are still existing charters for fond '" + idFond.getIdentifier() + "'");
         }
 
@@ -69,7 +69,7 @@ public class FondManager extends AbstractManager {
 
         Optional<Fond> fond = Optional.empty();
 
-        Optional<ExistResource> fondResource = getFirstMatchingExistResource(idFond.getContentXml());
+        Optional<ExistResource> fondResource = getFirstMatchingExistResource(idFond.getContentAsElement());
 
         if (fondResource.isPresent()) {
 

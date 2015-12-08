@@ -28,7 +28,7 @@ public abstract class IdAbstract {
     public abstract boolean equals(Object o);
 
     @NotNull
-    public abstract Element getContentXml();
+    public abstract Element getContentAsElement();
 
     @NotNull
     public String getIdentifier() {

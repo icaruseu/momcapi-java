@@ -365,7 +365,8 @@ public class MomcaConnection {
                         resultList.add(resource.getContent().toString());
                     }
 
-                    LOGGER.debug("Returning {} query results", resultList.size());
+                    LOGGER.debug("Returning {} query results.", resultList.size());
+                    LOGGER.trace("Results: {}", resultList);
 
                 } catch (XMLDBException e) {
                     LOGGER.error("Failed to extract query results from query resultSet.", e);
@@ -455,8 +456,8 @@ public class MomcaConnection {
 
         LOGGER.debug("Trying to write atom resource '{}' to the database.", resource.getId());
 
-        AtomId id = resource.getId().getContentXml();
-        AtomAuthor author = resource.getCreator().map(IdUser::getContentXml).orElse(new AtomAuthor(""));
+        AtomId id = resource.getId().getContentAsElement();
+        AtomAuthor author = resource.getCreator().map(IdUser::getContentAsElement).orElse(new AtomAuthor(""));
         Element content = resource.getContent();
 
         AtomEntry newEntry = new AtomEntry(id, author, publishedDateTime, updatedDateTime, content);

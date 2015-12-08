@@ -30,7 +30,7 @@ public class IdUser extends IdAbstract {
 
     @NotNull
     @Override
-    public AtomAuthor getContentXml() {
+    public AtomAuthor getContentAsElement() {
         AtomAuthor author = (AtomAuthor) contentXml;
         author.detach();
         return author;
