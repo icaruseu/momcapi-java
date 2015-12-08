@@ -241,6 +241,16 @@ public class CharterManagerTest {
     }
 
     @Test
+    public void testGetCharterForPublishedCharter() throws Exception {
+
+        IdCharter id = new IdCharter("CH-KAE", "Urkunden", "KAE_Urkunde_Nr_1");
+        Optional<Charter> charters = cm.getCharter(id, CharterStatus.PUBLIC);
+        assertTrue(charters.isPresent());
+        assertEquals(charters.get().getId().getContentXml().toXML(), id.getContentXml().toXML());
+
+    }
+
+    @Test
     public void testGetCharterForSavedCharter() throws Exception {
 
         IdCharter id = new IdCharter("CH-KAE", "Urkunden", "KAE_Urkunde_Nr_2");
@@ -266,17 +276,7 @@ public class CharterManagerTest {
     }
 
     @Test
-    public void testGetGetCharterForPublishedCharter() throws Exception {
-
-        IdCharter id = new IdCharter("CH-KAE", "Urkunden", "KAE_Urkunde_Nr_1");
-        Optional<Charter> charters = cm.getCharter(id, CharterStatus.PUBLIC);
-        assertTrue(charters.isPresent());
-        assertEquals(charters.get().getId().getContentXml().toXML(), id.getContentXml().toXML());
-
-    }
-
-    @Test
-    public void testGetGetCharterInstancesCharterNotExisting() throws Exception {
+    public void testGetCharterInstancesCharterNotExisting() throws Exception {
         IdCharter id = new IdCharter("RS-IAGNS", "Charters", "NotExisting");
         List<Charter> charters = cm.getCharterInstances(id);
         assertTrue(charters.isEmpty());

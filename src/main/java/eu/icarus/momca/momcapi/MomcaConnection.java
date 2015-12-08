@@ -147,7 +147,7 @@ public class MomcaConnection {
             }
 
         } else {
-            LOGGER.info("Collection '{}' not existing. Aborting deletion.", uri);
+            LOGGER.debug("Collection '{}' not existing. Aborting deletion.", uri);
         }
 
         return success;
@@ -175,7 +175,7 @@ public class MomcaConnection {
             }
 
         } else {
-            LOGGER.info("Resource '{}' not existing. Aborting deletion.", uri);
+            LOGGER.debug("Resource '{}' not existing. Aborting deletion.", uri);
         }
 
         return success;

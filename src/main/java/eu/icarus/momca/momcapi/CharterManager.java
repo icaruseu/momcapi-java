@@ -32,10 +32,10 @@ public class CharterManager extends AbstractManager {
 
     public boolean addCharter(@NotNull Charter charter) {
 
-        boolean success = false;
-
         String charterUri = charter.getUri();
         LOGGER.info("Trying to add charter '{}' to the database.", charterUri);
+
+        boolean success = false;
 
         if (isParentExisting(charter)) {
 
@@ -59,7 +59,7 @@ public class CharterManager extends AbstractManager {
 
             }
         } else {
-            LOGGER.info("The parent of charter '{}' is not existing. Aborting addition.", charter.getUri());
+            LOGGER.info("The parent fond/collection of charter '{}' is not existing. Aborting addition.", charter.getUri());
         }
 
         return success;
@@ -100,8 +100,9 @@ public class CharterManager extends AbstractManager {
 
     public boolean deletePublicCharter(@NotNull IdCharter id, @NotNull CharterStatus status) {
 
-        boolean success = false;
         LOGGER.info("Trying to delete public charter '{}' with status '{}'", id, status);
+
+        boolean success = false;
 
         if (status != CharterStatus.PRIVATE) {
 
@@ -128,6 +129,8 @@ public class CharterManager extends AbstractManager {
     @NotNull
     public Optional<Charter> getCharter(@NotNull IdCharter idCharter, @NotNull CharterStatus charterStatus) {
 
+        LOGGER.info("Trying to get charter '{}' with status '{}' from the database.", idCharter, charterStatus);
+
         ExistQuery query = ExistQueryFactory.getResourceUri(idCharter.getContentXml(), charterStatus.getResourceRoot());
         List<String> results = momcaConnection.queryDatabase(query);
 
@@ -149,6 +152,8 @@ public class CharterManager extends AbstractManager {
 
         }
 
+        LOGGER.info("Returning '{}' for charter '{}' with status '{}' from the database.", charter, idCharter, charterStatus);
+
         return charter;
 
     }
@@ -161,12 +166,19 @@ public class CharterManager extends AbstractManager {
     @NotNull
     public List<Charter> getCharterInstances(@NotNull IdCharter idCharter) {
 
-        return momcaConnection.queryDatabase(ExistQueryFactory.getResourceUri(idCharter.getContentXml(), null
-        )).stream()
+        LOGGER.info("Trying to get all instances for the charter '{}' from the database.", idCharter);
+
+        ExistQuery resourceUri = ExistQueryFactory.getResourceUri(idCharter.getContentXml(), null);
+        List<Charter> charters = momcaConnection.queryDatabase(resourceUri)
+                .stream()
                 .map(this::getCharterFromUri)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
+
+        LOGGER.info("Returning the following instances of the charter '{}' from the database: '{}'", idCharter, charters);
+
+        return charters;
 
     }
 
