@@ -576,6 +576,19 @@ public class ExistQueryFactory {
 
     }
 
+    @NotNull
+    public static ExistQuery moveResource(@NotNull String sourceCollectiontUri, @NotNull String targetCollectionUri, @NotNull String fileName) {
+
+        String query = String.format(
+                "xmldb:move('%s', '%s', '%s')",
+                sourceCollectiontUri,
+                targetCollectionUri,
+                fileName);
+
+        return new ExistQuery(query);
+
+    }
+
     public static ExistQuery removeCollection(@NotNull String collectionUri) {
 
         String query = String.format(
