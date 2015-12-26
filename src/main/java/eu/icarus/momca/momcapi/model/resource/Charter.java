@@ -266,7 +266,7 @@ public class Charter extends AtomResource {
 
                     parentUri = String.format("%s/%s/%s/%s",
                             ResourceRoot.USER_DATA.getUri(),
-                            creator.getIdentifier(),
+                            Util.encode(creator.getIdentifier()),
                             "metadata.charter",
                             idCharter.getHierarchicalUriPartsAsString());
                 }
