@@ -641,6 +641,27 @@ public class ExistQueryFactory {
 
     }
 
+    public static ExistQuery updateCharterAtomId(@NotNull String parentUri, @NotNull String oldAtomId,
+                                                 @NotNull String newAtomId, @NotNull String newDocumentName) {
+
+        String query = String.format(
+                "%slet $oldAtomIdNode := collection('%s')//atom:id[text() = '%s']\n" +
+                        "let $oldDocumentName := util:document-name($oldAtomIdNode)\n" +
+                        "return (\n" +
+                        "    update value $oldAtomIdNode/text() with '%s',\n" +
+                        "    xmldb:rename('%s', $oldDocumentName, '%s')\n" +
+                        ")",
+                getNamespaceDeclaration(Namespace.ATOM),
+                parentUri,
+                oldAtomId,
+                newAtomId,
+                parentUri,
+                newDocumentName);
+
+        return new ExistQuery(query);
+
+    }
+
     @NotNull
     public static ExistQuery updateCharterContent(@NotNull Charter charter) {
 

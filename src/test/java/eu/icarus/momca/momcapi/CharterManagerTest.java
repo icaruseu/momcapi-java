@@ -391,7 +391,7 @@ public class CharterManagerTest {
     }
 
     @Test
-    public void testPublishCharter() throws Exception {
+    public void testPublishSavedCharter() throws Exception {
 
         UserManager userManager = mc.getUserManager();
         User user = new User("newUser", "admin");
@@ -416,7 +416,7 @@ public class CharterManagerTest {
 
         userManager.addUser(user, "password");
 
-        cm.publishCharter(user, id);
+        cm.publishSavedCharter(user, id);
 
         assertFalse(cm.getCharter(id, CharterStatus.SAVED).isPresent());
 
@@ -514,6 +514,41 @@ public class CharterManagerTest {
         charter.setCharterStatus(CharterStatus.PRIVATE);
 
         assertFalse(cm.updateCharter(charter));
+
+    }
+
+    @Test
+    public void testUpdateCharterNewId() throws Exception {
+
+        IdCharter notExistingId = new IdCharter("CH-KAE", "Urkunden", "NotExistingCharter");
+
+        IdCharter originalId = new IdCharter("CH-KAE", "Urkunden", "originalId");
+        CharterStatus status = CharterStatus.PUBLIC;
+
+        assertFalse(cm.updateCharter(originalId, originalId, status));
+
+        assertFalse(cm.updateCharter(originalId, notExistingId, status));
+
+        User admin = mc.getUserManager().getUser(new IdUser("admin")).get();
+        Date date = new Date(LocalDate.of(1413, 2, 2), 0, "2nd Februrary, 1413");
+
+        Charter charter = new Charter(originalId, status, admin, date);
+
+        cm.addCharter(charter);
+
+        assertFalse(cm.updateCharter(originalId, originalId, status));
+
+        IdCharter newId = new IdCharter("Ch-KAE", "Urkunden", "newId");
+
+        assertTrue(cm.updateCharter(newId, originalId, status));
+
+        Optional<Charter> updated = cm.getCharter(newId, status);
+
+        cm.deletePublicCharter(originalId, status);
+        cm.deletePublicCharter(newId, status);
+
+        assertTrue(updated.isPresent());
+        assertEquals(updated.get().getId(), newId);
 
     }
 
