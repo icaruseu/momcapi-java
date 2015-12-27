@@ -47,30 +47,44 @@ public class ExistQueryFactory {
 
     }
 
+    /**
+     * @param collectionUri The URI of the collection to test.
+     * @return An ExistQuery that checks if a collection exists. When executed, the query returns @code{[true]} if the
+     * collection exists.
+     */
     @NotNull
     public static ExistQuery checkCollectionExistence(@NotNull String collectionUri) {
 
         String query = String.format(
                 "xmldb:collection-available('%s')",
-                collectionUri
-        );
+                collectionUri);
 
         return new ExistQuery(query);
 
     }
 
+    /**
+     * @param resourceUri The URI of the resource to check for.
+     * @return An ExistQuery that checks whether or not a resource exists in the database. When executed, the query
+     * returns @code{[true]} if the resource exists.
+     */
     @NotNull
     public static ExistQuery checkExistResourceExistence(@NotNull String resourceUri) {
 
         String query = String.format(
                 "exists(doc('%s'))",
-                resourceUri
-        );
+                resourceUri);
 
         return new ExistQuery(query);
 
     }
 
+    /**
+     * @param idMyCollection     The id of the myCollection to test for.
+     * @param myCollectionStatus The status of the mycollection.
+     * @return An ExistQuery that checks if a collection exists. When executed, the query returns @code{[true]}
+     * if the collection exists.
+     */
     @NotNull
     public static ExistQuery checkMyCollectionExistence(@NotNull IdMyCollection idMyCollection,
                                                         @NotNull MyCollectionStatus myCollectionStatus) {
@@ -80,8 +94,7 @@ public class ExistQueryFactory {
                 getNamespaceDeclaration(Namespace.ATOM, Namespace.CEI),
                 myCollectionStatus == MyCollectionStatus.PRIVATE ?
                         ResourceRoot.USER_DATA.getUri() : ResourceRoot.PUBLISHED_USER_COLLECTIONS.getUri(),
-                idMyCollection.getAtomId()
-        );
+                idMyCollection.getAtomId());
 
         return new ExistQuery(query);
 
@@ -92,8 +105,7 @@ public class ExistQueryFactory {
 
         String query = String.format(
                 "xmldb:exists-user('%s')",
-                idUser.getIdentifier()
-        );
+                idUser.getIdentifier());
 
         return new ExistQuery(query);
 
@@ -105,8 +117,7 @@ public class ExistQueryFactory {
         String query = String.format(
                 "xmldb:create-collection('%s', '%s')",
                 parentUri,
-                name
-        );
+                name);
 
         return new ExistQuery(query);
 
@@ -570,8 +581,7 @@ public class ExistQueryFactory {
 
         String query = String.format(
                 "%scollection('/db/mom-data/xrx.user')//xrx:email/text()",
-                getNamespaceDeclaration(Namespace.XRX)
-        );
+                getNamespaceDeclaration(Namespace.XRX));
 
         return new ExistQuery(query);
 
@@ -632,27 +642,39 @@ public class ExistQueryFactory {
 
     }
 
+    /**
+     * @param collectionUri The URI of the collection to remove
+     * @return An ExistQuery that removes a collection from the database.
+     * The executed query returns @code{[true]} if the deletion was successful.
+     */
     public static ExistQuery removeCollection(@NotNull String collectionUri) {
 
         String query = String.format(
-                "xmldb:remove('%s')",
-                collectionUri
-        );
+                "(xmldb:remove('%s')," +
+                        "not(exists(collection('%s'))))",
+                collectionUri,
+                collectionUri);
 
         return new ExistQuery(query);
 
     }
 
+    /**
+     * @param existResource The resource to remove.
+     * @return An ExistQuery that removes a resource from the database.
+     * The executed query returns @code{[true]} if the deletion was successful.
+     */
     public static ExistQuery removeResource(@NotNull ExistResource existResource) {
 
         String parentUri = existResource.getParentUri();
         String name = existResource.getResourceName();
 
         String query = String.format(
-                "xmldb:remove('%s', '%s')",
+                "(xmldb:remove('%s', '%s')," +
+                        "not(exists(doc('%s'))))",
                 parentUri,
-                name
-        );
+                name,
+                existResource.getUri());
 
         return new ExistQuery(query);
 
@@ -721,9 +743,9 @@ public class ExistQueryFactory {
 
     /**
      * @param charter The charter to update.
-     * @return An ExistQuery that updates the content of an existing charter.
-     * The query returns @code{[0]} if atom:updated after the updates equals the current time at the update,
-     * meaning the update was successful), otherwise @code{[1]}
+     * @return An ExistQuery that updates the CEI - content of an existing charter. The ATOM-content will *not* be
+     * updated apart from atom:updated. The executed query returns @code{[0]} if atom:updated after the updates
+     * equals the current time at the update, meaning the update was successful), otherwise @code{[1]}
      */
     @NotNull
     public static ExistQuery updateCharterContent(@NotNull Charter charter) {

@@ -438,6 +438,13 @@ public class CharterManager extends AbstractManager {
 
     }
 
+    /**
+     * Update the CEI content of a charter. The ATOM content, apart from @code{atom:updated} will not be updated
+     * (for example @code{atom:author}).
+     *
+     * @param updatedCharter The charter with updated content.
+     * @return true if the update was successful.
+     */
     public boolean updateCharterContent(@NotNull Charter updatedCharter) {
 
         String uri = updatedCharter.getUri();

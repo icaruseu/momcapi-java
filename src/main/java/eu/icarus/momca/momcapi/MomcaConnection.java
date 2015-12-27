@@ -105,7 +105,7 @@ public class MomcaConnection {
 
     boolean createCollection(@NotNull String name, @NotNull String parentUri) {
 
-        LOGGER.debug("Trying to write collection '{}/{}'.", parentUri, name);
+        LOGGER.debug("Trying to create collection '{}/{}'.", parentUri, name);
 
         String encodedName = Util.encode(name);
         String encodedParentUri = Util.encode(parentUri);
@@ -118,9 +118,9 @@ public class MomcaConnection {
         boolean success = result.size() == 1 && result.get(0).equals(resultingCollectionUri);
 
         if (success) {
-            LOGGER.debug("Collection '{}' written.", resultingCollectionUri);
+            LOGGER.debug("Collection '{}' created.", resultingCollectionUri);
         } else {
-            LOGGER.debug("Collection '{}' not written.", resultingCollectionUri);
+            LOGGER.debug("Collection '{}' not created.", resultingCollectionUri);
         }
 
         return success;
@@ -136,9 +136,9 @@ public class MomcaConnection {
         if (isCollectionExisting(uri)) {
 
             ExistQuery query = ExistQueryFactory.removeCollection(Util.encode(uri));
-            queryDatabase(query);
+            List<String> results = queryDatabase(query);
 
-            success = !isCollectionExisting(uri);
+            success = results.size() == 1 && results.get(0).equals("true");
 
             if (success) {
                 LOGGER.debug("Collection '{}' deleted.", uri);
@@ -164,9 +164,9 @@ public class MomcaConnection {
         if (isResourceExisting(uri)) {
 
             ExistQuery query = ExistQueryFactory.removeResource(resource);
-            queryDatabase(query);
+            List<String> results = queryDatabase(query);
 
-            success = !isResourceExisting(uri);
+            success = results.size() == 1 && results.get(0).equals("true");
 
             if (success) {
                 LOGGER.debug("Resource '{}' deleted.", uri);
@@ -249,7 +249,7 @@ public class MomcaConnection {
         ExistQuery query = ExistQueryFactory.checkCollectionExistence(encodedUri);
         List<String> result = queryDatabase(query);
 
-        if (result.size() != 1) {
+        if (result.size() != 1 && result.get(0).equals("true")) {
             throw new MomcaException("Failed to test for existence of collection '" + collectionUri + "'");
         }
 
@@ -268,7 +268,7 @@ public class MomcaConnection {
         ExistQuery query = ExistQueryFactory.checkExistResourceExistence(resourceUri);
         List<String> result = queryDatabase(query);
 
-        if (result.size() != 1) {
+        if (result.size() != 1 && result.get(0).equals("true")) {
             throw new MomcaException("Failed to test for existence of resource '" + resourceUri + "'");
         }
 
@@ -431,7 +431,7 @@ public class MomcaConnection {
         ExistQuery query = ExistQueryFactory.getResource(encodedUri);
         List<String> result = queryDatabase(query);
 
-        if (result.size() == 1) {
+        if (result.size() == 1 && !result.get(0).isEmpty()) {
 
             String name = Util.getLastUriPart(resourceUri);
             String parentUri = Util.getParentUri(resourceUri);
