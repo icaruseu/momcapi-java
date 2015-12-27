@@ -315,7 +315,7 @@ public class Charter extends AtomResource {
 
         }
 
-        return resourceName;
+        return Util.encode(resourceName);
 
     }
 

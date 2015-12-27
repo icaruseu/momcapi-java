@@ -362,7 +362,9 @@ public class CharterManager extends AbstractManager {
 
     }
 
-    public void publishSavedCharter(@NotNull User user, @NotNull IdCharter idCharter) {
+    public boolean publishSavedCharter(@NotNull User user, @NotNull IdCharter idCharter) {
+
+        LOGGER.info("Trying to publish the edited charter '{}' from user '{}'.", idCharter, user);
 
         List<Saved> savedList = user.getSavedCharters();
         List<Saved> withoutCurrent = user.getSavedCharters()
@@ -370,70 +372,46 @@ public class CharterManager extends AbstractManager {
                 .filter(saved -> !idCharter.equals(saved.getId()))
                 .collect(Collectors.toList());
 
-        if (withoutCurrent.size() == savedList.size() - 1) {
-
-            Optional<Charter> originalCharter = getCharter(idCharter, CharterStatus.SAVED);
-
-            if (!originalCharter.isPresent()) {
-                String message = String.format(
-                        "The charter with the id '%s'to be published for user '%s' is not existing in 'metadata.charter.saved'.",
-                        idCharter, user.getId());
-                throw new MomcaException(message);
-            }
-
-            Charter toUpdate = originalCharter.get();
-            toUpdate.setCharterStatus(CharterStatus.PUBLIC);
-
-            updateCharter(toUpdate, idCharter, CharterStatus.SAVED);
-
-            user.setSavedCharters(withoutCurrent);
-
-            momcaConnection.getUserManager().updateUserData(user);
-
-        }
-
-    }
-
-    public boolean updateCharter(@NotNull Charter modifiedCharter, @NotNull IdCharter originalId, @Nullable CharterStatus originalStatus) {
-
-        // TODO remove updates of status and id
-
         boolean success = false;
 
-        LOGGER.info("Trying to update charter '{}' with original id '{}' and original status '{}'.",
-                modifiedCharter, originalId, originalStatus);
+        if (withoutCurrent.size() == savedList.size() - 1) {
 
-        IdCharter realOriginalId = originalId == null ? modifiedCharter.getId() : originalId;
-        CharterStatus realOriginalStatus = originalStatus == null ? modifiedCharter.getCharterStatus() : originalStatus;
+            if (isCharterExisting(idCharter, ResourceRoot.ARCHIVAL_CHARTERS_BEING_EDITED)) {
 
-        boolean writeAndDeleteNeccessary = !modifiedCharter.getId().equals(realOriginalId) ||
-                modifiedCharter.getCharterStatus() != realOriginalStatus;
+                ExistQuery query = ExistQueryFactory.publishCharter(idCharter);
+                momcaConnection.queryDatabase(query);
 
-        LOGGER.debug("The neccessity to fully write and delete the charter is '{}'.", writeAndDeleteNeccessary);
+                if (isCharterExisting(idCharter, ResourceRoot.PUBLIC_CHARTERS)) {
 
-        if (writeAndDeleteNeccessary) {
+                    user.setSavedCharters(withoutCurrent);
+                    success = momcaConnection.getUserManager().updateUserData(user);
 
-            LOGGER.trace("Actual original id of '{}' is '{}''.", modifiedCharter, realOriginalId);
-            LOGGER.trace("Actual original status of '{}' is '{}.'", modifiedCharter, realOriginalStatus);
+                    if (success) {
+                        LOGGER.info("Charter '{}', edited by user '{}' published.", idCharter, user);
+                    } else {
+                        LOGGER.info("Failed to remove charter with id '{}' from the list of edited charters for user" +
+                                " '{}'. Needs to be manually removed.", idCharter, user);
+                    }
 
-            Optional<Charter> originalCharterOptional = getCharter(realOriginalId, realOriginalStatus);
-            if (!originalCharterOptional.isPresent()) {
-                LOGGER.info("The charter with id '{}' and status '{}' does not exist in the database.");
+                } else {
+
+                    LOGGER.info("Failed to update the status of charter '{}' to 'PUBLISHED'. Aborting publishing.",
+                            idCharter);
+
+                }
+
+            } else {
+
+                LOGGER.info("Charter with id '{}' to be published is currently not being edited. Abort publishing.",
+                        idCharter);
+
             }
 
-            Charter originalCharter = originalCharterOptional.get();
-
-            LOGGER.debug("Removing old version of charter with id '{}' and status '{}'.",
-                    realOriginalId, realOriginalStatus);
-            momcaConnection.deleteExistResource(originalCharter);
-            LOGGER.debug("Old version of the charter with id '{}' and status '{}' removed.",
-                    realOriginalId, realOriginalStatus);
-
-            LOGGER.debug("Inserting updated charter '{}'.", modifiedCharter);
-            writeCharterToDatabase(modifiedCharter, originalCharter.getPublished(), momcaConnection.queryRemoteDateTime());
-            LOGGER.debug("Updated charter '{}' inserted.", modifiedCharter);
 
         } else {
+
+            LOGGER.info("Charter to be removed (with the id '{}') is not present in the list of chartes currently" +
+                    " edited by user '{}'. Aborting publishing.", idCharter, user);
 
         }
 
@@ -454,7 +432,7 @@ public class CharterManager extends AbstractManager {
             ExistQuery query = ExistQueryFactory.updateCharterContent(updatedCharter);
             momcaConnection.queryDatabase(query);
 
-            success = true;
+            success = true; // TODO add test for success
 
             LOGGER.info("Charter '{}' updated.", uri);
 
@@ -469,62 +447,59 @@ public class CharterManager extends AbstractManager {
     public boolean updateCharterId(@NotNull IdCharter newId, @NotNull IdCharter originalId,
                                    @NotNull CharterStatus status, @Nullable IdUser creator) {
 
-        LOGGER.info("Trying to update id of charter '{}' with status '{}' and creator '{}' to '{}'.", originalId, status, creator, newId);
-
-        boolean success = false;
+        LOGGER.info("Trying to update id of charter '{}' with status '{}' and creator '{}' to '{}'.",
+                originalId, status, creator, newId);
 
         ResourceRoot resourceRoot = status.getResourceRoot();
 
+        boolean proceedWithUpdate = true;
+
         if (originalId.equals(newId)) {
-
+            proceedWithUpdate = false;
             LOGGER.info("The original id '{}' is equal to the new id '{}'. Aborting update.", originalId, newId);
+        }
 
-        } else {
+        if (proceedWithUpdate && !isCharterExisting(originalId, resourceRoot)) {
+            proceedWithUpdate = false;
+            LOGGER.info("There is no charter with id '{}' and status '{}' existing. Aborting update.", originalId, status);
+        }
 
-            if (isCharterExisting(originalId, resourceRoot)) {
+        if (proceedWithUpdate && isCharterExisting(newId, resourceRoot)) {
+            proceedWithUpdate = false;
+            LOGGER.info("Charter with id '{}' is already existing for new status '{}'. Aborting update.", newId, status);
+        }
 
-                if (isCharterExisting(newId, resourceRoot)) {
+        if (proceedWithUpdate && status == CharterStatus.PRIVATE && creator == null) {
+            proceedWithUpdate = false;
+            LOGGER.info("It's not possible to update a private charter without a provided creator. Creator is 'NULL'. Aborting update.");
+        }
 
-                    LOGGER.info("Charter with id '{}' is already existing for status '{}' and creator '{}'. Aborting update.", newId, status, creator);
+        if (proceedWithUpdate && !momcaConnection.isCollectionExisting(Charter.createParentUri(newId, status, creator))) {
+            proceedWithUpdate = false;
+            LOGGER.info("Target hierarchy is not existing for id '{}', status '{}' and creator '{}'. Aborting update.", newId, status, creator);
+        }
 
-                } else {
+        boolean success = false;
 
-                    String newParentUri = Charter.createParentUri(newId, status, creator);
+        if (proceedWithUpdate) {
 
-                    if (momcaConnection.isCollectionExisting(newParentUri)) {
+            String parentUri = Charter.createParentUri(originalId, status, creator);
+            String oldAtomId = originalId.getAtomId();
+            String newAtomId = newId.getAtomId();
+            String newDocumentName = Charter.createResourceName(newId, status);
 
-                        String parentUri = Charter.createParentUri(originalId, status, creator);
-                        String oldAtomId = originalId.getAtomId();
-                        String newAtomId = newId.getAtomId();
-                        String newDocumentName = Charter.createResourceName(newId, status);
+            ExistQuery query = ExistQueryFactory.updateCharterAtomId(parentUri, oldAtomId, newAtomId, newDocumentName);
+            momcaConnection.queryDatabase(query);
 
-                        ExistQuery query = ExistQueryFactory.updateCharterAtomId(parentUri, oldAtomId, newAtomId, newDocumentName);
-                        momcaConnection.queryDatabase(query);
+            success = isCharterExisting(newId, resourceRoot);
 
-                        success = isCharterExisting(newId, resourceRoot);
-
-                    } else {
-
-                        LOGGER.info("Target hierarchy is not existing for id '{}' and status '{}' and creator '{}'. Aborting update.", newId, status, creator);
-
-                    }
-
-                }
-
+            if (success) {
+                LOGGER.info("Id of '{}' charter updated from '{}' to '{}'.", status, originalId, newId);
             } else {
-
-                LOGGER.info("There is no charter with id '{}', status '{}' and creator '{}' existing. Aborting update.", originalId, status, creator);
-
+                LOGGER.info("Failed to update the Id of '{}' charter from '{}' to '{}'.", status, originalId, newId);
             }
 
         }
-
-        if (success) {
-            LOGGER.info("Id of '{}' charter updated from '{}' to '{}'.", status, originalId, newId);
-        } else {
-            LOGGER.info("Failed to update the Id of '{}' charter from '{}' to '{}'.", status, originalId, newId);
-        }
-
 
         return success;
 
@@ -535,23 +510,51 @@ public class CharterManager extends AbstractManager {
 
         LOGGER.info("Trying to update status of charter with id '{}' from '{}' to '{}'", idCharter, originalStatus, newStatus);
 
+        boolean proceedWithUpdate = true;
+
+        if (originalStatus.equals(newStatus)) {
+            proceedWithUpdate = false;
+            LOGGER.info("The original status '{}' is equal to the new status '{}'. Aborting update.", originalStatus, newStatus);
+        }
+
+        if (proceedWithUpdate && !isCharterExisting(idCharter, originalStatus.getResourceRoot())) {
+            proceedWithUpdate = false;
+            LOGGER.info("There is no charter with id '{}' and status '{}' existing. Aborting update.", idCharter, originalStatus);
+        }
+
+        if (proceedWithUpdate && isCharterExisting(idCharter, newStatus.getResourceRoot())) {
+            proceedWithUpdate = false;
+            LOGGER.info("Charter with id '{}' is already existing for new status '{}'. Aborting update.", idCharter, newStatus);
+        }
+
+        if (proceedWithUpdate && (originalStatus == CharterStatus.PRIVATE || newStatus == CharterStatus.PRIVATE) && creator == null) {
+            proceedWithUpdate = false;
+            LOGGER.info("It's not possible to update to or from status 'PRIVATE' without a provided user. User is 'NULL'. Aborting update.");
+        }
+
+        if (proceedWithUpdate && !momcaConnection.isCollectionExisting(Charter.createParentUri(idCharter, newStatus, creator))) {
+            proceedWithUpdate = false;
+            LOGGER.info("Target hierarchy is not existing for id '{}', status '{}' and creator '{}'. Aborting update.", idCharter, newStatus, creator);
+        }
+
         boolean success = false;
 
-        if (newStatus == originalStatus) {
+        if (proceedWithUpdate) {
 
-            LOGGER.info("New status '{}' equals original status '{}'. Aborting update of status.", newStatus, originalStatus);
+            String oldParentUri = Charter.createParentUri(idCharter, originalStatus, creator);
+            String newParentUri = Charter.createParentUri(idCharter, newStatus, creator);
+            String oldFileName = Charter.createResourceName(idCharter, originalStatus);
+            String newFileName = Charter.createResourceName(idCharter, newStatus);
 
-        } else {
+            ExistQuery query = ExistQueryFactory.moveResource(oldParentUri, newParentUri, newFileName, oldFileName);
+            momcaConnection.queryDatabase(query);
 
-            if (isCharterExisting(idCharter, originalStatus.getResourceRoot())) {
+            success = (isCharterExisting(idCharter, newStatus.getResourceRoot()) && !isCharterExisting(idCharter, originalStatus.getResourceRoot()));
 
-                // TODO implement
-
-
+            if (success) {
+                LOGGER.info("Status of charter with id '{}' updated from '{}' to '{}'.", idCharter, originalStatus, newStatus);
             } else {
-
-                LOGGER.info("Charter with id '{}' and status '{}' not existing. Aborting update of status.", idCharter, originalStatus);
-
+                LOGGER.info("Failed to update status of charter with id '{}' from '{}' to '{}'.", idCharter, originalStatus, newStatus);
             }
 
         }

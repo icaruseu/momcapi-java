@@ -1,5 +1,6 @@
 package eu.icarus.momca.momcapi.query;
 
+import eu.icarus.momca.momcapi.model.CharterStatus;
 import eu.icarus.momca.momcapi.model.CountryCode;
 import eu.icarus.momca.momcapi.model.id.*;
 import eu.icarus.momca.momcapi.model.resource.Charter;
@@ -577,13 +578,55 @@ public class ExistQueryFactory {
     }
 
     @NotNull
-    public static ExistQuery moveResource(@NotNull String sourceCollectiontUri, @NotNull String targetCollectionUri, @NotNull String fileName) {
+    public static ExistQuery moveResource(@NotNull String sourceCollectiontUri, @NotNull String targetCollectionUri,
+                                          @NotNull String targetFileName, @Nullable String originalFileName) {
+
+        String query;
+
+        if (originalFileName == null || originalFileName.isEmpty() || originalFileName.equals(targetFileName)) {
+
+            query = String.format(
+                    "xmldb:move('%s', '%s', '%s')",
+                    sourceCollectiontUri,
+                    targetCollectionUri,
+                    targetFileName);
+
+        } else {
+
+            query = String.format(
+                    "(xmldb:move('%s', '%s', '%s'), xmldb:rename('%s', '%s', '%s'))",
+                    sourceCollectiontUri,
+                    targetCollectionUri,
+                    originalFileName,
+                    targetCollectionUri,
+                    originalFileName,
+                    targetFileName);
+
+        }
+
+        return new ExistQuery(query);
+
+    }
+
+    @NotNull
+    public static ExistQuery publishCharter(@NotNull IdCharter idCharter) {
+
+        String publishedParentUri = Charter.createParentUri(idCharter, CharterStatus.PUBLIC, null);
+        String savedFileName = Charter.createResourceName(idCharter, CharterStatus.SAVED);
+        String publishedFileName = Charter.createResourceName(idCharter, CharterStatus.PUBLIC);
 
         String query = String.format(
-                "xmldb:move('%s', '%s', '%s')",
-                sourceCollectiontUri,
-                targetCollectionUri,
-                fileName);
+                "(xmldb:move('%s', '%s', '%s'), " +
+                        "xmldb:remove('%s', '%s'), " +
+                        "xmldb:rename('%s', '%s', '%s'))",
+                ResourceRoot.ARCHIVAL_CHARTERS_BEING_EDITED.getUri(),
+                publishedParentUri,
+                savedFileName,
+                publishedParentUri,
+                publishedFileName,
+                publishedParentUri,
+                savedFileName,
+                publishedFileName);
 
         return new ExistQuery(query);
 
