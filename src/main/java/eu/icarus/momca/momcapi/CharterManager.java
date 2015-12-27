@@ -442,7 +442,7 @@ public class CharterManager extends AbstractManager {
 
         String uri = updatedCharter.getUri();
 
-        LOGGER.info("Trying to update charter '{}'.", uri);
+        LOGGER.info("Trying to update content of charter '{}'.", uri);
 
         boolean proceed = true;
 
@@ -456,11 +456,15 @@ public class CharterManager extends AbstractManager {
         if (proceed) {
 
             ExistQuery query = ExistQueryFactory.updateCharterContent(updatedCharter);
-            momcaConnection.queryDatabase(query);
+            List<String> results = momcaConnection.queryDatabase(query);
 
-            success = true; // TODO add test for success
+            success = results.size() == 1 && results.get(0).equals("0");
 
-            LOGGER.info("Charter '{}' updated.", uri);
+            if (success) {
+                LOGGER.info("Content of charter '{}' updated.", uri);
+            } else {
+                LOGGER.info("Content of charter '{}' not successfully updated.", uri);
+            }
 
         }
 

@@ -697,6 +697,7 @@ public class ExistQueryFactory {
 
     }
 
+    @NotNull
     public static ExistQuery updateCharterAtomId(@NotNull String parentUri, @NotNull String oldAtomId,
                                                  @NotNull String newAtomId, @NotNull String newDocumentName) {
 
@@ -718,6 +719,12 @@ public class ExistQueryFactory {
 
     }
 
+    /**
+     * @param charter The charter to update.
+     * @return An ExistQuery that updates the content of an existing charter.
+     * The query returns @code{[0]} if atom:updated after the updates equals the current time at the update,
+     * meaning the update was successful), otherwise @code{[1]}
+     */
     @NotNull
     public static ExistQuery updateCharterContent(@NotNull Charter charter) {
 
@@ -725,11 +732,14 @@ public class ExistQueryFactory {
                 "%s\n" +
                         "let $charter := doc('%s')\n" +
                         "let $replacement := %s\n" +
+                        "let $currentTime :=  current-dateTime()\n" +
                         "return (update replace $charter//cei:text with $replacement," +
-                        "        update replace $charter//atom:updated/text() with current-dateTime())",
+                        "        update replace $charter//atom:updated/text() with $currentTime," +
+                        "        compare(doc('%s')//atom:updated/text(), $currentTime))",
                 getNamespaceDeclaration(Namespace.ATOM, Namespace.CEI),
                 charter.getUri(),
-                charter.toCei().toXML());
+                charter.toCei().toXML(),
+                charter.getUri());
 
         return new ExistQuery(query);
 
