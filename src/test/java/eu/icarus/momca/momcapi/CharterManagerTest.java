@@ -184,6 +184,8 @@ public class CharterManagerTest {
         User user = mc.getUserManager().getUser(new IdUser("user1.testuser@dev.monasterium.net")).get();
         Date date = new Date(LocalDate.of(1413, 2, 2), 0, "2nd Februrary, 1413");
 
+        assertFalse(cm.deletePrivateCharter(new IdCharter("67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3", "not-existing"), user.getId()));
+
         Charter charter = new Charter(id, CharterStatus.PRIVATE, user, date);
         cm.addCharter(charter);
 
@@ -399,6 +401,9 @@ public class CharterManagerTest {
         IdCharter id = new IdCharter("AbteiEberbach", "Charter7");
         User admin = userManager.getUser(new IdUser("admin")).get();
         Date date = new Date(LocalDate.of(1413, 2, 2), 0, "2nd Februrary, 1413");
+
+        assertFalse(cm.publishSavedCharter(user, new IdCharter("CH-KAE", "Urkunden", "KAE_Urkunde_Nr_3")));
+        assertFalse(cm.publishSavedCharter(user, id));
 
         Charter charter = new Charter(id, CharterStatus.PUBLIC, admin, date);
 
