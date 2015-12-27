@@ -5,7 +5,9 @@ import eu.icarus.momca.momcapi.model.Region;
 import eu.icarus.momca.momcapi.model.id.IdArchive;
 import eu.icarus.momca.momcapi.model.resource.Archive;
 import eu.icarus.momca.momcapi.model.resource.ResourceRoot;
+import eu.icarus.momca.momcapi.model.resource.ResourceType;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
+import eu.icarus.momca.momcapi.query.ExistQuery;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -28,40 +30,37 @@ public class ArchiveManager extends AbstractManager {
 
     public boolean addArchive(@NotNull Archive newArchive) {
 
-        boolean success = false;
         String identifier = newArchive.getIdentifier();
 
         LOGGER.info("Try to add archive '{}' to the database.", identifier);
 
-        if (getArchive(newArchive.getId()).isPresent()) {
+        boolean proceed = true;
 
+        if (isArchiveExisting(newArchive.getId())) {
+            proceed = false;
             LOGGER.info("Archive '{}' already exists, aborting addition.", identifier);
+        }
 
-        } else {
+        if (proceed && newArchive.getRegionName().isPresent() &&
+                !momcaConnection.getCountryManager().isRegionExisting(newArchive.getCountry(), newArchive.getRegionName().get())) {
+            proceed = false;
+            LOGGER.info("Region of archive to be added ({}) is not part of '{}' in the database. Aborting addition",
+                    newArchive.getRegionName().get(),
+                    newArchive.getCountry().getNativeName());
+        }
 
-            boolean isRegionOk = newArchive.getRegionName()
-                    .map(s -> momcaConnection.getCountryManager()
-                            .getRegions(newArchive.getCountry())
-                            .stream()
-                            .anyMatch(region -> s.equals(region.getNativeName())))
-                    .orElse(true);
+        boolean success = false;
 
-            if (isRegionOk) {
+        if (proceed) {
 
-                momcaConnection.createCollection(identifier, ResourceRoot.ARCHIVES.getUri());
-                String time = momcaConnection.queryRemoteDateTime();
-                momcaConnection.writeAtomResource(newArchive, time, time);
+            momcaConnection.createCollection(identifier, ResourceRoot.ARCHIVES.getUri());
+            String time = momcaConnection.queryRemoteDateTime();
+            success = momcaConnection.writeAtomResource(newArchive, time, time);
 
-                success = true;
+            if (success) {
                 LOGGER.info("Archive '{}' added.", identifier);
-
             } else {
-
-                LOGGER.info("The region of the archive to be added ({}) is not part of '{}' in the database," +
-                                " aborting addition",
-                        newArchive.getRegionName().get(),
-                        newArchive.getCountry().getNativeName());
-
+                LOGGER.info("Archive '{}' not added.", identifier);
             }
 
         }
@@ -80,21 +79,38 @@ public class ArchiveManager extends AbstractManager {
 
     }
 
+    private String createUriFromArchiveId(IdArchive idArchive) {
+
+        return String.format(
+                "%s/%s/%s%s",
+                ResourceRoot.ARCHIVES.getUri(),
+                idArchive.getIdentifier(),
+                idArchive.getIdentifier(),
+                ResourceType.ARCHIVE.getNameSuffix());
+
+    }
+
     public boolean deleteArchive(@NotNull IdArchive idArchive) {
 
-        boolean success = false;
         String identifier = idArchive.getIdentifier();
 
         LOGGER.info("Trying to delete archive '{}'", identifier);
 
-        boolean stillHasFonds = !momcaConnection.getFondManager().listFonds(idArchive).isEmpty();
+        boolean proceed = true;
 
-        if (stillHasFonds) {
+        if (!isArchiveExisting(idArchive)) {
+            proceed = false;
+            LOGGER.info("The archive '{}' that is to be deleted doesn't exist. Aborting deletion.", identifier);
+        }
 
-            LOGGER.info("The archive '{}',  that is to be deleted still has associated fonds, aborting deletion.",
-                    identifier);
+        if (proceed && !momcaConnection.getFondManager().listFonds(idArchive).isEmpty()) {
+            proceed = false;
+            LOGGER.info("The archive '{}' that is to be deleted still has associated fonds. Aborting deletion.", identifier);
+        }
 
-        } else {
+        boolean success = false;
+
+        if (proceed) {
 
             String archiveCollectionUri = String.format("%s/%s", ResourceRoot.ARCHIVES.getUri(), identifier);
             LOGGER.trace("Trying to delete archival collection at '{}'", archiveCollectionUri);
@@ -131,11 +147,30 @@ public class ArchiveManager extends AbstractManager {
 
         LOGGER.info("Trying to get archive '{}'.", identifier);
 
-        Optional<Archive> archive = getFirstMatchingExistResource(idArchive.getContentAsElement()).map(Archive::new);
+        String uri = createUriFromArchiveId(idArchive);
+
+        Optional<Archive> archive = momcaConnection.readExistResource(uri).map(Archive::new);
 
         LOGGER.info("Returning '{}' for archive '{}'.", archive, identifier);
 
         return archive;
+
+    }
+
+    private boolean isArchiveExisting(IdArchive idArchive) {
+
+        LOGGER.debug("Try to determine the existance of archive '{}'.", idArchive);
+
+        String uri = createUriFromArchiveId(idArchive);
+
+        ExistQuery query = ExistQueryFactory.checkExistResourceExistence(uri);
+        List<String> results = momcaConnection.queryDatabase(query);
+
+        boolean isArchiveExisting = results.size() == 1 && results.get(0).equals("true");
+
+        LOGGER.debug("The result for the query for existence of archive '{}' is '{}'", idArchive, isArchiveExisting);
+
+        return isArchiveExisting;
 
     }
 
@@ -144,7 +179,8 @@ public class ArchiveManager extends AbstractManager {
 
         LOGGER.info("Trying to list all archives in the database.");
 
-        List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listArchives());
+        ExistQuery query = ExistQueryFactory.listArchives();
+        List<String> queryResults = momcaConnection.queryDatabase(query);
 
         List<IdArchive> archiveList = collectArchiveIds(queryResults);
 
@@ -164,7 +200,8 @@ public class ArchiveManager extends AbstractManager {
 
         LOGGER.info("Trying to list all archives for region '{}'.", nativeName);
 
-        List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listArchivesForRegion(nativeName));
+        ExistQuery query = ExistQueryFactory.listArchivesForRegion(nativeName);
+        List<String> queryResults = momcaConnection.queryDatabase(query);
 
         List<IdArchive> archiveList = collectArchiveIds(queryResults);
 
@@ -184,8 +221,8 @@ public class ArchiveManager extends AbstractManager {
         String nativeName = country.getNativeName();
         LOGGER.info("Trying to list all archives for country '{}'.", nativeName);
 
-        List<String> queryResults = momcaConnection.queryDatabase(
-                ExistQueryFactory.listArchivesForCountry(country.getCountryCode()));
+        ExistQuery query = ExistQueryFactory.listArchivesForCountry(country.getCountryCode());
+        List<String> queryResults = momcaConnection.queryDatabase(query);
 
         List<IdArchive> archiveList = collectArchiveIds(queryResults);
 

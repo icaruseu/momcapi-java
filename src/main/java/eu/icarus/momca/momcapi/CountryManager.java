@@ -171,6 +171,15 @@ public class CountryManager extends AbstractManager {
         return !momcaConnection.queryDatabase(ExistQueryFactory.getEapCountryXml(code)).isEmpty();
     }
 
+    public Boolean isRegionExisting(@NotNull Country country, @NotNull String regionName) {
+
+        return momcaConnection.getCountryManager()
+                .getRegions(country)
+                .stream()
+                .anyMatch(region -> regionName.equals(region.getNativeName()));
+
+    }
+
     /**
      * @return A list of the country codes of all countries in the database (archives and collections).
      */

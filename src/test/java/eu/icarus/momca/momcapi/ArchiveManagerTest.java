@@ -118,12 +118,15 @@ public class ArchiveManagerTest {
     @Test
     public void testDeleteArchive() throws Exception {
 
+        assertFalse(am.deleteArchive(new IdArchive("Not-Existing")));
+
         Country country = new Country(new CountryCode("DE"), "Deutschland");
         String shortName = "DE-HStASt";
         String name = "Landesarchiv Baden-Württemberg, Abt. Hauptstaatsarchiv Stuttgart";
 
         Archive newArchive = new Archive(shortName, name, country);
         am.addArchive(newArchive);
+
         assertTrue(am.deleteArchive(newArchive.getId()));
 
         assertFalse(am.getArchive(newArchive.getId()).isPresent());
@@ -143,9 +146,12 @@ public class ArchiveManagerTest {
         IdArchive existingArchiveIdentifier = new IdArchive("CH-KAE");
         IdArchive nonExistingArchiveIdentifier = new IdArchive("CH-ABC");
 
-        assertTrue(am.getArchive(existingArchiveIdentifier).isPresent());
+        Optional<Archive> archiveOptional = am.getArchive(existingArchiveIdentifier);
 
-        Archive archive = am.getArchive(existingArchiveIdentifier).get();
+        assertTrue(archiveOptional.isPresent());
+
+        Archive archive = archiveOptional.get();
+
         assertEquals(archive.getName(), "Klosterarchiv Einsiedeln");
         assertEquals(archive.getCountry().getCountryCode().getCode(), "CH");
         assertFalse(archive.getRegionName().isPresent());
