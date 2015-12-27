@@ -10,6 +10,8 @@ import eu.icarus.momca.momcapi.model.xml.eap.EapSubdivision;
 import eu.icarus.momca.momcapi.query.ExistQuery;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +26,8 @@ import java.util.stream.Collectors;
  */
 public class CountryManager extends AbstractManager {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(CountryManager.class);
+
     @NotNull
     private static final String MOM_PORTAL_XML_URI = String
             .format("%s/mom.portal.xml", ResourceRoot.PORTAL_HIERARCHY.getUri());
@@ -36,20 +40,40 @@ public class CountryManager extends AbstractManager {
      * Adds a new country to country hierarchy used for archives and fonds.
      *
      * @param country The country to add.
+     * @return true if the process succeeds.
      */
-    public void addNewCountryToHierarchy(@NotNull Country country) {
+    public boolean addNewCountryToHierarchy(@NotNull Country country) {
 
         String code = country.getCountryCode().getCode();
         String name = country.getNativeName();
 
+        LOGGER.info("Trying to add country '{}' to the hierarchy.", code);
+
+        boolean proceed = true;
+
         if (isCodeInUseInHierarchy(code)) {
-            throw new IllegalArgumentException(String.format("EapCountry code '%s' is already existing.", code));
+            proceed = false;
+            LOGGER.info("Country code '{}' is already existing. Aborting addition.", code);
         }
 
-        EapCountry newEapCountry = new EapCountry(code, name, new ArrayList<>(0));
-        ExistQuery query = ExistQueryFactory
-                .insertEapElement(MOM_PORTAL_XML_URI, "eap:countries", null, newEapCountry.toXML());
-        momcaConnection.queryDatabase(query);
+        boolean success = false;
+
+        if (proceed) {
+
+            EapCountry newEapCountry = new EapCountry(code, name, new ArrayList<>(0));
+
+            ExistQuery query = ExistQueryFactory.insertEapElement(MOM_PORTAL_XML_URI, "eap:countries", null, newEapCountry.toXML());
+            success = Util.isTrue(momcaConnection.queryDatabase(query));
+
+            if (success) {
+                LOGGER.info("Country '{}' added to the hierarchy.", name);
+            } else {
+                LOGGER.info("Failed to add country '{}' to the hierarchy.", name);
+            }
+
+        }
+
+        return success;
 
     }
 
@@ -58,38 +82,85 @@ public class CountryManager extends AbstractManager {
      *
      * @param country The country to add the region to.
      * @param region  The region to add to the hierarchy
+     * @return true if the addition was successful.
      */
 
-    public void addRegionToHierarchy(@NotNull Country country, @NotNull Region region) {
+    public boolean addRegionToHierarchy(@NotNull Country country, @NotNull Region region) {
+
+        String regionNativeName = region.getNativeName();
+        CountryCode countryCode = country.getCountryCode();
+
+        LOGGER.info("Trying to add region '{}' to country '{}'.", regionNativeName, countryCode);
+
+        boolean proceed = true;
 
         if (getRegions(country).contains(region)) {
-            throw new IllegalArgumentException(String.format("Region '%s' is already existing.", region.getNativeName()));
+            proceed = false;
+            LOGGER.info("Region '{}' is already existing. Aborting addition.", regionNativeName);
         }
 
-        if (!region.getCode().isPresent()) {
-            throw new IllegalArgumentException("A hierarchical region needs to contain a region code.");
+        if (proceed && !region.getCode().isPresent()) {
+            proceed = false;
+            LOGGER.info("A hierarchical region needs to contain a region code. Aborting addition.");
         }
 
-        EapSubdivision eapSubdivision = new EapSubdivision(region.getCode().get(), region.getNativeName());
-        ExistQuery query = ExistQueryFactory.insertEapElement(
-                MOM_PORTAL_XML_URI, "eap:subdivisions", country.getCountryCode().getCode(), eapSubdivision.toXML());
-        momcaConnection.queryDatabase(query);
+        boolean success = false;
+
+        if (proceed) {
+
+            EapSubdivision eapSubdivision = new EapSubdivision(region.getCode().get(), regionNativeName);
+
+            ExistQuery query = ExistQueryFactory.insertEapElement(MOM_PORTAL_XML_URI, "eap:subdivisions",
+                    countryCode.getCode(), eapSubdivision.toXML());
+            success = Util.isTrue(momcaConnection.queryDatabase(query));
+
+            if (success) {
+                LOGGER.info("Region '{}' added to country '{}'.", regionNativeName, countryCode);
+            } else {
+                LOGGER.info("Failed to add region '{}' to country '{}'.", regionNativeName, countryCode);
+            }
+
+        }
+
+        return success;
 
     }
 
     /**
      * Deletes a country.
      *
-     * @param code The code of the country to delete, e.g. {@code DE}.
+     * @param countryCode The code of the country to delete, e.g. {@code DE}.
+     * @return true if the deletion was successful.
      */
-    public void deleteCountryFromHierarchy(@NotNull CountryCode code) {
+    public boolean deleteCountryFromHierarchy(@NotNull CountryCode countryCode) {
 
-        List<String> archivesForCode = momcaConnection.queryDatabase(ExistQueryFactory.listArchivesForCountry(code));
-        if (!archivesForCode.isEmpty()) {
-            throw new MomcaException("There are existing archives for country '" + code + "'.");
+        String code = countryCode.getCode();
+
+        LOGGER.info("Trying to delete the country code '{}' from the hierarchy.", code);
+
+        boolean proceed = true;
+
+        if (!momcaConnection.queryDatabase(ExistQueryFactory.listArchivesForCountry(countryCode)).isEmpty()) {
+            proceed = false;
+            LOGGER.info("There are existing archives for country '{}'.", code);
         }
 
-        momcaConnection.queryDatabase(ExistQueryFactory.deleteEapElement(code.getCode()));
+        boolean success = false;
+
+        if (proceed) {
+
+            ExistQuery query = ExistQueryFactory.deleteEapElement(code);
+            success = Util.isTrue(momcaConnection.queryDatabase(query));
+
+            if (success) {
+                LOGGER.info("Deleted country conde '{}' from the hierarchy.", code);
+            } else {
+                LOGGER.info("Failed to delete country conde '{}' from the hierarchy.", code);
+            }
+
+        }
+
+        return success;
 
     }
 
@@ -97,47 +168,75 @@ public class CountryManager extends AbstractManager {
      * Deletes a region from a countries hierarchy.
      *
      * @param country    The country to delete from.
-     * @param regionName The native name of the region to delete
+     * @param regionName The native name of the region to delete.
+     * @return true if the deletion was successful.
      */
-    public void deleteRegionFromHierarchy(@NotNull Country country, @NotNull String regionName) {
+    public boolean deleteRegionFromHierarchy(@NotNull Country country, @NotNull String regionName) {
 
-        if (getRegions(country).stream().anyMatch(region -> regionName.equals(region.getNativeName()))) {
+        String nativeName = country.getNativeName();
 
-            if (!momcaConnection.queryDatabase(
-                    ExistQueryFactory.listArchivesForRegion(regionName)).isEmpty()) {
-                String message = String.format("There are existing archives for region '%s'.", regionName);
-                throw new MomcaException(message);
+        LOGGER.info("Trying to delete the region '{}' from the country '{}'.", regionName, nativeName);
+
+        boolean proceed = true;
+
+        if (!getRegions(country).stream().anyMatch(region -> regionName.equals(region.getNativeName()))) {
+            proceed = false;
+            LOGGER.info("The region '{}' does not exist in country '{}'. Aborting delete.", regionName, nativeName);
+        }
+
+        if (proceed && !momcaConnection.queryDatabase(ExistQueryFactory.listArchivesForRegion(regionName)).isEmpty()) {
+            proceed = false;
+            LOGGER.info("There are existing archives for region '{}'.", regionName);
+        }
+
+        boolean success = false;
+
+        if (proceed) {
+
+            ExistQuery query = ExistQueryFactory.deleteEapElement(regionName);
+            success = Util.isTrue(momcaConnection.queryDatabase(query));
+
+            if (success) {
+                LOGGER.info("Region '{}' deleted from country '{}'.", regionName, nativeName);
+            } else {
+                LOGGER.info("Failed to delete region '{}' from country '{}'.", regionName, nativeName);
             }
 
-            momcaConnection.queryDatabase(ExistQueryFactory.deleteEapElement(regionName));
-
         }
+
+        return success;
 
     }
 
     /**
      * Gets a country from the database.
      *
-     * @param code The code of the country, e.g. {@code DE}.
+     * @param countryCode The code of the country, e.g. {@code DE}.
      * @return The country.
      */
     @NotNull
-    public Optional<Country> getCountry(@NotNull CountryCode code) {
+    public Optional<Country> getCountry(@NotNull CountryCode countryCode) {
+
+        String code = countryCode.getCode();
+
+        LOGGER.info("Trying to get the country for code '{}' from the database.", code);
 
         Optional<Country> country = Optional.empty();
 
-        if (listCountries().stream().anyMatch(countryCode -> countryCode.equals(code))) {
+        if (listCountries().stream().anyMatch(c -> c.equals(countryCode))) {
 
-            List<String> nativeNames = momcaConnection.queryDatabase(ExistQueryFactory.getCountryNativeName(code));
+            List<String> nativeNames = momcaConnection.queryDatabase(ExistQueryFactory.getCountryNativeName(countryCode));
 
             if (nativeNames.size() > 1) {
-                throw new MomcaException("There are multiple names for country code '" + code.getCode() + "'");
+                throw new MomcaException("There are multiple names for country code '" + code + "'");
             }
 
             String nativeName = nativeNames.isEmpty() ? "[No name]" : nativeNames.get(0);
-            country = Optional.of(new Country(code, nativeName));
+            country = Optional.of(new Country(countryCode, nativeName));
 
         }
+
+        LOGGER.info("Returning '{}' as the country for code '{}'.", country, code);
 
         return country;
 
@@ -145,6 +244,10 @@ public class CountryManager extends AbstractManager {
 
     @NotNull
     public List<Region> getRegions(@NotNull Country country) {
+
+        String countryCode = country.getCountryCode().getCode();
+
+        LOGGER.info("Try to get the regions for country '{}' from the database.", countryCode);
 
         List<Region> regions = new ArrayList<>(0);
 
@@ -163,6 +266,8 @@ public class CountryManager extends AbstractManager {
 
         }
 
+        LOGGER.info("Returning the following number of regions for country '{}': {}", countryCode, regions.size());
+
         return regions;
 
     }
@@ -173,10 +278,19 @@ public class CountryManager extends AbstractManager {
 
     public Boolean isRegionExisting(@NotNull Country country, @NotNull String regionName) {
 
-        return momcaConnection.getCountryManager()
+        CountryCode countryCode = country.getCountryCode();
+
+        LOGGER.info("Try to determine if the region '{}' is existing for country '{}'.", regionName, countryCode);
+
+        boolean isRegionExisting = momcaConnection
+                .getCountryManager()
                 .getRegions(country)
                 .stream()
                 .anyMatch(region -> regionName.equals(region.getNativeName()));
+
+        LOGGER.info("Result for query for existence of region '{}' in country '{}': {}", regionName, countryCode, isRegionExisting);
+
+        return isRegionExisting;
 
     }
 
@@ -185,8 +299,15 @@ public class CountryManager extends AbstractManager {
      */
     @NotNull
     public List<CountryCode> listCountries() {
-        return momcaConnection.queryDatabase(ExistQueryFactory.listCountryCodes())
+
+        LOGGER.info("Trying to list all countries in the database.");
+
+        List<CountryCode> codeList = momcaConnection.queryDatabase(ExistQueryFactory.listCountryCodes())
                 .stream().map(CountryCode::new).collect(Collectors.toList());
+
+        LOGGER.info("Returning list of {} countries.", codeList.size());
+
+        return codeList;
     }
 
 }

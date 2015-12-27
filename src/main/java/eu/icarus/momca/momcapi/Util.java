@@ -143,6 +143,16 @@ public class Util {
                 (archIdentifierElement.getValue().isEmpty() && archIdentifierElement.getChildElements().size() == 0);
     }
 
+    /**
+     * Tests if a ExistQuery result is signifying @code{true}.
+     *
+     * @param queryResults The result list which to process.
+     * @return true if the queryResults @code{[true]}.
+     */
+    public static boolean isTrue(List<String> queryResults) {
+        return queryResults.size() == 1 & queryResults.get(0).equals("true");
+    }
+
     @NotNull
     public static String joinChildNodes(@NotNull Element xml) {
 

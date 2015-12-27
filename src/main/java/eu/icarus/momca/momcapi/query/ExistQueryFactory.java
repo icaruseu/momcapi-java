@@ -129,14 +129,18 @@ public class ExistQueryFactory {
      * @return A query to delete a eap-element tree, e.g.
      * {@code <eap:country><eap:code>DE</eap:code><eap:nativeform/></eap:country>} or
      * {@code <eap:subdivision><eap:code>DE-BW</eap:code><eap:nativeform/></eap:subdivision>}. It deletes the whole tree
-     * including its sub-elements.
+     * including its sub-elements. When executed, the query returns @code{[true]}.
      */
     @NotNull
     public static ExistQuery deleteEapElement(@NotNull String eapText) {
 
         String query = String.format(
-                "%supdate delete doc('%s/mom.portal.xml')//eap:*[eap:code='%s' or eap:nativeform='%s']",
+                "%s(update delete doc('%s/mom.portal.xml')//eap:*[eap:code='%s' or eap:nativeform='%s'], " +
+                        "not(exists( doc('%s/mom.portal.xml')//eap:*[eap:code='%s' or eap:nativeform='%s'])))",
                 getNamespaceDeclaration(Namespace.EAP),
+                ResourceRoot.PORTAL_HIERARCHY.getUri(),
+                eapText,
+                eapText,
                 ResourceRoot.PORTAL_HIERARCHY.getUri(),
                 eapText,
                 eapText);
@@ -278,7 +282,7 @@ public class ExistQueryFactory {
      * @param code                The code of the element to append into, can be "" or null to target all elements.
      * @param elementToInsert     The XML code to append.
      * @return A query to append an eap element tree into all matching parent eap elements. The element is appended
-     * after all other child-elements.
+     * after all other child-elements. When executed, the query returns @code{[true]}.
      */
     @NotNull
     public static ExistQuery insertEapElement(@NotNull String resourceUri, @NotNull String qualifiedParentName,
@@ -287,12 +291,14 @@ public class ExistQueryFactory {
         String predicate = (code == null || code.isEmpty()) ? "" : String.format("/eap:country[eap:code='%s']", code);
 
         String query = String.format(
-                "%supdate insert %s into doc('%s')/%s/%s",
+                "%s(update insert %s into doc('%s')/%s/%s, exists(doc('%s')//%s))",
                 getNamespaceDeclaration(qualifiedParentName),
                 elementToInsert,
                 resourceUri,
                 predicate,
-                qualifiedParentName);
+                qualifiedParentName,
+                resourceUri,
+                elementToInsert);
 
         return new ExistQuery(query);
 

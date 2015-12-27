@@ -1,6 +1,5 @@
 package eu.icarus.momca.momcapi;
 
-import eu.icarus.momca.momcapi.exception.MomcaException;
 import eu.icarus.momca.momcapi.model.Country;
 import eu.icarus.momca.momcapi.model.CountryCode;
 import eu.icarus.momca.momcapi.model.Region;
@@ -42,7 +41,8 @@ public class CountryManagerTest {
         String nativeName = "Österreich";
         Country country = new Country(code, nativeName);
 
-        cm.addNewCountryToHierarchy(country);
+        assertTrue(cm.addNewCountryToHierarchy(country));
+
         Optional<Country> countryOptional = cm.getCountry(code);
         cm.deleteCountryFromHierarchy(code);
 
@@ -51,9 +51,9 @@ public class CountryManagerTest {
 
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class)
+    @Test
     public void testAddNewCountryToHierarchyThatExists() throws Exception {
-        cm.addNewCountryToHierarchy(new Country(new CountryCode("DE"), "Deutschland"));
+        assertFalse(cm.addNewCountryToHierarchy(new Country(new CountryCode("DE"), "Deutschland")));
     }
 
     @Test
@@ -62,7 +62,8 @@ public class CountryManagerTest {
         Country country = new Country(new CountryCode("RS"), "Serbia");
         Region region = new Region("RS-BG", "Beograd");
 
-        cm.addRegionToHierarchy(country, region);
+        assertTrue(cm.addRegionToHierarchy(country, region));
+
         List<Region> regions = cm.getRegions(country);
         cm.deleteRegionFromHierarchy(country, region.getNativeName());
 
@@ -70,10 +71,10 @@ public class CountryManagerTest {
 
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class)
+    @Test
     public void testAddRegionToHierarchyAlreadyExisting() throws Exception {
         Country country = new Country(new CountryCode("DE"), "Deutschland");
-        cm.addRegionToHierarchy(country, new Region("DE-BW", "Baden-Württemberg"));
+        assertFalse(cm.addRegionToHierarchy(country, new Region("DE-BW", "Baden-Württemberg")));
     }
 
     @Test
@@ -81,14 +82,16 @@ public class CountryManagerTest {
 
         CountryCode code = new CountryCode("SE");
         cm.addNewCountryToHierarchy(new Country(code, "Sverige"));
-        cm.deleteCountryFromHierarchy(code);
+
+        assertTrue(cm.deleteCountryFromHierarchy(code));
+
         assertFalse(cm.getCountry(code).isPresent());
 
     }
 
-    @Test(expectedExceptions = MomcaException.class)
+    @Test
     public void testDeleteCountryFromHierarchyWithExistingArchives() throws Exception {
-        cm.deleteCountryFromHierarchy(new CountryCode("CH"));
+        assertFalse(cm.deleteCountryFromHierarchy(new CountryCode("CH")));
     }
 
     @Test
@@ -98,16 +101,16 @@ public class CountryManagerTest {
         Region region = new Region("CH-SG", "Sankt Gallen");
         cm.addRegionToHierarchy(country, region);
 
-        cm.deleteRegionFromHierarchy(country, region.getNativeName());
+        assertTrue(cm.deleteRegionFromHierarchy(country, region.getNativeName()));
 
         assertTrue(cm.getRegions(country).isEmpty());
 
     }
 
-    @Test(expectedExceptions = MomcaException.class)
+    @Test
     public void testDeleteRegionFromHierarchyWithExistingArchives() throws Exception {
         Country country = cm.getCountry(new CountryCode("DE")).get();
-        cm.deleteRegionFromHierarchy(country, "Bayern");
+        assertFalse(cm.deleteRegionFromHierarchy(country, "Bayern"));
     }
 
     @Test

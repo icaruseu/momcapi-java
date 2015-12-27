@@ -136,9 +136,7 @@ public class MomcaConnection {
         if (isCollectionExisting(uri)) {
 
             ExistQuery query = ExistQueryFactory.removeCollection(Util.encode(uri));
-            List<String> results = queryDatabase(query);
-
-            success = results.size() == 1 && results.get(0).equals("true");
+            success = Util.isTrue(queryDatabase(query));
 
             if (success) {
                 LOGGER.debug("Collection '{}' deleted.", uri);
@@ -164,9 +162,7 @@ public class MomcaConnection {
         if (isResourceExisting(uri)) {
 
             ExistQuery query = ExistQueryFactory.removeResource(resource);
-            List<String> results = queryDatabase(query);
-
-            success = results.size() == 1 && results.get(0).equals("true");
+            success = Util.isTrue(queryDatabase(query));
 
             if (success) {
                 LOGGER.debug("Resource '{}' deleted.", uri);
@@ -247,13 +243,7 @@ public class MomcaConnection {
 
         String encodedUri = Util.encode(collectionUri);
         ExistQuery query = ExistQueryFactory.checkCollectionExistence(encodedUri);
-        List<String> result = queryDatabase(query);
-
-        if (result.size() != 1 && result.get(0).equals("true")) {
-            throw new MomcaException("Failed to test for existence of collection '" + collectionUri + "'");
-        }
-
-        boolean isExisting = result.get(0).equals("true");
+        boolean isExisting = Util.isTrue(queryDatabase(query));
 
         LOGGER.debug("Returning '{}' for the existence of collection '{}'.", isExisting, collectionUri);
 
@@ -266,13 +256,7 @@ public class MomcaConnection {
         LOGGER.debug("Testing existence of resource '{}'.", resourceUri);
 
         ExistQuery query = ExistQueryFactory.checkExistResourceExistence(resourceUri);
-        List<String> result = queryDatabase(query);
-
-        if (result.size() != 1 && result.get(0).equals("true")) {
-            throw new MomcaException("Failed to test for existence of resource '" + resourceUri + "'");
-        }
-
-        boolean isExisting = result.get(0).equals("true");
+        boolean isExisting = Util.isTrue(queryDatabase(query));
 
         LOGGER.debug("Returning '{}' for the existence of resource '{}'.", isExisting, resourceUri);
 
