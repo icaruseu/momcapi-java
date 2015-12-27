@@ -69,14 +69,8 @@ public class ArchiveManager extends AbstractManager {
 
     }
 
-    private List<IdArchive> collectArchiveIds(List<String> queryResults) {
-
-        return queryResults
-                .stream()
-                .map(AtomId::new)
-                .map(IdArchive::new)
-                .collect(Collectors.toList());
-
+    private String createCollectionUri(String identifier, String uri) {
+        return String.format("%s/%s", uri, identifier);
     }
 
     private String createUriFromArchiveId(IdArchive idArchive) {
@@ -112,14 +106,14 @@ public class ArchiveManager extends AbstractManager {
 
         if (proceed) {
 
-            String archiveCollectionUri = String.format("%s/%s", ResourceRoot.ARCHIVES.getUri(), identifier);
+            String archiveCollectionUri = createCollectionUri(identifier, ResourceRoot.ARCHIVES.getUri());
             LOGGER.trace("Trying to delete archival collection at '{}'", archiveCollectionUri);
 
             success = momcaConnection.deleteCollection(archiveCollectionUri);
 
             if (success) {
 
-                String archiveFondsCollectionUri = String.format("%s/%s", ResourceRoot.ARCHIVAL_FONDS.getUri(), identifier);
+                String archiveFondsCollectionUri = createCollectionUri(identifier, ResourceRoot.ARCHIVAL_FONDS.getUri());
                 success = momcaConnection.deleteCollection(archiveFondsCollectionUri);
 
                 if (success) {
@@ -180,9 +174,7 @@ public class ArchiveManager extends AbstractManager {
         LOGGER.info("Trying to list all archives in the database.");
 
         ExistQuery query = ExistQueryFactory.listArchives();
-        List<String> queryResults = momcaConnection.queryDatabase(query);
-
-        List<IdArchive> archiveList = collectArchiveIds(queryResults);
+        List<IdArchive> archiveList = queryIdList(query);
 
         int resultSize = archiveList.size();
         LOGGER.info("Returning {} {}.",
@@ -201,9 +193,7 @@ public class ArchiveManager extends AbstractManager {
         LOGGER.info("Trying to list all archives for region '{}'.", nativeName);
 
         ExistQuery query = ExistQueryFactory.listArchivesForRegion(nativeName);
-        List<String> queryResults = momcaConnection.queryDatabase(query);
-
-        List<IdArchive> archiveList = collectArchiveIds(queryResults);
+        List<IdArchive> archiveList = queryIdList(query);
 
         int resultSize = archiveList.size();
         LOGGER.info("Returning {} {} for region '{}'.",
@@ -222,9 +212,7 @@ public class ArchiveManager extends AbstractManager {
         LOGGER.info("Trying to list all archives for country '{}'.", nativeName);
 
         ExistQuery query = ExistQueryFactory.listArchivesForCountry(country.getCountryCode());
-        List<String> queryResults = momcaConnection.queryDatabase(query);
-
-        List<IdArchive> archiveList = collectArchiveIds(queryResults);
+        List<IdArchive> archiveList = queryIdList(query);
 
         int resultSize = archiveList.size();
         LOGGER.info("Returning {} {} for country '{}'.",
@@ -233,6 +221,17 @@ public class ArchiveManager extends AbstractManager {
                 nativeName);
 
         return archiveList;
+
+    }
+
+    private List<IdArchive> queryIdList(ExistQuery query) {
+
+        return momcaConnection
+                .queryDatabase(query)
+                .stream()
+                .map(AtomId::new)
+                .map(IdArchive::new)
+                .collect(Collectors.toList());
 
     }
 
