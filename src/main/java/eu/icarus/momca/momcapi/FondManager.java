@@ -9,6 +9,8 @@ import eu.icarus.momca.momcapi.model.resource.ResourceType;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,28 +21,61 @@ import java.util.stream.Collectors;
  */
 public class FondManager extends AbstractManager {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(FondManager.class);
+
     FondManager(@NotNull MomcaConnection momcaConnection) {
         super(momcaConnection);
     }
 
-    public void addFond(@NotNull Fond fond) {
+    public boolean addFond(@NotNull Fond fond) {
+
+        IdFond id = fond.getId();
+
+        LOGGER.info("Trying to add fond '{}' to the database.", id);
+
+        boolean proceed = true;
 
         if (momcaConnection.isResourceExisting(fond.getUri())) {
-            throw new IllegalArgumentException(String.format("The fond '%s' is already existing in the database.", fond.getId()));
+            proceed = false;
+            LOGGER.info("The fond '{}' is already existing in the database.", id);
         }
 
-        String identifier = fond.getIdentifier();
-        String archiveIdentifier = fond.getArchiveId().getIdentifier();
-        String parentUri = ResourceRoot.ARCHIVAL_FONDS.getUri() + "/" + archiveIdentifier;
+        boolean success = false;
 
-        momcaConnection.createCollection(archiveIdentifier, ResourceRoot.ARCHIVAL_FONDS.getUri());
-        momcaConnection.createCollection(identifier, parentUri);
+        if (proceed) {
 
-        String time = momcaConnection.queryRemoteDateTime();
+            String uri = createUriFromId(id);
+            success = momcaConnection.makeSureCollectionPathExists(uri);
 
-        momcaConnection.writeAtomResource(fond, time, time);
-        fond.getFondPreferences().ifPresent(momcaConnection::writeExistResource);
+            if (success) {
 
+                String time = momcaConnection.queryRemoteDateTime();
+                success = momcaConnection.writeAtomResource(fond, time, time);
+
+                if (success && fond.getFondPreferences().isPresent()) {
+                    momcaConnection.writeExistResource(fond.getFondPreferences().get());
+                }
+
+                if (success) {
+                    LOGGER.info("Fond '{}' added to the database.", id);
+                } else {
+                    LOGGER.info("Failed to add fond '{}' to the database.", id);
+                }
+
+            } else {
+
+                LOGGER.info("Failed to assure the parent path, '{}', for fond '{}' exists. Aborting addition.", uri, id);
+
+            }
+
+        }
+
+        return success;
+
+    }
+
+    private String createUriFromId(IdFond id) {
+        return String.format("%s/%s/%s", ResourceRoot.ARCHIVAL_FONDS.getUri(), id.getIdArchive().getIdentifier(), id.getIdentifier());
     }
 
     public void deleteFond(@NotNull IdFond idFond) {
@@ -56,11 +91,8 @@ public class FondManager extends AbstractManager {
                         idFond.getIdArchive().getIdentifier(),
                         idFond.getIdentifier()));
 
-        momcaConnection.deleteCollection(
-                String.format("%s/%s/%s",
-                        ResourceRoot.ARCHIVAL_FONDS.getUri(),
-                        idFond.getIdArchive().getIdentifier(),
-                        idFond.getIdentifier()));
+        String uri = createUriFromId(idFond);
+        momcaConnection.deleteCollection(uri);
 
     }
 

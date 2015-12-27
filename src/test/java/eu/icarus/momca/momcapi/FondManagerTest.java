@@ -38,7 +38,7 @@ public class FondManagerTest {
 
         Fond newFond = new Fond(identifier, idArchive, name);
 
-        fm.addFond(newFond);
+        assertTrue(fm.addFond(newFond));
 
         Optional<Fond> fondFromTheDatabaseOptional = fm.getFond(new IdFond(archiveIdentifier, identifier));
         fm.deleteFond(newFond.getId());
@@ -50,9 +50,9 @@ public class FondManagerTest {
 
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class)
+    @Test
     public void testAddFondExisting() throws Exception {
-        fm.addFond(new Fond("Urkunden", new IdArchive("CH-KAE"), "Klosterurkunden"));
+        assertFalse(fm.addFond(new Fond("Urkunden", new IdArchive("CH-KAE"), "Klosterurkunden")));
     }
 
     @Test
