@@ -66,7 +66,8 @@ public class CharterManager extends AbstractManager {
 
     }
 
-    private List<IdCharter> createIds(List<String> atomIdStrings) {
+    @NotNull
+    private List<IdCharter> createIds(@NotNull List<String> atomIdStrings) {
 
         return atomIdStrings
                 .stream()

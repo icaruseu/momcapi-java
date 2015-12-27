@@ -69,11 +69,13 @@ public class ArchiveManager extends AbstractManager {
 
     }
 
-    private String createCollectionUri(String identifier, String uri) {
+    @NotNull
+    private String createCollectionUri(@NotNull String identifier, @NotNull String uri) {
         return String.format("%s/%s", uri, identifier);
     }
 
-    private String createUriFromArchiveId(IdArchive idArchive) {
+    @NotNull
+    private String createUriFromArchiveId(@NotNull IdArchive idArchive) {
 
         return String.format(
                 "%s/%s/%s%s",
@@ -142,7 +144,6 @@ public class ArchiveManager extends AbstractManager {
         LOGGER.info("Trying to get archive '{}'.", identifier);
 
         String uri = createUriFromArchiveId(idArchive);
-
         Optional<Archive> archive = momcaConnection.readExistResource(uri).map(Archive::new);
 
         LOGGER.info("Returning '{}' for archive '{}'.", archive, identifier);
@@ -151,16 +152,12 @@ public class ArchiveManager extends AbstractManager {
 
     }
 
-    private boolean isArchiveExisting(IdArchive idArchive) {
+    private boolean isArchiveExisting(@NotNull IdArchive idArchive) {
 
         LOGGER.debug("Try to determine the existance of archive '{}'.", idArchive);
 
         String uri = createUriFromArchiveId(idArchive);
-
-        ExistQuery query = ExistQueryFactory.checkExistResourceExistence(uri);
-        List<String> results = momcaConnection.queryDatabase(query);
-
-        boolean isArchiveExisting = results.size() == 1 && results.get(0).equals("true");
+        boolean isArchiveExisting = momcaConnection.isResourceExisting(uri);
 
         LOGGER.debug("The result for the query for existence of archive '{}' is '{}'", idArchive, isArchiveExisting);
 
@@ -224,7 +221,7 @@ public class ArchiveManager extends AbstractManager {
 
     }
 
-    private List<IdArchive> queryIdList(ExistQuery query) {
+    private List<IdArchive> queryIdList(@NotNull ExistQuery query) {
 
         return momcaConnection
                 .queryDatabase(query)

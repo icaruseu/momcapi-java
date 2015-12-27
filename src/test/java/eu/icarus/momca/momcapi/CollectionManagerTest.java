@@ -36,10 +36,13 @@ public class CollectionManagerTest {
         String name = "A new collection";
 
         Collection collectionToAdd = new Collection(identifier, name);
-        cm.addCollection(collectionToAdd);
+
+        assertTrue(cm.addCollection(collectionToAdd));
 
         Optional<Collection> collectionFromDbOptional = cm.getCollection(collectionToAdd.getId());
+
         cm.deleteCollection(collectionToAdd.getId());
+
         assertTrue(collectionFromDbOptional.isPresent());
         Collection collectionFromDb = collectionFromDbOptional.get();
 
@@ -70,7 +73,8 @@ public class CollectionManagerTest {
         collectionFromDb.setImageFolderName(imageFolderName);
         collectionFromDb.setKeyword(keyword);
 
-        cm.addCollection(collectionFromDb);
+        assertTrue(cm.addCollection(collectionFromDb));
+
         Optional<Collection> changedCollectionOptional = cm.getCollection(collectionFromDb.getId());
         cm.deleteCollection(collectionFromDb.getId());
         assertTrue(changedCollectionOptional.isPresent());
@@ -87,10 +91,10 @@ public class CollectionManagerTest {
 
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class)
+    @Test
     public void testAddCollectionAlreadyExisting() throws Exception {
         Collection collection = new Collection("MedDocBulgEmp", "A new collection");
-        cm.addCollection(collection);
+        assertFalse(cm.addCollection(collection));
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
@@ -115,7 +119,7 @@ public class CollectionManagerTest {
         cm.addCollection(collection);
         mc.createCollection(identifier, ResourceRoot.PUBLIC_CHARTERS.getUri()); // add charters collection to test removal
 
-        cm.deleteCollection(collection.getId());
+        assertTrue(cm.deleteCollection(collection.getId()));
 
         assertFalse(cm.getCollection(new IdCollection(identifier)).isPresent());
 
@@ -127,16 +131,16 @@ public class CollectionManagerTest {
 
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class)
+    @Test
     public void testDeleteCollectionWithExistingImportedCharters() throws Exception {
         IdCollection id = new IdCollection("MedDocBulgEmp");
-        cm.deleteCollection(id);
+        assertFalse(cm.deleteCollection(id));
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class)
+    @Test
     public void testDeleteCollectionWithExistingPublicCharters() throws Exception {
         IdCollection id = new IdCollection("AbteiEberbach");
-        cm.deleteCollection(id);
+        assertFalse(cm.deleteCollection(id));
     }
 
     @Test
