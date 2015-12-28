@@ -49,7 +49,7 @@ public class UserManager extends AbstractManager {
 
     }
 
-    public boolean addUser(@NotNull User user, @NotNull String password) {
+    public boolean add(@NotNull User user, @NotNull String password) {
 
         boolean success = false;
         String identifier = user.getIdentifier();
@@ -62,7 +62,7 @@ public class UserManager extends AbstractManager {
 
             if (isExisting(user.getIdModerator())) {
 
-                success = initializeUser(user.getId(), password);
+                success = initialize(user.getId(), password);
 
                 if (success) {
                     success = momcaConnection.writeExistResource(user);
@@ -100,11 +100,11 @@ public class UserManager extends AbstractManager {
 
         LOGGER.info("Trying to update moderator of userIdentifier '{}' to '{}'.", userIdentifier, moderatorIdentifier);
 
-        Optional<User> userOptional = getUser(idUser);
+        Optional<User> userOptional = get(idUser);
 
         if (userOptional.isPresent()) {
 
-            if (getUser(idModerator).isPresent()) {
+            if (get(idModerator).isPresent()) {
 
                 User user = userOptional.get();
                 user.setModerator(moderatorIdentifier);
@@ -172,6 +172,47 @@ public class UserManager extends AbstractManager {
 
     }
 
+    public boolean delete(@NotNull IdUser idUser) {
+
+        boolean success = false;
+        String identifier = idUser.getIdentifier();
+
+        LOGGER.info("Trying to delete user '{}'.", identifier);
+
+        Optional<User> userOptional = get(idUser);
+        if (userOptional.isPresent()) {
+
+            User user = userOptional.get();
+
+            success = !isInitialized(idUser) || deleteExistUserAccount(user.getIdentifier());
+            if (success) {
+
+                success = momcaConnection.deleteExistResource(user);
+                if (success) {
+
+                    String uri = String.format("%s/%s", ResourceRoot.USER_DATA.getUri(), identifier);
+                    success = !momcaConnection.isCollectionExisting(uri) || momcaConnection.deleteCollection(uri);
+
+                    if (success) {
+                        LOGGER.info("User '{}' deleted.", identifier);
+                    } else {
+                        LOGGER.info("User '{}' deleted but failed to delete user collection '{}'.", identifier, uri);
+                    }
+
+                } else {
+                    LOGGER.info("Deleted eXist account for user '{}' but failed to delete user resource. ", identifier);
+                }
+
+            } else {
+                LOGGER.info("Failed to delete eXist account for user '{}', aborting deletion.", identifier);
+            }
+
+        }
+
+        return success;
+
+    }
+
     boolean deleteExistUserAccount(@NotNull String accountName) {
 
         boolean success = false;
@@ -207,49 +248,8 @@ public class UserManager extends AbstractManager {
 
     }
 
-    public boolean deleteUser(@NotNull IdUser idUser) {
-
-        boolean success = false;
-        String identifier = idUser.getIdentifier();
-
-        LOGGER.info("Trying to delete user '{}'.", identifier);
-
-        Optional<User> userOptional = getUser(idUser);
-        if (userOptional.isPresent()) {
-
-            User user = userOptional.get();
-
-            success = !isInitialized(idUser) || deleteExistUserAccount(user.getIdentifier());
-            if (success) {
-
-                success = momcaConnection.deleteExistResource(user);
-                if (success) {
-
-                    String uri = String.format("%s/%s", ResourceRoot.USER_DATA.getUri(), identifier);
-                    success = !momcaConnection.isCollectionExisting(uri) || momcaConnection.deleteCollection(uri);
-
-                    if (success) {
-                        LOGGER.info("User '{}' deleted.", identifier);
-                    } else {
-                        LOGGER.info("User '{}' deleted but failed to delete user collection '{}'.", identifier, uri);
-                    }
-
-                } else {
-                    LOGGER.info("Deleted eXist account for user '{}' but failed to delete user resource. ", identifier);
-                }
-
-            } else {
-                LOGGER.info("Failed to delete eXist account for user '{}', aborting deletion.", identifier);
-            }
-
-        }
-
-        return success;
-
-    }
-
     @NotNull
-    public Optional<User> getUser(@NotNull IdUser idUser) {
+    public Optional<User> get(@NotNull IdUser idUser) {
 
         String identifier = idUser.getIdentifier();
         User user = null;
@@ -273,7 +273,7 @@ public class UserManager extends AbstractManager {
 
     }
 
-    public boolean initializeUser(@NotNull IdUser idUser, @NotNull String password) {
+    public boolean initialize(@NotNull IdUser idUser, @NotNull String password) {
 
         boolean success = false;
         String identifier = idUser.getIdentifier();
@@ -364,7 +364,7 @@ public class UserManager extends AbstractManager {
     }
 
     @NotNull
-    public List<IdUser> listUsers() {
+    public List<IdUser> list() {
 
         LOGGER.info("Trying to get a list of all users.");
 

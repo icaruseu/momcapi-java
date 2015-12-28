@@ -108,12 +108,29 @@ public class MyCollectionManager extends AbstractManager {
 
     }
 
+    /**
+     * Deletes a public myCollection from the database. Doesn't delete myCollections that still have charters.
+     *
+     * @param id The myCollection to delete.
+     * @return True if the deletion was successful. Note: still returns true, if the method couldn't delete
+     * any empty charters' collections.
+     */
     public boolean delete(@NotNull IdMyCollection id) {
 
         return delete(id, null);
 
     }
 
+    /**
+     * Deletes a myCollection from the database. Doesn't delete private myCollections that still have a public
+     * myCollection or myCollections that still have charters.
+     *
+     * @param id     The myCollection to delete.
+     * @param idUser The creator of the myColleciton. If @code{NULL}, the myCollection is considered
+     *               as a public myCollection.
+     * @return True if the deletion was successful. Note: still returns true, if the method couldn't delete
+     * any empty charters' collections.
+     */
     public boolean delete(@NotNull IdMyCollection id, @Nullable IdUser idUser) {
 
         MyCollectionStatus status = (idUser == null) ? MyCollectionStatus.PUBLISHED : MyCollectionStatus.PRIVATE;

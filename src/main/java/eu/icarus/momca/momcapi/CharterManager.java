@@ -316,7 +316,7 @@ public class CharterManager extends AbstractManager {
 
         List<IdCharter> results = new ArrayList<>(0);
 
-        momcaConnection.getUserManager().getUser(idUser).ifPresent(user ->
+        momcaConnection.getUserManager().get(idUser).ifPresent(user ->
                 results.addAll(user.getSavedCharters().stream()
                         .map(Saved::getId)
                         .filter(idCharter -> !isCharterExisting(idCharter, ResourceRoot.ARCHIVAL_CHARTERS_BEING_EDITED))

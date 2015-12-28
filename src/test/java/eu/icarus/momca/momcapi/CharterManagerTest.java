@@ -39,7 +39,7 @@ public class CharterManagerTest {
     public void testAddCharter1() throws Exception {
 
         IdCharter id = new IdCharter("AbteiEberbach", "Charter1");
-        User admin = mc.getUserManager().getUser(new IdUser("admin")).get();
+        User admin = mc.getUserManager().get(new IdUser("admin")).get();
         Date date = new Date(LocalDate.of(1413, 2, 2), 0, "2nd Februrary, 1413");
 
         Charter charter = new Charter(id, CharterStatus.PUBLIC, admin, date);
@@ -58,7 +58,7 @@ public class CharterManagerTest {
     public void testAddCharter2() throws Exception {
 
         IdCharter id = new IdCharter("CH-KAE", "Urkunden", "Charter1");
-        User admin = mc.getUserManager().getUser(new IdUser("admin")).get();
+        User admin = mc.getUserManager().get(new IdUser("admin")).get();
         Date date = new Date(LocalDate.of(1413, 2, 2), 0, "2nd Februrary, 1413");
 
         Charter charter = new Charter(id, CharterStatus.PUBLIC, admin, date);
@@ -77,7 +77,7 @@ public class CharterManagerTest {
     public void testAddCharter3() throws Exception {
 
         IdCharter id = new IdCharter("ea13e5f1-03b2-4bfa-9dd5-8fb770f98d7b", "Charter1");
-        User admin = mc.getUserManager().getUser(new IdUser("admin")).get();
+        User admin = mc.getUserManager().get(new IdUser("admin")).get();
         Date date = new Date(LocalDate.of(1413, 2, 2), 0, "2nd Februrary, 1413");
 
         Charter charter = new Charter(id, CharterStatus.PRIVATE, admin, date);
@@ -96,7 +96,7 @@ public class CharterManagerTest {
     public void testAddCharter4() throws Exception {
 
         IdCharter id = new IdCharter("RS-IAGNS", "Charters", "Charter1");
-        User admin = mc.getUserManager().getUser(new IdUser("admin")).get();
+        User admin = mc.getUserManager().get(new IdUser("admin")).get();
         Date date = new Date(LocalDate.of(1413, 2, 2), 0, "2nd Februrary, 1413");
 
         Charter charter = new Charter(id, CharterStatus.IMPORTED, admin, date);
@@ -115,7 +115,7 @@ public class CharterManagerTest {
     public void testAddCharter5() throws Exception {
 
         IdCharter id = new IdCharter("CH-", "Urkunden", "Charter1");
-        User admin = mc.getUserManager().getUser(new IdUser("admin")).get();
+        User admin = mc.getUserManager().get(new IdUser("admin")).get();
         Date date = new Date(LocalDate.of(1413, 2, 2), 0, "2nd Februrary, 1413");
 
         Charter charter = new Charter(id, CharterStatus.PUBLIC, admin, date);
@@ -154,7 +154,7 @@ public class CharterManagerTest {
     public void testAddCharter7() throws Exception {
 
         User newUser = new User("newUser", "admin");
-        mc.getUserManager().addUser(newUser, "password");
+        mc.getUserManager().add(newUser, "password");
 
         IdMyCollection idMyCollection = new IdMyCollection("532ffe0f-668b-4f02-a992-35bcc660e958");
         MyCollection myCollection = new MyCollection(idMyCollection.getIdentifier(),
@@ -171,7 +171,7 @@ public class CharterManagerTest {
         charter = cm.getCharter(charter.getId(), charter.getCharterStatus()).get();
 
         cm.deletePublicCharter(charter.getId(), charter.getCharterStatus());
-        mc.getUserManager().deleteUser(newUser.getId());
+        mc.getUserManager().delete(newUser.getId());
 
         assertTrue(charter.toCei().toXML().contains("cei:dateRange"));
 
@@ -181,7 +181,7 @@ public class CharterManagerTest {
     public void testDeletePrivateCharter() throws Exception {
 
         IdCharter id = new IdCharter("67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3", "a7e2a744-6a32-4d71-abaa-7a5f7b0e9bf5");
-        User user = mc.getUserManager().getUser(new IdUser("user1.testuser@dev.monasterium.net")).get();
+        User user = mc.getUserManager().get(new IdUser("user1.testuser@dev.monasterium.net")).get();
         Date date = new Date(LocalDate.of(1413, 2, 2), 0, "2nd Februrary, 1413");
 
         assertFalse(cm.deletePrivateCharter(new IdCharter("67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3", "not-existing"), user.getId()));
@@ -199,7 +199,7 @@ public class CharterManagerTest {
     public void testDeletePublicCharter() throws Exception {
 
         IdCharter id = new IdCharter("RS-IAGNS", "Charters", "Charter1");
-        User admin = mc.getUserManager().getUser(new IdUser("admin")).get();
+        User admin = mc.getUserManager().get(new IdUser("admin")).get();
         Date date = new Date(LocalDate.of(1413, 2, 2), 0, "2nd Februrary, 1413");
 
         Charter charter = new Charter(id, CharterStatus.IMPORTED, admin, date);
@@ -399,7 +399,7 @@ public class CharterManagerTest {
         User user = new User("newUser", "admin");
 
         IdCharter id = new IdCharter("AbteiEberbach", "Charter7");
-        User admin = userManager.getUser(new IdUser("admin")).get();
+        User admin = userManager.get(new IdUser("admin")).get();
         Date date = new Date(LocalDate.of(1413, 2, 2), 0, "2nd Februrary, 1413");
 
         assertFalse(cm.publishSavedCharter(user, new IdCharter("CH-KAE", "Urkunden", "KAE_Urkunde_Nr_3")));
@@ -419,16 +419,16 @@ public class CharterManagerTest {
         savedList.add(saved);
         user.setSavedCharters(savedList);
 
-        userManager.addUser(user, "password");
+        userManager.add(user, "password");
 
         assertTrue(cm.publishSavedCharter(user, id));
 
         assertFalse(cm.getCharter(id, CharterStatus.SAVED).isPresent());
 
         Optional<Charter> published = cm.getCharter(id, CharterStatus.PUBLIC);
-        user = userManager.getUser(user.getId()).get();
+        user = userManager.get(user.getId()).get();
 
-        userManager.deleteUser(user.getId());
+        userManager.delete(user.getId());
         cm.deletePublicCharter(id, CharterStatus.PUBLIC);
 
         assertTrue(published.isPresent());
@@ -442,7 +442,7 @@ public class CharterManagerTest {
     public void testUpdateCharterContent() throws Exception {
 
         IdCharter idCharter = new IdCharter("CH-KAE", "Urkunden", "Charter2");
-        User admin = mc.getUserManager().getUser(new IdUser("admin")).get();
+        User admin = mc.getUserManager().get(new IdUser("admin")).get();
         Date date = new Date(LocalDate.of(1413, 2, 2), 0, "2nd Februrary, 1413");
         CharterStatus charterStatus = CharterStatus.PUBLIC;
 
@@ -473,7 +473,7 @@ public class CharterManagerTest {
         IdCharter originalId = new IdCharter("67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3", "originalId");
         CharterStatus status = CharterStatus.PRIVATE;
 
-        User user = mc.getUserManager().getUser(new IdUser("user1.testuser@dev.monasterium.net")).get();
+        User user = mc.getUserManager().get(new IdUser("user1.testuser@dev.monasterium.net")).get();
         Date date = new Date(LocalDate.of(1413, 2, 2), 0, "2nd Februrary, 1413");
 
         assertFalse(cm.updateCharterId(originalId, originalId, status, null));
@@ -515,7 +515,7 @@ public class CharterManagerTest {
         IdCharter idCharter = new IdCharter("67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3", "newCharter");
         CharterStatus originalStatus = CharterStatus.PRIVATE;
 
-        User user = mc.getUserManager().getUser(new IdUser("user1.testuser@dev.monasterium.net")).get();
+        User user = mc.getUserManager().get(new IdUser("user1.testuser@dev.monasterium.net")).get();
         Date date = new Date(LocalDate.of(1413, 2, 2), 0, "2nd Februrary, 1413");
         IdUser idUser = user.getId();
 
