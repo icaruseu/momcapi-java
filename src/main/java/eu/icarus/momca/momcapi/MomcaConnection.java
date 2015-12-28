@@ -105,7 +105,7 @@ public class MomcaConnection {
 
     boolean createCollection(@NotNull String name, @NotNull String parentUri) {
 
-        LOGGER.debug("Trying to create collection '{}/{}'.", parentUri, name);
+        LOGGER.debug("Trying to create eXist-collection '{}/{}'.", parentUri, name);
 
         String encodedName = Util.encode(name);
         String encodedParentUri = Util.encode(parentUri);
@@ -118,9 +118,9 @@ public class MomcaConnection {
         boolean success = result.size() == 1 && result.get(0).equals(resultingCollectionUri);
 
         if (success) {
-            LOGGER.debug("Collection '{}' created.", resultingCollectionUri);
+            LOGGER.debug("EXist-collection '{}' created.", resultingCollectionUri);
         } else {
-            LOGGER.debug("Collection '{}' not created.", resultingCollectionUri);
+            LOGGER.debug("Failed to create eXist-collection '{}'.", resultingCollectionUri);
         }
 
         return success;
@@ -129,7 +129,7 @@ public class MomcaConnection {
 
     boolean deleteCollection(@NotNull String uri) {
 
-        LOGGER.debug("Trying to delete collection '{}'.", uri);
+        LOGGER.debug("Trying to delete eXist-collection '{}'.", uri);
 
         boolean success = false;
 
@@ -139,13 +139,13 @@ public class MomcaConnection {
             success = Util.isTrue(queryDatabase(query));
 
             if (success) {
-                LOGGER.debug("Collection '{}' deleted.", uri);
+                LOGGER.debug("EXist-collection '{}' deleted.", uri);
             } else {
-                LOGGER.debug("Failed to delete collection '{}'", uri);
+                LOGGER.debug("Failed to delete eXist-collection '{}'", uri);
             }
 
         } else {
-            LOGGER.debug("Collection '{}' not existing. Aborting deletion.", uri);
+            LOGGER.debug("EXist-collection '{}' not existing. Aborting deletion.", uri);
         }
 
         return success;
@@ -155,7 +155,7 @@ public class MomcaConnection {
     boolean deleteExistResource(@NotNull ExistResource resource) {
 
         String uri = resource.getUri();
-        LOGGER.debug("Trying to delete resource '{}'.", uri);
+        LOGGER.debug("Trying to delete eXist-resource '{}'.", uri);
 
         boolean success = false;
 
@@ -165,13 +165,14 @@ public class MomcaConnection {
             success = Util.isTrue(queryDatabase(query));
 
             if (success) {
-                LOGGER.debug("Resource '{}' deleted.", uri);
+                LOGGER.debug("R" +
+                        "EXist-resource '{}' deleted.", uri);
             } else {
-                LOGGER.debug("Failed to delete resource '{}'", uri);
+                LOGGER.debug("Failed to delete eXist-resource '{}'", uri);
             }
 
         } else {
-            LOGGER.debug("Resource '{}' not existing. Aborting deletion.", uri);
+            LOGGER.debug("EXist-resource '{}' not existing. Aborting deletion.", uri);
         }
 
         return success;
@@ -239,13 +240,13 @@ public class MomcaConnection {
 
     boolean isCollectionExisting(@NotNull String collectionUri) {
 
-        LOGGER.debug("Testing existence of collection '{}'.", collectionUri);
+        LOGGER.debug("Testing existence of eXist-collection '{}'.", collectionUri);
 
         String encodedUri = Util.encode(collectionUri);
         ExistQuery query = ExistQueryFactory.checkCollectionExistence(encodedUri);
         boolean isExisting = Util.isTrue(queryDatabase(query));
 
-        LOGGER.debug("Returning '{}' for the existence of collection '{}'.", isExisting, collectionUri);
+        LOGGER.debug("Returning '{}' for the existence of eXist-collection '{}'.", isExisting, collectionUri);
 
         return isExisting;
 
@@ -253,12 +254,12 @@ public class MomcaConnection {
 
     boolean isResourceExisting(@NotNull String resourceUri) {
 
-        LOGGER.debug("Testing existence of resource '{}'.", resourceUri);
+        LOGGER.debug("Testing existence of eXist-resource '{}'.", resourceUri);
 
         ExistQuery query = ExistQueryFactory.checkExistResourceExistence(resourceUri);
         boolean isExisting = Util.isTrue(queryDatabase(query));
 
-        LOGGER.debug("Returning '{}' for the existence of resource '{}'.", isExisting, resourceUri);
+        LOGGER.debug("Returning '{}' for the existence of eXist-resource '{}'.", isExisting, resourceUri);
 
         return isExisting;
 
@@ -266,7 +267,7 @@ public class MomcaConnection {
 
     boolean makeSureCollectionPathExists(@NotNull String absoluteUri) {
 
-        LOGGER.debug("Trying to create all collections on path '{}'.", absoluteUri);
+        LOGGER.debug("Trying to create all eXist-collections on path '{}'.", absoluteUri);
 
         boolean success = false;
 
@@ -275,7 +276,7 @@ public class MomcaConnection {
             if (isCollectionExisting(absoluteUri)) {
 
                 success = true;
-                LOGGER.debug("Collection '{}' already exists. Aborting creation.", absoluteUri);
+                LOGGER.debug("EXist-collection '{}' already exists. Aborting creation.", absoluteUri);
 
             } else {
 
@@ -284,30 +285,30 @@ public class MomcaConnection {
 
                 for (String part : parts) {
 
-                    LOGGER.debug("Trying to add collection '{}' in '{}'", part, parentUri);
+                    LOGGER.debug("Trying to add eXist-collection '{}' in '{}'", part, parentUri);
 
                     success = createCollection(part, parentUri);
                     parentUri = parentUri + "/" + part;
 
                     if (success) {
-                        LOGGER.debug("Successfully added collection '{}' in '{}'", part, parentUri);
+                        LOGGER.debug("Successfully added eXist-collection '{}' in '{}'", part, parentUri);
                     } else {
-                        LOGGER.debug("Failed to create collection '{}' on path '{}'. Aborting further creation attempts.", part, absoluteUri);
+                        LOGGER.debug("Failed to create eXist-collection '{}' on path '{}'. Aborting further creation attempts.", part, absoluteUri);
                         break;
                     }
 
                 }
 
                 if (success) {
-                    LOGGER.debug("Created all collections on path '{}'.", absoluteUri);
+                    LOGGER.debug("Created all eXist-collections on path '{}'.", absoluteUri);
                 } else {
-                    LOGGER.debug("Failed to create all collections on path '{}'", absoluteUri);
+                    LOGGER.debug("Failed to create all eXist-collections on path '{}'", absoluteUri);
                 }
 
             }
 
         } else {
-            LOGGER.debug("Creation of path '{}' aborted. Path invalid.", absoluteUri);
+            LOGGER.debug("Creation of eXist-collection path '{}' aborted. Path invalid.", absoluteUri);
         }
 
         return success;
@@ -379,7 +380,7 @@ public class MomcaConnection {
     @NotNull
     Optional<Collection> readCollection(@NotNull String uri) {
 
-        LOGGER.debug("Trying to read collection '{}' from the database.", uri);
+        LOGGER.debug("Trying to read eXist-collection '{}' from the database.", uri);
 
         Collection result = null;
 
@@ -389,14 +390,14 @@ public class MomcaConnection {
             result = DatabaseManager.getCollection(absoluteUri, admin, password);
 
             if (result == null) {
-                LOGGER.debug("Collection '{}' not found in the database. Returning nothing.", uri);
+                LOGGER.debug("EXist-collection '{}' not found in the database. Returning nothing.", uri);
             } else {
-                LOGGER.debug("Collection '{}' read from the database.", uri);
+                LOGGER.debug("EXist-collection '{}' read from the database.", uri);
             }
 
 
         } catch (@NotNull XMLDBException e) {
-            LOGGER.error("Failed to get collection '{}' from the database due to an XMLDBException. Returning nothing.",
+            LOGGER.error("Failed to get eXist-collection '{}' from the database due to an XMLDBException. Returning nothing.",
                     uri, e);
         }
 
@@ -407,7 +408,7 @@ public class MomcaConnection {
     @NotNull
     Optional<ExistResource> readExistResource(@NotNull String resourceUri) {
 
-        LOGGER.debug("Trying to read resource '{}' from the database.", resourceUri);
+        LOGGER.debug("Trying to read eXist-resource '{}' from the database.", resourceUri);
 
         ExistResource resource = null;
 
@@ -426,9 +427,9 @@ public class MomcaConnection {
         }
 
         if (resource == null) {
-            LOGGER.debug("Failed to read resource '{}' from the database.", resourceUri);
+            LOGGER.debug("Failed to read eXist-resource '{}' from the database.", resourceUri);
         } else {
-            LOGGER.debug("Resource '{}' read from the database: {}", resourceUri, resource);
+            LOGGER.debug("EXist-resource '{}' read from the database: {}", resourceUri, resource);
         }
 
         return Optional.ofNullable(resource);
@@ -471,7 +472,7 @@ public class MomcaConnection {
         if (success) {
             LOGGER.debug("Atom resource '{}' written to the database.", resource);
         } else {
-            LOGGER.debug("Failed to write resource '{}' to the database.", resource);
+            LOGGER.debug("Failed to write atom resource '{}' to the database.", resource);
         }
 
         return success;
@@ -482,7 +483,7 @@ public class MomcaConnection {
 
         String resourceUri = resource.getUri();
 
-        LOGGER.debug("Trying to write resource '{}' to the database.", resourceUri);
+        LOGGER.debug("Trying to write eXist-resource '{}' to the database.", resourceUri);
 
         ExistQuery query = ExistQueryFactory.storeResource(resource);
         List<String> result = queryDatabase(query);
@@ -490,9 +491,9 @@ public class MomcaConnection {
         boolean success = result.size() == 1 && result.get(0).equals(resourceUri);
 
         if (success) {
-            LOGGER.debug("Resource '{}' written to the database.", resourceUri);
+            LOGGER.debug("EXist-resource '{}' written to the database.", resourceUri);
         } else {
-            LOGGER.debug("Failed to write resource '{}' to the database", resourceUri);
+            LOGGER.debug("Failed to write eXist-resource '{}' to the database", resourceUri);
         }
 
         return success;

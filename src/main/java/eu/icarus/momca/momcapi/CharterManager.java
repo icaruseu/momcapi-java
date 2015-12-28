@@ -207,13 +207,18 @@ public class CharterManager extends AbstractManager {
 
     private boolean isCharterExisting(@NotNull IdCharter idCharter, @Nullable ResourceRoot resourceRoot) {
 
-        LOGGER.trace("Trying to determine the existence of charter '{}' in '{}'.", idCharter, resourceRoot);
-
         ExistQuery query = ExistQueryFactory.checkAtomResourceExistence(idCharter.getContentAsElement(), resourceRoot);
+        return !momcaConnection.queryDatabase(query).isEmpty();
 
-        boolean isCharterExisting = !momcaConnection.queryDatabase(query).isEmpty();
+    }
 
-        LOGGER.trace("Result of query for existence of charter '{}' in '{}': '{}'", idCharter, resourceRoot, isCharterExisting);
+    public boolean isExisting(@NotNull IdCharter idCharter, @Nullable CharterStatus status) {
+
+        LOGGER.info("Trying to determine the existence of charter '{}' in '{}'.", idCharter, status);
+
+        boolean isCharterExisting = isCharterExisting(idCharter, status == null ? null : status.getResourceRoot());
+
+        LOGGER.info("Result of query for existence of charter '{}' in '{}': '{}'", idCharter, status, isCharterExisting);
 
         return isCharterExisting;
 
@@ -234,7 +239,7 @@ public class CharterManager extends AbstractManager {
             FondManager fm = momcaConnection.getFondManager();
             IdFond idFond = new IdFond(archiveIdentifier, fondIdentifier);
 
-            isExisting = fm.isFondExisting(idFond);
+            isExisting = fm.isExisting(idFond);
 
         } else {
 
@@ -244,7 +249,7 @@ public class CharterManager extends AbstractManager {
             IdCollection idCollection = new IdCollection(identifier);
             IdMyCollection idMyCollection = new IdMyCollection(identifier);
 
-            isExisting = cm.isCollectionExisting(idCollection) ||
+            isExisting = cm.isExisting(idCollection) ||
                     mm.isMyCollectionExisting(idMyCollection, MyCollectionStatus.PRIVATE) ||
                     mm.isMyCollectionExisting(idMyCollection, MyCollectionStatus.PUBLISHED);
 

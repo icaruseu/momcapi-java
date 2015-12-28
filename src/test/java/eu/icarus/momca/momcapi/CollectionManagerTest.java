@@ -37,11 +37,11 @@ public class CollectionManagerTest {
 
         Collection collectionToAdd = new Collection(identifier, name);
 
-        assertTrue(cm.addCollection(collectionToAdd));
+        assertTrue(cm.add(collectionToAdd));
 
-        Optional<Collection> collectionFromDbOptional = cm.getCollection(collectionToAdd.getId());
+        Optional<Collection> collectionFromDbOptional = cm.get(collectionToAdd.getId());
 
-        cm.deleteCollection(collectionToAdd.getId());
+        cm.delete(collectionToAdd.getId());
 
         assertTrue(collectionFromDbOptional.isPresent());
         Collection collectionFromDb = collectionFromDbOptional.get();
@@ -73,10 +73,10 @@ public class CollectionManagerTest {
         collectionFromDb.setImageFolderName(imageFolderName);
         collectionFromDb.setKeyword(keyword);
 
-        assertTrue(cm.addCollection(collectionFromDb));
+        assertTrue(cm.add(collectionFromDb));
 
-        Optional<Collection> changedCollectionOptional = cm.getCollection(collectionFromDb.getId());
-        cm.deleteCollection(collectionFromDb.getId());
+        Optional<Collection> changedCollectionOptional = cm.get(collectionFromDb.getId());
+        cm.delete(collectionFromDb.getId());
         assertTrue(changedCollectionOptional.isPresent());
         Collection changedCollection = changedCollectionOptional.get();
 
@@ -94,19 +94,19 @@ public class CollectionManagerTest {
     @Test
     public void testAddCollectionAlreadyExisting() throws Exception {
         Collection collection = new Collection("MedDocBulgEmp", "A new collection");
-        assertFalse(cm.addCollection(collection));
+        assertFalse(cm.add(collection));
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddCollectionWithEmptyIdentifier() throws Exception {
         Collection collection = new Collection("", "A new collection");
-        cm.addCollection(collection);
+        cm.add(collection);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddCollectionWithEmptyName() throws Exception {
         Collection collection = new Collection("newCollection", "");
-        cm.addCollection(collection);
+        cm.add(collection);
     }
 
     @Test
@@ -116,12 +116,12 @@ public class CollectionManagerTest {
         String name = "Collection to delete";
         Collection collection = new Collection(identifier, name);
 
-        cm.addCollection(collection);
+        cm.add(collection);
         mc.createCollection(identifier, ResourceRoot.PUBLIC_CHARTERS.getUri()); // add charters collection to test removal
 
-        assertTrue(cm.deleteCollection(collection.getId()));
+        assertTrue(cm.delete(collection.getId()));
 
-        assertFalse(cm.getCollection(new IdCollection(identifier)).isPresent());
+        assertFalse(cm.get(new IdCollection(identifier)).isPresent());
 
         // Test if eXist collections are removed
         String collectionUri = ResourceRoot.ARCHIVAL_COLLECTIONS.getUri() + "/" + identifier;
@@ -134,19 +134,19 @@ public class CollectionManagerTest {
     @Test
     public void testDeleteCollectionWithExistingImportedCharters() throws Exception {
         IdCollection id = new IdCollection("MedDocBulgEmp");
-        assertFalse(cm.deleteCollection(id));
+        assertFalse(cm.delete(id));
     }
 
     @Test
     public void testDeleteCollectionWithExistingPublicCharters() throws Exception {
         IdCollection id = new IdCollection("AbteiEberbach");
-        assertFalse(cm.deleteCollection(id));
+        assertFalse(cm.delete(id));
     }
 
     @Test
     public void testGetCollection() throws Exception {
 
-        Collection collection1 = cm.getCollection(new IdCollection("AbteiEberbach")).get();
+        Collection collection1 = cm.get(new IdCollection("AbteiEberbach")).get();
         assertEquals(collection1.getCountry().get(), new Country(new CountryCode("DE"), "Deutschland"));
         assertEquals(collection1.getRegion().get(), new Region("DE-NRW", "Nordrhein-Westfalen"));
         assertEquals(collection1.getId().getContentAsElement().getText(), "tag:www.monasterium.net,2011:/collection/AbteiEberbach");
@@ -157,7 +157,7 @@ public class CollectionManagerTest {
         assertEquals(collection1.getImageFolderName().get(), "google/Teil1/AbteiEberbach");
         assertEquals(collection1.getKeyword().get(), "Retrodigitalisierte Urkundeneditionen");
 
-        Collection collection2 = cm.getCollection(new IdCollection("emptycollection")).get();
+        Collection collection2 = cm.get(new IdCollection("emptycollection")).get();
         assertFalse(collection2.getCountry().isPresent());
         assertFalse(collection2.getRegion().isPresent());
         assertEquals(collection2.getId().getContentAsElement().getText(), "tag:www.monasterium.net,2011:/collection/emptycollection");
@@ -172,25 +172,33 @@ public class CollectionManagerTest {
 
     @Test
     public void testIsCollectionExisting() throws Exception {
-        assertTrue(cm.isCollectionExisting(new IdCollection("AbteiEberbach")));
-        assertFalse(cm.isCollectionExisting(new IdCollection("NotExistingCollection")));
+        assertTrue(cm.isExisting(new IdCollection("AbteiEberbach")));
+        assertFalse(cm.isExisting(new IdCollection("NotExistingCollection")));
+    }
+
+    @Test
+    public void testIsExisting() throws Exception {
+
+        assertTrue(cm.isExisting(new IdCollection("AbteiEberbach")));
+        assertFalse(cm.isExisting(new IdCollection("AbteiNotExisting")));
+
     }
 
     @Test
     public void testListCollections() throws Exception {
-        assertEquals(cm.listCollections().size(), 3);
+        assertEquals(cm.list().size(), 3);
     }
 
     @Test
     public void testListCollectionsForCountry() throws Exception {
         Country country = new Country(new CountryCode("BG"), "Bǎlgarija");
-        assertEquals(cm.listCollections(country).size(), 1);
+        assertEquals(cm.list(country).size(), 1);
     }
 
     @Test
     public void testListCollectionsForRegion() throws Exception {
         Region region = new Region("DE-NRW", "Nordrhein-Westfalen");
-        assertEquals(cm.listCollections(region).size(), 1);
+        assertEquals(cm.list(region).size(), 1);
     }
 
 }

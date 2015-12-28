@@ -34,10 +34,10 @@ public class ArchiveManagerTest {
         Country country = new Country(new CountryCode("DE"), "Deutschland");
 
         Archive archiveToAdd = new Archive(identifier, name, country);
-        am.addArchive(archiveToAdd);
+        am.add(archiveToAdd);
 
-        Optional<Archive> archiveFromDbOptional = am.getArchive(archiveToAdd.getId());
-        am.deleteArchive(archiveToAdd.getId());
+        Optional<Archive> archiveFromDbOptional = am.get(archiveToAdd.getId());
+        am.delete(archiveToAdd.getId());
         assertTrue(archiveFromDbOptional.isPresent());
         Archive archiveFromDb = archiveFromDbOptional.get();
 
@@ -70,9 +70,9 @@ public class ArchiveManagerTest {
         archiveFromDb.setContactInformation(contactInformation);
         archiveFromDb.setLogoUrl(logoUrl);
 
-        assertTrue(am.addArchive(archiveFromDb));
-        Optional<Archive> changedArchiveOptional = am.getArchive(archiveFromDb.getId());
-        am.deleteArchive(archiveFromDb.getId());
+        assertTrue(am.add(archiveFromDb));
+        Optional<Archive> changedArchiveOptional = am.get(archiveFromDb.getId());
+        am.delete(archiveFromDb.getId());
         assertTrue(changedArchiveOptional.isPresent());
         Archive changedArchive = changedArchiveOptional.get();
 
@@ -90,19 +90,19 @@ public class ArchiveManagerTest {
 
     @Test
     public void testAddArchiveAlreadyExisting() throws Exception {
-        assertFalse(am.addArchive(
+        assertFalse(am.add(
                 new Archive("DE-BayHStA", "München, Bayerisches Hauptstaatsarchiv",
                         new Country(new CountryCode("DE"), "Deutschland"))));
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddArchiveWithEmptyIdentifier() throws Exception {
-        am.addArchive(new Archive("", "Some Archive", new Country(new CountryCode("DE"), "Deutschland")));
+        am.add(new Archive("", "Some Archive", new Country(new CountryCode("DE"), "Deutschland")));
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testAddArchiveWithEmptyName() throws Exception {
-        am.addArchive(new Archive("sarchive", "", new Country(new CountryCode("DE"), "Deutschland")));
+        am.add(new Archive("sarchive", "", new Country(new CountryCode("DE"), "Deutschland")));
     }
 
     @Test
@@ -111,25 +111,25 @@ public class ArchiveManagerTest {
         Archive archive = new Archive("DE-StAM", "Staatsarchiv München",
                 new Country(new CountryCode("DE"), "Deutschland"));
         archive.setRegionName("Campania");
-        assertFalse(am.addArchive(archive));
+        assertFalse(am.add(archive));
 
     }
 
     @Test
     public void testDeleteArchive() throws Exception {
 
-        assertFalse(am.deleteArchive(new IdArchive("Not-Existing")));
+        assertFalse(am.delete(new IdArchive("Not-Existing")));
 
         Country country = new Country(new CountryCode("DE"), "Deutschland");
         String shortName = "DE-HStASt";
         String name = "Landesarchiv Baden-Württemberg, Abt. Hauptstaatsarchiv Stuttgart";
 
         Archive newArchive = new Archive(shortName, name, country);
-        am.addArchive(newArchive);
+        am.add(newArchive);
 
-        assertTrue(am.deleteArchive(newArchive.getId()));
+        assertTrue(am.delete(newArchive.getId()));
 
-        assertFalse(am.getArchive(newArchive.getId()).isPresent());
+        assertFalse(am.get(newArchive.getId()).isPresent());
         assertFalse(mc.readCollection("/db/mom-data/metadata.fond.public/" + newArchive.getIdentifier()).isPresent());
 
     }
@@ -137,7 +137,7 @@ public class ArchiveManagerTest {
     @Test
     public void testDeleteArchiveWithExistingFonds() throws Exception {
         IdArchive id = new IdArchive("CH-KAE");
-        assertFalse(am.deleteArchive(id));
+        assertFalse(am.delete(id));
     }
 
     @Test
@@ -146,7 +146,7 @@ public class ArchiveManagerTest {
         IdArchive existingArchiveIdentifier = new IdArchive("CH-KAE");
         IdArchive nonExistingArchiveIdentifier = new IdArchive("CH-ABC");
 
-        Optional<Archive> archiveOptional = am.getArchive(existingArchiveIdentifier);
+        Optional<Archive> archiveOptional = am.get(existingArchiveIdentifier);
 
         assertTrue(archiveOptional.isPresent());
 
@@ -156,19 +156,27 @@ public class ArchiveManagerTest {
         assertEquals(archive.getCountry().getCountryCode().getCode(), "CH");
         assertFalse(archive.getRegionName().isPresent());
 
-        assertFalse(am.getArchive(nonExistingArchiveIdentifier).isPresent());
+        assertFalse(am.get(nonExistingArchiveIdentifier).isPresent());
+
+    }
+
+    @Test
+    public void testIsArchiveExisting() throws Exception {
+
+        assertTrue(am.isExisting(new IdArchive("CH-KAE")));
+        assertFalse(am.isExisting(new IdArchive("CH-KAB")));
 
     }
 
     @Test
     public void testListArchives() throws Exception {
-        assertEquals(am.listArchives().size(), 6);
+        assertEquals(am.list().size(), 6);
     }
 
     @Test
     public void testListArchivesForCountry() throws Exception {
-        assertTrue(am.listArchives(new Country(new CountryCode("AT"), "Österreich")).isEmpty());
-        assertEquals(am.listArchives(new Country(new CountryCode("CH"), "Schweiz")).size(), 2);
+        assertTrue(am.list(new Country(new CountryCode("AT"), "Österreich")).isEmpty());
+        assertEquals(am.list(new Country(new CountryCode("CH"), "Schweiz")).size(), 2);
     }
 
     @Test
@@ -177,8 +185,8 @@ public class ArchiveManagerTest {
         Region region1 = new Region("DE-BW", "Baden-Württemberg");
         Region region2 = new Region("DE-BY", "Bayern");
 
-        assertTrue(am.listArchives(region1).isEmpty());
-        assertEquals(am.listArchives(region2).size(), 1);
+        assertTrue(am.list(region1).isEmpty());
+        assertEquals(am.list(region2).size(), 1);
 
     }
 

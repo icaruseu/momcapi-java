@@ -28,7 +28,7 @@ public class CollectionManager extends AbstractManager {
         super(momcaConnection);
     }
 
-    public boolean addCollection(@NotNull Collection collection) {
+    public boolean add(@NotNull Collection collection) {
 
         String identifier = collection.getIdentifier();
 
@@ -36,7 +36,7 @@ public class CollectionManager extends AbstractManager {
 
         boolean proceed = true;
 
-        if (getCollection(collection.getId()).isPresent()) {
+        if (isCollectionExisting(collection.getId())) {
             proceed = false;
             LOGGER.info("An collection '{}' is already existing. Aborting addition.", identifier);
         }
@@ -70,7 +70,13 @@ public class CollectionManager extends AbstractManager {
 
     }
 
-    private String createUriFromCollectionId(@NotNull IdCollection id) {
+    private String createCollectionUri(String identifier, String uri) {
+
+        return String.format("%s/%s", uri, identifier);
+
+    }
+
+    private String createResourceUri(@NotNull IdCollection id) {
 
         return String.format("%s/%s/%s%s",
                 ResourceRoot.ARCHIVAL_COLLECTIONS.getUri(),
@@ -80,7 +86,14 @@ public class CollectionManager extends AbstractManager {
 
     }
 
-    public boolean deleteCollection(@NotNull IdCollection idCollection) {
+    /**
+     * Deletes a charters collection from the database. Only collections without existing charters are deleted.
+     *
+     * @param idCollection The collection to delete.
+     * @return True if the deletion was successful. Note: still returns true even if the deletion of any empty
+     * charters eXist-collections didn't succeed.
+     */
+    public boolean delete(@NotNull IdCollection idCollection) {
 
         String identifier = idCollection.getIdentifier();
 
@@ -104,13 +117,25 @@ public class CollectionManager extends AbstractManager {
 
         if (proceed) {
 
-            deleteCollection(ResourceRoot.PUBLIC_CHARTERS, identifier); // delete public charters collection if existing
-            success = deleteCollection(ResourceRoot.ARCHIVAL_COLLECTIONS, identifier); // delete collection collection
+            String collectionUri = createCollectionUri(identifier, ResourceRoot.ARCHIVAL_COLLECTIONS.getUri());
+            success = momcaConnection.deleteCollection(collectionUri);
 
             if (success) {
-                LOGGER.info("Collection '{}' deleted.", identifier);
+
+                String chartersCollectionUri = createCollectionUri(identifier, ResourceRoot.PUBLIC_CHARTERS.getUri());
+                success = momcaConnection.deleteCollection(chartersCollectionUri);
+
+                if (success) {
+                    LOGGER.info("Collection '{}' deleted.", identifier);
+                } else {
+                    success = true;
+                    LOGGER.info("Deleted collection '{}' but failed to delete empty charters' collection at '{}'.", identifier, chartersCollectionUri);
+                }
+
             } else {
+
                 LOGGER.info("Failed to delete collection '{}'.", identifier);
+
             }
 
         }
@@ -119,19 +144,14 @@ public class CollectionManager extends AbstractManager {
 
     }
 
-    private boolean deleteCollection(@NotNull ResourceRoot resourceRoot, @NotNull String identifier) {
-        String uri = String.format("%s/%s", resourceRoot.getUri(), identifier);
-        return momcaConnection.deleteCollection(uri);
-    }
-
     @NotNull
-    public Optional<Collection> getCollection(@NotNull IdCollection idCollection) {
+    public Optional<Collection> get(@NotNull IdCollection idCollection) {
 
         String identifier = idCollection.getIdentifier();
 
         LOGGER.info("Trying to get collection '{}' from the database.", identifier);
 
-        String uri = createUriFromCollectionId(idCollection);
+        String uri = createResourceUri(idCollection);
         Optional<Collection> collection = momcaConnection.readExistResource(uri).map(Collection::new);
 
         LOGGER.info("Returning '{}' for collection '{}'", collection, identifier);
@@ -140,21 +160,27 @@ public class CollectionManager extends AbstractManager {
 
     }
 
-    public boolean isCollectionExisting(@NotNull IdCollection idCollection) {
+    private boolean isCollectionExisting(@NotNull IdCollection idCollection) {
 
-        LOGGER.debug("Try to determine the existance of collection '{}'.", idCollection);
+        String uri = createResourceUri(idCollection);
+        return momcaConnection.isResourceExisting(uri);
 
-        String uri = createUriFromCollectionId(idCollection);
-        boolean isCollectionExisting = momcaConnection.isResourceExisting(uri);
+    }
 
-        LOGGER.debug("The result for the query for existence of collection '{}' is '{}'", idCollection, isCollectionExisting);
+    public boolean isExisting(@NotNull IdCollection idCollection) {
+
+        LOGGER.info("Try to determine the existance of collection '{}'.", idCollection);
+
+        boolean isCollectionExisting = isCollectionExisting(idCollection);
+
+        LOGGER.info("The result for the query for existence of collection '{}' is '{}'", idCollection, isCollectionExisting);
 
         return isCollectionExisting;
 
     }
 
     @NotNull
-    public List<IdCollection> listCollections(@NotNull Country country) {
+    public List<IdCollection> list(@NotNull Country country) {
 
         LOGGER.info("Trying to list all collections for country '{}'.", country);
 
@@ -168,7 +194,7 @@ public class CollectionManager extends AbstractManager {
     }
 
     @NotNull
-    public List<IdCollection> listCollections(@NotNull Region region) {
+    public List<IdCollection> list(@NotNull Region region) {
 
         LOGGER.info("Trying to list all collections for region '{}'.", region);
 
@@ -182,7 +208,7 @@ public class CollectionManager extends AbstractManager {
     }
 
     @NotNull
-    public List<IdCollection> listCollections() {
+    public List<IdCollection> list() {
 
         LOGGER.info("Trying to list all collections in the database.");
 

@@ -550,4 +550,11 @@ public class CharterManagerTest {
 
     }
 
+    @Test
+    public void testisExisting() throws Exception {
+
+        assertTrue(cm.isExisting(new IdCharter("RS-IAGNS", "Charters", "F1_fasc.16_sub_N_1513"), CharterStatus.IMPORTED));
+
+    }
+
 }

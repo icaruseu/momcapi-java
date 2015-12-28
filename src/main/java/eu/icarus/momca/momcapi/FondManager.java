@@ -27,7 +27,7 @@ public class FondManager extends AbstractManager {
         super(momcaConnection);
     }
 
-    public boolean addFond(@NotNull Fond fond) {
+    public boolean add(@NotNull Fond fond) {
 
         IdFond id = fond.getId();
 
@@ -35,16 +35,21 @@ public class FondManager extends AbstractManager {
 
         boolean proceed = true;
 
-        if (momcaConnection.isResourceExisting(fond.getUri())) {
+        if (isFondExisting(id)) {
             proceed = false;
-            LOGGER.info("The fond '{}' is already existing in the database.", id);
+            LOGGER.info("The fond '{}' is already existing in the database. Aborting addition.", id);
+        }
+
+        if (proceed && !momcaConnection.getArchiveManager().isExisting(fond.getArchiveId())) {
+            proceed = false;
+            LOGGER.info("The archive, '{}', the fond '{}' is added to doesn't exist. Aborting addition.", fond.getArchiveId(), id);
         }
 
         boolean success = false;
 
         if (proceed) {
 
-            String uri = createUriFromId(id);
+            String uri = createCollectionUri(ResourceRoot.ARCHIVAL_FONDS, id);
             success = momcaConnection.makeSureCollectionPathExists(uri);
 
             if (success) {
@@ -74,65 +79,146 @@ public class FondManager extends AbstractManager {
 
     }
 
-    private String createUriFromId(IdFond id) {
-        return String.format("%s/%s/%s", ResourceRoot.ARCHIVAL_FONDS.getUri(), id.getIdArchive().getIdentifier(), id.getIdentifier());
-    }
+    @NotNull
+    private String createCollectionUri(@NotNull ResourceRoot resourceRoot, @NotNull IdFond id) {
 
-    public void deleteFond(@NotNull IdFond idFond) {
-
-        if (!momcaConnection.getCharterManager().listPublicCharters(idFond).isEmpty()
-                || !momcaConnection.getCharterManager().listImportedCharters(idFond).isEmpty()) {
-            throw new IllegalArgumentException("There are still existing charters for fond '" + idFond.getIdentifier() + "'");
-        }
-
-        momcaConnection.deleteCollection(
-                String.format("%s/%s/%s",
-                        ResourceRoot.PUBLIC_CHARTERS.getUri(),
-                        idFond.getIdArchive().getIdentifier(),
-                        idFond.getIdentifier()));
-
-        String uri = createUriFromId(idFond);
-        momcaConnection.deleteCollection(uri);
+        return String.format("%s/%s/%s", resourceRoot.getUri(), id.getIdArchive().getIdentifier(), id.getIdentifier());
 
     }
 
     @NotNull
-    public Optional<Fond> getFond(@NotNull IdFond idFond) {
+    private String createEadResourceUri(@NotNull IdFond id) {
+
+        return String.format("%s/%s/%s/%s%s",
+                ResourceRoot.ARCHIVAL_FONDS.getUri(),
+                id.getIdArchive().getIdentifier(),
+                id.getIdentifier(),
+                id.getIdentifier(),
+                ResourceType.FOND.getNameSuffix());
+
+    }
+
+    @NotNull
+    private String createPrefsUri(@NotNull Optional<ExistResource> fondResource) {
+
+        return fondResource.get().getUri().replace("ead", "preferences");
+
+    }
+
+    /**
+     * Deletes a fond from the database. The fond is not allowed to still have existing charters.
+     *
+     * @param idFond The fond to delete.
+     * @return True if the deletion is successful. Note: still returns true if the process wasn't able to delete
+     * any empty charter eXist-collections.
+     */
+    public boolean delete(@NotNull IdFond idFond) {
+
+        LOGGER.info("Trying to delete the fond '{}'.", idFond);
+
+        boolean proceed = true;
+
+        if (!isFondExisting(idFond)) {
+            proceed = false;
+            LOGGER.info("The fond '{}' is not existing. Aborting deletion.", idFond);
+        }
+
+        if (proceed && !momcaConnection.getCharterManager().listPublicCharters(idFond).isEmpty()
+                || !momcaConnection.getCharterManager().listImportedCharters(idFond).isEmpty()) {
+            proceed = false;
+            LOGGER.info("There are still existing charters for fond '{}'. Aborting deletion.", idFond);
+        }
+
+        boolean success = false;
+
+        if (proceed) {
+
+            String fondCollectionUri = createCollectionUri(ResourceRoot.ARCHIVAL_FONDS, idFond);
+            success = momcaConnection.deleteCollection(fondCollectionUri);
+
+            if (success) {
+
+                String charterCollectionUri = createCollectionUri(ResourceRoot.PUBLIC_CHARTERS, idFond);
+                success = momcaConnection.deleteCollection(charterCollectionUri);
+
+                if (success) {
+                    LOGGER.info("Fond '{}' deleted.", idFond);
+                } else {
+                    success = true;
+                    LOGGER.info("Deleted fond '{}' but failed to delete empty charters' collection at '{}'.", idFond, charterCollectionUri);
+                }
+
+            } else {
+                LOGGER.info("Failed to delete fond '{}'.", idFond);
+            }
+
+        }
+
+        return success;
+
+    }
+
+    @NotNull
+    public Optional<Fond> get(@NotNull IdFond idFond) {
+
+        LOGGER.info("Trying to get fond '{}' from the database.", idFond);
 
         Optional<Fond> fond = Optional.empty();
 
-        Optional<ExistResource> fondResource = getFirstMatchingExistResource(idFond.getContentAsElement());
+        String eadUri = createEadResourceUri(idFond);
+        Optional<ExistResource> fondResource = momcaConnection.readExistResource(eadUri);
 
         if (fondResource.isPresent()) {
 
-            String prefsUrl = fondResource.get().getUri().replace("ead", "preferences");
+            LOGGER.debug("Trying to get preferences for fond '{}'.", idFond);
+
+            String prefsUrl = createPrefsUri(fondResource);
             Optional<ExistResource> fondPrefs = getExistResource(prefsUrl);
 
             fond = Optional.of(new Fond(fondResource.get(), fondPrefs));
 
+            LOGGER.debug("Read preferences for fond '{}': {}", idFond, fondPrefs);
+
         }
+
+        LOGGER.info("Returning fond '{}': {}", idFond, fondResource);
 
         return fond;
 
     }
 
-    public boolean isFondExisting(@NotNull IdFond idFond) {
+    public boolean isExisting(@NotNull IdFond idFond) {
 
-        String identifier = idFond.getIdentifier();
-        String resourceName = idFond.getIdentifier() + ResourceType.FOND.getNameSuffix();
-        String archiveIdentifier = idFond.getIdArchive().getIdentifier();
-        String rootUri = ResourceRoot.ARCHIVAL_FONDS.getUri();
-        String uri = String.join("/", rootUri, archiveIdentifier, identifier, resourceName);
+        LOGGER.info("Trying to determine the existence of fond '{}'.", idFond);
 
+        boolean isFondExisting = isFondExisting(idFond);
+
+        LOGGER.info("Is fond '{}' existing: {}", idFond, isFondExisting);
+
+        return isFondExisting;
+
+    }
+
+    private boolean isFondExisting(@NotNull IdFond idFond) {
+
+        String uri = createEadResourceUri(idFond);
         return momcaConnection.isResourceExisting(uri);
 
     }
 
     @NotNull
-    public List<IdFond> listFonds(@NotNull IdArchive idArchive) {
+    public List<IdFond> list(@NotNull IdArchive idArchive) {
+
+        LOGGER.info("Trying to list all fonds belonging to archive '{}'.", idArchive);
+
         List<String> queryResults = momcaConnection.queryDatabase(
                 ExistQueryFactory.listFonds(idArchive));
-        return queryResults.stream().map(AtomId::new).map(IdFond::new).collect(Collectors.toList());
+        List<IdFond> fondList = queryResults.stream().map(AtomId::new).map(IdFond::new).collect(Collectors.toList());
+
+        LOGGER.info("Returning '{}' fonds for archive '{}'.", fondList.size(), idArchive);
+
+        return fondList;
+
     }
 
 }

@@ -28,7 +28,7 @@ public class ArchiveManager extends AbstractManager {
         super(momcaConnection);
     }
 
-    public boolean addArchive(@NotNull Archive newArchive) {
+    public boolean add(@NotNull Archive newArchive) {
 
         String identifier = newArchive.getIdentifier();
 
@@ -75,7 +75,7 @@ public class ArchiveManager extends AbstractManager {
     }
 
     @NotNull
-    private String createUriFromArchiveId(@NotNull IdArchive idArchive) {
+    private String createResourceUri(@NotNull IdArchive idArchive) {
 
         return String.format(
                 "%s/%s/%s%s",
@@ -86,7 +86,14 @@ public class ArchiveManager extends AbstractManager {
 
     }
 
-    public boolean deleteArchive(@NotNull IdArchive idArchive) {
+    /**
+     * Deltes an archive from the database. The archive is not allowed to still have existing fonds.
+     *
+     * @param idArchive The archive to delete.
+     * @return True if the process was successful. Note: Returns true, even if the deletion of any empty fond
+     * eXist-collections didn't succeed.
+     */
+    public boolean delete(@NotNull IdArchive idArchive) {
 
         String identifier = idArchive.getIdentifier();
 
@@ -99,7 +106,7 @@ public class ArchiveManager extends AbstractManager {
             LOGGER.info("The archive '{}' that is to be deleted doesn't exist. Aborting deletion.", identifier);
         }
 
-        if (proceed && !momcaConnection.getFondManager().listFonds(idArchive).isEmpty()) {
+        if (proceed && !momcaConnection.getFondManager().list(idArchive).isEmpty()) {
             proceed = false;
             LOGGER.info("The archive '{}' that is to be deleted still has associated fonds. Aborting deletion.", identifier);
         }
@@ -109,8 +116,6 @@ public class ArchiveManager extends AbstractManager {
         if (proceed) {
 
             String archiveCollectionUri = createCollectionUri(identifier, ResourceRoot.ARCHIVES.getUri());
-            LOGGER.trace("Trying to delete archival collection at '{}'", archiveCollectionUri);
-
             success = momcaConnection.deleteCollection(archiveCollectionUri);
 
             if (success) {
@@ -137,13 +142,13 @@ public class ArchiveManager extends AbstractManager {
     }
 
     @NotNull
-    public Optional<Archive> getArchive(@NotNull IdArchive idArchive) {
+    public Optional<Archive> get(@NotNull IdArchive idArchive) {
 
         String identifier = idArchive.getIdentifier();
 
         LOGGER.info("Trying to get archive '{}'.", identifier);
 
-        String uri = createUriFromArchiveId(idArchive);
+        String uri = createResourceUri(idArchive);
         Optional<Archive> archive = momcaConnection.readExistResource(uri).map(Archive::new);
 
         LOGGER.info("Returning '{}' for archive '{}'.", archive, identifier);
@@ -154,19 +159,25 @@ public class ArchiveManager extends AbstractManager {
 
     private boolean isArchiveExisting(@NotNull IdArchive idArchive) {
 
-        LOGGER.debug("Try to determine the existance of archive '{}'.", idArchive);
+        String uri = createResourceUri(idArchive);
+        return momcaConnection.isResourceExisting(uri);
 
-        String uri = createUriFromArchiveId(idArchive);
-        boolean isArchiveExisting = momcaConnection.isResourceExisting(uri);
+    }
 
-        LOGGER.debug("The result for the query for existence of archive '{}' is '{}'", idArchive, isArchiveExisting);
+    public boolean isExisting(@NotNull IdArchive idArchive) {
+
+        LOGGER.info("Try to determine the existance of archive '{}'.", idArchive);
+
+        boolean isArchiveExisting = isArchiveExisting(idArchive);
+
+        LOGGER.info("The result for the query for existence of archive '{}' is '{}'", idArchive, isArchiveExisting);
 
         return isArchiveExisting;
 
     }
 
     @NotNull
-    public List<IdArchive> listArchives() {
+    public List<IdArchive> list() {
 
         LOGGER.info("Trying to list all archives in the database.");
 
@@ -183,7 +194,7 @@ public class ArchiveManager extends AbstractManager {
     }
 
     @NotNull
-    public List<IdArchive> listArchives(@NotNull Region region) {
+    public List<IdArchive> list(@NotNull Region region) {
 
         String nativeName = region.getNativeName();
 
@@ -203,7 +214,7 @@ public class ArchiveManager extends AbstractManager {
     }
 
     @NotNull
-    public List<IdArchive> listArchives(@NotNull Country country) {
+    public List<IdArchive> list(@NotNull Country country) {
 
         String nativeName = country.getNativeName();
         LOGGER.info("Trying to list all archives for country '{}'.", nativeName);
