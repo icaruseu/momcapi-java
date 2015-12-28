@@ -1,15 +1,14 @@
 package eu.icarus.momca.momcapi;
 
-import eu.icarus.momca.momcapi.exception.MomcaException;
 import eu.icarus.momca.momcapi.model.id.IdMyCollection;
 import eu.icarus.momca.momcapi.model.id.IdUser;
 import eu.icarus.momca.momcapi.model.resource.MyCollection;
 import eu.icarus.momca.momcapi.model.resource.MyCollectionStatus;
-import eu.icarus.momca.momcapi.model.resource.ResourceRoot;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomId;
 import eu.icarus.momca.momcapi.query.ExistQuery;
 import eu.icarus.momca.momcapi.query.ExistQueryFactory;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +55,7 @@ public class MyCollectionManager extends AbstractManager {
 
         if (proceed) {
 
-            String parentUri = createCollectionUri(myCollection, idUser);
+            String parentUri = createCollectionUri(myCollection.getId(), myCollection.getStatus(), idUser.getIdentifier());
             success = momcaConnection.makeSureCollectionPathExists(parentUri);
 
             LOGGER.debug("Created parent collection '{}'.", parentUri);
@@ -85,23 +84,23 @@ public class MyCollectionManager extends AbstractManager {
     }
 
     @NotNull
-    private String createCollectionUri(@NotNull MyCollection myCollection, @NotNull IdUser idUser) {
+    private String createCollectionUri(@NotNull IdMyCollection idMyCollection, @NotNull MyCollectionStatus status, @NotNull String userIdentifier) {
 
         String parentUri;
 
-        if (myCollection.getStatus() == MyCollectionStatus.PRIVATE) {
+        if (status == MyCollectionStatus.PRIVATE) {
 
             parentUri = String.format("%s/%s/%s/%s",
-                    myCollection.getStatus().getResourceRoot().getUri(),
-                    idUser.getIdentifier(),
+                    status.getResourceRoot().getUri(),
+                    userIdentifier,
                     MyCollection.PRIVATE_URI_PART,
-                    myCollection.getIdentifier());
+                    idMyCollection.getIdentifier());
 
         } else {
 
             parentUri = String.format("%s/%s",
                     MyCollectionStatus.PUBLISHED.getResourceRoot().getUri(),
-                    myCollection.getIdentifier());
+                    idMyCollection.getIdentifier());
 
         }
 
@@ -109,56 +108,101 @@ public class MyCollectionManager extends AbstractManager {
 
     }
 
-    public void delete(@NotNull IdMyCollection idMyCollection) {
+    public boolean delete(@NotNull IdMyCollection id) {
 
-        LOGGER.info("Trying to delete myCollection '{}'.", idMyCollection);
+        return delete(id, null);
+
+    }
+
+    public boolean delete(@NotNull IdMyCollection id, @Nullable IdUser idUser) {
+
+        MyCollectionStatus status = (idUser == null) ? MyCollectionStatus.PUBLISHED : MyCollectionStatus.PRIVATE;
+        CharterManager charterManager = momcaConnection.getCharterManager();
+
+        LOGGER.info("Trying to delete myCollection '{}' with status '{}'.", id, status);
 
         boolean proceed = true;
 
-        if (!momcaConnection.getCharterManager().listChartersInPrivateMyCollection(idMyCollection).isEmpty()) {
+        if (!isMyCollectionExisting(id, status)) {
             proceed = false;
-            LOGGER.info("There are still existing private charters for collection '{}'.", idMyCollection);
+            LOGGER.info("MyCollection '{}' with status '{}' is not existing. Aborting deletion.", id, status);
         }
 
-        deletePublic(idMyCollection);
-
-        Optional<MyCollection> privateMyCollection = get(idMyCollection, MyCollectionStatus.PRIVATE);
-        privateMyCollection.ifPresent(myCollection -> momcaConnection.deleteCollection(myCollection.getParentUri()));
-
-    }
-
-    public void deletePublic(@NotNull IdMyCollection idMyCollection) {
-
-        CharterManager cm = momcaConnection.getCharterManager();
-        if (!cm.listPublicCharters(idMyCollection).isEmpty()) {
-            String message = String.format("There are still existing public charters for collection '%s'.",
-                    idMyCollection.getIdentifier());
-            throw new MomcaException(message);
+        if (proceed && status == MyCollectionStatus.PRIVATE && isMyCollectionExisting(id, MyCollectionStatus.PUBLISHED)) {
+            proceed = false;
+            LOGGER.info("There is a public myCollection for private myCollection '{}' existing. Aborting deletion.", id);
         }
 
-        String uri = String.format("%s/%s",
-                ResourceRoot.PUBLISHED_USER_COLLECTIONS.getUri(), idMyCollection.getIdentifier());
-        momcaConnection.deleteCollection(uri);
+        if (proceed && status == MyCollectionStatus.PRIVATE && !charterManager.listChartersInPrivateMyCollection(id).isEmpty()) {
+            proceed = false;
+            LOGGER.info("There are still existing charters for private myCollection '{}'. Aborting deletion.", id);
+        }
+
+        if (proceed && status == MyCollectionStatus.PUBLISHED && !charterManager.listPublicCharters(id).isEmpty()) {
+            proceed = false;
+            LOGGER.info("There are still existing charters for public myCollection '{}'. Aborting deletion.", id);
+        }
+
+        boolean success = false;
+
+        if (proceed) {
+
+            String userIdentifier = idUser == null ? "" : idUser.getIdentifier();
+            String myCollectionUri = createCollectionUri(id, status, userIdentifier);
+            success = momcaConnection.deleteCollection(myCollectionUri);
+
+            if (success) {
+
+                String chartersCollectionUri = myCollectionUri.replace("metadata.mycollection", "metadata.charter");
+                success = momcaConnection.deleteCollection(chartersCollectionUri);
+
+                if (success) {
+                    LOGGER.info("MyCollection '{}' deleted.", id);
+                } else {
+                    success = true;
+                    LOGGER.info("Deleted myCollection '{}' but failed to delete empty charters' collection at '{}'.", id, chartersCollectionUri);
+                }
+
+            } else {
+
+                LOGGER.info("Failed to delete myCollection '{}'.", id);
+
+            }
+
+        }
+
+        return success;
+
     }
 
     @NotNull
-    public Optional<MyCollection> get(@NotNull IdMyCollection idCollection, @NotNull MyCollectionStatus status) {
+    public Optional<MyCollection> get(@NotNull IdMyCollection id, @NotNull MyCollectionStatus status) {
 
-        List<MyCollection> instances = momcaConnection.queryDatabase(
-                ExistQueryFactory.getResourceUri(idCollection.getContentAsElement(), status.getResourceRoot()
-                )).stream()
+        LOGGER.info("Trying to get myCollection '{}' with status '{}'.", id, status);
+
+        ExistQuery query = ExistQueryFactory.getResourceUri(id.getContentAsElement(), status.getResourceRoot());
+
+        List<MyCollection> instances = momcaConnection
+                .queryDatabase(query)
+                .stream()
                 .map(this::getMyCollectionFromUri)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
 
-        return instances.size() == 0 ? Optional.empty() : Optional.of(instances.get(0));
+        Optional<MyCollection> result = instances.size() == 0 ? Optional.empty() : Optional.of(instances.get(0));
+
+        LOGGER.info("Returning myCollection '{}': {}", id, result);
+
+        return result;
 
     }
 
     @NotNull
     private Optional<MyCollection> getMyCollectionFromUri(@NotNull String myCollectionUri) {
+
         return momcaConnection.readExistResource(myCollectionUri).map(MyCollection::new);
+
     }
 
     public boolean isExisting(@NotNull IdMyCollection idMyCollection, @NotNull MyCollectionStatus myCollectionStatus) {
@@ -184,14 +228,40 @@ public class MyCollectionManager extends AbstractManager {
 
     @NotNull
     public List<IdMyCollection> listPrivateMyCollections(@NotNull IdUser idUser) {
-        List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listMyCollectionsPrivate(idUser));
-        return queryResults.stream().map(AtomId::new).map(IdMyCollection::new).collect(Collectors.toList());
+
+        LOGGER.info("Trying to list private myCollections for user '{}'.", idUser);
+
+        ExistQuery query = ExistQueryFactory.listMyCollectionsPrivate(idUser);
+        List<IdMyCollection> myCollectionList = queryMyCollections(query);
+
+        LOGGER.info("Returning '{}' myCollections for user '{}'.", myCollectionList.size(), idUser);
+
+        return myCollectionList;
+
     }
 
     @NotNull
     public List<IdMyCollection> listPublicMyCollections() {
-        List<String> queryResults = momcaConnection.queryDatabase(ExistQueryFactory.listMyCollectionsPublic());
-        return queryResults.stream().map(AtomId::new).map(IdMyCollection::new).collect(Collectors.toList());
+
+        LOGGER.info("Trying to list all public myCollections in the database.");
+
+        ExistQuery query = ExistQueryFactory.listMyCollectionsPublic();
+        List<IdMyCollection> myCollectionList = queryMyCollections(query);
+
+        LOGGER.info("Returning '{}' public myCollections.", myCollectionList.size());
+
+        return myCollectionList;
+
+    }
+
+    @NotNull
+    private List<IdMyCollection> queryMyCollections(@NotNull ExistQuery query) {
+
+        return momcaConnection.queryDatabase(query).stream()
+                .map(AtomId::new)
+                .map(IdMyCollection::new)
+                .collect(Collectors.toList());
+
     }
 
 }
