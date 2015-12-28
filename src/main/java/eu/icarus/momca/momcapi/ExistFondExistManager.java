@@ -169,7 +169,7 @@ public class ExistFondExistManager extends AbstractExistManager implements FondM
             LOGGER.debug("Trying to get preferences for fond '{}'.", idFond);
 
             String prefsUrl = createPrefsUri(fondResource);
-            Optional<ExistResource> fondPrefs = getExistResource(prefsUrl);
+            Optional<ExistResource> fondPrefs = momcaConnection.readExistResource(prefsUrl);
 
             fond = Optional.of(new Fond(fondResource.get(), fondPrefs));
 

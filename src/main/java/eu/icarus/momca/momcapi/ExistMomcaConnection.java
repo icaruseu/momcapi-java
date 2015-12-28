@@ -63,7 +63,6 @@ public class ExistMomcaConnection implements MomcaConnection {
 
     public ExistMomcaConnection(@NotNull String dbRootUri, @NotNull String admin, @NotNull String password) {
 
-
         LOGGER.debug("Initiating connection to '{}' for user '{}'.", dbRootUri, admin);
 
         this.dbRootUri = dbRootUri;
