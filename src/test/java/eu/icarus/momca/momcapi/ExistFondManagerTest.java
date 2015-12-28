@@ -15,10 +15,10 @@ import static org.testng.Assert.*;
 /**
  * Created by djell on 09/08/2015.
  */
-public class FondManagerTest {
+public class ExistFondManagerTest {
 
     private FondManager fm;
-    private MomcaConnection mc;
+    private ExistMomcaConnection mc;
 
     @BeforeClass
     public void setUp() throws Exception {

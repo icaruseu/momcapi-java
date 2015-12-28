@@ -17,10 +17,10 @@ import static org.testng.Assert.*;
 /**
  * Created by djell on 11/08/2015.
  */
-public class CollectionManagerTest {
+public class ExistCollectionManagerTest {
 
     private CollectionManager cm;
-    private MomcaConnection mc;
+    private ExistMomcaConnection mc;
 
     @BeforeClass
     public void setUp() throws Exception {

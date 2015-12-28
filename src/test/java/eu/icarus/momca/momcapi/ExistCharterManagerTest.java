@@ -23,7 +23,7 @@ import static org.testng.Assert.*;
 /**
  * Created by daniel on 03.07.2015.
  */
-public class CharterManagerTest {
+public class ExistCharterManagerTest {
 
     private CharterManager cm;
     private MomcaConnection mc;

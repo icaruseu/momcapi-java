@@ -19,9 +19,9 @@ abstract class AbstractManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractManager.class);
 
     @NotNull
-    final MomcaConnection momcaConnection;
+    final ExistMomcaConnection momcaConnection;
 
-    AbstractManager(@NotNull MomcaConnection momcaConnection) {
+    AbstractManager(@NotNull ExistMomcaConnection momcaConnection) {
         this.momcaConnection = momcaConnection;
     }
 

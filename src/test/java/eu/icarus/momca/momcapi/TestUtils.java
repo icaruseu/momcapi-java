@@ -25,7 +25,7 @@ public class TestUtils {
     private static final String password = "momcapitest";
 
     @NotNull
-    public static MomcaConnection initMomcaConnection() throws MomcaException {
+    public static ExistMomcaConnection initMomcaConnection() throws MomcaException {
 
         URL serverPropertiesUrl = TestUtils.class.getResource(SERVER_PROPERTIES_PATH);
         assertNotNull(TestUtils.class.getResource(SERVER_PROPERTIES_PATH), "Test file missing");
@@ -44,7 +44,7 @@ public class TestUtils {
         String serverUrl = serverProperties.getProperty("serverUrl");
         assertNotNull(serverUrl, "'serverUrl' missing from '" + SERVER_PROPERTIES_PATH + "'");
 
-        return new MomcaConnection(serverUrl, adminUser, password);
+        return new ExistMomcaConnection(serverUrl, adminUser, password);
 
     }
 

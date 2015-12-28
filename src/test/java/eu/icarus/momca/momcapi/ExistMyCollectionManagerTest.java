@@ -15,7 +15,7 @@ import static org.testng.Assert.*;
 /**
  * Created by djell on 29/09/2015.
  */
-public class MyCollectionManagerTest {
+public class ExistMyCollectionManagerTest {
 
     private MomcaConnection mc;
     private MyCollectionManager mm;

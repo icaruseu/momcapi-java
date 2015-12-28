@@ -15,7 +15,7 @@ import static org.testng.Assert.*;
  * @author daniel
  *         Created on 17.07.2015.
  */
-public class CountryManagerTest {
+public class ExistCountryManagerTest {
 
     private CountryManager cm;
 

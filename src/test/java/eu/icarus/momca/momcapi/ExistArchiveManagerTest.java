@@ -14,10 +14,10 @@ import static org.testng.Assert.*;
 /**
  * Created by daniel on 22.07.2015.
  */
-public class ArchiveManagerTest {
+public class ExistArchiveManagerTest {
 
     private ArchiveManager am;
-    private MomcaConnection mc;
+    private ExistMomcaConnection mc;
 
     @BeforeClass
     public void setUp() throws Exception {

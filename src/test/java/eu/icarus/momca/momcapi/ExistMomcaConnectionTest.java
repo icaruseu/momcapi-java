@@ -12,14 +12,14 @@ import static org.testng.Assert.*;
 /**
  * Created by daniel on 25.06.2015.
  */
-public class MomcaConnectionTest {
+public class ExistMomcaConnectionTest {
 
-    private MomcaConnection momcaConnection;
+    private ExistMomcaConnection momcaConnection;
 
     @BeforeClass
     public void setUp() throws Exception {
         momcaConnection = TestUtils.initMomcaConnection();
-        assertNotNull(momcaConnection, "MomcaConnection connection not initialized.");
+        assertNotNull(momcaConnection, "ExistMomcaConnection connection not initialized.");
     }
 
     @AfterClass

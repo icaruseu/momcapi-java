@@ -13,16 +13,17 @@ import static org.testng.Assert.*;
 /**
  * Created by daniel on 03.07.2015.
  */
-public class UserManagerTest {
+public class ExistUserManagerTest {
 
-    private MomcaConnection momcaConnection;
-    private UserManager userManager;
+    private ExistMomcaConnection momcaConnection;
+    private ExistMomcaConnection momcaConnection;
+    private ExistUserManager existUserManager;
 
     @BeforeClass
     public void setUp() throws Exception {
         momcaConnection = TestUtils.initMomcaConnection();
-        userManager = momcaConnection.getUserManager();
-        assertNotNull(userManager, "MOM-CA connection not initialized.");
+        existUserManager = momcaConnection.getUserManager();
+        assertNotNull(existUserManager, "MOM-CA connection not initialized.");
     }
 
     @Test
@@ -32,17 +33,17 @@ public class UserManagerTest {
         IdUser id = new IdUser(userName);
         String password = "newPassword";
         String moderator = "admin";
-        assertTrue(userManager.add(new User(userName, moderator), password));
+        assertTrue(existUserManager.add(new User(userName, moderator), password));
 
-        assertTrue(userManager.get(id).isPresent());
-        assertTrue(userManager.isInitialized(id));
+        assertTrue(existUserManager.get(id).isPresent());
+        assertTrue(existUserManager.isInitialized(id));
 
-        userManager.delete(id);
+        existUserManager.delete(id);
 
         userName = "newUser@dev.monasterium.net";
         password = "newPassword";
         moderator = "notExistingModerator";
-        assertFalse(userManager.add(new User(userName, moderator), password));
+        assertFalse(existUserManager.add(new User(userName, moderator), password));
 
     }
 
@@ -51,17 +52,17 @@ public class UserManagerTest {
 
         String userName = "modUpdateUser";
 
-        User newModerator = userManager.get(new IdUser("user1.testuser@dev.monasterium.net")).get();
+        User newModerator = existUserManager.get(new IdUser("user1.testuser@dev.monasterium.net")).get();
 
-        userManager.add(new User(userName, "admin"), "");
+        existUserManager.add(new User(userName, "admin"), "");
 
-        User originalUser = userManager.get(new IdUser(userName)).get();
+        User originalUser = existUserManager.get(new IdUser(userName)).get();
         originalUser.setModerator(newModerator.getIdentifier());
 
-        assertTrue(userManager.changeModerator(originalUser.getId(), newModerator.getId()));
-        assertEquals(userManager.get(originalUser.getId()).get().getIdModerator().getIdentifier(), newModerator.getIdentifier());
+        assertTrue(existUserManager.changeModerator(originalUser.getId(), newModerator.getId()));
+        assertEquals(existUserManager.get(originalUser.getId()).get().getIdModerator().getIdentifier(), newModerator.getIdentifier());
 
-        userManager.delete(originalUser.getId());
+        existUserManager.delete(originalUser.getId());
 
     }
 
@@ -72,13 +73,13 @@ public class UserManagerTest {
         String moderator = "admin";
         IdUser idUser = new IdUser(userName);
 
-        userManager.add(new User(userName, moderator), "");
+        existUserManager.add(new User(userName, moderator), "");
 
-        User user = userManager.get(idUser).get();
+        User user = existUserManager.get(idUser).get();
 
-        assertTrue(userManager.changeUserPassword(user, "newPassword"));
+        assertTrue(existUserManager.changeUserPassword(user, "newPassword"));
 
-        userManager.delete(idUser);
+        existUserManager.delete(idUser);
 
     }
 
@@ -88,13 +89,13 @@ public class UserManagerTest {
         String userName = "removeAccountTest@dev.monasterium.net";
         String password = "testing123";
         String moderator = "admin";
-        userManager.add(new User(userName, moderator), password);
-        User user = userManager.get(new IdUser(userName)).get();
-        userManager.deleteExistUserAccount(userName);
+        existUserManager.add(new User(userName, moderator), password);
+        User user = existUserManager.get(new IdUser(userName)).get();
+        existUserManager.deleteExistUserAccount(userName);
 
-        assertFalse(userManager.isInitialized(new IdUser(userName)));
+        assertFalse(existUserManager.isInitialized(new IdUser(userName)));
 
-        userManager.delete(user.getId());
+        existUserManager.delete(user.getId());
 
     }
 
@@ -106,11 +107,11 @@ public class UserManagerTest {
         String password = "testing123";
         String moderator = "admin";
 
-        userManager.add(new User(userName, moderator), password);
-        assertTrue(userManager.delete(id));
+        existUserManager.add(new User(userName, moderator), password);
+        assertTrue(existUserManager.delete(id));
 
-        assertFalse(userManager.get(id).isPresent());
-        assertFalse(userManager.isInitialized(id));
+        assertFalse(existUserManager.get(id).isPresent());
+        assertFalse(existUserManager.isInitialized(id));
         assertFalse(momcaConnection.readCollection("/db/mom-data/xrx.user/" + userName).isPresent());
 
     }
@@ -121,7 +122,7 @@ public class UserManagerTest {
         String userName = "user1.testuser@dev.monasterium.net";
         String moderator = "admin";
 
-        User user = userManager.get(new IdUser(userName)).get();
+        User user = existUserManager.get(new IdUser(userName)).get();
 
         assertEquals(user.getIdentifier(), userName);
         assertEquals(user.getIdModerator().getIdentifier(), moderator);
@@ -131,7 +132,7 @@ public class UserManagerTest {
     @Test
     public void testGetUserWithNotExistingUser() throws Exception {
         String userId = "randomstuff@crazyness.uk";
-        assertEquals(userManager.get(new IdUser(userId)), Optional.empty());
+        assertEquals(existUserManager.get(new IdUser(userId)), Optional.empty());
     }
 
     @Test
@@ -148,30 +149,30 @@ public class UserManagerTest {
         User user = new User(userResource);
 
         // initialize user
-        assertTrue(userManager.initialize(user.getId(), newUserPassword));
-        assertTrue(userManager.isInitialized(user.getId()));
+        assertTrue(existUserManager.initialize(user.getId(), newUserPassword));
+        assertTrue(existUserManager.isInitialized(user.getId()));
 
         // clean up
-        userManager.delete(user.getId());
+        existUserManager.delete(user.getId());
 
     }
 
     @Test
     public void testIsExisting() throws Exception {
-        assertTrue(userManager.isExisting(new IdUser("user1.testuser@dev.monasterium.net")));
-        assertFalse(userManager.isExisting(new IdUser("user17.testuser@dev.monasterium.net")));
+        assertTrue(existUserManager.isExisting(new IdUser("user1.testuser@dev.monasterium.net")));
+        assertFalse(existUserManager.isExisting(new IdUser("user17.testuser@dev.monasterium.net")));
     }
 
     @Test
     public void testIsInitialized() throws Exception {
-        assertFalse(userManager.isInitialized(new IdUser("uninitialized.testuser@dev.monasterium.net")));
-        assertTrue(userManager.isInitialized(new IdUser("admin")));
+        assertFalse(existUserManager.isInitialized(new IdUser("uninitialized.testuser@dev.monasterium.net")));
+        assertTrue(existUserManager.isInitialized(new IdUser("admin")));
     }
 
     @Test
     public void testListUsers() throws Exception {
-        assertEquals(userManager.list().size(), 4);
-        assertTrue(userManager.list().contains(new IdUser("admin")));
+        assertEquals(existUserManager.list().size(), 4);
+        assertTrue(existUserManager.list().contains(new IdUser("admin")));
     }
 
 }
