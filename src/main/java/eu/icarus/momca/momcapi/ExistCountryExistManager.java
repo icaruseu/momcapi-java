@@ -24,15 +24,15 @@ import java.util.stream.Collectors;
  * @author Daniel Jeller
  *         Created on 17.07.2015.
  */
-public class ExistCountryManager extends AbstractManager implements CountryManager {
+public class ExistCountryExistManager extends AbstractExistManager implements CountryManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExistCountryManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExistCountryExistManager.class);
 
     @NotNull
     private static final String MOM_PORTAL_XML_URI = String
             .format("%s/mom.portal.xml", ResourceRoot.PORTAL_HIERARCHY.getUri());
 
-    ExistCountryManager(@NotNull ExistMomcaConnection momcaConnection) {
+    ExistCountryExistManager(@NotNull ExistMomcaConnection momcaConnection) {
         super(momcaConnection);
     }
 

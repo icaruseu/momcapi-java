@@ -14,14 +14,14 @@ import java.util.stream.Collectors;
 /**
  * Created by djell on 09/08/2015.
  */
-abstract class AbstractManager {
+abstract class AbstractExistManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractExistManager.class);
 
     @NotNull
     final ExistMomcaConnection momcaConnection;
 
-    AbstractManager(@NotNull ExistMomcaConnection momcaConnection) {
+    AbstractExistManager(@NotNull ExistMomcaConnection momcaConnection) {
         this.momcaConnection = momcaConnection;
     }
 

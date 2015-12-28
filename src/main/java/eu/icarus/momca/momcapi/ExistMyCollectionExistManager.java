@@ -19,11 +19,11 @@ import java.util.stream.Collectors;
 /**
  * Created by djell on 29/09/2015.
  */
-public class ExistMyCollectionManager extends AbstractManager implements MyCollectionManager {
+public class ExistMyCollectionExistManager extends AbstractExistManager implements MyCollectionManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExistMyCollectionManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExistMyCollectionExistManager.class);
 
-    ExistMyCollectionManager(@NotNull ExistMomcaConnection momcaConnection) {
+    ExistMyCollectionExistManager(@NotNull ExistMomcaConnection momcaConnection) {
         super(momcaConnection);
     }
 

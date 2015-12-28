@@ -22,11 +22,11 @@ import java.util.stream.Collectors;
 /**
  * Created by daniel on 03.07.2015.
  */
-public class ExistCharterManager extends AbstractManager implements CharterManager {
+public class ExistCharterExistManager extends AbstractExistManager implements CharterManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExistCharterManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExistCharterExistManager.class);
 
-    ExistCharterManager(@NotNull ExistMomcaConnection momcaConnection) {
+    ExistCharterExistManager(@NotNull ExistMomcaConnection momcaConnection) {
         super(momcaConnection);
     }
 

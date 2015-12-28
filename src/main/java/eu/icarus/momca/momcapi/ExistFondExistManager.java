@@ -19,11 +19,11 @@ import java.util.stream.Collectors;
 /**
  * Created by djell on 09/08/2015.
  */
-public class ExistFondManager extends AbstractManager implements FondManager {
+public class ExistFondExistManager extends AbstractExistManager implements FondManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExistFondManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExistFondExistManager.class);
 
-    ExistFondManager(@NotNull ExistMomcaConnection momcaConnection) {
+    ExistFondExistManager(@NotNull ExistMomcaConnection momcaConnection) {
         super(momcaConnection);
     }
 

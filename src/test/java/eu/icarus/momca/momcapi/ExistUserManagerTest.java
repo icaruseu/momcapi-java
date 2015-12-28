@@ -15,9 +15,8 @@ import static org.testng.Assert.*;
  */
 public class ExistUserManagerTest {
 
-    private ExistMomcaConnection momcaConnection;
-    private ExistMomcaConnection momcaConnection;
-    private ExistUserManager existUserManager;
+    private ExistUserExistManager existUserManager;
+    private MomcaConnection momcaConnection;
 
     @BeforeClass
     public void setUp() throws Exception {
@@ -112,7 +111,7 @@ public class ExistUserManagerTest {
 
         assertFalse(existUserManager.get(id).isPresent());
         assertFalse(existUserManager.isInitialized(id));
-        assertFalse(momcaConnection.readCollection("/db/mom-data/xrx.user/" + userName).isPresent());
+        assertFalse(((ExistMomcaConnection) momcaConnection).readCollection("/db/mom-data/xrx.user/" + userName).isPresent());
 
     }
 
@@ -142,7 +141,7 @@ public class ExistUserManagerTest {
         String newUserName = "testuser@gmail.com";
         String newUserXml = "<xrx:user xmlns:xrx='http://www.monasterium.net/NS/xrx'> <xrx:username /> <xrx:password /> <xrx:firstname>Anna</xrx:firstname> <xrx:name>Madeo</xrx:name> <xrx:email>testuser@gmail.com</xrx:email> <xrx:moderator>admin</xrx:moderator> <xrx:street /> <xrx:zip /> <xrx:town /> <xrx:phone /> <xrx:institution /> <xrx:info /> <xrx:storage> <xrx:saved_list /> <xrx:bookmark_list /> </xrx:storage> </xrx:user>";
         ExistResource userResource = new ExistResource(newUserName + ".xml", "/db/mom-data/xrx.user", newUserXml);
-        momcaConnection.writeExistResource(userResource);
+        ((ExistMomcaConnection) momcaConnection).writeExistResource(userResource);
 
         // create new user without using momcaConnection.add()
         String newUserPassword = "testing123";

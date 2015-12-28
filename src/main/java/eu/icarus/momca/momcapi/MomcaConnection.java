@@ -28,6 +28,6 @@ public interface MomcaConnection {
     MyCollectionManager getMyCollectionManager();
 
     @NotNull
-    ExistUserManager getUserManager();
+    ExistUserExistManager getUserManager();
 
 }

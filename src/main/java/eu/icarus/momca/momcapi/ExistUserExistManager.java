@@ -29,13 +29,13 @@ import java.util.stream.Collectors;
  *         Created on 03.07.2015.
  * @see
  */
-public class ExistUserManager extends AbstractManager implements UserManager {
+public class ExistUserExistManager extends AbstractExistManager implements UserManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExistUserManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExistUserExistManager.class);
     private RemoteUserManagementService remoteUserManagementService;
 
-    ExistUserManager(@NotNull ExistMomcaConnection momcaConnection,
-                     @NotNull Collection rootCollection) {
+    ExistUserExistManager(@NotNull ExistMomcaConnection momcaConnection,
+                          @NotNull Collection rootCollection) {
 
         super(momcaConnection);
 
