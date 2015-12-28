@@ -35,16 +35,16 @@ public class MyCollectionManagerTest {
         MyCollection myCollection1 = new MyCollection("newCollection", "A very new collection",
                 new IdUser("admin"), MyCollectionStatus.PRIVATE);
 
-        mm.addMyCollection(myCollection1);
+        assertTrue(mm.add(myCollection1));
 
         MyCollection myCollection2 = new MyCollection("newCollection", "A very new collection",
                 new IdUser("admin"), MyCollectionStatus.PUBLISHED);
 
-        mm.addMyCollection(myCollection2);
+        assertTrue(mm.add(myCollection2));
 
-        Optional<MyCollection> result = mm.getMyCollection(myCollection2.getId(), MyCollectionStatus.PUBLISHED);
-        mm.deleteMyCollection(myCollection1.getId());
-        mm.deleteMyCollection(myCollection2.getId());
+        Optional<MyCollection> result = mm.get(myCollection2.getId(), MyCollectionStatus.PUBLISHED);
+        mm.delete(myCollection1.getId());
+        mm.delete(myCollection2.getId());
 
         assertTrue(result.isPresent());
 
@@ -57,20 +57,20 @@ public class MyCollectionManagerTest {
                 new IdUser("admin"), MyCollectionStatus.PRIVATE);
         myCollection.setPreface("Preface");
 
-        mm.addMyCollection(myCollection);
+        assertTrue(mm.add(myCollection));
 
-        Optional<MyCollection> result = mm.getMyCollection(myCollection.getId(), MyCollectionStatus.PRIVATE);
-        mm.deleteMyCollection(myCollection.getId());
+        Optional<MyCollection> result = mm.get(myCollection.getId(), MyCollectionStatus.PRIVATE);
+        mm.delete(myCollection.getId());
 
         assertTrue(result.isPresent());
 
     }
 
-    @Test(expectedExceptions = MomcaException.class)
+    @Test
     public void testAddMyCollection2() throws Exception {
         MyCollection myCollection = new MyCollection("newCollection", "A very new collection",
                 new IdUser("admin"), MyCollectionStatus.PUBLISHED);
-        mm.addMyCollection(myCollection);
+        assertFalse(mm.add(myCollection));
     }
 
     @Test
@@ -80,19 +80,19 @@ public class MyCollectionManagerTest {
                 new IdUser("admin"), MyCollectionStatus.PRIVATE);
         MyCollection myCollection2 = new MyCollection("newCollection", "A very new collection",
                 new IdUser("admin"), MyCollectionStatus.PUBLISHED);
-        mm.addMyCollection(myCollection1);
-        mm.addMyCollection(myCollection2);
+        mm.add(myCollection1);
+        mm.add(myCollection2);
 
-        mm.deleteMyCollection(myCollection1.getId());
+        mm.delete(myCollection1.getId());
 
-        assertFalse(mm.getMyCollection(myCollection1.getId(), MyCollectionStatus.PRIVATE).isPresent());
-        assertFalse(mm.getMyCollection(myCollection2.getId(), MyCollectionStatus.PUBLISHED).isPresent());
+        assertFalse(mm.get(myCollection1.getId(), MyCollectionStatus.PRIVATE).isPresent());
+        assertFalse(mm.get(myCollection2.getId(), MyCollectionStatus.PUBLISHED).isPresent());
 
     }
 
     @Test(expectedExceptions = MomcaException.class)
     public void testDeleteMyCollection2() throws Exception {
-        mm.deleteMyCollection(new IdMyCollection("67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3"));
+        mm.delete(new IdMyCollection("67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3"));
     }
 
     @Test
@@ -102,14 +102,14 @@ public class MyCollectionManagerTest {
                 new IdUser("admin"), MyCollectionStatus.PRIVATE);
         MyCollection myCollectionPublic = new MyCollection("newCollection", "A very new collection",
                 new IdUser("admin"), MyCollectionStatus.PUBLISHED);
-        mm.addMyCollection(myCollectionPrivate);
-        mm.addMyCollection(myCollectionPublic);
+        mm.add(myCollectionPrivate);
+        mm.add(myCollectionPublic);
 
-        mm.deleteMyCollectionPublic(myCollectionPublic.getId());
+        mm.deletePublic(myCollectionPublic.getId());
 
-        Optional<MyCollection> myCollectionResultPrivate = mm.getMyCollection(myCollectionPrivate.getId(), MyCollectionStatus.PRIVATE);
-        Optional<MyCollection> myCollectionResultPublic = mm.getMyCollection(myCollectionPublic.getId(), MyCollectionStatus.PUBLISHED);
-        mm.deleteMyCollection(myCollectionPrivate.getId());
+        Optional<MyCollection> myCollectionResultPrivate = mm.get(myCollectionPrivate.getId(), MyCollectionStatus.PRIVATE);
+        Optional<MyCollection> myCollectionResultPublic = mm.get(myCollectionPublic.getId(), MyCollectionStatus.PUBLISHED);
+        mm.delete(myCollectionPrivate.getId());
 
         assertTrue(myCollectionResultPrivate.isPresent());
         assertFalse(myCollectionResultPublic.isPresent());
@@ -118,26 +118,26 @@ public class MyCollectionManagerTest {
 
     @Test(expectedExceptions = MomcaException.class)
     public void testDeleteMyCollectionPublic2() throws Exception {
-        mm.deleteMyCollectionPublic(new IdMyCollection("67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3"));
+        mm.deletePublic(new IdMyCollection("67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3"));
     }
 
     @Test
     public void testGetMyCollection() throws Exception {
 
         IdMyCollection id1 = new IdMyCollection("ea13e5f1-03b2-4bfa-9dd5-8fb770f98d7b");
-        Optional<MyCollection> collection1 = mm.getMyCollection(id1, MyCollectionStatus.PRIVATE);
+        Optional<MyCollection> collection1 = mm.get(id1, MyCollectionStatus.PRIVATE);
         assertTrue(collection1.isPresent());
         assertEquals(collection1.get().getStatus(), MyCollectionStatus.PRIVATE);
         assertEquals(collection1.get().getParentUri(), "/db/mom-data/xrx.user/admin/metadata.mycollection/ea13e5f1-03b2-4bfa-9dd5-8fb770f98d7b");
 
-        collection1 = mm.getMyCollection(id1, MyCollectionStatus.PUBLISHED);
+        collection1 = mm.get(id1, MyCollectionStatus.PUBLISHED);
         assertFalse(collection1.isPresent());
 
         IdMyCollection id2 = new IdMyCollection("0d48f895-f296-485b-a6d9-e88b4523cc92");
-        Optional<MyCollection> collection2 = mm.getMyCollection(id2, MyCollectionStatus.PRIVATE);
+        Optional<MyCollection> collection2 = mm.get(id2, MyCollectionStatus.PRIVATE);
         assertTrue(collection2.isPresent());
 
-        collection2 = mm.getMyCollection(id2, MyCollectionStatus.PUBLISHED);
+        collection2 = mm.get(id2, MyCollectionStatus.PUBLISHED);
         assertTrue(collection2.isPresent());
 
     }
@@ -146,16 +146,16 @@ public class MyCollectionManagerTest {
     public void testIsMyCollectionExisting() throws Exception {
 
         IdMyCollection idPrivate = new IdMyCollection("ea13e5f1-03b2-4bfa-9dd5-8fb770f98d7b");
-        assertTrue(mm.isMyCollectionExisting(idPrivate, MyCollectionStatus.PRIVATE));
-        assertFalse(mm.isMyCollectionExisting(idPrivate, MyCollectionStatus.PUBLISHED));
+        assertTrue(mm.isExisting(idPrivate, MyCollectionStatus.PRIVATE));
+        assertFalse(mm.isExisting(idPrivate, MyCollectionStatus.PUBLISHED));
 
         IdMyCollection idPublished = new IdMyCollection("67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3");
-        assertTrue(mm.isMyCollectionExisting(idPublished, MyCollectionStatus.PRIVATE));
-        assertTrue(mm.isMyCollectionExisting(idPublished, MyCollectionStatus.PUBLISHED));
+        assertTrue(mm.isExisting(idPublished, MyCollectionStatus.PRIVATE));
+        assertTrue(mm.isExisting(idPublished, MyCollectionStatus.PUBLISHED));
 
         IdMyCollection idNotExisting = new IdMyCollection("ea13e5f1-03b2-4bfa-");
-        assertFalse(mm.isMyCollectionExisting(idNotExisting, MyCollectionStatus.PRIVATE));
-        assertFalse(mm.isMyCollectionExisting(idNotExisting, MyCollectionStatus.PUBLISHED));
+        assertFalse(mm.isExisting(idNotExisting, MyCollectionStatus.PRIVATE));
+        assertFalse(mm.isExisting(idNotExisting, MyCollectionStatus.PUBLISHED));
 
     }
 

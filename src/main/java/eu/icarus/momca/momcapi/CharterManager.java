@@ -250,8 +250,8 @@ public class CharterManager extends AbstractManager {
             IdMyCollection idMyCollection = new IdMyCollection(identifier);
 
             isExisting = cm.isExisting(idCollection) ||
-                    mm.isMyCollectionExisting(idMyCollection, MyCollectionStatus.PRIVATE) ||
-                    mm.isMyCollectionExisting(idMyCollection, MyCollectionStatus.PUBLISHED);
+                    mm.isExisting(idMyCollection, MyCollectionStatus.PRIVATE) ||
+                    mm.isExisting(idMyCollection, MyCollectionStatus.PUBLISHED);
 
         }
 

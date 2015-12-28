@@ -28,64 +28,106 @@ public class MyCollectionManager extends AbstractManager {
         super(momcaConnection);
     }
 
-    public void addMyCollection(@NotNull MyCollection myCollection) {
+    public boolean add(@NotNull MyCollection myCollection) {
 
-        if (getMyCollection(myCollection.getId(), myCollection.getStatus()).isPresent()) {
-            String message = String.format("An '%s' myCollection '%s' is already existing.",
-                    myCollection.getStatus(), myCollection.getIdentifier());
-            throw new IllegalArgumentException(message);
-        }
-
-        if (myCollection.getStatus() == MyCollectionStatus.PUBLISHED &&
-                !getMyCollection(myCollection.getId(), MyCollectionStatus.PRIVATE).isPresent()) {
-            throw new MomcaException(
-                    "Before adding a published MyCollection, a private version of this MyCollection has to exist.");
-        }
-
+        IdMyCollection id = myCollection.getId();
         IdUser idUser = myCollection.getCreator().get();
-        if (!momcaConnection.getUserManager().getUser(idUser).isPresent()) {
-            throw new IllegalArgumentException("The user " + idUser.getIdentifier() + " is not existing in the database.");
+
+        LOGGER.info("Trying to add myCollection '{}'", id);
+
+        boolean proceed = true;
+
+        if (isExisting(id, myCollection.getStatus())) {
+            proceed = false;
+            LOGGER.info("An '{}' myCollection '{}' is already existing. Aborting addition.", myCollection.getStatus(), myCollection.getIdentifier());
         }
 
-        String parentCollection;
-        if (myCollection.getStatus() == MyCollectionStatus.PRIVATE) {
+        if (proceed && myCollection.getStatus() == MyCollectionStatus.PUBLISHED && !isMyCollectionExisting(id, MyCollectionStatus.PRIVATE)) {
+            proceed = false;
+            LOGGER.info("Before adding public myCollection '{}', a private version of this myCollection has to exist. Aborting addition.", id);
+        }
 
-            String rootCollection = myCollection.getStatus().getResourceRoot().getUri() + "/" + idUser.getIdentifier();
-            momcaConnection.createCollection(MyCollection.PRIVATE_URI_PART, rootCollection);
+        if (proceed && !momcaConnection.getUserManager().isExisting(idUser)) {
+            proceed = false;
+            LOGGER.info("The user '{}' is not existing in the database. Aborting addition.", idUser.getIdentifier());
+        }
 
-            parentCollection = rootCollection + "/" + MyCollection.PRIVATE_URI_PART;
+        boolean success = false;
 
-        } else {
+        if (proceed) {
 
-            parentCollection = MyCollectionStatus.PUBLISHED.getResourceRoot().getUri();
+            String parentUri = createCollectionUri(myCollection, idUser);
+            success = momcaConnection.makeSureCollectionPathExists(parentUri);
+
+            LOGGER.debug("Created parent collection '{}'.", parentUri);
+
+            if (success) {
+
+                String time = momcaConnection.queryRemoteDateTime();
+                success = momcaConnection.writeAtomResource(myCollection, time, time);
+
+                if (success) {
+                    LOGGER.info("Added myCollection '{}'.", id);
+                } else {
+                    LOGGER.info("Failed to add myCollection '{}'.", id);
+                }
+
+            } else {
+
+                LOGGER.info("Failed to create parent collection '{}'. Aborting addition.", parentUri);
+
+            }
 
         }
 
-        momcaConnection.makeSureCollectionPathExists(parentCollection);
-        momcaConnection.createCollection(myCollection.getIdentifier(), parentCollection);
-
-        String time = momcaConnection.queryRemoteDateTime();
-        momcaConnection.writeAtomResource(myCollection, time, time);
+        return success;
 
     }
 
-    public void deleteMyCollection(@NotNull IdMyCollection idMyCollection) {
+    @NotNull
+    private String createCollectionUri(@NotNull MyCollection myCollection, @NotNull IdUser idUser) {
 
-        CharterManager cm = momcaConnection.getCharterManager();
-        if (!cm.listChartersInPrivateMyCollection(idMyCollection).isEmpty()) {
-            String message = String.format("There are still existing private charters for collection '%s'.",
-                    idMyCollection.getIdentifier());
-            throw new MomcaException(message);
+        String parentUri;
+
+        if (myCollection.getStatus() == MyCollectionStatus.PRIVATE) {
+
+            parentUri = String.format("%s/%s/%s/%s",
+                    myCollection.getStatus().getResourceRoot().getUri(),
+                    idUser.getIdentifier(),
+                    MyCollection.PRIVATE_URI_PART,
+                    myCollection.getIdentifier());
+
+        } else {
+
+            parentUri = String.format("%s/%s",
+                    MyCollectionStatus.PUBLISHED.getResourceRoot().getUri(),
+                    myCollection.getIdentifier());
+
         }
 
-        deleteMyCollectionPublic(idMyCollection);
+        return parentUri;
 
-        Optional<MyCollection> privateMyCollection = getMyCollection(idMyCollection, MyCollectionStatus.PRIVATE);
+    }
+
+    public void delete(@NotNull IdMyCollection idMyCollection) {
+
+        LOGGER.info("Trying to delete myCollection '{}'.", idMyCollection);
+
+        boolean proceed = true;
+
+        if (!momcaConnection.getCharterManager().listChartersInPrivateMyCollection(idMyCollection).isEmpty()) {
+            proceed = false;
+            LOGGER.info("There are still existing private charters for collection '{}'.", idMyCollection);
+        }
+
+        deletePublic(idMyCollection);
+
+        Optional<MyCollection> privateMyCollection = get(idMyCollection, MyCollectionStatus.PRIVATE);
         privateMyCollection.ifPresent(myCollection -> momcaConnection.deleteCollection(myCollection.getParentUri()));
 
     }
 
-    public void deleteMyCollectionPublic(@NotNull IdMyCollection idMyCollection) {
+    public void deletePublic(@NotNull IdMyCollection idMyCollection) {
 
         CharterManager cm = momcaConnection.getCharterManager();
         if (!cm.listPublicCharters(idMyCollection).isEmpty()) {
@@ -100,8 +142,7 @@ public class MyCollectionManager extends AbstractManager {
     }
 
     @NotNull
-    public Optional<MyCollection> getMyCollection(@NotNull IdMyCollection idCollection,
-                                                  @NotNull MyCollectionStatus status) {
+    public Optional<MyCollection> get(@NotNull IdMyCollection idCollection, @NotNull MyCollectionStatus status) {
 
         List<MyCollection> instances = momcaConnection.queryDatabase(
                 ExistQueryFactory.getResourceUri(idCollection.getContentAsElement(), status.getResourceRoot()
@@ -120,25 +161,24 @@ public class MyCollectionManager extends AbstractManager {
         return momcaConnection.readExistResource(myCollectionUri).map(MyCollection::new);
     }
 
-    public boolean isMyCollectionExisting(@NotNull IdMyCollection idMyCollection,
-                                          @NotNull MyCollectionStatus myCollectionStatus) {
+    public boolean isExisting(@NotNull IdMyCollection idMyCollection, @NotNull MyCollectionStatus myCollectionStatus) {
 
         LOGGER.info("Trying to determine existence of myCollection '{}' with status '{}'",
                 idMyCollection, myCollectionStatus);
 
-        ExistQuery query = ExistQueryFactory.checkMyCollectionExistence(idMyCollection, myCollectionStatus);
-        List<String> results = momcaConnection.queryDatabase(query);
-
-        if (results.size() != 1) {
-            throw new MomcaException("Failed to test for existence of myCollection '" + idMyCollection + "'");
-        }
-
-        boolean isExisting = results.get(0).equals("true");
+        boolean isMyCollectionExisting = isMyCollectionExisting(idMyCollection, myCollectionStatus);
 
         LOGGER.info("Returning '{}' for the existence of myCollection '{}' with status '{}'",
-                isExisting, idMyCollection, myCollectionStatus);
+                isMyCollectionExisting, idMyCollection, myCollectionStatus);
 
-        return isExisting;
+        return isMyCollectionExisting;
+
+    }
+
+    private boolean isMyCollectionExisting(@NotNull IdMyCollection idMyCollection, @NotNull MyCollectionStatus myCollectionStatus) {
+
+        ExistQuery query = ExistQueryFactory.checkMyCollectionExistence(idMyCollection, myCollectionStatus);
+        return Util.isTrue(momcaConnection.queryDatabase(query));
 
     }
 

@@ -160,7 +160,7 @@ public class CharterManagerTest {
         MyCollection myCollection = new MyCollection(idMyCollection.getIdentifier(),
                 "Test MyCollection", newUser.getId(), MyCollectionStatus.PRIVATE);
 
-        mc.getMyCollectionManager().addMyCollection(myCollection);
+        mc.getMyCollectionManager().add(myCollection);
 
         IdCharter id = new IdCharter(idMyCollection.getIdentifier(), "f48cd631-9b3b-46b3-b819-f1f20026594b");
         Date date = new Date(LocalDate.of(1413, 2, 2), 0, "2nd Februrary, 1413");
