@@ -1,5 +1,6 @@
 package eu.icarus.momca.momcapi;
 
+import eu.icarus.momca.momcapi.model.CharterStatus;
 import eu.icarus.momca.momcapi.model.Country;
 import eu.icarus.momca.momcapi.model.Region;
 import eu.icarus.momca.momcapi.model.id.IdCollection;
@@ -20,11 +21,11 @@ import java.util.stream.Collectors;
 /**
  * Created by djell on 11/08/2015.
  */
-public class ExistCollectionExistManager extends AbstractExistManager implements CollectionManager {
+public class ExistCollectionManager extends AbstractExistManager implements CollectionManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExistCollectionExistManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExistCollectionManager.class);
 
-    ExistCollectionExistManager(@NotNull ExistMomcaConnection momcaConnection) {
+    ExistCollectionManager(@NotNull ExistMomcaConnection momcaConnection) {
         super(momcaConnection);
     }
 
@@ -102,8 +103,8 @@ public class ExistCollectionExistManager extends AbstractExistManager implements
         }
 
         if (proceed &&
-                !momcaConnection.getCharterManager().listPublicCharters(idCollection).isEmpty() ||
-                !momcaConnection.getCharterManager().listImportedCharters(idCollection).isEmpty()) {
+                !momcaConnection.getCharterManager().list(idCollection).isEmpty() ||
+                !momcaConnection.getCharterManager().list(idCollection, CharterStatus.IMPORTED).isEmpty()) {
             proceed = false;
             LOGGER.info("There are still existing charters for collection '{}'", identifier);
         }

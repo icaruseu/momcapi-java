@@ -1,5 +1,6 @@
 package eu.icarus.momca.momcapi;
 
+import eu.icarus.momca.momcapi.model.CharterStatus;
 import eu.icarus.momca.momcapi.model.id.IdArchive;
 import eu.icarus.momca.momcapi.model.id.IdFond;
 import eu.icarus.momca.momcapi.model.resource.ExistResource;
@@ -19,11 +20,11 @@ import java.util.stream.Collectors;
 /**
  * Created by djell on 09/08/2015.
  */
-public class ExistFondExistManager extends AbstractExistManager implements FondManager {
+public class ExistFondManager extends AbstractExistManager implements FondManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExistFondExistManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExistFondManager.class);
 
-    ExistFondExistManager(@NotNull ExistMomcaConnection momcaConnection) {
+    ExistFondManager(@NotNull ExistMomcaConnection momcaConnection) {
         super(momcaConnection);
     }
 
@@ -118,8 +119,8 @@ public class ExistFondExistManager extends AbstractExistManager implements FondM
             LOGGER.info("The fond '{}' is not existing. Aborting deletion.", idFond);
         }
 
-        if (proceed && !momcaConnection.getCharterManager().listPublicCharters(idFond).isEmpty()
-                || !momcaConnection.getCharterManager().listImportedCharters(idFond).isEmpty()) {
+        if (proceed && !momcaConnection.getCharterManager().list(idFond).isEmpty()
+                || !momcaConnection.getCharterManager().list(idFond, CharterStatus.IMPORTED).isEmpty()) {
             proceed = false;
             LOGGER.info("There are still existing charters for fond '{}'. Aborting deletion.", idFond);
         }

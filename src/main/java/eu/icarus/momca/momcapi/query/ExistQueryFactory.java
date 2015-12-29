@@ -354,105 +354,33 @@ public class ExistQueryFactory {
     }
 
     @NotNull
-    public static ExistQuery listChartersImport(@NotNull IdFond idFond) {
+    public static ExistQuery listCharterAtomIds(@NotNull IdAbstract parent, @NotNull CharterStatus status) {
+
+        String rootUrl = status.getResourceRoot().getUri();
+        String parentSelector = "";
+        String userSelector = "";
+
+        if (parent instanceof IdFond) {
+
+            IdFond idFond = (IdFond) parent;
+            parentSelector = String.format(".*(%s/%s)", idFond.getIdArchive().getIdentifier(), idFond.getIdentifier());
+
+        } else if (parent instanceof IdUser) {
+
+            userSelector = String.format("[./following-sibling::atom:author/atom:email='%s']", parent.getIdentifier());
+
+        } else {
+
+            parentSelector = ".*(" + parent.getIdentifier() + ")";
+
+        }
 
         String query = String.format(
-                "%scollection('%s/%s/%s')//atom:id/text()",
+                "%scollection('%s')//atom:id[matches(., '(^tag:www\\.monasterium\\.net,2011:/charter)%s')]%s/text()",
                 getNamespaceDeclaration(Namespace.ATOM),
-                ResourceRoot.IMPORTED_ARCHIVAL_CHARTERS.getUri(),
-                idFond.getIdArchive().getIdentifier(),
-                idFond.getIdentifier());
-
-        return new ExistQuery(query);
-
-    }
-
-    @NotNull
-    public static ExistQuery listChartersImport(@NotNull IdCollection idCollection) {
-
-        String query = String.format(
-                "%scollection('%s/%s')//atom:id/text()",
-                getNamespaceDeclaration(Namespace.ATOM),
-                ResourceRoot.IMPORTED_ARCHIVAL_CHARTERS.getUri(),
-                idCollection.getIdentifier());
-
-        return new ExistQuery(query);
-
-    }
-
-    @NotNull
-    public static ExistQuery listChartersPrivate(@NotNull IdMyCollection idMyCollection) {
-
-        String query = String.format(
-                "%scollection('%s')//atom:entry/atom:id/text()[contains(., 'charter') and contains(., '%s')]",
-                getNamespaceDeclaration(Namespace.ATOM),
-                ResourceRoot.USER_DATA.getUri(),
-                idMyCollection.getIdentifier());
-
-        return new ExistQuery(query);
-
-    }
-
-    @NotNull
-    public static ExistQuery listChartersPrivate(@NotNull IdUser idUser) {
-
-        String query = String.format(
-                "%scollection('%s')//atom:entry[contains(./atom:id/text(), 'charter')][./atom:author/atom:email/text()='%s']/atom:id/text()",
-                getNamespaceDeclaration(Namespace.ATOM),
-                ResourceRoot.USER_DATA.getUri(),
-                idUser.getIdentifier());
-
-        return new ExistQuery(query);
-
-    }
-
-    @NotNull
-    public static ExistQuery listChartersPublic(@NotNull IdFond idFond) {
-
-        String query = String.format(
-                "%scollection('%s/%s/%s')//atom:id/text()",
-                getNamespaceDeclaration(Namespace.ATOM),
-                ResourceRoot.PUBLIC_CHARTERS.getUri(),
-                idFond.getIdArchive().getIdentifier(),
-                idFond.getIdentifier());
-
-        return new ExistQuery(query);
-
-    }
-
-    @NotNull
-    public static ExistQuery listChartersPublic(@NotNull IdCollection idCollection) {
-
-        String query = String.format(
-                "%scollection('%s/%s')//atom:id/text()",
-                getNamespaceDeclaration(Namespace.ATOM),
-                ResourceRoot.PUBLIC_CHARTERS.getUri(),
-                idCollection.getIdentifier());
-
-        return new ExistQuery(query);
-
-    }
-
-    @NotNull
-    public static ExistQuery listChartersPublic(@NotNull IdMyCollection idMyCollection) {
-
-        String query = String.format(
-                "%scollection('%s/%s')//atom:id/text()",
-                getNamespaceDeclaration(Namespace.ATOM),
-                ResourceRoot.PUBLIC_CHARTERS.getUri(),
-                idMyCollection.getIdentifier());
-
-        return new ExistQuery(query);
-
-    }
-
-    @NotNull
-    public static ExistQuery listChartersSaved() {
-
-        String query = String.format(
-                "%scollection('%s')//atom:id/text()",
-                getNamespaceDeclaration(Namespace.ATOM),
-                ResourceRoot.ARCHIVAL_CHARTERS_BEING_EDITED.getUri());
+                rootUrl,
+                parentSelector,
+                userSelector);
 
         return new ExistQuery(query);
 
@@ -686,28 +614,6 @@ public class ExistQueryFactory {
 
     }
 
-    /**
-     * @param resourceUri      The full uri of the resource, e.g. {@code /db/mom-data/xrx.user/admin.xml}.
-     * @param elementToReplace The qualified name of the XML element to replace, e.g. {@code cei:idno} or {@code
-     *                         element} (no namespace).
-     * @param newElement       The new element content, e.g. {@code <cei:idno @id="ABC">Number 1</cei:idno>}.
-     * @return A query to replace the first occurrence of an xml element with a new element in the specified resource.
-     */
-    @NotNull
-    public static ExistQuery replaceFirstInResource(@NotNull String resourceUri, @NotNull String elementToReplace,
-                                                    @NotNull String newElement) {
-
-        String query = String.format(
-                "%supdate replace doc('%s')//%s[1] with %s",
-                getNamespaceDeclaration(elementToReplace),
-                resourceUri,
-                elementToReplace,
-                newElement);
-
-        return new ExistQuery(query);
-
-    }
-
     @NotNull
     public static ExistQuery storeResource(@NotNull ExistResource existResource) {
 
@@ -768,34 +674,6 @@ public class ExistQueryFactory {
                 charter.getUri(),
                 charter.toCei().toXML(),
                 charter.getUri());
-
-        return new ExistQuery(query);
-
-    }
-
-    /**
-     * @param resourceUri      The URI of the resource to update.
-     * @param qualifiedElement The qualified name of the element to update, e.g. {@code eap:nativeform}.
-     * @param currentText      The text content of the element to replace. If this is {@code null} or {@code ""}, the
-     *                         returned query  targets all elements specified by {@code resourceUri} and
-     *                         {@code qualifiedElement}.
-     * @param newText          The text to replace currentText with.
-     * @return A query to update the text content of all elements specified by {@code resourceUri},
-     * {@code qualifiedElement} and {@code currentText} with {@code newText}.
-     */
-    @NotNull
-    public static ExistQuery updateElementText(@NotNull String resourceUri, @NotNull String qualifiedElement,
-                                               @Nullable String currentText, @NotNull String newText) {
-
-        String predicate = (currentText == null || currentText.isEmpty())
-                ? "" : String.format("[text()='%s']", currentText);
-        String query = String.format(
-                "%supdate replace doc('%s')//%s%s/text() with '%s'",
-                getNamespaceDeclaration(qualifiedElement),
-                resourceUri,
-                qualifiedElement,
-                predicate,
-                newText);
 
         return new ExistQuery(query);
 

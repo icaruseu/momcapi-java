@@ -44,10 +44,10 @@ public class ExistCharterManagerTest {
 
         Charter charter = new Charter(id, CharterStatus.PUBLIC, admin, date);
 
-        cm.addCharter(charter);
+        cm.add(charter);
 
         Optional<Charter> addedCharter = cm.getCharter(id, CharterStatus.PUBLIC);
-        cm.deletePublicCharter(id, CharterStatus.PUBLIC);
+        cm.delete(id);
 
         assertTrue(addedCharter.isPresent());
         assertEquals(addedCharter.get().getDate(), date);
@@ -63,10 +63,10 @@ public class ExistCharterManagerTest {
 
         Charter charter = new Charter(id, CharterStatus.PUBLIC, admin, date);
 
-        cm.addCharter(charter);
+        cm.add(charter);
 
         Optional<Charter> addedCharter = cm.getCharter(id, CharterStatus.PUBLIC);
-        cm.deletePublicCharter(id, CharterStatus.PUBLIC);
+        cm.delete(id);
 
         assertTrue(addedCharter.isPresent());
         assertEquals(addedCharter.get().getDate(), date);
@@ -82,10 +82,10 @@ public class ExistCharterManagerTest {
 
         Charter charter = new Charter(id, CharterStatus.PRIVATE, admin, date);
 
-        cm.addCharter(charter);
+        cm.add(charter);
 
         Optional<Charter> addedCharter = cm.getCharter(id, CharterStatus.PRIVATE);
-        cm.deletePublicCharter(id, CharterStatus.PRIVATE);
+        cm.delete(id, CharterStatus.PRIVATE, admin.getId());
 
         assertTrue(addedCharter.isPresent());
         assertEquals(addedCharter.get().getDate(), date);
@@ -101,10 +101,10 @@ public class ExistCharterManagerTest {
 
         Charter charter = new Charter(id, CharterStatus.IMPORTED, admin, date);
 
-        cm.addCharter(charter);
+        cm.add(charter);
 
         Optional<Charter> addedCharter = cm.getCharter(id, CharterStatus.IMPORTED);
-        cm.deletePublicCharter(id, CharterStatus.IMPORTED);
+        cm.delete(id, CharterStatus.IMPORTED, null);
 
         assertTrue(addedCharter.isPresent());
         assertEquals(addedCharter.get().getDate(), date);
@@ -120,7 +120,7 @@ public class ExistCharterManagerTest {
 
         Charter charter = new Charter(id, CharterStatus.PUBLIC, admin, date);
 
-        assertFalse(cm.addCharter(charter));
+        assertFalse(cm.add(charter));
 
 
     }
@@ -140,11 +140,11 @@ public class ExistCharterManagerTest {
         savedCharter.setCharterStatus(newStatus);
         savedCharter.setId(newIdCharter);
 
-        assertTrue(cm.addCharter(savedCharter));
+        assertTrue(cm.add(savedCharter));
 
         Optional<Charter> newPrivateCharter = cm.getCharter(newIdCharter, newStatus);
 
-        assertTrue(cm.deletePrivateCharter(newIdCharter, newIdUser));
+        assertTrue(cm.delete(newIdCharter, CharterStatus.PRIVATE, newIdUser));
 
         assertTrue(newPrivateCharter.isPresent());
 
@@ -166,11 +166,11 @@ public class ExistCharterManagerTest {
         Date date = new Date(LocalDate.of(1413, 2, 2), 0, "2nd Februrary, 1413");
         Charter charter = new Charter(id, CharterStatus.PRIVATE, newUser, date);
 
-        assertTrue(cm.addCharter(charter));
+        assertTrue(cm.add(charter));
 
         charter = cm.getCharter(charter.getId(), charter.getCharterStatus()).get();
 
-        cm.deletePublicCharter(charter.getId(), charter.getCharterStatus());
+        cm.delete(charter.getId(), charter.getCharterStatus(), newUser.getId());
         mc.getUserManager().delete(newUser.getId());
 
         assertTrue(charter.toCei().toXML().contains("cei:dateRange"));
@@ -184,14 +184,14 @@ public class ExistCharterManagerTest {
         User user = mc.getUserManager().get(new IdUser("user1.testuser@dev.monasterium.net")).get();
         Date date = new Date(LocalDate.of(1413, 2, 2), 0, "2nd Februrary, 1413");
 
-        assertFalse(cm.deletePrivateCharter(new IdCharter("67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3", "not-existing"), user.getId()));
+        assertFalse(cm.delete(new IdCharter("67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3", "not-existing"), CharterStatus.PRIVATE, user.getId()));
 
         Charter charter = new Charter(id, CharterStatus.PRIVATE, user, date);
-        cm.addCharter(charter);
+        cm.add(charter);
 
-        assertTrue(cm.deletePrivateCharter(id, user.getId()));
+        assertTrue(cm.delete(id, CharterStatus.PRIVATE, user.getId()));
         assertFalse(cm.getCharter(id, CharterStatus.PRIVATE).isPresent());
-        assertFalse(cm.deletePrivateCharter(id, user.getId()));
+        assertFalse(cm.delete(id, CharterStatus.PRIVATE, user.getId()));
 
     }
 
@@ -203,19 +203,19 @@ public class ExistCharterManagerTest {
         Date date = new Date(LocalDate.of(1413, 2, 2), 0, "2nd Februrary, 1413");
 
         Charter charter = new Charter(id, CharterStatus.IMPORTED, admin, date);
-        cm.addCharter(charter);
+        cm.add(charter);
 
-        assertFalse(cm.deletePublicCharter(charter.getId(), CharterStatus.PUBLIC));
+        assertFalse(cm.delete(charter.getId()));
 
         assertTrue(cm.getCharter(charter.getId(), CharterStatus.IMPORTED).isPresent());
 
-        assertTrue(cm.deletePublicCharter(charter.getId(), CharterStatus.IMPORTED));
+        assertTrue(cm.delete(charter.getId(), CharterStatus.IMPORTED, null));
 
         assertFalse(cm.getCharter(charter.getId(), CharterStatus.IMPORTED).isPresent());
 
-        assertFalse(cm.deletePublicCharter(
+        assertFalse(cm.delete(
                 new IdCharter("67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3", "425d3dba-714e-40c9-af41-7edeb12d1a25"),
-                CharterStatus.PRIVATE));
+                CharterStatus.PRIVATE, admin.getId()));
 
     }
 
@@ -288,11 +288,11 @@ public class ExistCharterManagerTest {
     public void testListChartersImportForCollections() throws Exception {
 
         IdCollection id1 = new IdCollection("MedDocBulgEmp");
-        List<IdCharter> charters1 = cm.listImportedCharters(id1);
+        List<IdCharter> charters1 = cm.list(id1, CharterStatus.IMPORTED);
         assertEquals(charters1.size(), 37);
 
         IdCollection id2 = new IdCollection("AbteiEiberbach");
-        List<IdCharter> charters2 = cm.listImportedCharters(id2);
+        List<IdCharter> charters2 = cm.list(id2, CharterStatus.IMPORTED);
         assertEquals(charters2.size(), 0);
 
     }
@@ -301,11 +301,11 @@ public class ExistCharterManagerTest {
     public void testListChartersImportForFonds() throws Exception {
 
         IdFond id1 = new IdFond("RS-IAGNS", "Charters");
-        List<IdCharter> charters1 = cm.listImportedCharters(id1);
+        List<IdCharter> charters1 = cm.list(id1, CharterStatus.IMPORTED);
         assertEquals(charters1.size(), 8);
 
         IdFond id2 = new IdFond("CH-KASchwyz", "Urkunden");
-        List<IdCharter> charters2 = cm.listImportedCharters(id2);
+        List<IdCharter> charters2 = cm.list(id2, CharterStatus.IMPORTED);
         assertEquals(charters2.size(), 0);
 
     }
@@ -314,11 +314,11 @@ public class ExistCharterManagerTest {
     public void testListChartersInPrivateMyCollection() throws Exception {
 
         IdMyCollection id1 = new IdMyCollection("67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3");
-        List<IdCharter> charters1 = cm.listChartersInPrivateMyCollection(id1);
+        List<IdCharter> charters1 = cm.list(id1, CharterStatus.PRIVATE);
         assertEquals(charters1.size(), 2);
 
         IdMyCollection id2 = new IdMyCollection("0d48f895-f296-485b-a6d9-e88b4523cc92");
-        List<IdCharter> charters2 = cm.listChartersInPrivateMyCollection(id2);
+        List<IdCharter> charters2 = cm.list(id2, CharterStatus.PRIVATE);
         assertEquals(charters2.size(), 0);
 
     }
@@ -327,11 +327,11 @@ public class ExistCharterManagerTest {
     public void testListChartersPublicForCollections() throws Exception {
 
         IdCollection id1 = new IdCollection("AbteiEberbach");
-        List<IdCharter> charters1 = cm.listPublicCharters(id1);
+        List<IdCharter> charters1 = cm.list(id1);
         assertEquals(charters1.size(), 364);
 
         IdCollection id2 = new IdCollection("emptycollection");
-        List<IdCharter> charters2 = cm.listPublicCharters(id2);
+        List<IdCharter> charters2 = cm.list(id2);
         assertEquals(charters2.size(), 0);
 
     }
@@ -340,11 +340,11 @@ public class ExistCharterManagerTest {
     public void testListChartersPublicForFonds() throws Exception {
 
         IdFond id1 = new IdFond("CH-KAE", "Urkunden");
-        List<IdCharter> charters1 = cm.listPublicCharters(id1);
+        List<IdCharter> charters1 = cm.list(id1);
         assertEquals(charters1.size(), 10);
 
         IdFond id2 = new IdFond("CH-KASchwyz", "Urkunden");
-        List<IdCharter> charters2 = cm.listPublicCharters(id2);
+        List<IdCharter> charters2 = cm.list(id2);
         assertEquals(charters2.size(), 0);
 
     }
@@ -353,11 +353,11 @@ public class ExistCharterManagerTest {
     public void testListChartersPublicForMyCollections() throws Exception {
 
         IdMyCollection id1 = new IdMyCollection("67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3");
-        List<IdCharter> charters1 = cm.listPublicCharters(id1);
+        List<IdCharter> charters1 = cm.list(id1);
         assertEquals(charters1.size(), 1);
 
         IdMyCollection id2 = new IdMyCollection("0d48f895-f296-485b-a6d9-e88b4523cc92");
-        List<IdCharter> charters2 = cm.listPublicCharters(id2);
+        List<IdCharter> charters2 = cm.list(id2);
         assertEquals(charters2.size(), 0);
 
     }
@@ -376,19 +376,20 @@ public class ExistCharterManagerTest {
 
     @Test
     public void testListSavedCharters() throws Exception {
-        assertEquals(cm.listSavedCharters().size(), 3);
+        assertEquals(cm.list(new IdCollection("AbteiEberbach"), CharterStatus.SAVED).size(), 1);
+        assertEquals(cm.list(new IdFond("CH-KAE", "Urkunden"), CharterStatus.SAVED).size(), 2);
     }
 
     @Test
-    public void testListUsersPrivateCharters() throws Exception {
+    public void testListUsersCharters() throws Exception {
 
-        IdUser user1 = new IdUser("user1.testuser@dev.monasterium.net");
-        List<IdCharter> charters1 = cm.listUsersPrivateCharters(user1);
-        assertEquals(charters1.size(), 2);
+        IdUser user1 = new IdUser("guest");
+        List<IdCharter> charters1 = cm.list(user1);
+        assertEquals(charters1.size(), 364);
 
-        IdUser user2 = new IdUser("user2.testuser@dev.monasterium.net");
-        List<IdCharter> charters2 = cm.listUsersPrivateCharters(user2);
-        assertEquals(charters2.size(), 0);
+        IdUser user2 = new IdUser("user1.testuser@dev.monasterium.net");
+        List<IdCharter> charters2 = cm.list(user2, CharterStatus.PRIVATE);
+        assertEquals(charters2.size(), 2);
 
     }
 
@@ -407,12 +408,12 @@ public class ExistCharterManagerTest {
 
         Charter charter = new Charter(id, CharterStatus.PUBLIC, admin, date);
 
-        cm.addCharter(charter);
+        cm.add(charter);
 
         charter.setCharterStatus(CharterStatus.SAVED);
         charter.setAbstract(new Abstract("Abstract"));
         charter.setCreator(user.getIdentifier());
-        cm.addCharter(charter);
+        cm.add(charter);
 
         List<Saved> savedList = new ArrayList<>(1);
         Saved saved = new Saved(id, "2015-06-27T10:42:39.179+02:00", "no");
@@ -429,7 +430,7 @@ public class ExistCharterManagerTest {
         user = userManager.get(user.getId()).get();
 
         userManager.delete(user.getId());
-        cm.deletePublicCharter(id, CharterStatus.PUBLIC);
+        cm.delete(id);
 
         assertTrue(published.isPresent());
         assertEquals(published.get().getCreator().get(), user.getId());
@@ -448,22 +449,22 @@ public class ExistCharterManagerTest {
 
         Charter charter = new Charter(idCharter, charterStatus, admin, date);
 
-        cm.addCharter(charter);
+        cm.add(charter);
 
         charter.setAbstract(new Abstract("New abstract"));
 
-        assertTrue(cm.updateCharterContent(charter));
+        assertTrue(cm.update(charter));
 
         Optional<Charter> updated = cm.getCharter(charter.getId(), charter.getCharterStatus());
 
-        cm.deletePublicCharter(charter.getId(), charter.getCharterStatus());
+        cm.delete(charter.getId(), charter.getCharterStatus(), admin.getId());
 
         assertTrue(updated.isPresent());
         assertEquals(updated.get().getAbstract().get().getContent(), "New abstract");
 
         charter.setCharterStatus(CharterStatus.PRIVATE);
 
-        assertFalse(cm.updateCharterContent(charter));
+        assertFalse(cm.update(charter));
 
     }
 
@@ -476,32 +477,32 @@ public class ExistCharterManagerTest {
         User user = mc.getUserManager().get(new IdUser("user1.testuser@dev.monasterium.net")).get();
         Date date = new Date(LocalDate.of(1413, 2, 2), 0, "2nd Februrary, 1413");
 
-        assertFalse(cm.updateCharterId(originalId, originalId, status, null));
+        assertFalse(cm.updateId(originalId, originalId, status, null));
 
         Charter charter = new Charter(originalId, status, user, date);
 
-        cm.addCharter(charter);
+        cm.add(charter);
 
         IdCharter newId = new IdCharter("67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3", "newId");
 
-        assertFalse(cm.updateCharterId(newId, originalId, status, null));
+        assertFalse(cm.updateId(newId, originalId, status, null));
 
         IdUser notExistingUser = new IdUser("notExistingUser");
-        assertFalse(cm.updateCharterId(newId, originalId, status, notExistingUser));
+        assertFalse(cm.updateId(newId, originalId, status, notExistingUser));
 
         IdCharter notExistingOriginalId = new IdCharter("67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3", "NotExistingCharter");
-        assertFalse(cm.updateCharterId(newId, notExistingOriginalId, status, null));
+        assertFalse(cm.updateId(newId, notExistingOriginalId, status, null));
 
         IdUser idUser = user.getId();
 
-        assertTrue(cm.updateCharterId(newId, originalId, status, idUser));
+        assertTrue(cm.updateId(newId, originalId, status, idUser));
 
         Optional<Charter> updated = cm.getCharter(newId, status);
 
         if (updated.isPresent()) {
-            cm.deletePrivateCharter(newId, idUser);
+            cm.delete(newId, CharterStatus.PRIVATE, idUser);
         } else {
-            cm.deletePrivateCharter(originalId, idUser);
+            cm.delete(originalId, CharterStatus.PRIVATE, idUser);
         }
 
         assertTrue(updated.isPresent());
@@ -519,30 +520,30 @@ public class ExistCharterManagerTest {
         Date date = new Date(LocalDate.of(1413, 2, 2), 0, "2nd Februrary, 1413");
         IdUser idUser = user.getId();
 
-        assertFalse(cm.updateCharterStatus(originalStatus, originalStatus, idCharter, idUser));
+        assertFalse(cm.updateStatus(originalStatus, originalStatus, idCharter, idUser));
 
         Charter charter = new Charter(idCharter, originalStatus, user, date);
 
-        cm.addCharter(charter);
+        cm.add(charter);
 
         CharterStatus newStatus = CharterStatus.PUBLIC;
 
-        assertFalse(cm.updateCharterStatus(newStatus, originalStatus, idCharter, null));
+        assertFalse(cm.updateStatus(newStatus, originalStatus, idCharter, null));
 
         IdUser notExistingUser = new IdUser("notExistingUser");
-        assertFalse(cm.updateCharterStatus(newStatus, originalStatus, idCharter, notExistingUser));
+        assertFalse(cm.updateStatus(newStatus, originalStatus, idCharter, notExistingUser));
 
         CharterStatus statusForCharterWithNotExistingHierarchy = CharterStatus.IMPORTED;
-        assertFalse(cm.updateCharterStatus(statusForCharterWithNotExistingHierarchy, originalStatus, idCharter, idUser));
+        assertFalse(cm.updateStatus(statusForCharterWithNotExistingHierarchy, originalStatus, idCharter, idUser));
 
-        assertTrue(cm.updateCharterStatus(newStatus, originalStatus, idCharter, idUser));
+        assertTrue(cm.updateStatus(newStatus, originalStatus, idCharter, idUser));
 
         Optional<Charter> updated = cm.getCharter(idCharter, newStatus);
 
         if (updated.isPresent()) {
-            cm.deletePublicCharter(idCharter, newStatus);
+            cm.delete(idCharter);
         } else {
-            cm.deletePrivateCharter(idCharter, idUser);
+            cm.delete(idCharter, CharterStatus.PRIVATE, idUser);
         }
 
         assertTrue(updated.isPresent());

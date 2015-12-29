@@ -59,7 +59,7 @@ public class ExistMomcaConnection implements MomcaConnection {
     @NotNull
     private final Collection rootCollection;
     @NotNull
-    private final ExistUserExistManager userManager;
+    private final ExistUserManager userManager;
 
     public ExistMomcaConnection(@NotNull String dbRootUri, @NotNull String admin, @NotNull String password) {
 
@@ -71,13 +71,13 @@ public class ExistMomcaConnection implements MomcaConnection {
 
         rootCollection = initDatabaseConnection();
 
-        userManager = new ExistUserExistManager(this, rootCollection);
-        countryManager = new ExistCountryExistManager(this);
-        archiveManager = new ExistArchiveExistManager(this);
-        fondManager = new ExistFondExistManager(this);
-        collectionManager = new ExistCollectionExistManager(this);
-        charterManager = new ExistCharterExistManager(this);
-        myCollectionManager = new ExistMyCollectionExistManager(this);
+        userManager = new ExistUserManager(this, rootCollection);
+        countryManager = new ExistCountryManager(this);
+        archiveManager = new ExistArchiveManager(this);
+        fondManager = new ExistFondManager(this);
+        collectionManager = new ExistCollectionManager(this);
+        charterManager = new ExistCharterManager(this);
+        myCollectionManager = new ExistMyCollectionManager(this);
 
         LOGGER.info("Connection to '{}' for user '{}' established.", dbRootUri, admin);
 
@@ -217,7 +217,7 @@ public class ExistMomcaConnection implements MomcaConnection {
 
     @Override
     @NotNull
-    public ExistUserExistManager getUserManager() {
+    public ExistUserManager getUserManager() {
         return userManager;
     }
 

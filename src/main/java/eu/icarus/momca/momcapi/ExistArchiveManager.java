@@ -20,34 +20,34 @@ import java.util.stream.Collectors;
 /**
  * Created by daniel on 20.07.2015.
  */
-public class ExistArchiveExistManager extends AbstractExistManager implements ArchiveManager {
+public class ExistArchiveManager extends AbstractExistManager implements ArchiveManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExistArchiveExistManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExistArchiveManager.class);
 
-    ExistArchiveExistManager(@NotNull ExistMomcaConnection momcaConnection) {
+    ExistArchiveManager(@NotNull ExistMomcaConnection momcaConnection) {
         super(momcaConnection);
     }
 
     @Override
-    public boolean add(@NotNull Archive newArchive) {
+    public boolean add(@NotNull Archive archive) {
 
-        String identifier = newArchive.getIdentifier();
+        String identifier = archive.getIdentifier();
 
         LOGGER.info("Try to add archive '{}' to the database.", identifier);
 
         boolean proceed = true;
 
-        if (isArchiveExisting(newArchive.getId())) {
+        if (isArchiveExisting(archive.getId())) {
             proceed = false;
             LOGGER.info("Archive '{}' already exists, aborting addition.", identifier);
         }
 
-        if (proceed && newArchive.getRegionName().isPresent() &&
-                !momcaConnection.getCountryManager().isRegionExisting(newArchive.getCountry(), newArchive.getRegionName().get())) {
+        if (proceed && archive.getRegionName().isPresent() &&
+                !momcaConnection.getCountryManager().isRegionExisting(archive.getCountry(), archive.getRegionName().get())) {
             proceed = false;
             LOGGER.info("Region of archive to be added ({}) is not part of '{}' in the database. Aborting addition",
-                    newArchive.getRegionName().get(),
-                    newArchive.getCountry().getNativeName());
+                    archive.getRegionName().get(),
+                    archive.getCountry().getNativeName());
         }
 
         boolean success = false;
@@ -56,7 +56,7 @@ public class ExistArchiveExistManager extends AbstractExistManager implements Ar
 
             momcaConnection.createCollection(identifier, ResourceRoot.ARCHIVES.getUri());
             String time = momcaConnection.queryRemoteDateTime();
-            success = momcaConnection.writeAtomResource(newArchive, time, time);
+            success = momcaConnection.writeAtomResource(archive, time, time);
 
             if (success) {
                 LOGGER.info("Archive '{}' added.", identifier);
@@ -88,20 +88,20 @@ public class ExistArchiveExistManager extends AbstractExistManager implements Ar
     }
 
     @Override
-    public boolean delete(@NotNull IdArchive idArchive) {
+    public boolean delete(@NotNull IdArchive id) {
 
-        String identifier = idArchive.getIdentifier();
+        String identifier = id.getIdentifier();
 
         LOGGER.info("Trying to delete archive '{}'", identifier);
 
         boolean proceed = true;
 
-        if (!isArchiveExisting(idArchive)) {
+        if (!isArchiveExisting(id)) {
             proceed = false;
             LOGGER.info("The archive '{}' that is to be deleted doesn't exist. Aborting deletion.", identifier);
         }
 
-        if (proceed && !momcaConnection.getFondManager().list(idArchive).isEmpty()) {
+        if (proceed && !momcaConnection.getFondManager().list(id).isEmpty()) {
             proceed = false;
             LOGGER.info("The archive '{}' that is to be deleted still has associated fonds. Aborting deletion.", identifier);
         }
@@ -138,13 +138,13 @@ public class ExistArchiveExistManager extends AbstractExistManager implements Ar
 
     @Override
     @NotNull
-    public Optional<Archive> get(@NotNull IdArchive idArchive) {
+    public Optional<Archive> get(@NotNull IdArchive id) {
 
-        String identifier = idArchive.getIdentifier();
+        String identifier = id.getIdentifier();
 
         LOGGER.info("Trying to get archive '{}'.", identifier);
 
-        String uri = createResourceUri(idArchive);
+        String uri = createResourceUri(id);
         Optional<Archive> archive = momcaConnection.readExistResource(uri).map(Archive::new);
 
         LOGGER.info("Returning '{}' for archive '{}'.", archive, identifier);
@@ -161,13 +161,13 @@ public class ExistArchiveExistManager extends AbstractExistManager implements Ar
     }
 
     @Override
-    public boolean isExisting(@NotNull IdArchive idArchive) {
+    public boolean isExisting(@NotNull IdArchive id) {
 
-        LOGGER.info("Try to determine the existance of archive '{}'.", idArchive);
+        LOGGER.info("Try to determine the existance of archive '{}'.", id);
 
-        boolean isArchiveExisting = isArchiveExisting(idArchive);
+        boolean isArchiveExisting = isArchiveExisting(id);
 
-        LOGGER.info("The result for the query for existence of archive '{}' is '{}'", idArchive, isArchiveExisting);
+        LOGGER.info("The result for the query for existence of archive '{}' is '{}'", id, isArchiveExisting);
 
         return isArchiveExisting;
 

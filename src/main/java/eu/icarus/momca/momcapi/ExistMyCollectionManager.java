@@ -1,5 +1,6 @@
 package eu.icarus.momca.momcapi;
 
+import eu.icarus.momca.momcapi.model.CharterStatus;
 import eu.icarus.momca.momcapi.model.id.IdMyCollection;
 import eu.icarus.momca.momcapi.model.id.IdUser;
 import eu.icarus.momca.momcapi.model.resource.MyCollection;
@@ -19,11 +20,11 @@ import java.util.stream.Collectors;
 /**
  * Created by djell on 29/09/2015.
  */
-public class ExistMyCollectionExistManager extends AbstractExistManager implements MyCollectionManager {
+public class ExistMyCollectionManager extends AbstractExistManager implements MyCollectionManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExistMyCollectionExistManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExistMyCollectionManager.class);
 
-    ExistMyCollectionExistManager(@NotNull ExistMomcaConnection momcaConnection) {
+    ExistMyCollectionManager(@NotNull ExistMomcaConnection momcaConnection) {
         super(momcaConnection);
     }
 
@@ -136,12 +137,12 @@ public class ExistMyCollectionExistManager extends AbstractExistManager implemen
             LOGGER.info("There is a public myCollection for private myCollection '{}' existing. Aborting deletion.", id);
         }
 
-        if (proceed && status == MyCollectionStatus.PRIVATE && !charterManager.listChartersInPrivateMyCollection(id).isEmpty()) {
+        if (proceed && status == MyCollectionStatus.PRIVATE && !charterManager.list(id, CharterStatus.PRIVATE).isEmpty()) {
             proceed = false;
             LOGGER.info("There are still existing charters for private myCollection '{}'. Aborting deletion.", id);
         }
 
-        if (proceed && status == MyCollectionStatus.PUBLISHED && !charterManager.listPublicCharters(id).isEmpty()) {
+        if (proceed && status == MyCollectionStatus.PUBLISHED && !charterManager.list(id).isEmpty()) {
             proceed = false;
             LOGGER.info("There are still existing charters for public myCollection '{}'. Aborting deletion.", id);
         }

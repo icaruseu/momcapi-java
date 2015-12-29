@@ -15,7 +15,7 @@ import static org.testng.Assert.*;
  */
 public class ExistUserManagerTest {
 
-    private ExistUserExistManager existUserManager;
+    private ExistUserManager existUserManager;
     private MomcaConnection momcaConnection;
 
     @BeforeClass
