@@ -15,7 +15,7 @@ import java.util.Optional;
 /**
  * The charter manager. Performs charter-related tasks in the MOM-CA database.
  */
-public interface CharterManager {
+interface CharterManager {
 
     /**
      * Adds a charter to the database.
@@ -46,7 +46,7 @@ public interface CharterManager {
     boolean delete(@NotNull IdCharter id, @NotNull CharterStatus status, @Nullable IdUser author);
 
     /**
-     * Tries to get a charter instance from the database.
+     * Gets a charter instance from the database.
      *
      * @param id     The charter to get.
      * @param status The status of the charter to get.
@@ -65,7 +65,7 @@ public interface CharterManager {
     List<Charter> getCharterInstances(@NotNull IdCharter id);
 
     /**
-     * Checks if a charter instance exists in the database.
+     * Checks if a specific charter instance exists in the database.
      *
      * @param id     The id of the charter.
      * @param status The status of the charter.
@@ -115,7 +115,7 @@ public interface CharterManager {
     boolean publishSavedCharter(@NotNull User user, @NotNull IdCharter id);
 
     /**
-     * Update the CEI content of a charter. The ATOM content, apart from @code{atom:updated} will not be updated
+     * Updates the CEI content of a charter. The ATOM content, apart from @code{atom:updated} will not be updated
      * (for example @code{atom:author}).
      *
      * @param updatedCharter The charter with updated content.

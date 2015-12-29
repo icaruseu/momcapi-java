@@ -12,7 +12,7 @@ import java.util.Optional;
 /**
  * The archive manager. Performs archive-related tasks in the database.
  */
-public interface ArchiveManager {
+interface ArchiveManager {
 
     /**
      * Adds a new archive to the database.
@@ -32,7 +32,7 @@ public interface ArchiveManager {
     boolean delete(@NotNull IdArchive id);
 
     /**
-     * Tries to get an archive from the database.
+     * Gets an archive from the database.
      *
      * @param id The archive to get.
      * @return The Archive wrapped in an <code>Optional</code>.
@@ -41,7 +41,7 @@ public interface ArchiveManager {
     Optional<Archive> get(@NotNull IdArchive id);
 
     /**
-     * Check if an archive exists in the database.
+     * Checks if a specific archive exists in the database.
      *
      * @param id The archive to check for.
      * @return <code>True</code> if the archive is existing.

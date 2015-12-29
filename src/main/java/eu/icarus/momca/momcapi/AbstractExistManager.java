@@ -3,8 +3,9 @@ package eu.icarus.momca.momcapi;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Created by djell on 09/08/2015.
+ * The abstract manager for managers that us an eXist MOM-CA connection.
  */
+@SuppressWarnings("ClassWithoutLogger")
 abstract class AbstractExistManager {
 
     @NotNull

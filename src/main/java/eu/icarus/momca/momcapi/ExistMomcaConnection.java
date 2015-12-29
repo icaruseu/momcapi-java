@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * A connection to a MOM-CA database instance. Provides access to all manager classes.
+ * Connects to a MOM-CA database instance. Provides access to all manager classes.
  *
  * @author Daniel Jeller
  *         Created on 24.06.2015.
@@ -61,11 +61,18 @@ public class ExistMomcaConnection implements MomcaConnection {
     @NotNull
     private final ExistUserManager userManager;
 
-    public ExistMomcaConnection(@NotNull String dbRootUri, @NotNull String admin, @NotNull String password) {
+    /**
+     * Creates a MomcaConnection instance and establishes the connection to an MOM-CA database instance based on eXist.
+     *
+     * @param xmlrpcUri The uri to reach the xmlrpc of the database instance, e.g. <code>xmldb:exist://192.168.56.10:8181/xmlrpc</code>.
+     * @param admin     The admin username.
+     * @param password  The admin password.
+     */
+    public ExistMomcaConnection(@NotNull String xmlrpcUri, @NotNull String admin, @NotNull String password) {
 
-        LOGGER.debug("Initiating connection to '{}' for user '{}'.", dbRootUri, admin);
+        LOGGER.debug("Initiating connection to '{}' for user '{}'.", xmlrpcUri, admin);
 
-        this.dbRootUri = dbRootUri;
+        this.dbRootUri = xmlrpcUri;
         this.admin = admin;
         this.password = password;
 
@@ -79,7 +86,7 @@ public class ExistMomcaConnection implements MomcaConnection {
         charterManager = new ExistCharterManager(this);
         myCollectionManager = new ExistMyCollectionManager(this);
 
-        LOGGER.info("Connection to '{}' for user '{}' established.", dbRootUri, admin);
+        LOGGER.info("Connection to '{}' for user '{}' established.", xmlrpcUri, admin);
 
     }
 

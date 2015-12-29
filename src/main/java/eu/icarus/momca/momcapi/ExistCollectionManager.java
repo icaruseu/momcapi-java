@@ -89,22 +89,22 @@ public class ExistCollectionManager extends AbstractExistManager implements Coll
     }
 
     @Override
-    public boolean delete(@NotNull IdCollection idCollection) {
+    public boolean delete(@NotNull IdCollection id) {
 
-        String identifier = idCollection.getIdentifier();
+        String identifier = id.getIdentifier();
 
         LOGGER.info("Trying to delete the collection '{}'.", identifier);
 
         boolean proceed = true;
 
-        if (!isCollectionExisting(idCollection)) {
+        if (!isCollectionExisting(id)) {
             proceed = false;
             LOGGER.info("Collection '{}' not existing. Aborting delete.", identifier);
         }
 
         if (proceed &&
-                !momcaConnection.getCharterManager().list(idCollection).isEmpty() ||
-                !momcaConnection.getCharterManager().list(idCollection, CharterStatus.IMPORTED).isEmpty()) {
+                !momcaConnection.getCharterManager().list(id).isEmpty() ||
+                !momcaConnection.getCharterManager().list(id, CharterStatus.IMPORTED).isEmpty()) {
             proceed = false;
             LOGGER.info("There are still existing charters for collection '{}'", identifier);
         }
@@ -142,13 +142,13 @@ public class ExistCollectionManager extends AbstractExistManager implements Coll
 
     @Override
     @NotNull
-    public Optional<Collection> get(@NotNull IdCollection idCollection) {
+    public Optional<Collection> get(@NotNull IdCollection id) {
 
-        String identifier = idCollection.getIdentifier();
+        String identifier = id.getIdentifier();
 
         LOGGER.info("Trying to get collection '{}' from the database.", identifier);
 
-        String uri = createResourceUri(idCollection);
+        String uri = createResourceUri(id);
         Optional<Collection> collection = momcaConnection.readExistResource(uri).map(Collection::new);
 
         LOGGER.info("Returning '{}' for collection '{}'", collection, identifier);
@@ -165,13 +165,13 @@ public class ExistCollectionManager extends AbstractExistManager implements Coll
     }
 
     @Override
-    public boolean isExisting(@NotNull IdCollection idCollection) {
+    public boolean isExisting(@NotNull IdCollection id) {
 
-        LOGGER.info("Try to determine the existance of collection '{}'.", idCollection);
+        LOGGER.info("Try to determine the existance of collection '{}'.", id);
 
-        boolean isCollectionExisting = isCollectionExisting(idCollection);
+        boolean isCollectionExisting = isCollectionExisting(id);
 
-        LOGGER.info("The result for the query for existence of collection '{}' is '{}'", idCollection, isCollectionExisting);
+        LOGGER.info("The result for the query for existence of collection '{}' is '{}'", id, isCollectionExisting);
 
         return isCollectionExisting;
 
