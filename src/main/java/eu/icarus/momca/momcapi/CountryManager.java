@@ -9,15 +9,16 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Created by djell on 28/12/2015.
+ * The country manager. Performs country- and region-related tasks in the MOM-CA database.
  */
+@SuppressWarnings("AccessCanBeTightened")
 public interface CountryManager {
 
     /**
-     * Adds a new country to country hierarchy used for archives and fonds.
+     * Adds a country to the country hierarchy used for archives and fonds.
      *
      * @param country The country to add.
-     * @return true if the process succeeds.
+     * @return <code>True</code> if the action was successful.
      */
     boolean addNewCountryToHierarchy(@NotNull Country country);
 
@@ -25,41 +26,53 @@ public interface CountryManager {
      * Adds a region to the country hierarchy used for fonds and archives.
      *
      * @param country The country to add the region to.
-     * @param region  The region to add to the hierarchy
-     * @return true if the addition was successful.
+     * @param region  The region to add.
+     * @return <code>True</code> if the action was successful.
      */
-
     boolean addRegionToHierarchy(@NotNull Country country, @NotNull Region region);
 
     /**
      * Deletes a country.
      *
-     * @param countryCode The code of the country to delete, e.g. {@code DE}.
-     * @return true if the deletion was successful.
+     * @param code The code of the country to delete, e.g. <code>DE</code>.
+     * @return <code>True</code> if the action was successful.
      */
-    boolean deleteCountryFromHierarchy(@NotNull CountryCode countryCode);
+    boolean deleteCountryFromHierarchy(@NotNull CountryCode code);
 
     /**
-     * Deletes a region from a countries hierarchy.
+     * Deletes a region from a countries' hierarchy.
      *
      * @param country    The country to delete from.
      * @param regionName The native name of the region to delete.
-     * @return true if the deletion was successful.
+     * @return <code>True</code> if the action was successful.
      */
     boolean deleteRegionFromHierarchy(@NotNull Country country, @NotNull String regionName);
 
     /**
      * Gets a country from the database.
      *
-     * @param countryCode The code of the country, e.g. {@code DE}.
-     * @return The country.
+     * @param code The code of the country, e.g. <code>DE</code>.
+     * @return The country wrapped in an <code>Optional</code>.
      */
     @NotNull
-    Optional<Country> getCountry(@NotNull CountryCode countryCode);
+    Optional<Country> getCountry(@NotNull CountryCode code);
 
+    /**
+     * Gets a list of all regions associated with a specific country.
+     *
+     * @param country The country to associate with.
+     * @return A list of all regions.
+     */
     @NotNull
     List<Region> getRegions(@NotNull Country country);
 
+    /**
+     * Checks if a region is existing in the database.
+     *
+     * @param country    The country the region is associated with.
+     * @param regionName The name of the region to check.
+     * @return <code>True</code> if the region exists.
+     */
     Boolean isRegionExisting(@NotNull Country country, @NotNull String regionName);
 
     /**
@@ -67,5 +80,5 @@ public interface CountryManager {
      */
     @NotNull
     List<CountryCode> listCountries();
-    
+
 }

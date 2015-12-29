@@ -23,19 +23,20 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Manages users in MOM-CA.
- *
- * @author Daniel Jeller
- *         Created on 03.07.2015.
- * @see
+ * An implementation of <code>UserManager</code> based on an eXist MOM-CA connection.
  */
 public class ExistUserManager extends AbstractExistManager implements UserManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExistUserManager.class);
     private RemoteUserManagementService remoteUserManagementService;
 
-    ExistUserManager(@NotNull ExistMomcaConnection momcaConnection,
-                     @NotNull Collection rootCollection) {
+    /**
+     * Creates a charter manager instance.
+     *
+     * @param momcaConnection The MOM-CA connection.
+     * @param rootCollection  The database root collection, <code>/db</code>.
+     */
+    ExistUserManager(@NotNull ExistMomcaConnection momcaConnection, @NotNull Collection rootCollection) {
 
         super(momcaConnection);
 
@@ -176,19 +177,19 @@ public class ExistUserManager extends AbstractExistManager implements UserManage
     }
 
     @Override
-    public boolean delete(@NotNull IdUser idUser) {
+    public boolean delete(@NotNull IdUser id) {
 
         boolean success = false;
-        String identifier = idUser.getIdentifier();
+        String identifier = id.getIdentifier();
 
         LOGGER.info("Trying to delete user '{}'.", identifier);
 
-        Optional<User> userOptional = get(idUser);
+        Optional<User> userOptional = get(id);
         if (userOptional.isPresent()) {
 
             User user = userOptional.get();
 
-            success = !isInitialized(idUser) || deleteExistUserAccount(user.getIdentifier());
+            success = !isInitialized(id) || deleteExistUserAccount(user.getIdentifier());
             if (success) {
 
                 success = momcaConnection.deleteExistResource(user);
@@ -254,9 +255,9 @@ public class ExistUserManager extends AbstractExistManager implements UserManage
 
     @Override
     @NotNull
-    public Optional<User> get(@NotNull IdUser idUser) {
+    public Optional<User> get(@NotNull IdUser id) {
 
-        String identifier = idUser.getIdentifier();
+        String identifier = id.getIdentifier();
         User user = null;
 
         LOGGER.info("Trying to get user '{}' from the database.", identifier);
@@ -279,14 +280,14 @@ public class ExistUserManager extends AbstractExistManager implements UserManage
     }
 
     @Override
-    public boolean initialize(@NotNull IdUser idUser, @NotNull String password) {
+    public boolean initialize(@NotNull IdUser id, @NotNull String password) {
 
         boolean success = false;
-        String identifier = idUser.getIdentifier();
+        String identifier = id.getIdentifier();
 
         LOGGER.info("Trying to initialize account for user '{}' in eXist.", identifier);
 
-        if (!isInitialized(idUser)) {
+        if (!isInitialized(id)) {
 
             try {
 
@@ -327,13 +328,13 @@ public class ExistUserManager extends AbstractExistManager implements UserManage
     }
 
     @Override
-    public boolean isExisting(@NotNull IdUser idUser) {
+    public boolean isExisting(@NotNull IdUser id) {
 
-        String identifier = idUser.getIdentifier();
+        String identifier = id.getIdentifier();
 
         LOGGER.info("Testing the existence of user '{}'.", identifier);
 
-        ExistQuery query = ExistQueryFactory.checkUserExistence(idUser);
+        ExistQuery query = ExistQueryFactory.checkUserExistence(id);
         List<String> result = momcaConnection.queryDatabase(query);
 
         if (result.size() != 1) {

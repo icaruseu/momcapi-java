@@ -19,12 +19,17 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Created by djell on 11/08/2015.
+ * An implementation of <code>CollectionManager</code> based on an eXist MOM-CA connection.
  */
-public class ExistCollectionManager extends AbstractExistManager implements CollectionManager {
+class ExistCollectionManager extends AbstractExistManager implements CollectionManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExistCollectionManager.class);
 
+    /**
+     * Creates a collection manager instance.
+     *
+     * @param momcaConnection The MOM-CA connection.
+     */
     ExistCollectionManager(@NotNull ExistMomcaConnection momcaConnection) {
         super(momcaConnection);
     }

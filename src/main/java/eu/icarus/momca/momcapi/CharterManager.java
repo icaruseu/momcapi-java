@@ -15,7 +15,8 @@ import java.util.Optional;
 /**
  * The charter manager. Performs charter-related tasks in the MOM-CA database.
  */
-interface CharterManager {
+@SuppressWarnings("AccessCanBeTightened")
+public interface CharterManager {
 
     /**
      * Adds a charter to the database.

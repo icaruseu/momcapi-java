@@ -12,10 +12,11 @@ import java.util.Optional;
 /**
  * The archive manager. Performs archive-related tasks in the database.
  */
-interface ArchiveManager {
+@SuppressWarnings("AccessCanBeTightened")
+public interface ArchiveManager {
 
     /**
-     * Adds a new archive to the database.
+     * Adds an archive to the database.
      *
      * @param archive The archive to add.
      * @return <code>True</code> if the process was successful.

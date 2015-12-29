@@ -28,12 +28,9 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Connects to a MOM-CA database instance. Provides access to all manager classes.
- *
- * @author Daniel Jeller
- *         Created on 24.06.2015.
+ * An implementation of <code>MomcaConnection</code> based on eXist.
  */
-public class ExistMomcaConnection implements MomcaConnection {
+class ExistMomcaConnection implements MomcaConnection {
 
     @NotNull
     private static final String DRIVER = "org.exist.xmldb.DatabaseImpl";

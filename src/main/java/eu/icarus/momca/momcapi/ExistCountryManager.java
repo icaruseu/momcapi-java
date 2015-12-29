@@ -19,19 +19,20 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Manages countries in MOM-CA.
- *
- * @author Daniel Jeller
- *         Created on 17.07.2015.
+ * An implementation of <code>CountryManager</code> based on an eXist MOM-CA connection.
  */
-public class ExistCountryManager extends AbstractExistManager implements CountryManager {
+class ExistCountryManager extends AbstractExistManager implements CountryManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExistCountryManager.class);
 
     @NotNull
-    private static final String MOM_PORTAL_XML_URI = String
-            .format("%s/mom.portal.xml", ResourceRoot.PORTAL_HIERARCHY.getUri());
+    private static final String MOM_PORTAL_XML_URI = String.format("%s/mom.portal.xml", ResourceRoot.PORTAL_HIERARCHY.getUri());
 
+    /**
+     * Creates a country manager instance.
+     *
+     * @param momcaConnection The MOM-CA connection.
+     */
     ExistCountryManager(@NotNull ExistMomcaConnection momcaConnection) {
         super(momcaConnection);
     }

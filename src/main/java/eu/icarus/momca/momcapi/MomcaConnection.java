@@ -5,7 +5,8 @@ import org.jetbrains.annotations.NotNull;
 /**
  * The Connection to the MOM-CA database. Provides access to all managers.
  */
-interface MomcaConnection {
+@SuppressWarnings("AccessCanBeTightened")
+public interface MomcaConnection {
 
     /**
      * Closes the connection to the database instance.

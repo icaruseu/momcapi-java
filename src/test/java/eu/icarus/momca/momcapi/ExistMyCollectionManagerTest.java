@@ -17,12 +17,11 @@ import static org.testng.Assert.*;
  */
 public class ExistMyCollectionManagerTest {
 
-    private MomcaConnection mc;
     private MyCollectionManager mm;
 
     @BeforeClass
     public void setUp() throws Exception {
-        mc = TestUtils.initMomcaConnection();
+        MomcaConnection mc = TestUtils.initMomcaConnection();
         mm = mc.getMyCollectionManager();
         assertNotNull(mm, "MOM-CA connection not initialized.");
 

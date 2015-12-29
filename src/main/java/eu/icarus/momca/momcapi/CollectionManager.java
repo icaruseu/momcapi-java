@@ -12,10 +12,11 @@ import java.util.Optional;
 /**
  * The collection manager. Performs archival collation-related tasks in the MOM-CA database.
  */
+@SuppressWarnings("AccessCanBeTightened")
 public interface CollectionManager {
 
     /**
-     * Adds a new archival collection to the database.
+     * Adds a archival collection to the database.
      *
      * @param collection The collection to add.
      * @return <code>True</code> if the action was successful.

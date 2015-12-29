@@ -18,10 +18,8 @@ import java.util.Optional;
 
 /**
  * Utility functions.
- *
- * @author Daniel Jeller
- *         Created on 03.07.2015.
  */
+@SuppressWarnings({"ClassWithoutLogger", "PublicMethodWithoutLogging"})
 public class Util {
 
     public static void changeNamespace(@NotNull Element xml, @NotNull Namespace namespace) {
@@ -100,6 +98,7 @@ public class Util {
      * @param uri An URI.
      * @return The last URI part, e.g. {@code admin.xml} for {@code /db/mom-data/user.xrx/admin.xml}
      */
+    @SuppressWarnings("AccessCanBeTightened")
     @NotNull
     public static String getLastUriPart(@NotNull String uri) {
         testIfUri(uri);
@@ -149,6 +148,7 @@ public class Util {
      * @param queryResults The result list which to process.
      * @return true if the queryResults @code{[true]}.
      */
+    @SuppressWarnings("AccessCanBeTightened")
     public static boolean isTrue(List<String> queryResults) {
         return queryResults.size() == 1 & queryResults.get(0).equals("true");
     }
@@ -303,6 +303,7 @@ public class Util {
      * @param string The text to replace.
      * @return The resulting string.
      */
+    @SuppressWarnings("AccessCanBeTightened")
     @NotNull
     public static String replaceAmpersandInString(@NotNull String string) {
         return string.replaceAll("&(?!(quot;)|(amp;)|(apos;)|(lt;)|(gt;)|(nbsp;)|(#\\d+;))", "&amp;");

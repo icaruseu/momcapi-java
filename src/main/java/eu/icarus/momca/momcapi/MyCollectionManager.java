@@ -11,9 +11,17 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Created by djell on 28/12/2015.
+ * The myCollection manager. Performs myCollection-related tasks in the database.
  */
+@SuppressWarnings("AccessCanBeTightened")
 public interface MyCollectionManager {
+
+    /**
+     * Adds a myCollection to the database.
+     *
+     * @param myCollection The myCollection to add.
+     * @return <code>True</code> if the action was successful.
+     */
     boolean add(@NotNull MyCollection myCollection);
 
     /**
@@ -29,22 +37,48 @@ public interface MyCollectionManager {
      * Deletes a myCollection from the database. Doesn't delete private myCollections that still have a public
      * myCollection or myCollections that still have charters.
      *
-     * @param id     The myCollection to delete.
-     * @param idUser The creator of the myColleciton. If @code{NULL}, the myCollection is considered
-     *               as a public myCollection.
+     * @param id   The myCollection to delete.
+     * @param user The creator of the myColleciton. If @code{NULL}, the myCollection is considered
+     *             as a public myCollection.
      * @return True if the deletion was successful. Note: still returns true, if the method couldn't delete
      * any empty charters' collections.
      */
-    boolean delete(@NotNull IdMyCollection id, @Nullable IdUser idUser);
+    boolean delete(@NotNull IdMyCollection id, @Nullable IdUser user);
 
+    /**
+     * Gets a myCollection from the database.
+     *
+     * @param id     The mycollection to get.
+     * @param status The status of the mycollection to get.
+     * @return The myCollection wrapped in an <code>Optional</code>
+     */
     @NotNull
     Optional<MyCollection> get(@NotNull IdMyCollection id, @NotNull MyCollectionStatus status);
 
-    boolean isExisting(@NotNull IdMyCollection idMyCollection, @NotNull MyCollectionStatus myCollectionStatus);
+    /**
+     * Checks if a myCollection is existing in the database.
+     *
+     * @param id     The id of the myCollection to check.
+     * @param status The status to check for.
+     * @return <code>True</code> if a myCollection with the specified id and status exists in the database.
+     */
+    boolean isExisting(@NotNull IdMyCollection id, @NotNull MyCollectionStatus status);
 
+    /**
+     * Lists the private mycollections associated with a specific user.
+     *
+     * @param id The user to associate with.
+     * @return A list of the ids of all myCollections associated with the user.
+     */
     @NotNull
-    List<IdMyCollection> listPrivateMyCollections(@NotNull IdUser idUser);
+    List<IdMyCollection> listPrivateMyCollections(@NotNull IdUser id);
 
+    /**
+     * Lists all public myCollections in the database.
+     *
+     * @return A list of the ids of all myCollections in the database.
+     */
     @NotNull
     List<IdMyCollection> listPublicMyCollections();
+
 }

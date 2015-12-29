@@ -18,12 +18,17 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Created by djell on 09/08/2015.
+ * An implementation of <code>FondManager</code> based on an eXist MOM-CA connection.
  */
-public class ExistFondManager extends AbstractExistManager implements FondManager {
+class ExistFondManager extends AbstractExistManager implements FondManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExistFondManager.class);
 
+    /**
+     * Creates a fond manager instance.
+     *
+     * @param momcaConnection The MOM-CA connection.
+     */
     ExistFondManager(@NotNull ExistMomcaConnection momcaConnection) {
         super(momcaConnection);
     }
@@ -108,44 +113,44 @@ public class ExistFondManager extends AbstractExistManager implements FondManage
     }
 
     @Override
-    public boolean delete(@NotNull IdFond idFond) {
+    public boolean delete(@NotNull IdFond id) {
 
-        LOGGER.info("Trying to delete the fond '{}'.", idFond);
+        LOGGER.info("Trying to delete the fond '{}'.", id);
 
         boolean proceed = true;
 
-        if (!isFondExisting(idFond)) {
+        if (!isFondExisting(id)) {
             proceed = false;
-            LOGGER.info("The fond '{}' is not existing. Aborting deletion.", idFond);
+            LOGGER.info("The fond '{}' is not existing. Aborting deletion.", id);
         }
 
-        if (proceed && !momcaConnection.getCharterManager().list(idFond).isEmpty()
-                || !momcaConnection.getCharterManager().list(idFond, CharterStatus.IMPORTED).isEmpty()) {
+        if (proceed && !momcaConnection.getCharterManager().list(id).isEmpty()
+                || !momcaConnection.getCharterManager().list(id, CharterStatus.IMPORTED).isEmpty()) {
             proceed = false;
-            LOGGER.info("There are still existing charters for fond '{}'. Aborting deletion.", idFond);
+            LOGGER.info("There are still existing charters for fond '{}'. Aborting deletion.", id);
         }
 
         boolean success = false;
 
         if (proceed) {
 
-            String fondCollectionUri = createCollectionUri(ResourceRoot.ARCHIVAL_FONDS, idFond);
+            String fondCollectionUri = createCollectionUri(ResourceRoot.ARCHIVAL_FONDS, id);
             success = momcaConnection.deleteCollection(fondCollectionUri);
 
             if (success) {
 
-                String charterCollectionUri = createCollectionUri(ResourceRoot.PUBLIC_CHARTERS, idFond);
+                String charterCollectionUri = createCollectionUri(ResourceRoot.PUBLIC_CHARTERS, id);
                 success = momcaConnection.deleteCollection(charterCollectionUri);
 
                 if (success) {
-                    LOGGER.info("Fond '{}' deleted.", idFond);
+                    LOGGER.info("Fond '{}' deleted.", id);
                 } else {
                     success = true;
-                    LOGGER.info("Deleted fond '{}' but failed to delete empty charters' collection at '{}'.", idFond, charterCollectionUri);
+                    LOGGER.info("Deleted fond '{}' but failed to delete empty charters' collection at '{}'.", id, charterCollectionUri);
                 }
 
             } else {
-                LOGGER.info("Failed to delete fond '{}'.", idFond);
+                LOGGER.info("Failed to delete fond '{}'.", id);
             }
 
         }
@@ -156,42 +161,42 @@ public class ExistFondManager extends AbstractExistManager implements FondManage
 
     @Override
     @NotNull
-    public Optional<Fond> get(@NotNull IdFond idFond) {
+    public Optional<Fond> get(@NotNull IdFond id) {
 
-        LOGGER.info("Trying to get fond '{}' from the database.", idFond);
+        LOGGER.info("Trying to get fond '{}' from the database.", id);
 
         Optional<Fond> fond = Optional.empty();
 
-        String eadUri = createEadResourceUri(idFond);
+        String eadUri = createEadResourceUri(id);
         Optional<ExistResource> fondResource = momcaConnection.readExistResource(eadUri);
 
         if (fondResource.isPresent()) {
 
-            LOGGER.debug("Trying to get preferences for fond '{}'.", idFond);
+            LOGGER.debug("Trying to get preferences for fond '{}'.", id);
 
             String prefsUrl = createPrefsUri(fondResource);
             Optional<ExistResource> fondPrefs = momcaConnection.readExistResource(prefsUrl);
 
             fond = Optional.of(new Fond(fondResource.get(), fondPrefs));
 
-            LOGGER.debug("Read preferences for fond '{}': {}", idFond, fondPrefs);
+            LOGGER.debug("Read preferences for fond '{}': {}", id, fondPrefs);
 
         }
 
-        LOGGER.info("Returning fond '{}': {}", idFond, fondResource);
+        LOGGER.info("Returning fond '{}': {}", id, fondResource);
 
         return fond;
 
     }
 
     @Override
-    public boolean isExisting(@NotNull IdFond idFond) {
+    public boolean isExisting(@NotNull IdFond id) {
 
-        LOGGER.info("Trying to determine the existence of fond '{}'.", idFond);
+        LOGGER.info("Trying to determine the existence of fond '{}'.", id);
 
-        boolean isFondExisting = isFondExisting(idFond);
+        boolean isFondExisting = isFondExisting(id);
 
-        LOGGER.info("Is fond '{}' existing: {}", idFond, isFondExisting);
+        LOGGER.info("Is fond '{}' existing: {}", id, isFondExisting);
 
         return isFondExisting;
 
@@ -206,15 +211,15 @@ public class ExistFondManager extends AbstractExistManager implements FondManage
 
     @Override
     @NotNull
-    public List<IdFond> list(@NotNull IdArchive idArchive) {
+    public List<IdFond> list(@NotNull IdArchive id) {
 
-        LOGGER.info("Trying to list all fonds belonging to archive '{}'.", idArchive);
+        LOGGER.info("Trying to list all fonds belonging to archive '{}'.", id);
 
         List<String> queryResults = momcaConnection.queryDatabase(
-                ExistQueryFactory.listFonds(idArchive));
+                ExistQueryFactory.listFonds(id));
         List<IdFond> fondList = queryResults.stream().map(AtomId::new).map(IdFond::new).collect(Collectors.toList());
 
-        LOGGER.info("Returning '{}' fonds for archive '{}'.", fondList.size(), idArchive);
+        LOGGER.info("Returning '{}' fonds for archive '{}'.", fondList.size(), id);
 
         return fondList;
 

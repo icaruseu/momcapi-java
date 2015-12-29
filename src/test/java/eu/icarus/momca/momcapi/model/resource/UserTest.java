@@ -22,7 +22,7 @@ public class UserTest {
     public void testConstructor1() throws Exception {
 
         String correctXml = "<?xml version=\"1.0\"?>\n" +
-                "<xrx:user xmlns:xrx=\"http://www.monasterium.net/NS/xrx\"><xrx:username /><xrx:password /><xrx:firstname /><xrx:name /><xrx:email>user</xrx:email><xrx:moderator>moderator</xrx:moderator><xrx:street /><xrx:zip /><xrx:town /><xrx:phone /><xrx:institution /><xrx:info /><xrx:storage><xrx:saved_list /><xrx:bookmark_list /></xrx:storage></xrx:user>\n";
+                "<xrx:user xmlns:xrx=\"http://www.monasterium.net/NS/xrx\"><xrx:username /><xrx:password /><xrx:firstname /><xrx:name /><xrx:email>user</xrx:email><xrx:moderator>moderator</xrx:moderator><xrx:street /><xrx:zip /><xrx:town /><xrx:phone /><xrx:institution /><xrx:info /><xrx:storage><xrx:saved_list><xrx:saved><xrx:id>tag:www.monasterium.net,2011:/charter/CH-KAE/Urkunden/Urkunde1</xrx:id><xrx:start_time>2015-04-14T09:08:59.817+02:00</xrx:start_time><xrx:freigabe>no</xrx:freigabe></xrx:saved></xrx:saved_list><xrx:bookmark_list /></xrx:storage></xrx:user>\n";
 
         IdCharter id = new IdCharter("CH-KAE", "Urkunden", "Urkunde1");
         Saved saved = new Saved(id, "2015-04-14T09:08:59.817+02:00", "no");
@@ -31,11 +31,13 @@ public class UserTest {
         savedList.add(saved);
 
         User user = new User("user", "moderator");
+        user.setSavedCharters(savedList);
 
         assertEquals(user.getIdentifier(), "user");
         assertEquals(user.getIdModerator().getIdentifier(), "moderator");
 
         assertEquals(user.toXML(), correctXml);
+        assertEquals(user.getSavedCharters(), savedList);
 
     }
 

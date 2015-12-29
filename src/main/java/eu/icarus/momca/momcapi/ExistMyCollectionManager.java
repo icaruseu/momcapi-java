@@ -18,12 +18,17 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Created by djell on 29/09/2015.
+ * An implementation of <code>MyCollectionManager</code> based on an eXist MOM-CA connection.
  */
-public class ExistMyCollectionManager extends AbstractExistManager implements MyCollectionManager {
+class ExistMyCollectionManager extends AbstractExistManager implements MyCollectionManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExistMyCollectionManager.class);
 
+    /**
+     * Creates a myCollection manager instance.
+     *
+     * @param momcaConnection The MOM-CA connection.
+     */
     ExistMyCollectionManager(@NotNull ExistMomcaConnection momcaConnection) {
         super(momcaConnection);
     }
@@ -110,17 +115,16 @@ public class ExistMyCollectionManager extends AbstractExistManager implements My
 
     }
 
+    @SuppressWarnings("PublicMethodWithoutLogging")
     @Override
     public boolean delete(@NotNull IdMyCollection id) {
-
         return delete(id, null);
-
     }
 
     @Override
-    public boolean delete(@NotNull IdMyCollection id, @Nullable IdUser idUser) {
+    public boolean delete(@NotNull IdMyCollection id, @Nullable IdUser user) {
 
-        MyCollectionStatus status = (idUser == null) ? MyCollectionStatus.PUBLISHED : MyCollectionStatus.PRIVATE;
+        MyCollectionStatus status = (user == null) ? MyCollectionStatus.PUBLISHED : MyCollectionStatus.PRIVATE;
         CharterManager charterManager = momcaConnection.getCharterManager();
 
         LOGGER.info("Trying to delete myCollection '{}' with status '{}'.", id, status);
@@ -151,7 +155,7 @@ public class ExistMyCollectionManager extends AbstractExistManager implements My
 
         if (proceed) {
 
-            String userIdentifier = idUser == null ? "" : idUser.getIdentifier();
+            String userIdentifier = user == null ? "" : user.getIdentifier();
             String myCollectionUri = createCollectionUri(id, status, userIdentifier);
             success = momcaConnection.deleteCollection(myCollectionUri);
 
@@ -211,15 +215,15 @@ public class ExistMyCollectionManager extends AbstractExistManager implements My
     }
 
     @Override
-    public boolean isExisting(@NotNull IdMyCollection idMyCollection, @NotNull MyCollectionStatus myCollectionStatus) {
+    public boolean isExisting(@NotNull IdMyCollection id, @NotNull MyCollectionStatus status) {
 
         LOGGER.info("Trying to determine existence of myCollection '{}' with status '{}'",
-                idMyCollection, myCollectionStatus);
+                id, status);
 
-        boolean isMyCollectionExisting = isMyCollectionExisting(idMyCollection, myCollectionStatus);
+        boolean isMyCollectionExisting = isMyCollectionExisting(id, status);
 
         LOGGER.info("Returning '{}' for the existence of myCollection '{}' with status '{}'",
-                isMyCollectionExisting, idMyCollection, myCollectionStatus);
+                isMyCollectionExisting, id, status);
 
         return isMyCollectionExisting;
 
@@ -234,14 +238,14 @@ public class ExistMyCollectionManager extends AbstractExistManager implements My
 
     @Override
     @NotNull
-    public List<IdMyCollection> listPrivateMyCollections(@NotNull IdUser idUser) {
+    public List<IdMyCollection> listPrivateMyCollections(@NotNull IdUser id) {
 
-        LOGGER.info("Trying to list private myCollections for user '{}'.", idUser);
+        LOGGER.info("Trying to list private myCollections for user '{}'.", id);
 
-        ExistQuery query = ExistQueryFactory.listMyCollectionsPrivate(idUser);
+        ExistQuery query = ExistQueryFactory.listMyCollectionsPrivate(id);
         List<IdMyCollection> myCollectionList = queryMyCollections(query);
 
-        LOGGER.info("Returning '{}' myCollections for user '{}'.", myCollectionList.size(), idUser);
+        LOGGER.info("Returning '{}' myCollections for user '{}'.", myCollectionList.size(), id);
 
         return myCollectionList;
 

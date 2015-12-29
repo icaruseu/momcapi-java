@@ -18,12 +18,17 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Created by daniel on 20.07.2015.
+ * An implementation of <code>ArchiveManager</code> based on an eXist MOM-CA connection.
  */
-public class ExistArchiveManager extends AbstractExistManager implements ArchiveManager {
+class ExistArchiveManager extends AbstractExistManager implements ArchiveManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExistArchiveManager.class);
 
+    /**
+     * Creates an archive manager instance.
+     *
+     * @param momcaConnection The MOM-CA connection.
+     */
     ExistArchiveManager(@NotNull ExistMomcaConnection momcaConnection) {
         super(momcaConnection);
     }

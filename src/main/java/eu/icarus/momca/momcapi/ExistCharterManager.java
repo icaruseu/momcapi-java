@@ -23,12 +23,17 @@ import java.util.stream.Collectors;
 
 
 /**
- * Created by daniel on 03.07.2015.
+ * An implementation of <code>CharterManager</code> based on an eXist MOM-CA connection.
  */
-public class ExistCharterManager extends AbstractExistManager implements CharterManager {
+class ExistCharterManager extends AbstractExistManager implements CharterManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExistCharterManager.class);
 
+    /**
+     * Creates a charter manager instance.
+     *
+     * @param momcaConnection The MOM-CA connection.
+     */
     ExistCharterManager(@NotNull ExistMomcaConnection momcaConnection) {
         super(momcaConnection);
     }
@@ -81,6 +86,7 @@ public class ExistCharterManager extends AbstractExistManager implements Charter
 
     }
 
+    @SuppressWarnings("PublicMethodWithoutLogging")
     @Override
     public boolean delete(@NotNull IdCharter id) {
         return delete(id, CharterStatus.PUBLIC, null);
@@ -186,7 +192,8 @@ public class ExistCharterManager extends AbstractExistManager implements Charter
 
     private boolean isCharterExisting(@NotNull IdCharter idCharter, @Nullable CharterStatus status) {
 
-        ExistQuery query = ExistQueryFactory.checkAtomResourceExistence(idCharter.getContentAsElement(), status.getResourceRoot());
+        ExistQuery query = ExistQueryFactory.checkAtomResourceExistence(idCharter.getContentAsElement(),
+                status == null ? null : status.getResourceRoot());
         return !momcaConnection.queryDatabase(query).isEmpty();
 
     }
@@ -241,6 +248,7 @@ public class ExistCharterManager extends AbstractExistManager implements Charter
         return isExisting;
     }
 
+    @SuppressWarnings("PublicMethodWithoutLogging")
     @Override
     @NotNull
     public List<IdCharter> list(@NotNull IdAbstract parent) {
