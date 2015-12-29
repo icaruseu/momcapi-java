@@ -107,7 +107,7 @@ public class ExistQueryFactory {
                                                         @NotNull MyCollectionStatus myCollectionStatus) {
 
         String query = String.format(
-                "%sexists(collection('%s')//atom:entry[.//atom:id/text()='%s'])",
+                "%sexists(collection('%s')//atom:id[.='%s'])",
                 getNamespaceDeclaration(Namespace.ATOM, Namespace.CEI),
                 myCollectionStatus == MyCollectionStatus.PRIVATE ?
                         ResourceRoot.USER_DATA.getUri() : ResourceRoot.PUBLISHED_USER_COLLECTIONS.getUri(),
@@ -309,7 +309,7 @@ public class ExistQueryFactory {
     public static ExistQuery getResourceUri(@NotNull AtomId resourceAtomId, @Nullable ResourceRoot resourceRoot) {
 
         String query = String.format(
-                "%slet $nodes := collection('%s')//atom:entry[.//atom:id/text()='%s']\n" +
+                "%slet $nodes := collection('%s')//atom:id[./text()='%s']\n" +
                         " for $node in $nodes\n" +
                         " return concat(util:collection-name($node), '/', util:document-name($node))",
                 getNamespaceDeclaration(Namespace.ATOM),
@@ -377,7 +377,7 @@ public class ExistQueryFactory {
     public static ExistQuery listArchivesForCountry(@NotNull CountryCode countryCode) {
 
         String query = String.format(
-                "%scollection('%s')//atom:entry[.//eag:repositorid/@countrycode='%s']/atom:id/text()",
+                "%scollection('%s')//eag:repositorid[@countrycode='%s']/ancestor::atom:entry/atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM, Namespace.EAG),
                 ResourceRoot.ARCHIVES.getUri(),
                 countryCode.getCode());
@@ -394,7 +394,7 @@ public class ExistQueryFactory {
     public static ExistQuery listArchivesForRegion(@NotNull String regionName) {
 
         String query = String.format(
-                "%scollection('%s')//atom:entry[.//eag:firstdem/text()='%s']/atom:id/text()",
+                "%scollection('%s')//eag:firstdem[./text()='%s']/ancestor::atom:entry/atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM, Namespace.EAG),
                 ResourceRoot.ARCHIVES.getUri(),
                 regionName);
@@ -465,7 +465,7 @@ public class ExistQueryFactory {
     public static ExistQuery listCollectionsForCountry(@NotNull CountryCode countryCode) {
 
         String query = String.format(
-                "%scollection('%s')//atom:entry[.//cei:country/@id='%s']/atom:id/text()",
+                "%scollection('%s')//cei:country[@id='%s']/ancestor::atom:entry/atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM, Namespace.CEI),
                 ResourceRoot.ARCHIVAL_COLLECTIONS.getUri(),
                 countryCode.getCode());
@@ -482,7 +482,7 @@ public class ExistQueryFactory {
     public static ExistQuery listCollectionsForRegion(@NotNull String regionName) {
 
         String query = String.format(
-                "%scollection('%s')//atom:entry[.//cei:region/text()='%s']/atom:id/text()",
+                "%scollection('%s')//cei:region[./text()='%s']/ancestor::atom:entry/atom:id/text()",
                 getNamespaceDeclaration(Namespace.ATOM, Namespace.CEI),
                 ResourceRoot.ARCHIVAL_COLLECTIONS.getUri(),
                 regionName);
