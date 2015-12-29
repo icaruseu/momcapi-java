@@ -1,6 +1,6 @@
 package eu.icarus.momca.momcapi.model.resource;
 
-import eu.icarus.momca.momcapi.Util;
+import eu.icarus.momca.momcapi.TestUtils;
 import eu.icarus.momca.momcapi.model.CharterStatus;
 import eu.icarus.momca.momcapi.model.Date;
 import eu.icarus.momca.momcapi.model.id.IdCharter;
@@ -37,7 +37,7 @@ public class CharterTest {
 
     @NotNull
     private static ExistResource getExistResource(String fileName) throws ParsingException, IOException {
-        Element element = (Element) Util.getXmlFromResource(fileName).getRootElement().copy();
+        Element element = (Element) TestUtils.getXmlFromResource(fileName).getRootElement().copy();
         String uri = "/db/mom-data/metadata.charter.public/collection";
         return new ExistResource(fileName, uri, element.toXML());
     }

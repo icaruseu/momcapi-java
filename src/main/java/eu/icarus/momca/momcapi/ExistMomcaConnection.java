@@ -107,6 +107,13 @@ class ExistMomcaConnection implements MomcaConnection {
 
     }
 
+    /**
+     * Creates an eXist-collection in the database.
+     *
+     * @param name      The name of the eXist-collection.
+     * @param parentUri The URI of the parent-collection.
+     * @return <code>True</code> if the action was successful.
+     */
     boolean createCollection(@NotNull String name, @NotNull String parentUri) {
 
         LOGGER.debug("Trying to create eXist-collection '{}/{}'.", parentUri, name);
@@ -131,6 +138,59 @@ class ExistMomcaConnection implements MomcaConnection {
 
     }
 
+    /**
+     * Creates all eXist-collections that lie on an URI.
+     *
+     * @param absoluteUri The absolute URI to create, e.g. <code>/db/create/all/collections/on/uri</code>.
+     * @return <code>True</code> if the eXist-collection path already exists or the creation was successful.
+     */
+    boolean createCollectionPath(@NotNull String absoluteUri) {
+
+        LOGGER.debug("Trying to create all eXist-collections on path '{}'.", absoluteUri);
+
+        boolean proceed = true;
+
+        if (absoluteUri.isEmpty() || !absoluteUri.startsWith("/db/")) {
+            proceed = false;
+            LOGGER.debug("Creation of eXist-collection path '{}' aborted. Path invalid.", absoluteUri);
+        }
+
+        boolean success = false;
+
+        if (proceed) {
+
+            ExistQuery query = ExistQueryFactory.createCollectionPath(absoluteUri);
+
+            List<String> results = queryDatabase(query);
+
+            if (results.size() == 1 && results.get(0).equals("true")) {
+
+                success = true;
+                LOGGER.info("Path '{}' is already existing.", absoluteUri);
+
+            } else if (results.size() != 0 && results.get(results.size() - 1).equals(absoluteUri)) {
+
+                success = true;
+                LOGGER.info("Created path '{}'.", absoluteUri);
+
+            } else {
+
+                LOGGER.info("Failed to create path '{}'.", absoluteUri);
+
+            }
+
+        }
+
+        return success;
+
+    }
+
+    /**
+     * Deletes an eXist-collection from the database.
+     *
+     * @param uri The URI of the collection to delete.
+     * @return <code>True</code> if the action was successful.
+     */
     boolean deleteCollection(@NotNull String uri) {
 
         LOGGER.debug("Trying to delete eXist-collection '{}'.", uri);
@@ -156,7 +216,13 @@ class ExistMomcaConnection implements MomcaConnection {
 
     }
 
-    boolean deleteExistResource(@NotNull ExistResource resource) {
+    /**
+     * Deletes an eXist-resource from the database.
+     *
+     * @param resource The eXist-resource to delete.
+     * @return <code>True</code> if the process was successful.
+     */
+    boolean deleteResource(@NotNull ExistResource resource) {
 
         String uri = resource.getUri();
         LOGGER.debug("Trying to delete eXist-resource '{}'.", uri);
@@ -249,83 +315,51 @@ class ExistMomcaConnection implements MomcaConnection {
 
     }
 
-    boolean isCollectionExisting(@NotNull String collectionUri) {
+    /**
+     * Checks if an eXist-collection is existing in the database.
+     *
+     * @param uri The URI of the eXist-collection.
+     * @return <code>True</code> if the eXist-collection exists.
+     */
+    boolean isCollectionExisting(@NotNull String uri) {
 
-        LOGGER.debug("Testing existence of eXist-collection '{}'.", collectionUri);
+        LOGGER.debug("Testing existence of eXist-collection '{}'.", uri);
 
-        String encodedUri = Util.encode(collectionUri);
+        String encodedUri = Util.encode(uri);
         ExistQuery query = ExistQueryFactory.checkCollectionExistence(encodedUri);
         boolean isExisting = Util.isTrue(queryDatabase(query));
 
-        LOGGER.debug("Returning '{}' for the existence of eXist-collection '{}'.", isExisting, collectionUri);
+        LOGGER.debug("Returning '{}' for the existence of eXist-collection '{}'.", isExisting, uri);
 
         return isExisting;
 
     }
 
-    boolean isResourceExisting(@NotNull String resourceUri) {
+    /**
+     * Checks if an eXist-resource is existing in the database.
+     *
+     * @param uri The URI of the eXist-resource.
+     * @return <code>True</code> if the eXist-resource exists.
+     */
+    boolean isResourceExisting(@NotNull String uri) {
 
-        LOGGER.debug("Testing existence of eXist-resource '{}'.", resourceUri);
+        LOGGER.debug("Testing existence of eXist-resource '{}'.", uri);
 
-        ExistQuery query = ExistQueryFactory.checkExistResourceExistence(resourceUri);
+        ExistQuery query = ExistQueryFactory.checkExistResourceExistence(uri);
         boolean isExisting = Util.isTrue(queryDatabase(query));
 
-        LOGGER.debug("Returning '{}' for the existence of eXist-resource '{}'.", isExisting, resourceUri);
+        LOGGER.debug("Returning '{}' for the existence of eXist-resource '{}'.", isExisting, uri);
 
         return isExisting;
 
     }
 
-    boolean makeSureCollectionPathExists(@NotNull String absoluteUri) {
-
-        LOGGER.debug("Trying to create all eXist-collections on path '{}'.", absoluteUri);
-
-        boolean success = false;
-
-        if (!absoluteUri.isEmpty() && absoluteUri.startsWith("/db/")) {
-
-            if (isCollectionExisting(absoluteUri)) {
-
-                success = true;
-                LOGGER.debug("EXist-collection '{}' already exists. Aborting creation.", absoluteUri);
-
-            } else {
-
-                String[] parts = absoluteUri.replace("/db/", "").split("/");
-                String parentUri = "/db";
-
-                for (String part : parts) {
-
-                    LOGGER.debug("Trying to add eXist-collection '{}' in '{}'", part, parentUri);
-
-                    success = createCollection(part, parentUri);
-                    parentUri = parentUri + "/" + part;
-
-                    if (success) {
-                        LOGGER.debug("Successfully added eXist-collection '{}' in '{}'", part, parentUri);
-                    } else {
-                        LOGGER.debug("Failed to create eXist-collection '{}' on path '{}'. Aborting further creation attempts.", part, absoluteUri);
-                        break;
-                    }
-
-                }
-
-                if (success) {
-                    LOGGER.debug("Created all eXist-collections on path '{}'.", absoluteUri);
-                } else {
-                    LOGGER.debug("Failed to create all eXist-collections on path '{}'", absoluteUri);
-                }
-
-            }
-
-        } else {
-            LOGGER.debug("Creation of eXist-collection path '{}' aborted. Path invalid.", absoluteUri);
-        }
-
-        return success;
-
-    }
-
+    /**
+     * Executes an ExistQuery on the database.
+     *
+     * @param existQuery The query to execute.
+     * @return A list with all results returned by the database. The exact contents depend on the specific query.
+     */
     @NotNull
     List<String> queryDatabase(@NotNull ExistQuery existQuery) {
 
@@ -376,6 +410,12 @@ class ExistMomcaConnection implements MomcaConnection {
 
     }
 
+    /**
+     * Gets the current time from the server.
+     *
+     * @return The time as an ISO 8601, e.g. <code>2011-05-30T20:31:19.638+02:00</code>
+     * @see <a href="http://www.w3.org/TR/NOTE-datetime">W3C Date and Time Formats</a>
+     */
     String queryRemoteDateTime() {
 
         LOGGER.debug("Trying to query current time from the server.");
@@ -388,6 +428,12 @@ class ExistMomcaConnection implements MomcaConnection {
 
     }
 
+    /**
+     * Reads a eXist-collection from the database.
+     *
+     * @param uri The URI of the eXist-collection.
+     * @return The eXist-collection wrapped in an Optional.
+     */
     @NotNull
     Optional<Collection> readCollection(@NotNull String uri) {
 
@@ -416,21 +462,27 @@ class ExistMomcaConnection implements MomcaConnection {
 
     }
 
+    /**
+     * Reads an eXist-resource from the database.
+     *
+     * @param uri The URI of the resource.
+     * @return The eXist-resource wrapped in an Optional.
+     */
     @NotNull
-    Optional<ExistResource> readExistResource(@NotNull String resourceUri) {
+    Optional<ExistResource> readExistResource(@NotNull String uri) {
 
-        LOGGER.debug("Trying to read eXist-resource '{}' from the database.", resourceUri);
+        LOGGER.debug("Trying to read eXist-resource '{}' from the database.", uri);
 
         ExistResource resource = null;
 
-        String encodedUri = Util.encode(resourceUri);
+        String encodedUri = Util.encode(uri);
         ExistQuery query = ExistQueryFactory.getResource(encodedUri);
         List<String> result = queryDatabase(query);
 
         if (result.size() == 1 && !result.get(0).isEmpty()) {
 
-            String name = Util.getLastUriPart(resourceUri);
-            String parentUri = Util.getParentUri(resourceUri);
+            String name = Util.getLastUriPart(uri);
+            String parentUri = Util.getParentUri(uri);
             String content = result.get(0);
 
             resource = new ExistResource(name, parentUri, content);
@@ -438,15 +490,23 @@ class ExistMomcaConnection implements MomcaConnection {
         }
 
         if (resource == null) {
-            LOGGER.debug("Failed to read eXist-resource '{}' from the database.", resourceUri);
+            LOGGER.debug("Failed to read eXist-resource '{}' from the database.", uri);
         } else {
-            LOGGER.debug("EXist-resource '{}' read from the database: {}", resourceUri, resource);
+            LOGGER.debug("EXist-resource '{}' read from the database: {}", uri, resource);
         }
 
         return Optional.ofNullable(resource);
 
     }
 
+    /**
+     * Writes an Atom-resource to the database. Updates the published and updated times.
+     *
+     * @param resource          The Atom-resource to write.
+     * @param publishedDateTime The time the resource was first published.
+     * @param updatedDateTime   The time the resource was updated.
+     * @return <code>True</code> if the action was successful.
+     */
     boolean writeAtomResource(@NotNull AtomResource resource,
                               @NotNull String publishedDateTime, @NotNull String updatedDateTime) {
 
@@ -490,6 +550,12 @@ class ExistMomcaConnection implements MomcaConnection {
 
     }
 
+    /**
+     * Writes an eXist-resource to the database.
+     *
+     * @param resource The resource to write.
+     * @return <code>True</code> if the action was successful.
+     */
     boolean writeExistResource(@NotNull ExistResource resource) {
 
         String resourceUri = resource.getUri();

@@ -38,7 +38,7 @@ public interface MyCollectionManager {
      * myCollection or myCollections that still have charters.
      *
      * @param id   The myCollection to delete.
-     * @param user The creator of the myColleciton. If @code{NULL}, the myCollection is considered
+     * @param user The creator of the myColleciton. If @code{null}, the myCollection is considered
      *             as a public myCollection.
      * @return True if the deletion was successful. Note: still returns true, if the method couldn't delete
      * any empty charters' collections.
@@ -65,20 +65,14 @@ public interface MyCollectionManager {
     boolean isExisting(@NotNull IdMyCollection id, @NotNull MyCollectionStatus status);
 
     /**
-     * Lists the private mycollections associated with a specific user.
+     * Lists myCollections in the database.
      *
-     * @param id The user to associate with.
-     * @return A list of the ids of all myCollections associated with the user.
+     * @param status The status to look for.
+     * @param owner  The owner of the myCollection. If the id is <code>null</code>, all myCollections are returned
+     *               without taking their owner into consideration.
+     * @return A list of the ids of all myCollection that match the provided status and owner.
      */
     @NotNull
-    List<IdMyCollection> listPrivateMyCollections(@NotNull IdUser id);
-
-    /**
-     * Lists all public myCollections in the database.
-     *
-     * @return A list of the ids of all myCollections in the database.
-     */
-    @NotNull
-    List<IdMyCollection> listPublicMyCollections();
+    List<IdMyCollection> list(@NotNull MyCollectionStatus status, @Nullable IdUser owner);
 
 }

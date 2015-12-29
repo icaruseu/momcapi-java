@@ -63,7 +63,7 @@ class ExistMyCollectionManager extends AbstractExistManager implements MyCollect
         if (proceed) {
 
             String parentUri = createCollectionUri(myCollection.getId(), myCollection.getStatus(), idUser.getIdentifier());
-            success = momcaConnection.makeSureCollectionPathExists(parentUri);
+            success = momcaConnection.createCollectionPath(parentUri);
 
             LOGGER.debug("Created parent collection '{}'.", parentUri);
 
@@ -236,33 +236,18 @@ class ExistMyCollectionManager extends AbstractExistManager implements MyCollect
 
     }
 
-    @Override
     @NotNull
-    public List<IdMyCollection> listPrivateMyCollections(@NotNull IdUser id) {
-
-        LOGGER.info("Trying to list private myCollections for user '{}'.", id);
-
-        ExistQuery query = ExistQueryFactory.listMyCollectionsPrivate(id);
-        List<IdMyCollection> myCollectionList = queryMyCollections(query);
-
-        LOGGER.info("Returning '{}' myCollections for user '{}'.", myCollectionList.size(), id);
-
-        return myCollectionList;
-
-    }
-
     @Override
-    @NotNull
-    public List<IdMyCollection> listPublicMyCollections() {
+    public List<IdMyCollection> list(@NotNull MyCollectionStatus status, @Nullable IdUser owner) {
 
-        LOGGER.info("Trying to list all public myCollections in the database.");
+        LOGGER.info("Trying to list all myCollections that match status '{}' and owner '{}'.", status, owner);
 
-        ExistQuery query = ExistQueryFactory.listMyCollectionsPublic();
-        List<IdMyCollection> myCollectionList = queryMyCollections(query);
+        ExistQuery query = ExistQueryFactory.listMyCollections(status, owner);
+        List<IdMyCollection> myCollections = queryMyCollections(query);
 
-        LOGGER.info("Returning '{}' public myCollections.", myCollectionList.size());
+        LOGGER.info("Returning list of {} myCollections that match status '{}' and owner '{}'.", myCollections.size(), status, owner);
 
-        return myCollectionList;
+        return myCollections;
 
     }
 

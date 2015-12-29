@@ -1,5 +1,6 @@
 package eu.icarus.momca.momcapi.model.resource;
 
+import eu.icarus.momca.momcapi.TestUtils;
 import eu.icarus.momca.momcapi.Util;
 import eu.icarus.momca.momcapi.model.id.IdCharter;
 import eu.icarus.momca.momcapi.model.id.IdUser;
@@ -54,7 +55,7 @@ public class UserTest {
     @Test
     public void testConstructor2() throws Exception {
 
-        ExistResource resource = new ExistResource("admin.xml", "/db/mom-data/xrx.user", Util.getXmlFromResource("user.xml").toXML());
+        ExistResource resource = new ExistResource("admin.xml", "/db/mom-data/xrx.user", TestUtils.getXmlFromResource("user.xml").toXML());
         User user = new User(resource);
 
         assertEquals(user.getIdentifier(), "admin");

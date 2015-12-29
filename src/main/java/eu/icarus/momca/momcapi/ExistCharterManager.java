@@ -117,7 +117,7 @@ class ExistCharterManager extends AbstractExistManager implements CharterManager
             String name = Charter.createResourceName(id, status);
             ExistResource resource = new ExistResource(name, uri);
 
-            success = momcaConnection.deleteExistResource(resource);
+            success = momcaConnection.deleteResource(resource);
 
             if (success) {
                 LOGGER.info("Charter '{}' with status '{}' deleted.", id, status);
@@ -509,7 +509,7 @@ class ExistCharterManager extends AbstractExistManager implements CharterManager
 
         boolean success = false;
 
-        if (momcaConnection.makeSureCollectionPathExists(charter.getParentUri())) {
+        if (momcaConnection.createCollectionPath(charter.getParentUri())) {
             success = momcaConnection.writeAtomResource(charter, published, updated);
         }
 

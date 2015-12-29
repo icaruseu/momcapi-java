@@ -7,7 +7,6 @@ import nu.xom.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -22,6 +21,12 @@ import java.util.Optional;
 @SuppressWarnings({"ClassWithoutLogger", "PublicMethodWithoutLogging"})
 public class Util {
 
+    /**
+     * Changes the namespace of a whole XML-Element-Tree.
+     *
+     * @param xml       The root element.
+     * @param namespace The new namespace.
+     */
     public static void changeNamespace(@NotNull Element xml, @NotNull Namespace namespace) {
 
         xml.setNamespaceURI(namespace.getUri());
@@ -82,6 +87,10 @@ public class Util {
 
     }
 
+    /**
+     * @param element The element.
+     * @return Alist of all Childe <code>Node</code>s of an element.
+     */
     public static List<Node> getChildNodes(@NotNull Element element) {
 
         List<Node> nodes = new ArrayList<>(0);
@@ -116,16 +125,13 @@ public class Util {
         return uri.substring(0, uri.lastIndexOf('/'));
     }
 
-    @NotNull
-    public static Document getXmlFromResource(@NotNull String resourceName) throws ParsingException, IOException {
-
-        try (InputStream is = Util.class.getClassLoader().getResourceAsStream(resourceName)) {
-            Builder parser = new Builder();
-            return parser.build(is);
-        }
-
-    }
-
+    /**
+     * Creates an XPath context associated with an XML-element and a XPath query.
+     *
+     * @param root  The root element.
+     * @param query The query.
+     * @return The associated XPath context.
+     */
     @NotNull
     private static XPathContext getxPathContext(@NotNull Element root, @NotNull XpathQuery query) {
         XPathContext context = XPathContext.makeNamespaceContext(root);
@@ -153,6 +159,13 @@ public class Util {
         return queryResults.size() == 1 & queryResults.get(0).equals("true");
     }
 
+    /**
+     * Joins the XML-content of all child nodes of an XML Element in a single string.
+     *
+     * @param xml The element.
+     * @return A string made up of all child nodes of an element,
+     * e.g. <code>&lt;element1&gt;content1&lt;/element1&gt;&lt;element2&gt;content2&lt;/element2&gt;</code>
+     */
     @NotNull
     public static String joinChildNodes(@NotNull Element xml) {
 
@@ -168,6 +181,12 @@ public class Util {
 
     }
 
+    /**
+     * Parses the string representation of an XML-Element to an XOM-document.
+     *
+     * @param xml The content to parse.
+     * @return The document containing the content.
+     */
     @NotNull
     public static Document parseToDocument(@NotNull String xml) {
 
@@ -184,6 +203,12 @@ public class Util {
 
     }
 
+    /**
+     * Parses the string representation of an XML-Element to an XOM-element.
+     *
+     * @param xml The content to parse.
+     * @return The element containing the content.
+     */
     @NotNull
     public static Element parseToElement(@NotNull String xml) {
         Document doc = parseToDocument(xml);
@@ -240,6 +265,13 @@ public class Util {
 
     }
 
+    /**
+     * Executes an XPath-query and returns the result in an Optional.
+     *
+     * @param xml   The XML to query.
+     * @param query The query.
+     * @return The resulting Element wrapped in an Optional.
+     */
     @NotNull
     public static Optional<Element> queryXmlForOptionalElement(@NotNull Element xml, @NotNull XpathQuery query) {
 
@@ -255,6 +287,13 @@ public class Util {
 
     }
 
+    /**
+     * Executes an XPath-query and returns the result in an Optional.
+     *
+     * @param xml   The XML to query.
+     * @param query The query.
+     * @return The resulting String wrapped in an Optional.
+     */
     @NotNull
     public static Optional<String> queryXmlForOptionalString(@NotNull Element xml, @NotNull XpathQuery query) {
 
@@ -269,6 +308,13 @@ public class Util {
 
     }
 
+    /**
+     * Executes an XPath-query and returns the result as a string.
+     *
+     * @param xml   The XML to query.
+     * @param query The query.
+     * @return Either the result or an empty string.
+     */
     @NotNull
     public static String queryXmlForString(@NotNull Element xml, @NotNull XpathQuery query) {
 

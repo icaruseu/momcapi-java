@@ -57,7 +57,7 @@ class ExistFondManager extends AbstractExistManager implements FondManager {
         if (proceed) {
 
             String uri = createCollectionUri(ResourceRoot.ARCHIVAL_FONDS, id);
-            success = momcaConnection.makeSureCollectionPathExists(uri);
+            success = momcaConnection.createCollectionPath(uri);
 
             if (success) {
 

@@ -22,17 +22,34 @@ import java.util.List;
  *         Created on 07.03.2015.
  * @see ExistQuery
  */
+@SuppressWarnings({"ClassWithoutLogger", "PublicMethodWithoutLogging"})
 public class ExistQueryFactory {
 
     private ExistQueryFactory() {
     }
 
     /**
+     * @param idUser The user to check.
+     * @return An ExistQuery that checks if an eXist account exists for an MOM-CA user. When executed, the database
+     * returns <code>true</code> if the account exists.
+     */
+    @NotNull
+    public static ExistQuery checkAccountExistence(@NotNull IdUser idUser) {
+
+        String query = String.format(
+                "xmldb:exists-user('%s')",
+                idUser.getIdentifier());
+
+        return new ExistQuery(query);
+
+    }
+
+    /**
      * @param resourceAtomId The resource's {@code atom:id}.
-     * @param resourceRoot   The resource root of the resource the search should be restricted to. If {@code null},
+     * @param resourceRoot   The resource root of the resource the search should be restricted to. If <code>null</code>,
      *                       the whole database is searched.
-     * @return A query to check if a resource matching {@code resourceAtomId} is existing in the database at the
-     * specified {@code resourceRoot}.
+     * @return A query to check if a resource matching <code>resourceAtomId</code> is existing in the database at the
+     * specified <code>ResourceRoot</code>. When executed, the database returns the atom:id of the resource.
      */
     @NotNull
     public static ExistQuery checkAtomResourceExistence(@NotNull AtomId resourceAtomId, @Nullable ResourceRoot resourceRoot) {
@@ -49,8 +66,8 @@ public class ExistQueryFactory {
 
     /**
      * @param collectionUri The URI of the collection to test.
-     * @return An ExistQuery that checks if a collection exists. When executed, the query returns @code{[true]} if the
-     * collection exists.
+     * @return An ExistQuery that checks if a collection exists. When executed, the database returns <code>true</code>
+     * if the collection exists.
      */
     @NotNull
     public static ExistQuery checkCollectionExistence(@NotNull String collectionUri) {
@@ -65,8 +82,8 @@ public class ExistQueryFactory {
 
     /**
      * @param resourceUri The URI of the resource to check for.
-     * @return An ExistQuery that checks whether or not a resource exists in the database. When executed, the query
-     * returns @code{[true]} if the resource exists.
+     * @return An ExistQuery that checks whether or not a resource exists in the database. When executed, the database
+     * returns <code>true</code> if the resource exists.
      */
     @NotNull
     public static ExistQuery checkExistResourceExistence(@NotNull String resourceUri) {
@@ -82,8 +99,8 @@ public class ExistQueryFactory {
     /**
      * @param idMyCollection     The id of the myCollection to test for.
      * @param myCollectionStatus The status of the mycollection.
-     * @return An ExistQuery that checks if a collection exists. When executed, the query returns @code{[true]}
-     * if the collection exists.
+     * @return An ExistQuery that checks if a collection exists. When executed, the database returns
+     * <code>true</code> if the collection exists.
      */
     @NotNull
     public static ExistQuery checkMyCollectionExistence(@NotNull IdMyCollection idMyCollection,
@@ -100,17 +117,12 @@ public class ExistQueryFactory {
 
     }
 
-    @NotNull
-    public static ExistQuery checkUserExistence(@NotNull IdUser idUser) {
-
-        String query = String.format(
-                "xmldb:exists-user('%s')",
-                idUser.getIdentifier());
-
-        return new ExistQuery(query);
-
-    }
-
+    /**
+     * @param parentUri The URI of the parent collection.
+     * @param name      The name of the collection to create.
+     * @return An ExistQuery that creates a child collection in the collection specified. When executed, the database
+     * returns the URI of the collection created.
+     */
     @NotNull
     public static ExistQuery createCollection(@NotNull String parentUri, @NotNull String name) {
 
@@ -124,12 +136,37 @@ public class ExistQueryFactory {
     }
 
     /**
+     * @param absoluteUri The absolute uri of the last collection on the path to create,
+     *                    e.g. <code>/db/path/to/create</code>
+     * @return An ExistQuery that creates all collections on a given path. When executed, the database returns either
+     * <code>true</code> if the path already existed or a list of all created paths.
+     */
+    @NotNull
+    public static ExistQuery createCollectionPath(@NotNull String absoluteUri) {
+
+        String pathtokens = String.format("('%s')", absoluteUri.substring(1).replace("/", "','"));
+
+        String query = String.format(
+                "let $pathtokens := %s\n" +
+                        "return if(exists(collection(concat('/', string-join($pathtokens, '/'))))) then \"true\"\n" +
+                        "else\n" +
+                        "    for $token at $i in $pathtokens[position()< count($pathtokens)]\n" +
+                        "    let $parent := concat('/', string-join($pathtokens[position() <= $i], '/'))\n" +
+                        "    return xmldb:create-collection($parent, $pathtokens[$i +1])",
+                pathtokens
+        );
+
+        return new ExistQuery(query);
+
+    }
+
+    /**
      * @param eapText The text value that signifies which element to delete. Can be either a {@code eap:code} or
      *                {@code eap:nativeform}
      * @return A query to delete a eap-element tree, e.g.
      * {@code <eap:country><eap:code>DE</eap:code><eap:nativeform/></eap:country>} or
      * {@code <eap:subdivision><eap:code>DE-BW</eap:code><eap:nativeform/></eap:subdivision>}. It deletes the whole tree
-     * including its sub-elements. When executed, the query returns @code{[true]}.
+     * including its sub-elements. When executed, the database returns <code>true</code> if the action succeeded.
      */
     @NotNull
     public static ExistQuery deleteEapElement(@NotNull String eapText) {
@@ -149,6 +186,10 @@ public class ExistQueryFactory {
 
     }
 
+    /**
+     * @param countryCode The code of the country.
+     * @return An ExistQuery that queries the native name of a country.
+     */
     @NotNull
     public static ExistQuery getCountryNativeName(@NotNull CountryCode countryCode) {
 
@@ -166,7 +207,7 @@ public class ExistQueryFactory {
     }
 
     /**
-     * @return Returns the {@code xs:dateTime} (with timezone) from the database.
+     * @return Returns the <code>xs:dateTime</code> (with timezone) from the database.
      */
     @NotNull
     public static ExistQuery getCurrentDateTime() {
@@ -174,8 +215,8 @@ public class ExistQueryFactory {
     }
 
     /**
-     * @param code The code of the country, e.g. {@code DE}.
-     * @return A query to get the complete XML content of the {@code eap:country}-element specified by {@code code}.
+     * @param code The code of the country, e.g. <code>DE</code>.
+     * @return A query to get the complete XML content of the <code>eap:country<</code>-element specified by the code.
      */
     @NotNull
     public static ExistQuery getEapCountryXml(@NotNull String code) {
@@ -220,6 +261,10 @@ public class ExistQueryFactory {
 
     }
 
+    /**
+     * @param regionNativeName The native name of the region.
+     * @return An ExistQuery that gets the region code of a region from the database.
+     */
     @NotNull
     public static ExistQuery getRegionCode(@NotNull String regionNativeName) {
 
@@ -237,6 +282,10 @@ public class ExistQueryFactory {
 
     }
 
+    /**
+     * @param uri The URI of the resource to get.
+     * @return An ExistQuery that gets the content of a resource from the database.
+     */
     @NotNull
     public static ExistQuery getResource(@NotNull String uri) {
 
@@ -250,11 +299,11 @@ public class ExistQueryFactory {
     }
 
     /**
-     * @param resourceAtomId The {@code atom:id} of the resource to locate.
-     * @param resourceRoot   The resource root of the resource the search should be restricted to. If {@code null},
+     * @param resourceAtomId The <code>atom:id</code> of the resource to locate.
+     * @param resourceRoot   The resource root of the resource the search should be restricted to. If <code>null</code>,
      *                       the whole database is searched.
-     * @return A query to get the absolute URIs, e.g. {@code /db/mom-data/xrx.user/admin.xml}, of all resources
-     * matching {@code resourceAtomId} in {@code ResourceRoot} in the database.
+     * @return An ExistQuery to get the absolute URIs, e.g. <code>/db/mom-data/xrx.user/admin.xml</code>, of all resources
+     * matching <code>resourceAtomId</code> in <code>ResourceRoot</code> in the database.
      */
     @NotNull
     public static ExistQuery getResourceUri(@NotNull AtomId resourceAtomId, @Nullable ResourceRoot resourceRoot) {
@@ -278,11 +327,12 @@ public class ExistQueryFactory {
 
     /**
      * @param resourceUri         The URI of the resource to update.
-     * @param qualifiedParentName The name of the parent, usually either {@code eap:country} or {@code eap:subdivision}.
+     * @param qualifiedParentName The name of the parent, usually either <code>eap:country</code>
+     *                            or <code>eap:subdivision</code>.
      * @param code                The code of the element to append into, can be "" or null to target all elements.
      * @param elementToInsert     The XML code to append.
-     * @return A query to append an eap element tree into all matching parent eap elements. The element is appended
-     * after all other child-elements. When executed, the query returns @code{[true]}.
+     * @return An ExistQuery to append an eap element tree into all matching parent eap elements. The element is appended
+     * after all other child-elements. When executed, the database returns <code>true</code>.
      */
     @NotNull
     public static ExistQuery insertEapElement(@NotNull String resourceUri, @NotNull String qualifiedParentName,
@@ -305,7 +355,7 @@ public class ExistQueryFactory {
     }
 
     /**
-     * @return A query that lists the ids of all archives in the database as strings.
+     * @return An ExistQuery that lists the <code>atom:id</code>s of all archives in the database.
      */
     @NotNull
     public static ExistQuery listArchives() {
@@ -320,8 +370,8 @@ public class ExistQueryFactory {
     }
 
     /**
-     * @param countryCode The code of a country, e.g. {@code DE}.
-     * @return A query to list all archives that use the country code in their XML.
+     * @param countryCode The code of a country, e.g. <code>DE</code>.
+     * @return An ExistQuery to list the <code>atom:id</code>s of all archives that use the country code in their XML.
      */
     @NotNull
     public static ExistQuery listArchivesForCountry(@NotNull CountryCode countryCode) {
@@ -337,8 +387,8 @@ public class ExistQueryFactory {
     }
 
     /**
-     * @param regionName The native name of a region, e.g. {@code Bayern}.
-     * @return A query to list the ids of all archives that use the name of a region in their XML.
+     * @param regionName The native name of a region, e.g. <code>Bayern</code>.
+     * @return An ExistQuery to list the <code>atom:id</code>s of all archives that use the name of a region in their XML.
      */
     @NotNull
     public static ExistQuery listArchivesForRegion(@NotNull String regionName) {
@@ -353,6 +403,12 @@ public class ExistQueryFactory {
 
     }
 
+    /**
+     * @param parent The parent, e.g. an archive, fond or user.
+     * @param status The status of the charter instances, e.g. public or saved.
+     * @return An ExistQuery that lists the <code>atom:id</code>s of all charter instances associated
+     * with parent and status.
+     */
     @NotNull
     public static ExistQuery listCharterAtomIds(@NotNull IdAbstract parent, @NotNull CharterStatus status) {
 
@@ -387,7 +443,7 @@ public class ExistQueryFactory {
     }
 
     /**
-     * @return A query that lists the ids of all charter collections in the database as strings.
+     * @return An ExistQuery that lists the <code>atom:id</code>s of all charter collections in the database.
      */
     @NotNull
     public static ExistQuery listCollections() {
@@ -402,8 +458,8 @@ public class ExistQueryFactory {
     }
 
     /**
-     * @param countryCode The code of a country, e.g. {@code DE}.
-     * @return A query to list all collections that use the country code in their XML.
+     * @param countryCode The code of a country, e.g. <code>DE</code>.
+     * @return An ExistQuery to list the <code>atom:id</code>s of all collections that use the country code in their XML.
      */
     @NotNull
     public static ExistQuery listCollectionsForCountry(@NotNull CountryCode countryCode) {
@@ -419,8 +475,8 @@ public class ExistQueryFactory {
     }
 
     /**
-     * @param regionName The native name of a region, e.g. {@code Bayern}.
-     * @return A query to list the ids of all collections that use the name of a region in their XML.
+     * @param regionName The native name of a region, e.g. <code>Bayern</code>.
+     * @return An ExistQuery to list the <code>atom:id</code>s of all collections that use the name of a region in their XML.
      */
     @NotNull
     public static ExistQuery listCollectionsForRegion(@NotNull String regionName) {
@@ -436,8 +492,8 @@ public class ExistQueryFactory {
     }
 
     /**
-     * @return A query to get a list of the text content of all {@code eap:country/eap:code} elements. This is
-     * effectively a list of all countries registered in the portal.
+     * @return An ExistQuery to get a list of the text content of all <code>eap:country/eap:code</code> elements.
+     * This is effectively a list of all countries registered in the portal.
      */
     @NotNull
     public static ExistQuery listCountryCodes() {
@@ -454,8 +510,8 @@ public class ExistQueryFactory {
     }
 
     /**
-     * @param idArchive The id of the archive the fonds to list need to belong to, e.g. {@code CH-KAE}
-     * @return A query to list the ids of all fonds that belong to a specific archive.
+     * @param idArchive The id of the archive the fonds to list need to belong to, e.g. <code>CH-KAE</code>
+     * @return An ExistQuery to list the <code>atom:id</code>s of all fonds that belong to a specific archive.
      */
     @NotNull
     public static ExistQuery listFonds(@NotNull IdArchive idArchive) {
@@ -471,30 +527,37 @@ public class ExistQueryFactory {
 
     }
 
-    public static ExistQuery listMyCollectionsPrivate(IdUser idUser) {
+    /**
+     * @param status The status to associate with.
+     * @param owner  The user to associate with. If <code>null</code>, the owner of the myCollection is not taken
+     *               into consideration.
+     * @return An ExistQuery that lists the <code>atom:id</code>s of all myCollections in the database that are
+     * associated with a specific status and user.
+     */
+    @NotNull
+    public static ExistQuery listMyCollections(@NotNull MyCollectionStatus status, @Nullable IdUser owner) {
+
+        String authorSelector = owner == null
+                ? "" : String.format("atom:email[.='%s']/parent::atom:author/preceding-sibling::", owner.getIdentifier());
 
         String query = String.format(
-                "%scollection('/db/mom-data/xrx.user/%s/metadata.mycollection')//atom:id/text()",
+                "%scollection('%s')//%satom:id" +
+                        "[matches(., '^tag:www.monasterium.net,2011:/mycollection/')]/text()",
                 getNamespaceDeclaration(Namespace.ATOM),
-                idUser.getIdentifier());
+                status.getResourceRoot().getUri(),
+                authorSelector
+        );
 
         return new ExistQuery(query);
 
     }
 
+    /**
+     * @param code The code of the country.
+     * @return An ExistQuery that lists the native names of all regions associated with a specific country.
+     */
     @NotNull
-    public static ExistQuery listMyCollectionsPublic() {
-
-        String query = String.format(
-                "%scollection('/db/mom-data/metadata.mycollection.public')//atom:id/text()",
-                getNamespaceDeclaration(Namespace.ATOM));
-
-        return new ExistQuery(query);
-
-    }
-
-    @NotNull
-    public static ExistQuery listRegionsNativeNames(@NotNull CountryCode countryCode) {
+    public static ExistQuery listRegionsNativeNames(@NotNull CountryCode code) {
 
         String query = String.format(
                 "%sdistinct-values((" +
@@ -502,14 +565,17 @@ public class ExistQueryFactory {
                         "    data(collection('%s')//cei:provenance[cei:country/@id = '%s']/cei:region/text())))",
                 getNamespaceDeclaration(Namespace.CEI, Namespace.EAP),
                 ResourceRoot.PORTAL_HIERARCHY.getUri(),
-                countryCode.getCode(),
+                code.getCode(),
                 ResourceRoot.ARCHIVAL_COLLECTIONS.getUri(),
-                countryCode.getCode());
+                code.getCode());
 
         return new ExistQuery(query);
 
     }
 
+    /**
+     * @return An ExistQuery that lists the ids of all users in the database.
+     */
     @NotNull
     public static ExistQuery listUserIds() {
 
@@ -521,6 +587,13 @@ public class ExistQueryFactory {
 
     }
 
+    /**
+     * @param sourceCollectiontUri The collection the resource resides in.
+     * @param targetCollectionUri  The target collection to move the resource to.
+     * @param targetFileName       If not <code>null</code>, the name the resource will be renamed to after moving.
+     * @param originalFileName     The name of the resource to move.
+     * @return An ExistQuery that moves and possibly renames a resource in the datbase.
+     */
     @NotNull
     public static ExistQuery moveResource(@NotNull String sourceCollectiontUri, @NotNull String targetCollectionUri,
                                           @NotNull String targetFileName, @Nullable String originalFileName) {
@@ -552,12 +625,16 @@ public class ExistQueryFactory {
 
     }
 
+    /**
+     * @param id The charter to publish.
+     * @return An ExistQuery that publishes a saved charter. It overwrites the original charter in the process.
+     */
     @NotNull
-    public static ExistQuery publishCharter(@NotNull IdCharter idCharter) {
+    public static ExistQuery publishCharter(@NotNull IdCharter id) {
 
-        String publishedParentUri = Charter.createParentUri(idCharter, CharterStatus.PUBLIC, null);
-        String savedFileName = Charter.createResourceName(idCharter, CharterStatus.SAVED);
-        String publishedFileName = Charter.createResourceName(idCharter, CharterStatus.PUBLIC);
+        String publishedParentUri = Charter.createParentUri(id, CharterStatus.PUBLIC, null);
+        String savedFileName = Charter.createResourceName(id, CharterStatus.SAVED);
+        String publishedFileName = Charter.createResourceName(id, CharterStatus.PUBLIC);
 
         String query = String.format(
                 "(xmldb:move('%s', '%s', '%s'), " +
@@ -579,7 +656,7 @@ public class ExistQueryFactory {
     /**
      * @param collectionUri The URI of the collection to remove
      * @return An ExistQuery that removes a collection from the database.
-     * The executed query returns @code{[true]} if the deletion was successful.
+     * The executed database returns <code>true</code> if the deletion was successful.
      */
     public static ExistQuery removeCollection(@NotNull String collectionUri) {
 
@@ -596,7 +673,7 @@ public class ExistQueryFactory {
     /**
      * @param existResource The resource to remove.
      * @return An ExistQuery that removes a resource from the database.
-     * The executed query returns @code{[true]} if the deletion was successful.
+     * The executed database returns <code>true</code> if the deletion was successful.
      */
     public static ExistQuery removeResource(@NotNull ExistResource existResource) {
 
@@ -614,6 +691,11 @@ public class ExistQueryFactory {
 
     }
 
+    /**
+     * @param existResource The resource to store.
+     * @return An ExistQuery that stores a resource in the database. When executed, the database returns the URI of
+     * the new resource if successful.
+     */
     @NotNull
     public static ExistQuery storeResource(@NotNull ExistResource existResource) {
 
@@ -631,9 +713,17 @@ public class ExistQueryFactory {
 
     }
 
+    /**
+     * @param parentUri       The parent URI of the charter resource.
+     * @param oldAtomId       The old id.
+     * @param newAtomId       The new id.
+     * @param newResourceName The name of the resource after the change.
+     * @return An ExistQuery that changes the <code>atom:id</code> of a charter. It renames the charter
+     * resource in the process.
+     */
     @NotNull
     public static ExistQuery updateCharterAtomId(@NotNull String parentUri, @NotNull String oldAtomId,
-                                                 @NotNull String newAtomId, @NotNull String newDocumentName) {
+                                                 @NotNull String newAtomId, @NotNull String newResourceName) {
 
         String query = String.format(
                 "%slet $oldAtomIdNode := collection('%s')//atom:id[text() = '%s']\n" +
@@ -647,7 +737,7 @@ public class ExistQueryFactory {
                 oldAtomId,
                 newAtomId,
                 parentUri,
-                newDocumentName);
+                newResourceName);
 
         return new ExistQuery(query);
 
@@ -655,9 +745,9 @@ public class ExistQueryFactory {
 
     /**
      * @param charter The charter to update.
-     * @return An ExistQuery that updates the CEI - content of an existing charter. The ATOM-content will *not* be
-     * updated apart from atom:updated. The executed query returns @code{[0]} if atom:updated after the updates
-     * equals the current time at the update, meaning the update was successful), otherwise @code{[1]}
+     * @return An ExistQuery that updates the CEI-content of an existing charter. The ATOM-content will <b>not</b> be
+     * updated apart from <code>atom:updated</code>. The executed database returns <code>0</code> if atom:updated after the updates
+     * equals the current time at the update, meaning the update was successful), otherwise<code>1</code>
      */
     @NotNull
     public static ExistQuery updateCharterContent(@NotNull Charter charter) {
@@ -678,6 +768,5 @@ public class ExistQueryFactory {
         return new ExistQuery(query);
 
     }
-
 
 }

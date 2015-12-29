@@ -146,7 +146,7 @@ public class ExistMyCollectionManagerTest {
 
         IdUser idUser = new IdUser("admin");
 
-        List<IdMyCollection> idMyCollections = mm.listPrivateMyCollections(idUser);
+        List<IdMyCollection> idMyCollections = mm.list(MyCollectionStatus.PRIVATE, idUser);
         assertEquals(idMyCollections.size(), 1);
         assertEquals(idMyCollections.get(0).getIdentifier(), "ea13e5f1-03b2-4bfa-9dd5-8fb770f98d7b");
 
@@ -154,9 +154,12 @@ public class ExistMyCollectionManagerTest {
 
     @Test
     public void testListPublicMyCollections() throws Exception {
-        List<IdMyCollection> idMyCollections = mm.listPublicMyCollections();
+        List<IdMyCollection> idMyCollections = mm.list(MyCollectionStatus.PUBLISHED, null);
         assertEquals(idMyCollections.size(), 2);
         assertEquals(idMyCollections.get(0).getIdentifier(), "67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3");
+
+        assertEquals(mm.list(MyCollectionStatus.PUBLISHED, new IdUser("user1.testuser@dev.monasterium.net")).size(), 1);
+
     }
 
 }

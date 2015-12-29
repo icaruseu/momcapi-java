@@ -192,7 +192,7 @@ public class ExistUserManager extends AbstractExistManager implements UserManage
             success = !isInitialized(id) || deleteExistUserAccount(user.getIdentifier());
             if (success) {
 
-                success = momcaConnection.deleteExistResource(user);
+                success = momcaConnection.deleteResource(user);
                 if (success) {
 
                     String uri = String.format("%s/%s", ResourceRoot.USER_DATA.getUri(), identifier);
@@ -334,7 +334,7 @@ public class ExistUserManager extends AbstractExistManager implements UserManage
 
         LOGGER.info("Testing the existence of user '{}'.", identifier);
 
-        ExistQuery query = ExistQueryFactory.checkUserExistence(id);
+        ExistQuery query = ExistQueryFactory.checkAccountExistence(id);
         List<String> result = momcaConnection.queryDatabase(query);
 
         if (result.size() != 1) {

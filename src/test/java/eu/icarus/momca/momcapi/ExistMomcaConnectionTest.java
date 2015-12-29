@@ -58,7 +58,7 @@ public class ExistMomcaConnectionTest {
         ExistResource res = new ExistResource("delete@Test.xml", "/db");
 
         momcaConnection.writeExistResource(res);
-        assertTrue(momcaConnection.deleteExistResource(res));
+        assertTrue(momcaConnection.deleteResource(res));
         assertFalse(momcaConnection.readExistResource(res.getUri()).isPresent());
 
     }
@@ -86,10 +86,10 @@ public class ExistMomcaConnectionTest {
     public void testMakeSureCollectionPathExists() throws Exception {
 
         String path = "/db/path/to/collection";
-        assertTrue(momcaConnection.makeSureCollectionPathExists(path));
+        assertTrue(momcaConnection.createCollectionPath(path));
         momcaConnection.deleteCollection("/db/path");
 
-        assertFalse(momcaConnection.makeSureCollectionPathExists("not/absolute/path"));
+        assertFalse(momcaConnection.createCollectionPath("not/absolute/path"));
 
     }
 
@@ -108,6 +108,6 @@ public class ExistMomcaConnectionTest {
         ExistResource res = new ExistResource("write@Test.xml", "/db");
         assertTrue(momcaConnection.writeExistResource(res));
         assertTrue(momcaConnection.readExistResource(res.getUri()).isPresent());
-        momcaConnection.deleteExistResource(res);
+        momcaConnection.deleteResource(res);
     }
 }
