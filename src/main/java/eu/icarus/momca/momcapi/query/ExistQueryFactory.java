@@ -187,6 +187,27 @@ public class ExistQueryFactory {
     }
 
     /**
+     * Gets a specific charter instance from the database.
+     * @param id The id of the charter.
+     * @param status The status of the charter.
+     * @return An ExistQuery that gets a specific charter from the database. When executed, the query returns
+     */
+    public static ExistQuery getCharterInstance(@NotNull IdCharter id, @NotNull CharterStatus status) {
+
+        String query = String.format(
+                "%slet $charter := collection('%s')//atom:id[./text()='%s'][1]/ancestor::atom:entry\n" +
+                        "return " +
+                        "    if($charter) then (util:collection-name($charter), util:document-name($charter), $charter)" +
+                        "    else ()",
+                getNamespaceDeclaration(Namespace.ATOM),
+                status.getResourceRoot().getUri(),
+                id.getAtomId());
+
+        return new ExistQuery(query);
+
+    }
+
+    /**
      * @param countryCode The code of the country.
      * @return An ExistQuery that queries the native name of a country.
      */

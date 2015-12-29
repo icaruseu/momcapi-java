@@ -46,7 +46,7 @@ public class ExistCharterManagerTest {
 
         cm.add(charter);
 
-        Optional<Charter> addedCharter = cm.getCharter(id, CharterStatus.PUBLIC);
+        Optional<Charter> addedCharter = cm.get(id, CharterStatus.PUBLIC);
         cm.delete(id);
 
         assertTrue(addedCharter.isPresent());
@@ -65,7 +65,7 @@ public class ExistCharterManagerTest {
 
         cm.add(charter);
 
-        Optional<Charter> addedCharter = cm.getCharter(id, CharterStatus.PUBLIC);
+        Optional<Charter> addedCharter = cm.get(id, CharterStatus.PUBLIC);
         cm.delete(id);
 
         assertTrue(addedCharter.isPresent());
@@ -84,7 +84,7 @@ public class ExistCharterManagerTest {
 
         cm.add(charter);
 
-        Optional<Charter> addedCharter = cm.getCharter(id, CharterStatus.PRIVATE);
+        Optional<Charter> addedCharter = cm.get(id, CharterStatus.PRIVATE);
         cm.delete(id, CharterStatus.PRIVATE, admin.getId());
 
         assertTrue(addedCharter.isPresent());
@@ -103,7 +103,7 @@ public class ExistCharterManagerTest {
 
         cm.add(charter);
 
-        Optional<Charter> addedCharter = cm.getCharter(id, CharterStatus.IMPORTED);
+        Optional<Charter> addedCharter = cm.get(id, CharterStatus.IMPORTED);
         cm.delete(id, CharterStatus.IMPORTED, null);
 
         assertTrue(addedCharter.isPresent());
@@ -128,7 +128,7 @@ public class ExistCharterManagerTest {
     @Test
     public void testAddCharter6() throws Exception {
 
-        Charter savedCharter = cm.getCharter(
+        Charter savedCharter = cm.get(
                 new IdCharter("CH-KAE", "Urkunden", "KAE_Urkunde_Nr_3"),
                 CharterStatus.SAVED).get();
 
@@ -142,7 +142,7 @@ public class ExistCharterManagerTest {
 
         assertTrue(cm.add(savedCharter));
 
-        Optional<Charter> newPrivateCharter = cm.getCharter(newIdCharter, newStatus);
+        Optional<Charter> newPrivateCharter = cm.get(newIdCharter, newStatus);
 
         assertTrue(cm.delete(newIdCharter, CharterStatus.PRIVATE, newIdUser));
 
@@ -168,7 +168,7 @@ public class ExistCharterManagerTest {
 
         assertTrue(cm.add(charter));
 
-        charter = cm.getCharter(charter.getId(), charter.getCharterStatus()).get();
+        charter = cm.get(charter.getId(), charter.getCharterStatus()).get();
 
         cm.delete(charter.getId(), charter.getCharterStatus(), newUser.getId());
         mc.getUserManager().delete(newUser.getId());
@@ -190,7 +190,7 @@ public class ExistCharterManagerTest {
         cm.add(charter);
 
         assertTrue(cm.delete(id, CharterStatus.PRIVATE, user.getId()));
-        assertFalse(cm.getCharter(id, CharterStatus.PRIVATE).isPresent());
+        assertFalse(cm.get(id, CharterStatus.PRIVATE).isPresent());
         assertFalse(cm.delete(id, CharterStatus.PRIVATE, user.getId()));
 
     }
@@ -207,11 +207,11 @@ public class ExistCharterManagerTest {
 
         assertFalse(cm.delete(charter.getId()));
 
-        assertTrue(cm.getCharter(charter.getId(), CharterStatus.IMPORTED).isPresent());
+        assertTrue(cm.get(charter.getId(), CharterStatus.IMPORTED).isPresent());
 
         assertTrue(cm.delete(charter.getId(), CharterStatus.IMPORTED, null));
 
-        assertFalse(cm.getCharter(charter.getId(), CharterStatus.IMPORTED).isPresent());
+        assertFalse(cm.get(charter.getId(), CharterStatus.IMPORTED).isPresent());
 
         assertFalse(cm.delete(
                 new IdCharter("67e2a744-6a32-4d71-abaa-7a5f7b0e9bf3", "425d3dba-714e-40c9-af41-7edeb12d1a25"),
@@ -223,7 +223,7 @@ public class ExistCharterManagerTest {
     public void testGetCharterForImportedCharter() throws Exception {
 
         IdCharter id = new IdCharter("RS-IAGNS", "Charters", "F1_fasc.16_sub_N_1513");
-        Optional<Charter> charter = cm.getCharter(id, CharterStatus.IMPORTED);
+        Optional<Charter> charter = cm.get(id, CharterStatus.IMPORTED);
         assertTrue(charter.isPresent());
 
         charter.get().regenerateXmlContent();
@@ -236,7 +236,7 @@ public class ExistCharterManagerTest {
     public void testGetCharterForPrivateCharter() throws Exception {
 
         IdCharter id = new IdCharter("ea13e5f1-03b2-4bfa-9dd5-8fb770f98d7b", "46bc10f3-bc35-4fa8-ab82-25827dc243f6");
-        Optional<Charter> charter = cm.getCharter(id, CharterStatus.PRIVATE);
+        Optional<Charter> charter = cm.get(id, CharterStatus.PRIVATE);
         assertTrue(charter.isPresent());
         assertEquals(charter.get().getId().getContentAsElement().toXML(), id.getContentAsElement().toXML());
 
@@ -246,9 +246,11 @@ public class ExistCharterManagerTest {
     public void testGetCharterForPublishedCharter() throws Exception {
 
         IdCharter id = new IdCharter("CH-KAE", "Urkunden", "KAE_Urkunde_Nr_1");
-        Optional<Charter> charters = cm.getCharter(id, CharterStatus.PUBLIC);
+        Optional<Charter> charters = cm.get(id, CharterStatus.PUBLIC);
         assertTrue(charters.isPresent());
         assertEquals(charters.get().getId().getContentAsElement().toXML(), id.getContentAsElement().toXML());
+
+        assertFalse(cm.get(new IdCharter("CH-KAE", "Urkunden", "Not_existing"), CharterStatus.PUBLIC).isPresent());
 
     }
 
@@ -256,7 +258,7 @@ public class ExistCharterManagerTest {
     public void testGetCharterForSavedCharter() throws Exception {
 
         IdCharter id = new IdCharter("CH-KAE", "Urkunden", "KAE_Urkunde_Nr_2");
-        Optional<Charter> charter = cm.getCharter(id, CharterStatus.SAVED);
+        Optional<Charter> charter = cm.get(id, CharterStatus.SAVED);
         assertTrue(charter.isPresent());
         assertEquals(charter.get().getId().getContentAsElement().toXML(), id.getContentAsElement().toXML());
         assertTrue(charter.get().getAbstract().isPresent());
@@ -268,11 +270,11 @@ public class ExistCharterManagerTest {
     public void testGetCharterInstances() throws Exception {
 
         IdCharter id = new IdCharter("CH-KAE", "Urkunden", "KAE_Urkunde_Nr_2");
-        List<Charter> charters = cm.getCharterInstances(id);
+        List<Charter> charters = cm.getInstances(id);
         assertEquals(charters.size(), 2);
 
         IdCharter encodedId = new IdCharter("RS-IAGNS", "Charters", "IAGNS_F-.150_6605|193232"); // The | will be encoded
-        List<Charter> encodedIdCharters = cm.getCharterInstances(encodedId);
+        List<Charter> encodedIdCharters = cm.getInstances(encodedId);
         assertEquals(encodedIdCharters.size(), 1);
 
     }
@@ -280,7 +282,7 @@ public class ExistCharterManagerTest {
     @Test
     public void testGetCharterInstancesCharterNotExisting() throws Exception {
         IdCharter id = new IdCharter("RS-IAGNS", "Charters", "NotExisting");
-        List<Charter> charters = cm.getCharterInstances(id);
+        List<Charter> charters = cm.getInstances(id);
         assertTrue(charters.isEmpty());
     }
 
@@ -424,9 +426,9 @@ public class ExistCharterManagerTest {
 
         assertTrue(cm.publishSavedCharter(user, id));
 
-        assertFalse(cm.getCharter(id, CharterStatus.SAVED).isPresent());
+        assertFalse(cm.get(id, CharterStatus.SAVED).isPresent());
 
-        Optional<Charter> published = cm.getCharter(id, CharterStatus.PUBLIC);
+        Optional<Charter> published = cm.get(id, CharterStatus.PUBLIC);
         user = userManager.get(user.getId()).get();
 
         userManager.delete(user.getId());
@@ -455,7 +457,7 @@ public class ExistCharterManagerTest {
 
         assertTrue(cm.update(charter));
 
-        Optional<Charter> updated = cm.getCharter(charter.getId(), charter.getCharterStatus());
+        Optional<Charter> updated = cm.get(charter.getId(), charter.getCharterStatus());
 
         cm.delete(charter.getId(), charter.getCharterStatus(), admin.getId());
 
@@ -497,7 +499,7 @@ public class ExistCharterManagerTest {
 
         assertTrue(cm.updateId(newId, originalId, status, idUser));
 
-        Optional<Charter> updated = cm.getCharter(newId, status);
+        Optional<Charter> updated = cm.get(newId, status);
 
         if (updated.isPresent()) {
             cm.delete(newId, CharterStatus.PRIVATE, idUser);
@@ -538,7 +540,7 @@ public class ExistCharterManagerTest {
 
         assertTrue(cm.updateStatus(newStatus, originalStatus, idCharter, idUser));
 
-        Optional<Charter> updated = cm.getCharter(idCharter, newStatus);
+        Optional<Charter> updated = cm.get(idCharter, newStatus);
 
         if (updated.isPresent()) {
             cm.delete(idCharter);

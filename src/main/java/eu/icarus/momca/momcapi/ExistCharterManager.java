@@ -1,6 +1,5 @@
 package eu.icarus.momca.momcapi;
 
-import eu.icarus.momca.momcapi.exception.MomcaException;
 import eu.icarus.momca.momcapi.model.CharterStatus;
 import eu.icarus.momca.momcapi.model.id.*;
 import eu.icarus.momca.momcapi.model.resource.Charter;
@@ -133,24 +132,23 @@ class ExistCharterManager extends AbstractExistManager implements CharterManager
 
     @Override
     @NotNull
-    public Optional<Charter> getCharter(@NotNull IdCharter id, @NotNull CharterStatus status) {
+    public Optional<Charter> get(@NotNull IdCharter id, @NotNull CharterStatus status) {
 
         LOGGER.info("Trying to get charter '{}' with status '{}' from the database.", id, status);
 
-        ExistQuery query = ExistQueryFactory.getResourceUri(id.getContentAsElement(), status.getResourceRoot());
+        ExistQuery query = ExistQueryFactory.getCharterInstance(id, status);
         List<String> results = momcaConnection.queryDatabase(query);
 
         Optional<Charter> charter;
 
-        if (results.size() > 1) {
+        if (results.size() == 3) {
 
-            String message = String.format("More than one possible uri for charter '%s' with status '%s' found.",
-                    id, status);
-            throw new MomcaException(message);
+            String parentUri = results.get(0);
+            String name = results.get(1);
+            String content = results.get(2);
 
-        } else if (results.size() == 1) {
-
-            charter = getCharterFromUri(results.get(0));
+            ExistResource existResource = new ExistResource(name, parentUri, content);
+            charter = Optional.of(new Charter(existResource));
 
         } else {
 
@@ -171,7 +169,7 @@ class ExistCharterManager extends AbstractExistManager implements CharterManager
 
     @Override
     @NotNull
-    public List<Charter> getCharterInstances(@NotNull IdCharter id) {
+    public List<Charter> getInstances(@NotNull IdCharter id) {
 
         LOGGER.info("Trying to get all instances for the charter '{}' from the database.", id);
 

@@ -54,7 +54,7 @@ public interface CharterManager {
      * @return The charter wrapped in an optional.
      */
     @NotNull
-    Optional<Charter> getCharter(@NotNull IdCharter id, @NotNull CharterStatus status);
+    Optional<Charter> get(@NotNull IdCharter id, @NotNull CharterStatus status);
 
     /**
      * Gets all instances, for example the public and saved ones, of a charter from the database.
@@ -63,7 +63,7 @@ public interface CharterManager {
      * @return A list with all charter instances.
      */
     @NotNull
-    List<Charter> getCharterInstances(@NotNull IdCharter id);
+    List<Charter> getInstances(@NotNull IdCharter id);
 
     /**
      * Checks if a specific charter instance exists in the database.
