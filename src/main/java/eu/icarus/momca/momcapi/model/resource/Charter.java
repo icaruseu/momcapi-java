@@ -5,9 +5,7 @@ import eu.icarus.momca.momcapi.Util;
 import eu.icarus.momca.momcapi.exception.MomcaException;
 import eu.icarus.momca.momcapi.model.CharterStatus;
 import eu.icarus.momca.momcapi.model.Date;
-import eu.icarus.momca.momcapi.model.id.IdCharter;
-import eu.icarus.momca.momcapi.model.id.IdFond;
-import eu.icarus.momca.momcapi.model.id.IdUser;
+import eu.icarus.momca.momcapi.model.id.*;
 import eu.icarus.momca.momcapi.model.xml.Namespace;
 import eu.icarus.momca.momcapi.model.xml.XmlValidationProblem;
 import eu.icarus.momca.momcapi.model.xml.atom.AtomEntry;
@@ -81,11 +79,11 @@ public class Charter extends AtomResource {
     @NotNull
     private Optional<Witness> witnessOrig = Optional.empty();
 
-    public Charter(@NotNull IdCharter id, @NotNull CharterStatus charterStatus, @NotNull User author, @NotNull Date date) {
+    public Charter(@NotNull IdCharter id, @NotNull CharterStatus charterStatus, @NotNull IdUser author, @NotNull Date date) {
 
-        super(id, createParentUri(id, charterStatus, author.getId()), createResourceName(id, charterStatus));
+        super(id, createParentUri(id, charterStatus, author), createResourceName(id, charterStatus));
         this.charterStatus = charterStatus;
-        this.creator = Optional.of(author.getId());
+        this.creator = Optional.of(author);
         this.idno = new Idno(id.getIdentifier(), id.getIdentifier());
         this.date = date;
 
@@ -93,11 +91,23 @@ public class Charter extends AtomResource {
 
     }
 
-    public Charter(@NotNull Element ceiContent, @NotNull IdFond fond, @NotNull CharterStatus charterStatus, @NotNull User author) {
+    public Charter(@NotNull Element ceiContent, @NotNull IdAtomId parent, @NotNull CharterStatus charterStatus, @NotNull IdUser author) {
 
-        super(initIdCharterFromXml(ceiContent, fond),
-                createParentUri(initIdCharterFromXml(ceiContent, fond), charterStatus, author.getId()),
-                createResourceName(initIdCharterFromXml(ceiContent, fond), charterStatus));
+        super(initIdFromXml(ceiContent, parent),
+                createParentUri(initIdFromXml(ceiContent, parent), charterStatus, author),
+                createResourceName(initIdFromXml(ceiContent, parent), charterStatus));
+
+        if (!(parent instanceof IdFond) && !(parent instanceof IdCollection) && !(parent instanceof IdMyCollection)) {
+            throw new IllegalArgumentException("Parent is only allowed to be of type 'IdFond', 'IdCollection' or 'IdMyCollection'");
+        }
+
+        if (charterStatus == CharterStatus.PRIVATE && !(parent instanceof IdMyCollection)) {
+            throw new IllegalArgumentException("Private charters can only have a parent of type 'IdMyCollection'!");
+        }
+
+        if (parent instanceof IdMyCollection && charterStatus != CharterStatus.PRIVATE && charterStatus != CharterStatus.PUBLIC) {
+            throw new IllegalArgumentException("MyCollections are only allowed to have status 'public' or 'private'!");
+        }
 
         this.charterStatus = charterStatus;
         this.date = initDateFromXml(ceiContent);
@@ -546,13 +556,24 @@ public class Charter extends AtomResource {
     }
 
     @NotNull
-    private static IdCharter initIdCharterFromXml(@NotNull Element ceiContent, @NotNull IdFond fond) {
+    private static IdCharter initIdFromXml(@NotNull Element ceiContent, @NotNull IdAtomId parent) {
 
-        return
-                new IdCharter(
-                        fond.getIdArchive().getIdentifier(),
-                        fond.getIdentifier(),
-                        Util.queryXmlForString(ceiContent, XpathQuery.QUERY_CEI_BODY_IDNO_ID));
+        String charterIdentifier = Util.queryXmlForString(ceiContent, XpathQuery.QUERY_CEI_BODY_IDNO_ID);
+
+        IdCharter idCharter = new IdCharter(parent.getIdentifier(), charterIdentifier);
+
+        if (parent instanceof IdFond) {
+
+            IdFond fond = (IdFond) parent;
+
+            idCharter = new IdCharter(
+                    fond.getIdArchive().getIdentifier(),
+                    fond.getIdentifier(),
+                    charterIdentifier);
+
+        }
+
+        return idCharter;
 
     }
 

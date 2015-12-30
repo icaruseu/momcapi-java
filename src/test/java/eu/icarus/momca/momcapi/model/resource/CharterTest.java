@@ -1,14 +1,16 @@
 package eu.icarus.momca.momcapi.model.resource;
 
 import eu.icarus.momca.momcapi.TestUtils;
+import eu.icarus.momca.momcapi.Util;
 import eu.icarus.momca.momcapi.model.CharterStatus;
 import eu.icarus.momca.momcapi.model.Date;
-import eu.icarus.momca.momcapi.model.id.IdCharter;
+import eu.icarus.momca.momcapi.model.id.*;
 import eu.icarus.momca.momcapi.model.xml.cei.DateExact;
 import eu.icarus.momca.momcapi.model.xml.cei.Figure;
 import eu.icarus.momca.momcapi.model.xml.cei.Idno;
 import eu.icarus.momca.momcapi.model.xml.cei.Witness;
 import eu.icarus.momca.momcapi.model.xml.cei.mixedContentElement.*;
+import eu.icarus.momca.momcapi.query.XpathQuery;
 import nu.xom.Element;
 import nu.xom.ParsingException;
 import org.jetbrains.annotations.NotNull;
@@ -47,7 +49,7 @@ public class CharterTest {
 
         IdCharter id = new IdCharter("collection", "charter1");
         Date date = new Date(new DateExact("14180201", "February 1st, 1418"));
-        User user = new User("user", "moderator");
+        IdUser user = new IdUser("user");
 
         charter = new Charter(id, CharterStatus.PUBLIC, user, date);
 
@@ -58,7 +60,7 @@ public class CharterTest {
 
         IdCharter id = new IdCharter("collection", "charter1");
         Date date = new Date(new DateExact("14180201", "February 1st, 1418"));
-        User user = new User("user", "moderator");
+        IdUser user = new IdUser("user");
 
         charter = new Charter(id, CharterStatus.PUBLIC, user, date);
 
@@ -68,7 +70,7 @@ public class CharterTest {
 
         assertEquals(charter.getId(), id);
         assertTrue(charter.getCreator().isPresent());
-        assertEquals(charter.getCreator().get(), user.getId());
+        assertEquals(charter.getCreator().get(), user);
         assertEquals(charter.getIdno().getId(), "charter1");
         assertEquals(charter.getIdno().getText(), "charter1");
         assertEquals(charter.getDate(), date);
@@ -84,7 +86,73 @@ public class CharterTest {
     }
 
     @Test
-    public void testConstructor2WithEmptyCharter() throws Exception {
+    public void testConstructor2() throws Exception {
+
+        IdUser user = new IdUser("user1.testuser@dev.monasterium.net");
+        Element cei = Util.queryXmlForOptionalElement(TestUtils.getXmlFromResource("testcharter1.xml").getRootElement(), XpathQuery.QUERY_CEI_TEXT).get();
+
+        IdAtomId parent = new IdFond("CH-KAE", "Urkunden");
+
+        charter = new Charter(cei, parent, CharterStatus.PUBLIC, user);
+        assertEquals(charter.getUri(), "/db/mom-data/metadata.charter.public/CH-KAE/Urkunden/KAE_Urkunde_Nr_1.cei.xml");
+        assertEquals(charter.getId(), new IdCharter("CH-KAE", "Urkunden", "KAE_Urkunde_Nr_1"));
+
+        charter = new Charter(cei, parent, CharterStatus.IMPORTED, user);
+        assertEquals(charter.getUri(), "/db/mom-data/metadata.charter.import/CH-KAE/Urkunden/KAE_Urkunde_Nr_1.cei.xml");
+        assertEquals(charter.getId(), new IdCharter("CH-KAE", "Urkunden", "KAE_Urkunde_Nr_1"));
+
+        parent = new IdCollection("collection");
+
+        charter = new Charter(cei, parent, CharterStatus.PUBLIC, user);
+        assertEquals(charter.getUri(), "/db/mom-data/metadata.charter.public/collection/KAE_Urkunde_Nr_1.cei.xml");
+        assertEquals(charter.getId(), new IdCharter("collection", "KAE_Urkunde_Nr_1"));
+
+        parent = new IdMyCollection("myCollection");
+
+        charter = new Charter(cei, parent, CharterStatus.PRIVATE, user);
+        assertEquals(charter.getUri(), "/db/mom-data/xrx.user/user1.testuser%40dev.monasterium.net/metadata.charter/myCollection/KAE_Urkunde_Nr_1.charter.xml");
+        assertEquals(charter.getId(), new IdCharter("myCollection", "KAE_Urkunde_Nr_1"));
+
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testConstructor2WithPrivateFond() throws Exception {
+
+        IdUser user = new IdUser("user1.testuser@dev.monasterium.net");
+        Element cei = Util.queryXmlForOptionalElement(TestUtils.getXmlFromResource("testcharter1.xml").getRootElement(), XpathQuery.QUERY_CEI_TEXT).get();
+        IdAtomId parent = new IdFond("CH-KAE", "Urkunden");
+        CharterStatus status = CharterStatus.PRIVATE;
+
+        new Charter(cei, parent, status, user);
+
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testConstructor2WithImportedMyCollection() throws Exception {
+
+        IdUser user = new IdUser("user1.testuser@dev.monasterium.net");
+        Element cei = Util.queryXmlForOptionalElement(TestUtils.getXmlFromResource("testcharter1.xml").getRootElement(), XpathQuery.QUERY_CEI_TEXT).get();
+        IdAtomId parent = new IdMyCollection("myCollection");
+        CharterStatus status = CharterStatus.IMPORTED;
+
+        new Charter(cei, parent, status, user);
+
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testConstructor2WithWrongIdType() throws Exception {
+
+        IdUser user = new IdUser("user1.testuser@dev.monasterium.net");
+        Element cei = Util.queryXmlForOptionalElement(TestUtils.getXmlFromResource("testcharter1.xml").getRootElement(), XpathQuery.QUERY_CEI_TEXT).get();
+        IdAtomId parent = new IdArchive("CH-KAE");
+        CharterStatus status = CharterStatus.SAVED;
+
+        new Charter(cei, parent, status, user);
+
+    }
+
+    @Test
+    public void testConstructor3WithEmptyCharter() throws Exception {
 
         Date date = new Date();
         User user = new User("guest", "moderator");
@@ -113,7 +181,7 @@ public class CharterTest {
     }
 
     @Test
-    public void testConstructor2WithTestCharter1() throws Exception {
+    public void testConstructor3WithTestCharter1() throws Exception {
 
         Date date = new Date(LocalDate.of(947, 10, 27), "0947-10-27");
 
