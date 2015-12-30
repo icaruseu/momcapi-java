@@ -207,7 +207,7 @@ public class DateTest {
 
     @Test(expectedExceptions = MomcaException.class)
     public void testDateRangeInvalidDate() throws Exception {
-        DateAbstract dateRange = new DateRange("12170322", "", "12th January 1217");
+        DateAbstract dateRange = new DateRange("", "", "12th January 1217");
         new Date(dateRange);
     }
 

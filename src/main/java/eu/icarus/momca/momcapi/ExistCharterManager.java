@@ -158,7 +158,9 @@ class ExistCharterManager extends AbstractExistManager implements CharterManager
 
         if (proceed) {
 
-            for (IdCharter idCharter : charters) {
+            for (int i = 0; i < numberOfCharters; i++) {
+
+                IdCharter idCharter = charters.get(i);
 
                 Optional<Charter> charterOptional = getCharterInstance(idCharter, status);
 
@@ -190,7 +192,7 @@ class ExistCharterManager extends AbstractExistManager implements CharterManager
                         bw.write(outputFileContent);
                         bw.close();
 
-                        LOGGER.info("File '{}' written to disk.", path);
+                        LOGGER.info("{}/{} File '{}' written to disk.", i + 1, numberOfCharters, path);
 
                     } catch (IOException e) {
                         errors.add(String.format("Failed to write '%s' to disk.", path));

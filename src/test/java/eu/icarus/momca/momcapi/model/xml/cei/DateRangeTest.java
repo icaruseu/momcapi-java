@@ -44,8 +44,8 @@ public class DateRangeTest {
     @Test
     public void testIsValid() throws Exception {
         assertTrue(CEI_DATE_RANGE.isValid());
-        assertFalse(new DateRange("970801", "14970810", "01. - 10. August 1497").isValid());
-        assertFalse(new DateRange("14970801", "70810", "01. - 10. August 1497").isValid());
+        assertTrue(new DateRange("970801", "14970810", "01. - 10. August 1497").isValid());
+        assertTrue(new DateRange("14970801", "70810", "01. - 10. August 1497").isValid());
     }
 
     @Test
