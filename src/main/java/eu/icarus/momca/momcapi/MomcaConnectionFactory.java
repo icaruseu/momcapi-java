@@ -8,22 +8,24 @@ import java.io.IOException;
 import java.util.Properties;
 
 /**
- * Created by djell on 30/12/2015.
+ * Gets instances of MomcaConnection.
  */
 @SuppressWarnings("AccessCanBeTightened")
 public class MomcaConnectionFactory {
 
     public static final String PASSWORD_PROPERTY = "password";
-    public static final String SERVER_PROPERTIES_NAME = "server.properties";
-    public static final String SERVER_TYPE_PROPERTY = "serverType";
-    public static final String SERVER_URL_PROPERTY = "serverUrl";
+    public static final String SERVER_PROPERTIES_NAME = "connection.properties";
+    public static final String SERVER_TYPE_PROPERTY = "connectionType";
+    public static final String SERVER_URL_PROPERTY = "connectionUrl";
     public static final String USER_PROPERTY = "user";
     private static final Logger LOGGER = LoggerFactory.getLogger(MomcaConnectionFactory.class);
 
-    @NotNull
-    public static MomcaConnection get() {
+    private MomcaConnection momcaConnection = null;
 
-        LOGGER.info("Trying to get MOM-CA instance.");
+    @NotNull
+    private MomcaConnection createMomcaConnection() {
+
+        LOGGER.info("Creating new MOM-CA connection instance.");
 
         MomcaConnection momcaConnection;
 
@@ -31,7 +33,7 @@ public class MomcaConnectionFactory {
 
         try {
             LOGGER.debug("Try to read properties file '{}'.", SERVER_PROPERTIES_NAME);
-            properties.load(MomcaConnectionFactory.class.getClassLoader().getResourceAsStream(SERVER_PROPERTIES_NAME));
+            properties.load(this.getClass().getClassLoader().getResourceAsStream(SERVER_PROPERTIES_NAME));
             LOGGER.debug("Properties read from '{}'.", SERVER_PROPERTIES_NAME);
 
         } catch (IOException e) {
@@ -50,9 +52,27 @@ public class MomcaConnectionFactory {
                 momcaConnection = new ExistMomcaConnection(url, userName, password);
         }
 
-        LOGGER.info("Returning '{}'-based MOM-CA instance.", type);
+        LOGGER.info("{}-based MOM-CA connection instantiated.", type);
 
         return momcaConnection;
+
+    }
+
+    /**
+     * @return An instance of the MOM-CA connection as set up in 'server.properties'.
+     */
+    @NotNull
+    public MomcaConnection getMomcaConnection() {
+
+        LOGGER.info("Trying to get the MOM-CA connection instance.");
+
+        if (momcaConnection == null) {
+            this.momcaConnection = createMomcaConnection();
+        }
+
+        LOGGER.info("Returning the MOM-CA connection instance '{}'.", this.momcaConnection);
+
+        return this.momcaConnection;
 
     }
 

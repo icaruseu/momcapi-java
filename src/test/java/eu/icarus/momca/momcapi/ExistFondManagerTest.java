@@ -22,7 +22,8 @@ public class ExistFondManagerTest {
 
     @BeforeClass
     public void setUp() throws Exception {
-        mc = TestUtils.initMomcaConnection();
+        MomcaConnectionFactory factory = new MomcaConnectionFactory();
+        mc = (ExistMomcaConnection) factory.getMomcaConnection();
         fm = mc.getFondManager();
         assertNotNull(fm, "MOM-CA connection not initialized.");
     }

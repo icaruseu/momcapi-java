@@ -21,7 +21,8 @@ public class ExistArchiveManagerTest {
 
     @BeforeClass
     public void setUp() throws Exception {
-        mc = TestUtils.initMomcaConnection();
+        MomcaConnectionFactory factory = new MomcaConnectionFactory();
+        mc = (ExistMomcaConnection) factory.getMomcaConnection();
         am = mc.getArchiveManager();
         assertNotNull(am, "MOM-CA connection not initialized.");
     }

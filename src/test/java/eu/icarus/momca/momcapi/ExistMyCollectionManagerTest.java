@@ -21,7 +21,8 @@ public class ExistMyCollectionManagerTest {
 
     @BeforeClass
     public void setUp() throws Exception {
-        MomcaConnection mc = TestUtils.initMomcaConnection();
+        MomcaConnectionFactory factory = new MomcaConnectionFactory();
+        MomcaConnection mc = factory.getMomcaConnection();
         mm = mc.getMyCollectionManager();
         assertNotNull(mm, "MOM-CA connection not initialized.");
 

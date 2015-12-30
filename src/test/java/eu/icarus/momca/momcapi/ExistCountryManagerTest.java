@@ -22,9 +22,9 @@ public class ExistCountryManagerTest {
     @BeforeClass
     public void setUp() throws Exception {
 
-
-        MomcaConnection momcaConnection = TestUtils.initMomcaConnection();
-        cm = momcaConnection.getCountryManager();
+        MomcaConnectionFactory factory = new MomcaConnectionFactory();
+        MomcaConnection mc = factory.getMomcaConnection();
+        cm = mc.getCountryManager();
         assertNotNull(cm, "MOM-CA connection not initialized.");
 
         cm.deleteCountryFromHierarchy(new CountryCode("AT"));

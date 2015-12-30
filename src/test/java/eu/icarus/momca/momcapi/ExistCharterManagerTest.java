@@ -30,7 +30,8 @@ public class ExistCharterManagerTest {
 
     @BeforeClass
     public void setUp() throws Exception {
-        mc = TestUtils.initMomcaConnection();
+        MomcaConnectionFactory factory = new MomcaConnectionFactory();
+        mc = factory.getMomcaConnection();
         cm = mc.getCharterManager();
         assertNotNull(cm, "MOM-CA connection not initialized.");
     }
