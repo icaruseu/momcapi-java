@@ -2,3 +2,4 @@ src/test/connection.properties
 *.iml
 .idea/
 target/
+src/test/resources/connection.properties
