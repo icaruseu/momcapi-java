@@ -110,5 +110,9 @@ public class IdCharter extends IdAtomId {
     }
 
 
+    @Override
+    public String toString() {
+        return "IdCharter{" + getAtomId() + "}";
+    }
 
 }

@@ -40,4 +40,9 @@ public class IdMyCollection extends IdAtomId {
 
     }
 
+    @Override
+    public String toString() {
+        return "IdMyCollection{" + getAtomId() + "}";
+    }
+
 }

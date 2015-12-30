@@ -37,5 +37,8 @@ public class IdArchive extends IdAtomId {
 
     }
 
-
+    @Override
+    public String toString() {
+        return "IdArchive{" + getAtomId() + "}";
+    }
 }

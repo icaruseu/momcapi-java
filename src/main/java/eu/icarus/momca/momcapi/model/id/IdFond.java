@@ -83,4 +83,9 @@ public class IdFond extends IdAtomId {
 
     }
 
+    @Override
+    public String toString() {
+        return "IdFond{" + getAtomId() + "}";
+    }
+
 }

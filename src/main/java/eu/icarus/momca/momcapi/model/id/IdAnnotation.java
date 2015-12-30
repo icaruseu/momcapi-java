@@ -12,5 +12,10 @@ public class IdAnnotation extends IdAtomId {
         super(atomIdXml);
     }
 
+    @Override
+    public String toString() {
+        return "IdAnnotation{" + getAtomId() + "}";
+    }
+
 
 }

@@ -56,4 +56,9 @@ public class IdUser extends IdAbstract {
         return atomAuthor.getEmail();
     }
 
+    @Override
+    public String toString() {
+        return "IdUser{" + identifier + "}";
+    }
+
 }

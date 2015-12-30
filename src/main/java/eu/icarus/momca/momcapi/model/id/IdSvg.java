@@ -12,4 +12,9 @@ public class IdSvg extends IdAtomId {
         super(atomIdXml);
     }
 
+    @Override
+    public String toString() {
+        return "IdSvg{" + getAtomId() + "}";
+    }
+
 }
