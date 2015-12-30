@@ -49,7 +49,7 @@ public class DateRange extends DateAbstract {
         String from = dateElement.getAttributeValue("from");
         String to = dateElement.getAttributeValue("to");
 
-        if ((from == null || from.isEmpty()) || (to == null || to.isEmpty())) {
+        if ((from == null || from.isEmpty()) && (to == null || to.isEmpty())) {
             String message = String.format(
                     "At least either 'to' or 'from' element must be present in the 'dateRange' Element `%s`",
                     dateElement.toXML());
@@ -105,7 +105,7 @@ public class DateRange extends DateAbstract {
 
     @Override
     public boolean isValid() {
-        return fromDateValue.isValid() && toDateValue.isValid();
+        return fromDateValue.isValid() || toDateValue.isValid();
     }
 
     @Override

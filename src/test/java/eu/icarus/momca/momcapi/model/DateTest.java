@@ -1,5 +1,6 @@
 package eu.icarus.momca.momcapi.model;
 
+import eu.icarus.momca.momcapi.Util;
 import eu.icarus.momca.momcapi.exception.MomcaException;
 import eu.icarus.momca.momcapi.model.xml.cei.DateAbstract;
 import eu.icarus.momca.momcapi.model.xml.cei.DateExact;
@@ -339,6 +340,15 @@ public class DateTest {
         assertFalse(date.getEarliestPossibleDate().isPresent());
         assertEquals(date.getDaysInRange(), 0);
 
+        String element = "<cei:dateRange xmlns:cei=\"http://www.monasterium.net/NS/cei\" to=\"12129999\" from=\"\">[ca. 1212]</cei:dateRange>";
+        dateRange = new DateRange(Util.parseToElement(element));
+
+        date = new Date(dateRange);
+
+        assertTrue(date.getSortingDate().isPresent());
+        assertEquals(date.getSortingDate().get(), LocalDate.of(1212, 12, 31));
+        assertEquals(date.getDaysInRange(), 365);
+
     }
 
     @Test
@@ -352,6 +362,15 @@ public class DateTest {
         assertEquals(date.getSortingDate().get(), LocalDate.of(1217, 3, 22));
         assertFalse(date.getEarliestPossibleDate().isPresent());
         assertEquals(date.getDaysInRange(), 0);
+
+        String element = "<cei:dateRange xmlns:cei=\"http://www.monasterium.net/NS/cei\" to=\"\" from=\"12129999\">[ca. 1212]</cei:dateRange>";
+        dateRange = new DateRange(Util.parseToElement(element));
+
+        date = new Date(dateRange);
+
+        assertTrue(date.getSortingDate().isPresent());
+        assertEquals(date.getSortingDate().get(), LocalDate.of(1212, 12, 31));
+        assertEquals(date.getDaysInRange(), 365);
 
     }
 
