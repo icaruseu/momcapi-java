@@ -116,24 +116,24 @@ public class CharterTest {
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
-    public void testConstructor2WithPrivateFond() throws Exception {
-
-        IdUser user = new IdUser("user1.testuser@dev.monasterium.net");
-        Element cei = Util.queryXmlForOptionalElement(TestUtils.getXmlFromResource("testcharter1.xml").getRootElement(), XpathQuery.QUERY_CEI_TEXT).get();
-        IdAtomId parent = new IdFond("CH-KAE", "Urkunden");
-        CharterStatus status = CharterStatus.PRIVATE;
-
-        new Charter(cei, parent, status, user);
-
-    }
-
-    @Test(expectedExceptions = IllegalArgumentException.class)
     public void testConstructor2WithImportedMyCollection() throws Exception {
 
         IdUser user = new IdUser("user1.testuser@dev.monasterium.net");
         Element cei = Util.queryXmlForOptionalElement(TestUtils.getXmlFromResource("testcharter1.xml").getRootElement(), XpathQuery.QUERY_CEI_TEXT).get();
         IdAtomId parent = new IdMyCollection("myCollection");
         CharterStatus status = CharterStatus.IMPORTED;
+
+        new Charter(cei, parent, status, user);
+
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testConstructor2WithPrivateFond() throws Exception {
+
+        IdUser user = new IdUser("user1.testuser@dev.monasterium.net");
+        Element cei = Util.queryXmlForOptionalElement(TestUtils.getXmlFromResource("testcharter1.xml").getRootElement(), XpathQuery.QUERY_CEI_TEXT).get();
+        IdAtomId parent = new IdFond("CH-KAE", "Urkunden");
+        CharterStatus status = CharterStatus.PRIVATE;
 
         new Charter(cei, parent, status, user);
 
@@ -227,7 +227,7 @@ public class CharterTest {
         assertEquals(charter.getTenor().get().getN().get(), "n");
 
         assertTrue(charter.getAbstract().isPresent());
-        assertEquals(charter.getAbstract().get().getContent(), "König Otto I. verleiht auf Bitte Herzog Hermanns dem Kloster Meinradszell (Einsiedeln), das samt einer Kirche vom jetzigen <cei:persName>Abt Eberhard</cei:persName> auf Boden, der dem Herzog von einigen Getreuen zu eigen gegeben worden war, mit dessen Unterstützung errichtet worden ist, das Recht freier Wahl des Abtes nach dem Tode Eberhards und Immunität.");
+        assertEquals(charter.getAbstract().get().getContent(), "König Otto I. verleiht auf Bitte Herzog Hermanns dem Kloster Meinradszell (Einsiedeln), das samt einer Kirche vom jetzigen <cei:persName>Abt Eberhard</cei:persName> auf Boden, der dem Herzog von einigen Getreuen zu eigen gegeben worden war, mit dessen Unterstützung errichtet worden ist, das Recht freier Wahl des Abtes nach dem Tode Eberhards und Immunität.<cei:class>Charter</cei:class>");
         assertEquals(charter.getAbstract().get().getFacs().get(), "facs");
         assertEquals(charter.getAbstract().get().getId().get(), "id");
         assertEquals(charter.getAbstract().get().getLang().get(), "lang");
@@ -237,7 +237,7 @@ public class CharterTest {
         assertEquals(charter.getLangMom().get(), "Latein");
 
         assertTrue(charter.getCharterClass().isPresent());
-        assertEquals(charter.getCharterClass().get(), "Urkunde");
+        assertEquals(charter.getCharterClass().get(), "Charter");
 
         assertTrue(charter.getIssuedPlace().isPresent());
         assertEquals(charter.getIssuedPlace().get().getContent(),
@@ -295,6 +295,9 @@ public class CharterTest {
         assertEquals(charter.getBackDivNotes().get(0).getN().get(), "n");
         assertEquals(charter.getBackDivNotes().get(0).getContent(), "Unbekannt");
 
+        assertTrue(charter.getWitnessOrig().isPresent());
+        assertEquals(charter.getWitnessOrig().get().getRubrum().get().getContent(), "rubrum");
+
         assertEquals(charter.getWitListPar().size(), 1);
         assertEquals(charter.getWitListPar().get(0).getTraditioForm().get().getContent(), "Kopie");
         assertEquals(charter.getWitListPar().get(0).getFigures().size(), 1);
@@ -310,12 +313,12 @@ public class CharterTest {
         assertTrue(charter.isValidCei());
         assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front><cei:sourceDesc><cei:sourceDescRegest><cei:bibl facs=\"facs\" id=\"id\" key=\"key\" lang=\"lang\" n=\"n\">QW I/1, Nr. 28</cei:bibl></cei:sourceDescRegest><cei:sourceDescVolltext id=\"id\"><cei:bibl>Volltext</cei:bibl></cei:sourceDescVolltext></cei:sourceDesc><cei:publicationStmt>\n" +
                 "                    <cei:p>Published 2013</cei:p>\n" +
-                "                </cei:publicationStmt></cei:front><cei:body><cei:idno facs=\"facs\" id=\"KAE_Urkunde_Nr_1\" n=\"n\" old=\"1\">KAE, Urkunde Nr. 1</cei:idno><cei:chDesc><cei:abstract facs=\"facs\" id=\"id\" lang=\"lang\" n=\"n\">König Otto I. verleiht auf Bitte Herzog Hermanns dem Kloster Meinradszell (Einsiedeln), das samt einer Kirche vom jetzigen <cei:persName>Abt Eberhard</cei:persName> auf Boden, der dem Herzog von einigen Getreuen zu eigen gegeben worden war, mit dessen Unterstützung errichtet worden ist, das Recht freier Wahl des Abtes nach dem Tode Eberhards und Immunität.</cei:abstract><cei:issued><cei:placeName lang=\"lang\" type=\"City\">Frankfurt <cei:hi>am Main</cei:hi></cei:placeName><cei:date certainty=\"certainty\" facs=\"facs\" id=\"id\" lang=\"lang\" n=\"n\" value=\"9471027\">0947-10-27</cei:date></cei:issued><cei:witnessOrig n=\"A\"><cei:traditioForm>Original</cei:traditioForm><cei:archIdentifier>\n" +
+                "                </cei:publicationStmt></cei:front><cei:body><cei:idno facs=\"facs\" id=\"KAE_Urkunde_Nr_1\" n=\"n\" old=\"1\">KAE, Urkunde Nr. 1</cei:idno><cei:chDesc><cei:class>Charter</cei:class><cei:abstract facs=\"facs\" id=\"id\" lang=\"lang\" n=\"n\">König Otto I. verleiht auf Bitte Herzog Hermanns dem Kloster Meinradszell (Einsiedeln), das samt einer Kirche vom jetzigen <cei:persName>Abt Eberhard</cei:persName> auf Boden, der dem Herzog von einigen Getreuen zu eigen gegeben worden war, mit dessen Unterstützung errichtet worden ist, das Recht freier Wahl des Abtes nach dem Tode Eberhards und Immunität.<cei:class>Charter</cei:class></cei:abstract><cei:issued><cei:placeName lang=\"lang\" type=\"City\">Frankfurt <cei:hi>am Main</cei:hi></cei:placeName><cei:date certainty=\"certainty\" facs=\"facs\" id=\"id\" lang=\"lang\" n=\"n\" value=\"9471027\">0947-10-27</cei:date></cei:issued><cei:witnessOrig n=\"A\"><cei:traditioForm>Original</cei:traditioForm><cei:archIdentifier>\n" +
                 "                            <cei:arch>Klosterarchiv Einsiedeln</cei:arch>\n" +
                 "                            <cei:idno>KAE, A.BI.1</cei:idno>\n" +
                 "                        </cei:archIdentifier><cei:auth>\n" +
                 "                            <cei:sealDesc>1 Siegel</cei:sealDesc>\n" +
-                "                        </cei:auth><cei:figure><cei:graphic url=\"KAE_A_BI_1-v.jpg\" /></cei:figure><cei:figure><cei:graphic url=\"KAE_A_BI_1-r.jpg\" /></cei:figure></cei:witnessOrig><cei:witListPar><cei:witness n=\"B\"><cei:traditioForm>Kopie</cei:traditioForm><cei:archIdentifier>\n" +
+                "                        </cei:auth><cei:rubrum>rubrum</cei:rubrum><cei:figure><cei:graphic url=\"KAE_A_BI_1-v.jpg\" /></cei:figure><cei:figure><cei:graphic url=\"KAE_A_BI_1-r.jpg\" /></cei:figure></cei:witnessOrig><cei:witListPar><cei:witness n=\"B\"><cei:traditioForm>Kopie</cei:traditioForm><cei:archIdentifier>\n" +
                 "                                <cei:arch>Klosterarchiv Einsiedeln</cei:arch>\n" +
                 "                                <cei:idno>KAE, A.II.1</cei:idno>\n" +
                 "                            </cei:archIdentifier><cei:figure><cei:graphic url=\"http://www.klosterarchiv.ch/archivalien/KAE_A_II_1-1440/KAE_A_II_1-0067.jpg\" /></cei:figure></cei:witness></cei:witListPar><cei:diplomaticAnalysis>\n" +
@@ -337,7 +340,7 @@ public class CharterTest {
                 "                            <cei:bibl>Sickel, Kaiserurkunden, S. 70, 72-77.</cei:bibl>\n" +
                 "                            <cei:bibl>MGH Ergänzungen, Nr. O.I.094.</cei:bibl>\n" +
                 "                        </cei:listBiblErw>\n" +
-                "                    </cei:diplomaticAnalysis><cei:lang_MOM>Latein</cei:lang_MOM></cei:chDesc><cei:tenor facs=\"facs\" id=\"id\" n=\"n\">This is the <cei:hi>Winter</cei:hi> of our discontempt.</cei:tenor></cei:body><cei:back><cei:class>Urkunde</cei:class><cei:persName reg=\"Karl der Große\" type=\"Kaiser\">Carolus <cei:hi>Magnus</cei:hi></cei:persName><cei:persName certainty=\"certainty\" facs=\"facs\" id=\"id\" key=\"key\" lang=\"lang\" n=\"n\" reg=\"reg\" type=\"type\">Eginhardus</cei:persName><cei:placeName certainty=\"certainty\" existent=\"existent\" facs=\"facs\" id=\"id\" key=\"key\" lang=\"lang\" n=\"n\" reg=\"reg\" type=\"type\">Frankfurt</cei:placeName><cei:placeName reg=\"Einsiedeln\">Kloster <cei:hi>Einsiedeln</cei:hi> in der Schweiz</cei:placeName><cei:geogName certainty=\"certainty\" existent=\"existent\" facs=\"facs\" id=\"id\" key=\"key\" lang=\"lang\" n=\"n\" reg=\"reg\" type=\"type\">Ein Berg</cei:geogName><cei:geogName>Der <cei:hi>Grabeshügel</cei:hi></cei:geogName><cei:index facs=\"facs\" id=\"id\" indexName=\"indexName\" lang=\"lang\" lemma=\"lemma\" n=\"n\" sublemma=\"sublemma\" type=\"type\">Schwert</cei:index><cei:divNotes><cei:note place=\"§1\" id=\"id\" n=\"n\">Unbekannt</cei:note></cei:divNotes></cei:back></cei:text>");
+                "                    </cei:diplomaticAnalysis><cei:lang_MOM>Latein</cei:lang_MOM></cei:chDesc><cei:tenor facs=\"facs\" id=\"id\" n=\"n\">This is the <cei:hi>Winter</cei:hi> of our discontempt.</cei:tenor></cei:body><cei:back><cei:persName reg=\"Karl der Große\" type=\"Kaiser\">Carolus <cei:hi>Magnus</cei:hi></cei:persName><cei:persName certainty=\"certainty\" facs=\"facs\" id=\"id\" key=\"key\" lang=\"lang\" n=\"n\" reg=\"reg\" type=\"type\">Eginhardus</cei:persName><cei:placeName certainty=\"certainty\" existent=\"existent\" facs=\"facs\" id=\"id\" key=\"key\" lang=\"lang\" n=\"n\" reg=\"reg\" type=\"type\">Frankfurt</cei:placeName><cei:placeName reg=\"Einsiedeln\">Kloster <cei:hi>Einsiedeln</cei:hi> in der Schweiz</cei:placeName><cei:geogName certainty=\"certainty\" existent=\"existent\" facs=\"facs\" id=\"id\" key=\"key\" lang=\"lang\" n=\"n\" reg=\"reg\" type=\"type\">Ein Berg</cei:geogName><cei:geogName>Der <cei:hi>Grabeshügel</cei:hi></cei:geogName><cei:index facs=\"facs\" id=\"id\" indexName=\"indexName\" lang=\"lang\" lemma=\"lemma\" n=\"n\" sublemma=\"sublemma\" type=\"type\">Schwert</cei:index><cei:divNotes><cei:note place=\"§1\" id=\"id\" n=\"n\">Unbekannt</cei:note></cei:divNotes></cei:back></cei:text>");
 
     }
 
@@ -724,7 +727,7 @@ public class CharterTest {
         Figure figure = new Figure("image1.jpg");
         List<Figure> figures = new ArrayList<>(1);
         figures.add(figure);
-        Witness witness = new Witness(null, null, figures, "", "", "", null, null, null);
+        Witness witness = new Witness(null, null, figures, "", "", "", null, null, null, null);
 
         List<Witness> witListPar = new ArrayList<>(1);
         witListPar.add(witness);
@@ -747,7 +750,7 @@ public class CharterTest {
         Figure figure = new Figure("image1.jpg");
         List<Figure> figures = new ArrayList<>(1);
         figures.add(figure);
-        Witness witness = new Witness(null, null, figures, "", "", "", null, null, null);
+        Witness witness = new Witness(null, null, figures, "", "", "", null, null, null, null);
 
         assertFalse(charter.getWitnessOrig().isPresent());
 

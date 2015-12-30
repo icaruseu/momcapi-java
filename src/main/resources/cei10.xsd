@@ -1,7 +1,4 @@
-<xs:schema xmlns:xerces="http://xerces.apache.org" xmlns:xrxe="http://www.monasterium.net/NS/xrxe"
-           xmlns:xrx="http://www.monasterium.net/NS/xrx" xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns="http://www.monasterium.net/NS/cei" attributeFormDefault="unqualified" elementFormDefault="qualified"
-           targetNamespace="http://www.monasterium.net/NS/cei" id="cei10">
+<xs:schema xmlns="http://www.monasterium.net/NS/cei" xmlns:xerces="http://xerces.apache.org" xmlns:xrxe="http://www.monasterium.net/NS/xrxe" xmlns:xrx="http://www.monasterium.net/NS/xrx" xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://www.monasterium.net/NS/cei" id="cei10">
     <xs:element name="cei">
         <xs:annotation>
             <xs:documentation xml:lang="deu"> Wurzelelement für alle Dokumente, die den Regeln der
@@ -681,6 +678,7 @@
         <xs:complexType mixed="true">
             <xs:sequence>
                 <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="class"/>
                     <xs:element ref="abstract"/>
                     <xs:element name="issued" minOccurs="1" maxOccurs="1">
                         <xs:annotation>
@@ -786,6 +784,7 @@
                                     <xs:element ref="auth"/>
                                     <xs:element ref="physicalDesc"/>
                                     <xs:element ref="nota"/>
+                                    <xs:element ref="rubrum"/>
                                     <xs:element ref="figure">
                                         <xs:annotation>
                                             <xs:appinfo source="EditVDU">
@@ -974,6 +973,7 @@
                                     </xs:element>
                                     <xs:element ref="quoteOriginaldatierung"/>
                                     <xs:element ref="nota"/>
+                                    <xs:element ref="rubrum"/>
                                     <xs:element ref="divNotes"/>
                                 </xs:choice>
                             </xs:sequence>
@@ -1044,6 +1044,7 @@
         <xs:complexType mixed="true">
             <xs:sequence>
                 <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="class"/>
                     <xs:group ref="Sachliches"/>
                     <xs:group ref="layout"/>
                     <xs:element ref="recipient"/>
@@ -1221,6 +1222,7 @@
                     <xs:element ref="auth"/>
                     <xs:element ref="physicalDesc"/>
                     <xs:element ref="nota"/>
+                    <xs:element ref="rubrum"/>
                     <xs:element ref="figure"/>
                     <xs:group ref="layout"/>
                     <xs:group ref="textualElements"/>
@@ -1708,6 +1710,37 @@
             <xs:documentation xml:lang="deu"> Enthält Vermerke der ausstellenden Kanzlei auf der
                 Urkunde. Für Archivvermerke beim Empfänger vgl. rubrum </xs:documentation>
             <xs:documentation xml:lang="eng">contains the extra sigillum notes on the document.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:group ref="Originalbefund"/>
+                    <xs:group ref="Sachliches"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attributeGroup ref="type"/>
+            <xs:attribute name="position" type="xs:anySimpleType" use="optional"/>
+            <xs:attributeGroup ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="rubrum">
+        <xs:annotation>
+            <xs:appinfo source="EditVDU">
+                <xrxe:label>
+                    <xrx:i18n>
+                        <xrx:key>cei_rubrum</xrx:key>
+                        <xrx:default>rubrum</xrx:default>
+                    </xrx:i18n>
+                </xrxe:label>
+                <xrxe:min-occur>0</xrxe:min-occur>
+                <xrxe:max-occur>unbounded</xrxe:max-occur>
+                <xrxe:content-control>annotation</xrxe:content-control>
+            </xs:appinfo>
+            <xs:documentation xml:lang="deu"> Enthält Vermerke des verwahrenden Archivs oder des Empfängers auf der
+                Urkunde.</xs:documentation>
+            <xs:documentation xml:lang="eng">contains notes on the document applied by the preserving archives or the recipient.
             </xs:documentation>
         </xs:annotation>
         <xs:complexType mixed="true">
@@ -2602,6 +2635,7 @@
                 <xs:element ref="c"/>
                 <xs:element ref="sic"/>
                 <xs:element ref="handShift"/>
+                <xs:element ref="unclear"/>
             </xs:choice>
         </xs:sequence>
     </xs:group>
@@ -2702,6 +2736,55 @@
                             <xrx:i18n>
                                 <xrx:key>cei_at_agent</xrx:key>
                                 <xrx:default>agent</xrx:default>
+                            </xrx:i18n>
+                        </xrxe:label>
+                        <xrxe:relevant>true</xrxe:relevant>
+                    </xs:appinfo>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attributeGroup ref="certainty"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="unclear">
+        <xs:annotation>
+            <xs:appinfo source="EditVDU">
+                <xrxe:label>
+                    <xrx:i18n>
+                        <xrx:key>cei_unclear</xrx:key>
+                        <xrx:default>unclear</xrx:default>
+                    </xrx:i18n>
+                </xrxe:label>
+                <xrxe:menu-item>
+                    <xrx:i18n>
+                        <xrx:key>original</xrx:key>
+                        <xrx:default>original</xrx:default>
+                    </xrx:i18n>
+                </xrxe:menu-item>
+                <xrxe:min-occur>0</xrxe:min-occur>
+                <xrxe:max-occur>unbounded</xrxe:max-occur>
+            </xs:appinfo>
+            <xs:documentation xml:lang="deu"> enthält Text, der nicht eindeutig lesbar sind. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="expan"/>
+                    <xs:element ref="c"/>
+                    <xs:element ref="lb"/>
+                    <xs:element ref="pb"/>
+                    <xs:element ref="handShift"/>
+                    <xs:element ref="pict"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute name="extent" type="xs:anySimpleType"/>
+            <xs:attribute name="degree" type="xs:anySimpleType">
+                <xs:annotation>
+                    <xs:appinfo source="EditVDU">
+                        <xrxe:label>
+                            <xrx:i18n>
+                                <xrx:key>cei_at_degree</xrx:key>
+                                <xrx:default>degree</xrx:default>
                             </xrx:i18n>
                         </xrxe:label>
                         <xrxe:relevant>true</xrxe:relevant>
@@ -4530,6 +4613,7 @@
                     <xs:group ref="layout"/>
                     <xs:element ref="foreign"/>
                     <xs:element ref="quote"/>
+                    <xs:element ref="title"/>
                     <xs:element ref="scope"/>
                     <xs:group ref="Referenz"/>
                 </xs:choice>
@@ -4675,8 +4759,7 @@
                             <xrx:default>certainty</xrx:default>
                         </xrx:i18n>
                     </xrxe:label>
-                    <xrxe:relevant
-                            context="='persName' or $context='geogName' or $context='placeName' or $context='sic' or $context='del' or $context='expan' or $context='damage'"/>
+                    <xrxe:relevant context="='persName' or $context='geogName' or $context='placeName' or $context='sic' or $context='del' or $context='expan' or $context='damage'"/>
                 </xs:appinfo>
                 <xs:documentation xml:lang="deu"> Für Genauigkeitsangaben z.B. bei Datierungen,
                     werden mit Schlüsselwörtern (zu benennen in der encodingDesc) oder kurzen
@@ -4743,8 +4826,7 @@
                             <xrx:default>type</xrx:default>
                         </xrx:i18n>
                     </xrxe:label>
-                    <xrxe:relevant
-                            context="='persName' or $context='geogName' or $context='placeName' or $context='c'"/>
+                    <xrxe:relevant context="='persName' or $context='geogName' or $context='placeName' or $context='c'"/>
                 </xs:appinfo>
             </xs:annotation>
         </xs:attribute>

@@ -32,7 +32,8 @@
             <cei:body>
                 <cei:idno id="KAE_Urkunde_Nr_1" old="1" facs="facs" n="n">KAE, Urkunde Nr. 1</cei:idno>
                 <cei:chDesc>
-                    <cei:abstract lang="lang" n="n" id="id" facs="facs">König Otto I. verleiht auf Bitte Herzog Hermanns dem Kloster Meinradszell (Einsiedeln), das samt einer Kirche vom jetzigen <cei:persName>Abt Eberhard</cei:persName> auf Boden, der dem Herzog von einigen Getreuen zu eigen gegeben worden war, mit dessen Unterstützung errichtet worden ist, das Recht freier Wahl des Abtes nach dem Tode Eberhards und Immunität.</cei:abstract>
+                    <cei:class>Charter</cei:class>
+                    <cei:abstract lang="lang" n="n" id="id" facs="facs">König Otto I. verleiht auf Bitte Herzog Hermanns dem Kloster Meinradszell (Einsiedeln), das samt einer Kirche vom jetzigen <cei:persName>Abt Eberhard</cei:persName> auf Boden, der dem Herzog von einigen Getreuen zu eigen gegeben worden war, mit dessen Unterstützung errichtet worden ist, das Recht freier Wahl des Abtes nach dem Tode Eberhards und Immunität.<cei:class>Charter</cei:class></cei:abstract>
                     <cei:issued>
                         <cei:placeName type="City" lang="lang">Frankfurt <cei:hi>am Main</cei:hi></cei:placeName>
                         <cei:date value="9471027" facs="facs" n="n" lang="lang" id="id"
@@ -56,6 +57,7 @@
                         <cei:auth>
                             <cei:sealDesc>1 Siegel</cei:sealDesc>
                         </cei:auth>
+                        <cei:rubrum>rubrum</cei:rubrum>
                     </cei:witnessOrig>
                     <cei:witListPar>
                         <cei:witness

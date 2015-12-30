@@ -30,7 +30,7 @@ public enum XpathQuery {
     QUERY_CEI_BODY_IDNO_ID("//cei:body/cei:idno/@id", Namespace.CEI),
     QUERY_CEI_BODY_IDNO_TEXT("//cei:body/cei:idno/text()", Namespace.CEI),
     QUERY_CEI_BODY_IDNO_OLD("//cei:body/cei:idno/@old", Namespace.CEI),
-    QUERY_CEI_CLASS("//cei:class/text()", Namespace.CEI),
+    QUERY_CEI_CLASS("(//cei:class[./parent::cei:chDesc or ./parent::cei:back]/text())[1]", Namespace.CEI),
     QUERY_CEI_COUNTRY_TEXT("//cei:country/text()", Namespace.CEI),
     QUERY_CEI_COUNTRY_ID("//cei:country/@id", Namespace.CEI),
     QUERY_CEI_DIPLOMATIC_ANALYSIS("//cei:diplomaticAnalysis", Namespace.CEI),

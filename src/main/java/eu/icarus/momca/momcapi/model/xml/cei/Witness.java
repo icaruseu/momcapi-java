@@ -36,6 +36,8 @@ public class Witness extends Element {
     @NotNull
     private Optional<PhysicalDesc> physicalDesc = Optional.empty();
     @NotNull
+    private Optional<Rubrum> rubrum = Optional.empty();
+    @NotNull
     private Optional<TraditioForm> traditioForm = Optional.empty();
 
     public Witness() {
@@ -44,9 +46,10 @@ public class Witness extends Element {
 
     public Witness(@Nullable ArchIdentifier archIdentifier, @Nullable Auth auth, @Nullable List<Figure> figures,
                    @NotNull String id, @NotNull String lang, @NotNull String n,
-                   @Nullable Nota nota, @Nullable PhysicalDesc physicalDesc, @Nullable TraditioForm traditioForm) {
+                   @Nullable Nota nota, @Nullable PhysicalDesc physicalDesc, @Nullable Rubrum rubrum,
+                   @Nullable TraditioForm traditioForm) {
         this();
-        initChilds(archIdentifier, auth, figures, nota, physicalDesc, traditioForm);
+        initChilds(archIdentifier, auth, figures, nota, physicalDesc, rubrum, traditioForm);
         initAttributes(id, lang, n);
     }
 
@@ -76,11 +79,15 @@ public class Witness extends Element {
         PhysicalDesc physicalDesc = Util.isEmptyElement(physicalDescElement)
                 ? null : new PhysicalDesc(physicalDescElement);
 
+        Element rubrumElement = witnessElement.getFirstChildElement("rubrum", CEI_URI);
+        Rubrum rubrum = Util.isEmptyElement(rubrumElement)
+                ? null : new Rubrum(rubrumElement);
+
         Element traditioFormElement = witnessElement.getFirstChildElement("traditioForm", CEI_URI);
         TraditioForm traditioForm = Util.isEmptyElement(traditioFormElement)
                 ? null : new TraditioForm(traditioFormElement);
 
-        initChilds(archIdentifier, auth, figures, nota, physicalDesc, traditioForm);
+        initChilds(archIdentifier, auth, figures, nota, physicalDesc, rubrum, traditioForm);
 
         String id = witnessElement.getAttributeValue("id");
         String lang = witnessElement.getAttributeValue("lang");
@@ -131,6 +138,11 @@ public class Witness extends Element {
     }
 
     @NotNull
+    public Optional<Rubrum> getRubrum() {
+        return rubrum;
+    }
+
+    @NotNull
     public Optional<TraditioForm> getTraditioForm() {
         return traditioForm;
     }
@@ -155,7 +167,7 @@ public class Witness extends Element {
     }
 
     private void initChilds(@Nullable ArchIdentifier archIdentifier, @Nullable Auth auth, @Nullable List<Figure> figures,
-                            @Nullable Nota nota, @Nullable PhysicalDesc physicalDesc,
+                            @Nullable Nota nota, @Nullable PhysicalDesc physicalDesc, @Nullable Rubrum rubrum,
                             @Nullable TraditioForm traditioForm) {
 
         if (traditioForm != null) {
@@ -183,6 +195,10 @@ public class Witness extends Element {
             appendChild(nota.copy());
         }
 
+        if (rubrum != null) {
+            this.rubrum = Optional.of(rubrum);
+            appendChild(rubrum.copy());
+        }
 
         if (figures != null && !figures.isEmpty()) {
             this.figures = figures;
@@ -198,6 +214,7 @@ public class Witness extends Element {
                 && figures.isEmpty()
                 && !nota.isPresent()
                 && !physicalDesc.isPresent()
+                && !rubrum.isPresent()
                 && !traditioForm.isPresent();
 
     }
