@@ -9,6 +9,7 @@ import eu.icarus.momca.momcapi.model.resource.User;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,9 +43,21 @@ public interface CharterManager {
      * @param status The status of the charter to delete.
      * @param author The author of the charter to delete. Can be <code>NULL</code> if the charter
      *               is not <code>PRIVATE</code>.
-     * @return <code>True</code> if the deletion was successful.
+     * @return <code>True</code> if the action was successful.
      */
     boolean delete(@NotNull IdCharter id, @NotNull CharterStatus status, @Nullable IdUser author);
+
+    /**
+     * Exports instances of charters to the local hard disk.
+     *
+     * @param charters The list of charters to export.
+     * @param status   The status of the charters to be exported.
+     * @param target   The location to save the charters to.
+     * @param ceiOnly  <code>True</code> if the file should contain only the cei content of the charter,
+     *                 <code>false</code> if the whole charter xml content should be exported, including the <code>ATOM</code> elements.
+     */
+    @SuppressWarnings("unused")
+    void export(@NotNull List<IdCharter> charters, @NotNull CharterStatus status, @NotNull File target, boolean ceiOnly);
 
     /**
      * Gets a charter instance from the database.

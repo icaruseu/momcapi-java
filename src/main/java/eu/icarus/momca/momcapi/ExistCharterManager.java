@@ -15,6 +15,10 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -131,10 +135,106 @@ class ExistCharterManager extends AbstractExistManager implements CharterManager
     }
 
     @Override
+    public void export(@NotNull List<IdCharter> charters, @NotNull CharterStatus status, @NotNull File target, boolean ceiOnly) {
+
+        String absolutePath = target.getAbsolutePath();
+
+        List<String> errors = new ArrayList<>(0);
+        int numberOfCharters = charters.size();
+
+        LOGGER.info("Trying to export {} '{}' charters to '{}'.", numberOfCharters, status, absolutePath);
+
+        boolean proceed = true;
+
+        if (charters.isEmpty()) {
+            proceed = false;
+            LOGGER.info("The list of charters is empty. Aborting export.");
+        }
+
+        if (proceed && !target.exists()) {
+            proceed = false;
+            LOGGER.info("The target '{}' is not existing. Aborting export.", absolutePath);
+        }
+
+        if (proceed) {
+
+            for (IdCharter idCharter : charters) {
+
+                Optional<Charter> charterOptional = getCharterInstance(idCharter, status);
+
+                if (charterOptional.isPresent()) {
+
+                    Charter charter = charterOptional.get();
+
+                    LOGGER.debug("Writing charter '{}' to disk.", idCharter);
+
+                    String path = String.join(
+                            File.separator,
+                            target.getAbsolutePath(),
+                            status.name().toLowerCase(),
+                            idCharter.getHierarchicalUriPartsAsString(),
+                            charter.getResourceName());
+
+                    File outputFile = new File(path);
+
+                    try {
+
+                        if (!outputFile.exists()) {
+                            outputFile.getParentFile().mkdirs();
+                        }
+
+                        String outputFileContent = ceiOnly ? charter.toCei().toXML() : charter.toXML();
+
+                        FileWriter fw = new FileWriter(outputFile.getAbsoluteFile());
+                        BufferedWriter bw = new BufferedWriter(fw);
+                        bw.write(outputFileContent);
+                        bw.close();
+
+                        LOGGER.info("File '{}' written to disk.", path);
+
+                    } catch (IOException e) {
+                        errors.add(String.format("Failed to write '%s' to disk.", path));
+                        LOGGER.info("Failed to write '{}' to disk.", path, e);
+                    }
+
+                } else {
+                    errors.add(String.format("Couldn't locate '%s' charter '%s'.", status, idCharter));
+                    LOGGER.debug("Couldn't locate '{}' charter '{}'.", status, idCharter);
+                }
+
+            }
+
+        }
+
+        if (errors.isEmpty()) {
+            LOGGER.info("Finished exporting {} charters.", numberOfCharters);
+        } else {
+            LOGGER.info("Finished exporting. Exported {} of {} charters.\nErrors:\n{}",
+                    numberOfCharters - errors.size(), numberOfCharters, String.join("\n", errors));
+        }
+
+    }
+
+    @Override
     @NotNull
     public Optional<Charter> get(@NotNull IdCharter id, @NotNull CharterStatus status) {
 
         LOGGER.info("Trying to get charter '{}' with status '{}' from the database.", id, status);
+
+        Optional<Charter> charter = getCharterInstance(id, status);
+
+        LOGGER.info("Returning '{}' for charter '{}' with status '{}' from the database.", charter, id, status);
+
+        return charter;
+
+    }
+
+    @NotNull
+    private Optional<Charter> getCharterFromUri(@NotNull String charterUri) {
+        return momcaConnection.readExistResource(charterUri).map(Charter::new);
+    }
+
+    private Optional<Charter> getCharterInstance(@NotNull IdCharter id, @NotNull CharterStatus status) {
 
         ExistQuery query = ExistQueryFactory.getCharterInstance(id, status);
         List<String> results = momcaConnection.queryDatabase(query);
@@ -156,15 +256,8 @@ class ExistCharterManager extends AbstractExistManager implements CharterManager
 
         }
 
-        LOGGER.info("Returning '{}' for charter '{}' with status '{}' from the database.", charter, id, status);
-
         return charter;
 
-    }
-
-    @NotNull
-    private Optional<Charter> getCharterFromUri(@NotNull String charterUri) {
-        return momcaConnection.readExistResource(charterUri).map(Charter::new);
     }
 
     @Override
