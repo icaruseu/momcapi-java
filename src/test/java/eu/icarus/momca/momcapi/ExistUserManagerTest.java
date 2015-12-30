@@ -21,7 +21,7 @@ public class ExistUserManagerTest {
     @BeforeClass
     public void setUp() throws Exception {
         momcaConnection = TestUtils.initMomcaConnection();
-        existUserManager = momcaConnection.getUserManager();
+        existUserManager = (ExistUserManager) momcaConnection.getUserManager();
         assertNotNull(existUserManager, "MOM-CA connection not initialized.");
     }
 

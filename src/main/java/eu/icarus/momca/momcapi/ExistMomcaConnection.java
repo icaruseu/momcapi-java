@@ -65,7 +65,7 @@ class ExistMomcaConnection implements MomcaConnection {
      * @param admin     The admin username.
      * @param password  The admin password.
      */
-    public ExistMomcaConnection(@NotNull String xmlrpcUri, @NotNull String admin, @NotNull String password) {
+    ExistMomcaConnection(@NotNull String xmlrpcUri, @NotNull String admin, @NotNull String password) {
 
         LOGGER.debug("Initiating connection to '{}' for user '{}'.", xmlrpcUri, admin);
 
@@ -83,7 +83,7 @@ class ExistMomcaConnection implements MomcaConnection {
         charterManager = new ExistCharterManager(this);
         myCollectionManager = new ExistMyCollectionManager(this);
 
-        LOGGER.info("Connection to '{}' for user '{}' established.", xmlrpcUri, admin);
+        LOGGER.debug("Connection to '{}' for user '{}' established.", xmlrpcUri, admin);
 
     }
 
@@ -308,7 +308,7 @@ class ExistMomcaConnection implements MomcaConnection {
             if (e.getMessage().equals("Wrong password for user [admin] ")) {
                 throw new MomcaException("Wrong admin password!", e);
             } else {
-                throw new MomcaException(String.format("Failed to connect to remote database '%s'", dbRootUri), e);
+                throw new MomcaException(String.format("Failed to get to remote database '%s'", dbRootUri), e);
             }
 
         }

@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 /**
  * An implementation of <code>UserManager</code> based on an eXist MOM-CA connection.
  */
-public class ExistUserManager extends AbstractExistManager implements UserManager {
+class ExistUserManager extends AbstractExistManager implements UserManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExistUserManager.class);
     private RemoteUserManagementService remoteUserManagementService;

@@ -55,6 +55,6 @@ public interface MomcaConnection {
      * @return The user manager. Provides actions related to users.
      */
     @NotNull
-    ExistUserManager getUserManager();
+    UserManager getUserManager();
 
 }
