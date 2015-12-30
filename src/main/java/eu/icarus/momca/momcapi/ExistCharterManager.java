@@ -192,11 +192,11 @@ class ExistCharterManager extends AbstractExistManager implements CharterManager
                         bw.write(outputFileContent);
                         bw.close();
 
-                        LOGGER.info("{}/{} File '{}' written to disk.", i + 1, numberOfCharters, path);
+                        LOGGER.info("{}/{} - File '{}' written to disk.", i + 1, numberOfCharters, path);
 
                     } catch (IOException e) {
                         errors.add(String.format("Failed to write '%s' to disk.", path));
-                        LOGGER.info("Failed to write '{}' to disk.", path, e);
+                        LOGGER.info("{}/{} - Failed to write '{}' to disk.", i + 1, numberOfCharters, path, e);
                     }
 
                 } else {
