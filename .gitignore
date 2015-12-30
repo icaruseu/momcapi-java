@@ -1,4 +1,4 @@
-src/test/server.properties
+src/test/connection.properties
 *.iml
 .idea/
 target/
