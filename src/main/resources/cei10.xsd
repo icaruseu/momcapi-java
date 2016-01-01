@@ -1,4 +1,7 @@
-<xs:schema xmlns="http://www.monasterium.net/NS/cei" xmlns:xerces="http://xerces.apache.org" xmlns:xrxe="http://www.monasterium.net/NS/xrxe" xmlns:xrx="http://www.monasterium.net/NS/xrx" xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://www.monasterium.net/NS/cei" id="cei10">
+<xs:schema xmlns:xerces="http://xerces.apache.org" xmlns:xrxe="http://www.monasterium.net/NS/xrxe"
+           xmlns:xrx="http://www.monasterium.net/NS/xrx" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns="http://www.monasterium.net/NS/cei" attributeFormDefault="unqualified" elementFormDefault="qualified"
+           targetNamespace="http://www.monasterium.net/NS/cei" id="cei10">
     <xs:element name="cei">
         <xs:annotation>
             <xs:documentation xml:lang="deu"> Wurzelelement für alle Dokumente, die den Regeln der
@@ -1549,7 +1552,6 @@
             <xs:sequence>
                 <xs:choice minOccurs="0" maxOccurs="unbounded">
                     <xs:element ref="p"/>
-
                 </xs:choice>
             </xs:sequence>
             <xs:attributeGroup ref="reference"/>
@@ -4427,7 +4429,6 @@
                     <xs:group ref="Originalbefund"/>
                 </xs:choice>
             </xs:sequence>
-            <xs:attributeGroup ref="key"/>
             <xs:attributeGroup ref="geog"/>
             <xs:attributeGroup ref="type"/>
             <xs:attributeGroup ref="lang"/>
@@ -5002,7 +5003,6 @@
         <xs:attributeGroup ref="id"/>
         <xs:attributeGroup ref="facs"/>
         <xs:attributeGroup ref="n"/>
-
     </xs:attributeGroup>
     <xs:attributeGroup name="id">
         <xs:attribute name="id">
@@ -5020,7 +5020,6 @@
             </xs:annotation>
         </xs:attribute>
     </xs:attributeGroup>
-
     <xs:attributeGroup name="facs">
         <xs:attribute name="facs">
             <xs:annotation>
