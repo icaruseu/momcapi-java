@@ -115,6 +115,8 @@ public class Charter extends AtomResource {
 
         initCharterFromXml(ceiContent);
 
+        this.creator = Optional.of(author);
+
         regenerateXmlContent();
 
     }
