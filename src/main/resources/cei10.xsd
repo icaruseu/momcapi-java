@@ -4432,7 +4432,6 @@
                     <xs:group ref="Originalbefund"/>
                 </xs:choice>
             </xs:sequence>
-            <xs:attributeGroup ref="key"/>
             <xs:attributeGroup ref="geog"/>
             <xs:attributeGroup ref="type"/>
             <xs:attributeGroup ref="lang"/>
