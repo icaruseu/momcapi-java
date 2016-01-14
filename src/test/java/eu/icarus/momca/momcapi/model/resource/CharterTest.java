@@ -397,7 +397,7 @@ public class CharterTest {
 
         assertEquals(charter.getBackDivNotes().size(), 0);
 
-        Note note1 = new Note("Note1", "Somewhere", "id", "n");
+        Note note1 = new Note("Note1", "Somewhere", "id", "n", "type");
         Note note2 = new Note("Note2", "Over");
         List<Note> notes = new ArrayList<>(2);
         notes.add(note1);
@@ -408,7 +408,7 @@ public class CharterTest {
         assertTrue(charter.isValidCei());
         assertEquals(charter.getBackDivNotes().size(), 2);
         assertEquals(charter.getBackDivNotes().get(1).toXML(), note2.toXML());
-        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued></cei:chDesc></cei:body><cei:back><cei:divNotes><cei:note place=\"Somewhere\" id=\"id\" n=\"n\">Note1</cei:note><cei:note place=\"Over\">Note2</cei:note></cei:divNotes></cei:back></cei:text>");
+        assertEquals(charter.toCei().toXML(), "<cei:text xmlns:cei=\"http://www.monasterium.net/NS/cei\" type=\"charter\"><cei:front /><cei:body><cei:idno id=\"charter1\">charter1</cei:idno><cei:chDesc><cei:issued><cei:date value=\"14180201\">February 1st, 1418</cei:date></cei:issued></cei:chDesc></cei:body><cei:back><cei:divNotes><cei:note place=\"Somewhere\" id=\"id\" n=\"n\" type=\"type\">Note1</cei:note><cei:note place=\"Over\">Note2</cei:note></cei:divNotes></cei:back></cei:text>");
 
         charter.setBackDivNotes(new ArrayList<>(0));
 

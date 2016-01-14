@@ -817,7 +817,7 @@
                                 <xrxe:label>
                                     <xrx:i18n>
                                         <xrx:key>cei_diplomaticAnalysis</xrx:key>
-                                        <xrx:default>Bemerkungen</xrx:default>
+                                        <xrx:default>diplomatic analysis</xrx:default>
                                     </xrx:i18n>
                                 </xrxe:label>
                                 <xrxe:mixed>false</xrxe:mixed>
@@ -1483,7 +1483,7 @@
                     <xs:element ref="notariusSub">
                         <xs:annotation>
                             <xs:appinfo source="EditVDU">
-                                <xrxe:max-occurs>1</xrxe:max-occurs>
+                                <xrxe:max-occur>unbounded</xrxe:max-occur>
                             </xs:appinfo>
                         </xs:annotation>
                     </xs:element>
@@ -1502,6 +1502,38 @@
                     <xs:element ref="num"/>
                 </xs:choice>
             </xs:sequence>
+            <xs:attributeGroup ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="rubrum">
+        <xs:annotation>
+            <xs:appinfo source="EditVDU">
+                <xrxe:label>
+                    <xrx:i18n>
+                        <xrx:key>cei_rubrum</xrx:key>
+                        <xrx:default>rubrum</xrx:default>
+                    </xrx:i18n>
+                </xrxe:label>
+                <xrxe:min-occur>0</xrxe:min-occur>
+                <xrxe:max-occur>unbounded</xrxe:max-occur>
+                <xrxe:content-control>annotation</xrxe:content-control>
+                <xrxe:relevant>false</xrxe:relevant>
+            </xs:appinfo>
+            <xs:documentation xml:lang="deu"> Enthält Vermerke des verwahrenden Archivs oder des Empfängers auf der
+                Urkunde.</xs:documentation>
+            <xs:documentation xml:lang="eng">contains notes on the document applied by the preserving archives or the recipient.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:group ref="Originalbefund"/>
+                    <xs:group ref="Sachliches"/>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attributeGroup ref="type"/>
+            <xs:attribute name="position" type="xs:anySimpleType" use="optional"/>
             <xs:attributeGroup ref="lang"/>
             <xs:attributeGroup ref="standard"/>
         </xs:complexType>
@@ -1712,37 +1744,6 @@
             <xs:documentation xml:lang="deu"> Enthält Vermerke der ausstellenden Kanzlei auf der
                 Urkunde. Für Archivvermerke beim Empfänger vgl. rubrum </xs:documentation>
             <xs:documentation xml:lang="eng">contains the extra sigillum notes on the document.
-            </xs:documentation>
-        </xs:annotation>
-        <xs:complexType mixed="true">
-            <xs:sequence>
-                <xs:choice minOccurs="0" maxOccurs="unbounded">
-                    <xs:group ref="Originalbefund"/>
-                    <xs:group ref="Sachliches"/>
-                </xs:choice>
-            </xs:sequence>
-            <xs:attributeGroup ref="type"/>
-            <xs:attribute name="position" type="xs:anySimpleType" use="optional"/>
-            <xs:attributeGroup ref="lang"/>
-            <xs:attributeGroup ref="standard"/>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="rubrum">
-        <xs:annotation>
-            <xs:appinfo source="EditVDU">
-                <xrxe:label>
-                    <xrx:i18n>
-                        <xrx:key>cei_rubrum</xrx:key>
-                        <xrx:default>rubrum</xrx:default>
-                    </xrx:i18n>
-                </xrxe:label>
-                <xrxe:min-occur>0</xrxe:min-occur>
-                <xrxe:max-occur>unbounded</xrxe:max-occur>
-                <xrxe:content-control>annotation</xrxe:content-control>
-            </xs:appinfo>
-            <xs:documentation xml:lang="deu"> Enthält Vermerke des verwahrenden Archivs oder des Empfängers auf der
-                Urkunde.</xs:documentation>
-            <xs:documentation xml:lang="eng">contains notes on the document applied by the preserving archives or the recipient.
             </xs:documentation>
         </xs:annotation>
         <xs:complexType mixed="true">
@@ -2575,7 +2576,7 @@
                     </xrx:i18n>
                 </xrxe:menu-item>
                 <xrxe:min-occur>0</xrxe:min-occur>
-                <xrxe:max-occurs>unbounded</xrxe:max-occurs>
+                <xrxe:max-occur>unbounded</xrxe:max-occur>
                 <xrxe:content-control>annotation</xrxe:content-control>
                 <xrxe:rows>5</xrxe:rows>
             </xs:appinfo>
@@ -3251,7 +3252,7 @@
                 Markierung als Ordinalzahl unterschieden werden kann. </xs:documentation>
         </xs:annotation>
         <xs:complexType mixed="true">
-            <xs:attribute name="class"/>
+            <xs:attributeGroup ref="type"/>
             <xs:attributeGroup ref="standard"/>
         </xs:complexType>
     </xs:element>
@@ -3517,6 +3518,7 @@
             </xs:sequence>
             <xs:attribute name="place"/>
             <xs:attributeGroup ref="id"/>
+            <xs:attributeGroup ref="type"/>
             <xs:attribute name="n" type="xs:anySimpleType">
                 <xs:annotation>
                     <xs:appinfo source="EditVDU">
@@ -4049,6 +4051,7 @@
                     <xs:element ref="foreign"/>
                     <xs:element ref="num"/>
                     <xs:group ref="Originalbefund"/>
+                    <xs:element ref="ref"/>
                 </xs:choice>
             </xs:sequence>
             <xs:attributeGroup ref="date"/>
@@ -4315,25 +4318,6 @@
             <xs:attributeGroup ref="standard"/>
         </xs:complexType>
     </xs:element>
-    <xs:element name="region">
-        <xs:annotation>
-            <xs:appinfo source="EditVDU">
-                <xrxe:label>
-                    <xrx:i18n>
-                        <xrx:key>cei_region</xrx:key>
-                        <xrx:default>region</xrx:default>
-                    </xrx:i18n>
-                </xrxe:label>
-            </xs:appinfo>
-            <xs:documentation>der Name einer Region, eines Bundeslandes u.ä. </xs:documentation>
-        </xs:annotation>
-        <xs:complexType mixed="true">
-            <xs:attributeGroup ref="type"/>
-            <xs:attributeGroup ref="geog"/>
-            <xs:attributeGroup ref="lang"/>
-            <xs:attributeGroup ref="standard"/>
-        </xs:complexType>
-    </xs:element>
     <xs:element name="class">
         <xs:annotation>
             <xs:appinfo source="EditVDU">
@@ -4344,11 +4328,30 @@
                     </xrx:i18n>
                 </xrxe:label>
             </xs:appinfo>
-            <xs:documentation>Urkundenklassifikation
-              </xs:documentation>
+            <xs:documentation xml:lang="de">Urkundenart</xs:documentation>
         </xs:annotation>
         <xs:complexType mixed="true">
             <xs:attributeGroup ref="type"/>
+            <xs:attributeGroup ref="lang"/>
+            <xs:attributeGroup ref="standard"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="region">
+        <xs:annotation>
+            <xs:appinfo source="EditVDU">
+                <xrxe:label>
+                    <xrx:i18n>
+                        <xrx:key>cei_region</xrx:key>
+                        <xrx:default>region</xrx:default>
+                    </xrx:i18n>
+                </xrxe:label>
+            </xs:appinfo>
+            <xs:documentation>der Name einer Region, eines Bundeslandes u.ä.
+      </xs:documentation>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:attributeGroup ref="type"/>
+            <xs:attributeGroup ref="geog"/>
             <xs:attributeGroup ref="lang"/>
             <xs:attributeGroup ref="standard"/>
         </xs:complexType>
@@ -4429,6 +4432,7 @@
                     <xs:group ref="Originalbefund"/>
                 </xs:choice>
             </xs:sequence>
+            <xs:attributeGroup ref="key"/>
             <xs:attributeGroup ref="geog"/>
             <xs:attributeGroup ref="type"/>
             <xs:attributeGroup ref="lang"/>
@@ -5001,24 +5005,8 @@
     </xs:attributeGroup>
     <xs:attributeGroup name="standard">
         <xs:attributeGroup ref="id"/>
-        <xs:attributeGroup ref="facs"/>
         <xs:attributeGroup ref="n"/>
-    </xs:attributeGroup>
-    <xs:attributeGroup name="id">
-        <xs:attribute name="id">
-            <xs:annotation>
-                <xs:appinfo source="EditVDU">
-                    <xrxe:label>
-                        <xrx:i18n>
-                            <xrx:key>cei_at_id</xrx:key>
-                            <xrx:default>id</xrx:default>
-                        </xrx:i18n>
-                    </xrxe:label>
-                </xs:appinfo>
-                <xs:documentation xml:lang="deu"> Eine im gesamten Dokument eindeutige ID, die mit
-                    einem Buchtstaben beginnt. </xs:documentation>
-            </xs:annotation>
-        </xs:attribute>
+        <xs:attributeGroup ref="facs"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="facs">
         <xs:attribute name="facs">
@@ -5033,6 +5021,24 @@
                 </xs:appinfo>
                 <xs:documentation xml:lang="deu"> Eine eindeutige Verknüpfung des jeweiligen Markup-
                     Tags als Annotation eines Bildes. </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="id">
+        <xs:attribute name="id">
+            <xs:annotation>
+                <xs:appinfo source="EditVDU">
+                    <xrxe:label>
+                        <xrx:i18n>
+                            <xrx:key>cei_at_id</xrx:key>
+                            <xrx:default>id</xrx:default>
+                        </xrx:i18n>
+                    </xrxe:label>
+                </xs:appinfo>
+                <xs:documentation xml:lang="deu">
+          Eine im gesamten Dokument eindeutige ID, die mit einem Buchtstaben
+          beginnt.
+              </xs:documentation>
             </xs:annotation>
         </xs:attribute>
     </xs:attributeGroup>

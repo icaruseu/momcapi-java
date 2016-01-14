@@ -19,6 +19,8 @@ public class Note extends AbstractMixedContentElement {
     private Optional<String> n = Optional.empty();
     @NotNull
     private Optional<String> place = Optional.empty();
+    @NotNull
+    private Optional<String> type = Optional.empty();
 
     public Note(@NotNull String content) {
         super(content, LOCAL_NAME);
@@ -26,12 +28,12 @@ public class Note extends AbstractMixedContentElement {
 
     public Note(@NotNull String content, @NotNull String place) {
         this(content);
-        initAttributes(place, "", "");
+        initAttributes(place, "", "", "");
     }
 
-    public Note(@NotNull String content, @NotNull String place, @NotNull String id, @NotNull String n) {
+    public Note(@NotNull String content, @NotNull String place, @NotNull String id, @NotNull String n, @NotNull String type) {
         this(content);
-        initAttributes(place, id, n);
+        initAttributes(place, id, n, type);
     }
 
     public Note(@NotNull Element noteElement) {
@@ -41,8 +43,9 @@ public class Note extends AbstractMixedContentElement {
         String place = noteElement.getAttributeValue("place");
         String id = noteElement.getAttributeValue("id");
         String n = noteElement.getAttributeValue("n");
+        String type = noteElement.getAttributeValue("type");
 
-        initAttributes(place, id, n);
+        initAttributes(place, id, n, type);
 
     }
 
@@ -61,7 +64,11 @@ public class Note extends AbstractMixedContentElement {
         return place;
     }
 
-    private void initAttributes(@Nullable String place, @Nullable String id, @Nullable String n) {
+    public Optional<String> getType() {
+        return type;
+    }
+
+    private void initAttributes(@Nullable String place, @Nullable String id, @Nullable String n, @Nullable String type) {
 
         if (place != null && !place.isEmpty()) {
             addAttribute(new Attribute("place", place));
@@ -77,6 +84,12 @@ public class Note extends AbstractMixedContentElement {
             addAttribute(new Attribute("n", n));
             this.n = Optional.of(n);
         }
+
+        if (type != null && !type.isEmpty()) {
+            addAttribute(new Attribute("type", type));
+            this.type = Optional.of(n);
+        }
+
 
     }
 
