@@ -6,8 +6,31 @@ This is an API to access and modify the data in a [MOM-CA Database](https://gith
 Usage
 -----
 
-1. Create a new `MomcaConnection` object providing the URL of the databases' xmlrpc, e.g. `xmldb:exist://localhost:8181/xmlrpc` and admin credentials.
-2. Use the various *manager* classes, e.g. `CharterManager`, provided by MomcaConnection to access and modify data.
+1. Create a `connection.properties` file on classpath with the following properties:
+```
+    connectionType=exist
+    connectionUrl=xmldb:exist://[momca-url]/xmlrpc
+    user=admin
+    password=[momca-password]
+```
+2. Get a connection factory and momca connection:
+```
+MomcaConnectionFactory factory = new MomcaConnectionFactory();
+MomcaConnection momca = factory.getMomcaConnection();
+```
+       
+3. Use the various *manager* classes, e.g. `CharterManager`, provided by MomcaConnection to access and modify data:
+```
+CharterManager cm = momca.getCharterManager();
+```
+
+4. Do something with it. For instance, the following snippet gets a list of the ids of the charters of a specific fond:
+```
+List<IdCharter> charterIds = cm.list(new IdFond("AT-StiASei", "SeitenstettenOSB"))
+```
+
+Tests
+-----
 
 To run the unit tests, a new MOM-CA instance must be created and the backup data in `/src/test/resources/test_database_backup.zip` needs to be restored.
 
